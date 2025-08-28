@@ -177,3 +177,988 @@ The error "Could not find the 'updated_at' column of 'host_account' in the schem
 
 The inline editing system is now fully functional and ready for use across all fields in the host accounts table!
 
+---
+
+_**User**_
+
+pleae put a new checkbox column at left of the company.id ui column 
+
+this will allow user to select company ids. only highight the columns within the checked row that are in the host company section of the ui table grid (not the section in the host account section of columns ot the right side of the ui table grid) when this checkbox is selected witha  bg color of light yellow in the bg of the <td> cells in this company section. 
+
+after we have this built, please create a new button above the fetch domains glacier button that is only avialable (not grayed out) when user has 1(no morek, no less) company entities selected with our new checkbox system
+
+user can then click this button that says:
+create new host account
+
+the system will creat a new host account and the proper foreign key will be store in the host_account db table pointing to the host_company db row it was created "under" (by relationship) 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [ ] 🌡️ Add checkbox column for company selection with row highlighting
+- [ ] 🌡️ Create conditional 'Create New Host Account' button
+- [ ] 🌡️ Implement new host account creation functionality
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add checkbox column for company selection with row highlighting
+- [ ] 🌡️ Create conditional 'Create New Host Account' button
+- [ ] 🌡️ Implement new host account creation functionality
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/haccjar2/components/HostAccountsUITableV2.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useMemo } from 'react';
+     4→import { createClient } from '@supabase/supabase-js';
+     5→
+     6→interface HostCompany {
+     7→  id: string;
+     8→  name: string | null;
+     9→  portal_url1: string | null;
+    10→  fk_user_id: string;
+    11→  notes1: string | null;
+    12→  notes2: string | null;
+    13→  notes3: string | null;
+    14→}
+    15→
+    16→interface HostAccountRecord {
+    17→  id: string; // UUID
+    18→  username: string | null;
+    19→  pass: string | null;
+    20→  hostacct_apikey1: string | null;
+    21→  hostacct_api_secret: string | null;
+    22→  api_management_url: string | null;
+    23→  fk_user_id: string;
+    24→  fk_host_company_id: string | null;
+    25→  host_company: HostCompany | null;
+    26→  domains_glacier: string | null;
+    27→}
+    28→
+    29→interface HostAccountsUITableV2Props {
+    30→  data: HostAccountRecord[];
+    31→  userId: string;
+    32→  onDataChange?: () => void;
+    33→}
+    34→
+    35→type SortField = keyof HostAccountRecord;
+    36→type SortOrder = 'asc' | 'desc';
+    37→
+    38→export default function HostAccountsUITableV2({ data, onDataChange }: HostAccountsUITableV2Props) {
+    39→  const [searchTerm, setSearchTerm] = useState('');
+    40→  const [currentPage, setCurrentPage] = useState(1);
+    41→  const [itemsPerPage, setItemsPerPage] = useState(20);
+    42→  const [sortField, setSortField] = useState<SortField>('id');
+    43→  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+    44→  const [selectedHostAccounts, setSelectedHostAccounts] = useState<Set<string>>(new Set());
+    45→  const [selectAll, setSelectAll] = useState(false);
+    46→  const [isLoading, setIsLoading] = useState(false);
+    47→  const [fetchError, setFetchError] = useState<string | null>(null);
+    48→
+    49→  // Inline editing state
+    50→  const [editingCell, setEditingCell] = useState<{id: string, field: string} | null>(null);
+    51→  const [editValue, setEditValue] = useState<string>('');
+    52→  const [isSaving, setIsSaving] = useState(false);
+    53→
+    54→  // Filter and search logic
+    55→  const filteredData = useMemo(() => {
+    56→    return data.filter(item => {
+    57→      // Search filter
+    58→      const searchLower = searchTerm.toLowerCase();
+    59→      const matchesSearch = !searchTerm || 
+    60→        item.username?.toLowerCase().includes(searchLower) ||
+    61→        item.id?.toLowerCase().includes(searchLower) ||
+    62→        item.fk_host_company_id?.toLowerCase().includes(searchLower) ||
+    63→        item.hostacct_apikey1?.toLowerCase().includes(searchLower) ||
+    64→        item.hostacct_api_secret?.toLowerCase().includes(searchLower) ||
+    65→        item.api_management_url?.toLowerCase().includes(searchLower) ||
+    66→        item.host_company?.name?.toLowerCase().includes(searchLower) ||
+    67→        item.host_company?.portal_url1?.toLowerCase().includes(searchLower) ||
+    68→        item.host_company?.notes1?.toLowerCase().includes(searchLower) ||
+    69→        item.host_company?.notes2?.toLowerCase().includes(searchLower) ||
+    70→        item.host_company?.notes3?.toLowerCase().includes(searchLower);
+    71→
+    72→      return matchesSearch;
+    73→    });
+    74→  }, [data, searchTerm]);
+    75→
+    76→  // Sort logic
+    77→  const sortedData = useMemo(() => {
+    78→    const sorted = [...filteredData].sort((a, b) => {
+    79→      let aVal: any = a[sortField];
+    80→      let bVal: any = b[sortField];
+    81→
+    82→      // Handle null values
+    83→      if (aVal === null || aVal === undefined) aVal = '';
+    84→      if (bVal === null || bVal === undefined) bVal = '';
+    85→
+    86→      // Handle object values (like host_company) by converting to string
+    87→      if (typeof aVal === 'object') aVal = '';
+    88→      if (typeof bVal === 'object') bVal = '';
+    89→
+    90→      // Convert to lowercase for string comparison
+    91→      if (typeof aVal === 'string') {
+    92→        aVal = aVal.toLowerCase();
+    93→        bVal = (bVal as string).toLowerCase();
+    94→      }
+    95→
+    96→      if (sortOrder === 'asc') {
+    97→        return aVal > bVal ? 1 : -1;
+    98→      } else {
+    99→        return aVal < bVal ? 1 : -1;
+   100→      }
+   101→    });
+   102→
+   103→    return sorted;
+   104→  }, [filteredData, sortField, sortOrder]);
+   105→
+   106→  // Pagination logic
+   107→  const paginatedData = useMemo(() => {
+   108→    const startIndex = (currentPage - 1) * itemsPerPage;
+   109→    const endIndex = startIndex + itemsPerPage;
+   110→    return sortedData.slice(startIndex, endIndex);
+   111→  }, [sortedData, currentPage, itemsPerPage]);
+   112→
+   113→  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+   114→
+   115→  // Handle sort
+   116→  const handleSort = (field: SortField) => {
+   117→    if (sortField === field) {
+   118→      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+   119→    } else {
+   120→      setSortField(field);
+   121→      setSortOrder('asc');
+   122→    }
+   123→  };
+   124→
+   125→  // Handle select all checkbox
+   126→  const handleSelectAll = (checked: boolean) => {
+   127→    setSelectAll(checked);
+   128→    if (checked) {
+   129→      const allIds = new Set(paginatedData.map(item => item.id));
+   130→      setSelectedHostAccounts(allIds);
+   131→    } else {
+   132→      setSelectedHostAccounts(new Set());
+   133→    }
+   134→  };
+   135→
+   136→  // Handle individual checkbox
+   137→  const handleSelectHostAccount = (hostAccountId: string, checked: boolean) => {
+   138→    const newSelected = new Set(selectedHostAccounts);
+   139→    if (checked) {
+   140→      newSelected.add(hostAccountId);
+   141→    } else {
+   142→      newSelected.delete(hostAccountId);
+   143→      setSelectAll(false);
+   144→    }
+   145→    setSelectedHostAccounts(newSelected);
+   146→    
+   147→    // Check if all visible items are selected
+   148→    if (newSelected.size === paginatedData.length && paginatedData.every(item => newSelected.has(item.id))) {
+   149→      setSelectAll(true);
+   150→    }
+   151→  };
+   152→
+   153→  const truncateText = (text: string | null, maxLength: number = 30) => {
+   154→    if (!text) return '-';
+   155→    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+   156→  };
+   157→
+   158→  const maskPassword = (password: string | null) => {
+   159→    if (!password) return '-';
+   160→    return '••••••••';
+   161→  };
+   162→
+   163→  const maskApiKey = (apiKey: string | null) => {
+   164→    if (!apiKey) return '-';
+   165→    if (apiKey.length <= 8) return '••••••••';
+   166→    return apiKey.substring(0, 4) + '••••••••' + apiKey.substring(apiKey.length - 4);
+   167→  };
+   168→
+   169→  // Inline editing functions
+   170→  const handleCellClick = (id: string, field: string, currentValue: any) => {
+   171→    // Define which fields are editable
+   172→    const editableFields = [
+   173→      'username', 'pass', 'hostacct_apikey1', 'hostacct_api_secret', 'api_management_url',
+   174→      'host_company_name', 'host_company_portal_url1', 'host_company_notes1', 
+   175→      'host_company_notes2', 'host_company_notes3'
+   176→    ];
+   177→    
+   178→    if (!editableFields.includes(field)) {
+   179→      return; // Only allow editing specified fields
+   180→    }
+   181→    setEditingCell({ id, field });
+   182→    setEditValue(currentValue?.toString() || '');
+   183→  };
+   184→
+   185→  const handleCellSave = async () => {
+   186→    if (!editingCell || isSaving) return;
+   187→    
+   188→    const { id, field } = editingCell;
+   189→    setIsSaving(true);
+   190→    
+   191→    try {
+   192→      await updateField(id, field, editValue);
+   193→      setEditingCell(null);
+   194→      setEditValue('');
+   195→      
+   196→      // Refresh the data
+   197→      if (onDataChange) {
+   198→        onDataChange();
+   199→      }
+   200→    } catch (error) {
+   201→      console.error('Error updating API key:', error);
+   202→      setFetchError('Failed to update API key');
+   203→    } finally {
+   204→      setIsSaving(false);
+   205→    }
+   206→  };
+   207→
+   208→  const handleCellCancel = () => {
+   209→    setEditingCell(null);
+   210→    setEditValue('');
+   211→  };
+   212→
+   213→  const updateField = async (id: string, field: string, newValue: string) => {
+   214→    const supabase = createClient(
+   215→      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+   216→      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+   217→    );
+   218→
+   219→    let updateData: any = {};
+   220→    let tableName = 'host_account';
+   221→    let whereClause = { id };
+   222→
+   223→    // Handle host_company fields differently
+   224→    if (field.startsWith('host_company_')) {
+   225→      const companyField = field.replace('host_company_', '');
+   226→      const item = data.find(d => d.id === id);
+   227→      if (!item?.host_company?.id) {
+   228→        throw new Error('Host company not found');
+   229→      }
+   230→      
+   231→      tableName = 'host_company';
+   232→      whereClause = { id: item.host_company.id };
+   233→      updateData[companyField] = newValue;
+   234→      
+   235→      // Only add updated_at for host_company table if it exists
+   236→      updateData.updated_at = new Date().toISOString();
+   237→    } else {
+   238→      // Handle host_account fields - don't add updated_at since it doesn't exist
+   239→      updateData[field] = newValue;
+   240→    }
+   241→
+   242→    const { error } = await supabase
+   243→      .from(tableName)
+   244→      .update(updateData)
+   245→      .eq('id', whereClause.id);
+   246→
+   247→    if (error) {
+   248→      throw new Error(error.message);
+   249→    }
+   250→  };
+   251→
+   252→  const copyToClipboard = async (text: string) => {
+   253→    try {
+   254→      await navigator.clipboard.writeText(text);
+   255→    } catch (err) {
+   256→      console.error('Failed to copy text: ', err);
+   257→    }
+   258→  };
+   259→
+   260→  const renderEditableCell = (item: HostAccountRecord, field: string, value: any, className: string = "px-4 py-2 text-gray-500", isUrl: boolean = false) => {
+   261→    const cellId = item.id;
+   262→    const isEditing = editingCell?.id === cellId && editingCell?.field === field;
+   263→    
+   264→    return (
+   265→      <td className={`${className} group cursor-pointer hover:bg-blue-50 relative`}
+   266→          onClick={() => handleCellClick(cellId, field, value)}>
+   267→        {isEditing ? (
+   268→          <div className="flex items-center space-x-1">
+   269→            <input
+   270→              type="text"
+   271→              value={editValue}
+   272→              onChange={(e) => setEditValue(e.target.value)}
+   273→              onKeyDown={handleKeyDown}
+   274→              className="flex-1 px-2 py-1 text-xs border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+   275→              placeholder={`Enter ${field}`}
+   276→              autoFocus
+   277→              disabled={isSaving}
+   278→            />
+   279→            <button
+   280→              onClick={(e) => { e.stopPropagation(); handleCellSave(); }}
+   281→              disabled={isSaving}
+   282→              className="px-1 py-1 text-green-600 hover:text-green-800 disabled:opacity-50"
+   283→              title="Save (Enter)"
+   284→            >
+   285→              ✓
+   286→            </button>
+   287→            <button
+   288→              onClick={(e) => { e.stopPropagation(); handleCellCancel(); }}
+   289→              disabled={isSaving}
+   290→              className="px-1 py-1 text-red-600 hover:text-red-800 disabled:opacity-50"
+   291→              title="Cancel (Esc)"
+   292→            >
+   293→              ✕
+   294→            </button>
+   295→          </div>
+   296→        ) : (
+   297→          <div className="flex items-center justify-between">
+   298→            <span className={field.includes('pass') || field.includes('secret') ? 'font-mono text-xs' : ''}>
+   299→              {field.includes('pass') ? maskPassword(value) : 
+   300→               field === 'hostacct_apikey1' ? maskApiKey(value) :
+   301→               field.includes('secret') ? maskApiKey(value) :
+   302→               value || '-'}
+   303→            </span>
+   304→            <div className="flex items-center space-x-1">
+   305→              {isUrl && value && (
+   306→                <>
+   307→                  <button
+   308→                    onClick={(e) => {
+   309→                      e.stopPropagation();
+   310→                      window.open(value, '_blank');
+   311→                    }}
+   312→                    className="opacity-0 group-hover:opacity-100 p-1 text-blue-500 hover:text-blue-700 text-xs border border-blue-300 rounded"
+   313→                    title="Open in new tab"
+   314→                  >
+   315→                    ⧉
+   316→                  </button>
+   317→                  <button
+   318→                    onClick={(e) => {
+   319→                      e.stopPropagation();
+   320→                      copyToClipboard(value);
+   321→                    }}
+   322→                    className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-gray-700 text-xs border border-gray-300 rounded"
+   323→                    title="Copy URL"
+   324→                  >
+   325→                    📋
+   326→                  </button>
+   327→                </>
+   328→              )}
+   329→              <span className="opacity-0 group-hover:opacity-100 text-blue-500 text-xs ml-1">✎</span>
+   330→            </div>
+   331→          </div>
+   332→        )}
+   333→      </td>
+   334→    );
+   335→  };
+   336→
+   337→  const handleKeyDown = (e: React.KeyboardEvent) => {
+   338→    if (e.key === 'Enter') {
+   339→      e.preventDefault();
+   340→      handleCellSave();
+   341→    } else if (e.key === 'Escape') {
+   342→      e.preventDefault();
+   343→      handleCellCancel();
+   344→    }
+   345→  };
+   346→
+   347→  const handleFetchDomains = async () => {
+   348→    const selectedId = Array.from(selectedHostAccounts)[0];
+   349→    const selectedAccount = data.find(account => account.id === selectedId);
+   350→    
+   351→    if (!selectedAccount) {
+   352→      setFetchError('Selected account not found');
+   353→      return;
+   354→    }
+   355→
+   356→    setIsLoading(true);
+   357→    setFetchError(null);
+   358→
+   359→    try {
+   360→      console.log('Fetching domains for account:', selectedAccount);
+   361→      
+   362→      const response = await fetch('/api/fetch-domains', {
+   363→        method: 'POST',
+   364→        headers: {
+   365→          'Content-Type': 'application/json',
+   366→        },
+   367→        body: JSON.stringify({
+   368→          host_account_id: selectedAccount.id
+   369→        })
+   370→      });
+   371→
+   372→      const result = await response.json();
+   373→
+   374→      if (result.success) {
+   375→        console.log('Successfully fetched domains:', result);
+   376→        // Refresh the data to show updated domains_glacier
+   377→        if (onDataChange) {
+   378→          onDataChange();
+   379→        }
+   380→      } else {
+   381→        console.error('Error fetching domains:', result.error);
+   382→        setFetchError(result.error);
+   383→      }
+   384→    } catch (error) {
+   385→      console.error('Error calling fetch domains API:', error);
+   386→      setFetchError('Network error occurred while fetching domains');
+   387→    } finally {
+   388→      setIsLoading(false);
+   389→    }
+   390→  };
+   391→
+   392→  return (
+   393→    <div className="space-y-4">
+   394→      {/* Search */}
+   395→      <div className="bg-white p-4 rounded-lg shadow">
+   396→        <div className="flex items-center space-x-4">
+   397→          <input
+   398→            type="text"
+   399→            placeholder="Search host accounts..."
+   400→            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+   401→            value={searchTerm}
+   402→            onChange={(e) => {
+   403→              setSearchTerm(e.target.value);
+   404→              setCurrentPage(1);
+   405→            }}
+   406→          />
+   407→        </div>
+   408→      </div>
+   409→
+   410→      {/* Results count */}
+   411→      <div className="text-sm text-gray-600">
+   412→        Showing {paginatedData.length} of {sortedData.length} results
+   413→      </div>
+   414→
+   415→      {/* Table */}
+   416→      <div className="bg-white rounded-lg shadow overflow-hidden">
+   417→        <div className="overflow-x-auto">
+   418→          <table className="w-full text-sm">
+   419→            <thead className="bg-gray-50">
+   420→              <tr>
+   421→                {/* Host Company columns on the left */}
+   422→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   423→                  company.id
+   424→                </th>
+   425→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   426→                  company.name
+   427→                </th>
+   428→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   429→                  company.portal_url1
+   430→                </th>
+   431→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   432→                  company.fk_user_id
+   433→                </th>
+   434→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   435→                  company.notes1
+   436→                </th>
+   437→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   438→                  company.notes2
+   439→                </th>
+   440→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   441→                  company.notes3
+   442→                </th>
+   443→                {/* Separator column */}
+   444→                <th className="px-2 bg-gray-200"></th>
+   445→                {/* Checkbox column */}
+   446→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   447→                  <div className="flex items-center">
+   448→                    <input
+   449→                      type="checkbox"
+   450→                      checked={selectAll}
+   451→                      onChange={(e) => handleSelectAll(e.target.checked)}
+   452→                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+   453→                    />
+   454→                    <span className="ml-2">(checkbox)</span>
+   455→                  </div>
+   456→                </th>
+   457→                {/* Host Account columns on the right */}
+   458→                <th 
+   459→                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+   460→                  onClick={() => handleSort('id')}
+   461→                >
+   462→                  account.id {sortField === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
+   463→                </th>
+   464→                <th 
+   465→                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+   466→                  onClick={() => handleSort('username')}
+   467→                >
+   468→                  account.username {sortField === 'username' && (sortOrder === 'asc' ? '↑' : '↓')}
+   469→                </th>
+   470→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   471→                  account.pass
+   472→                </th>
+   473→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   474→                  account.hostacct_apikey1
+   475→                </th>
+   476→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   477→                  account.hostacct_api_secret
+   478→                </th>
+   479→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   480→                  account.api_management_url
+   481→                </th>
+   482→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   483→                  account.fk_user_id
+   484→                </th>
+   485→                <th 
+   486→                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+   487→                  onClick={() => handleSort('fk_host_company_id')}
+   488→                >
+   489→                  account.fk_host_company_id {sortField === 'fk_host_company_id' && (sortOrder === 'asc' ? '↑' : '↓')}
+   490→                </th>
+   491→              </tr>
+   492→            </thead>
+   493→            <tbody className="bg-white divide-y divide-gray-200">
+   494→              {paginatedData.map((item) => (
+   495→                <tr key={item.id} className="hover:bg-gray-50">
+   496→                  {/* Host Company columns */}
+   497→                  <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
+   498→                    {item.host_company ? truncateText(item.host_company.id, 8) + '...' : '-'}
+   499→                  </td>
+   500→                  {renderEditableCell(item, 'host_company_name', item.host_company?.name, "px-4 py-2 text-gray-900 font-medium")}
+   501→                  {renderEditableCell(item, 'host_company_portal_url1', item.host_company?.portal_url1, "px-4 py-2 text-blue-600", true)}
+   502→                  <td className="px-4 py-2 whitespace-nowrap text-gray-500 text-xs">
+   503→                    {item.host_company ? truncateText(item.host_company.fk_user_id, 8) + '...' : '-'}
+   504→                  </td>
+   505→                  {renderEditableCell(item, 'host_company_notes1', item.host_company?.notes1, "px-4 py-2 text-gray-600")}
+   506→                  {renderEditableCell(item, 'host_company_notes2', item.host_company?.notes2, "px-4 py-2 text-gray-600")}
+   507→                  {renderEditableCell(item, 'host_company_notes3', item.host_company?.notes3, "px-4 py-2 text-gray-600")}
+   508→                  {/* Separator column */}
+   509→                  <td className="px-2 bg-gray-200"></td>
+   510→                  {/* Checkbox column */}
+   511→                  <td className="px-4 py-2 whitespace-nowrap">
+   512→                    <input
+   513→                      type="checkbox"
+   514→                      checked={selectedHostAccounts.has(item.id)}
+   515→                      onChange={(e) => handleSelectHostAccount(item.id, e.target.checked)}
+   516→                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+   517→                    />
+   518→                  </td>
+   519→                  {/* Host Account columns */}
+   520→                  <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
+   521→                    {truncateText(item.id, 8)}...
+   522→                  </td>
+   523→                  {renderEditableCell(item, 'username', item.username, "px-4 py-2 text-gray-900 font-medium")}
+   524→                  {renderEditableCell(item, 'pass', item.pass, "px-4 py-2 text-gray-500")}
+   525→                  {renderEditableCell(item, 'hostacct_apikey1', item.hostacct_apikey1, "px-4 py-2 text-gray-500 font-mono text-xs")}
+   526→                  {renderEditableCell(item, 'hostacct_api_secret', item.hostacct_api_secret, "px-4 py-2 text-gray-500 font-mono text-xs")}
+   527→                  {renderEditableCell(item, 'api_management_url', item.api_management_url, "px-4 py-2 text-blue-600", true)}
+   528→                  <td className="px-4 py-2 whitespace-nowrap text-gray-500 text-xs">
+   529→                    {truncateText(item.fk_user_id, 8)}...
+   530→                  </td>
+   531→                  <td className="px-4 py-2 whitespace-nowrap text-gray-500 text-xs">
+   532→                    {item.fk_host_company_id ? truncateText(item.fk_host_company_id, 8) + '...' : '-'}
+   533→                  </td>
+   534→                </tr>
+   535→              ))}
+   536→              {paginatedData.length === 0 && (
+   537→                <tr>
+   538→                  <td colSpan={18} className="px-4 py-8 text-center text-gray-500">
+   539→                    No host accounts found
+   540→                  </td>
+   541→                </tr>
+   542→              )}
+   543→            </tbody>
+   544→          </table>
+   545→        </div>
+   546→      </div>
+   547→
+   548→      {/* Pagination */}
+   549→      <div className="flex items-center justify-between">
+   550→        <div className="flex items-center space-x-2">
+   551→          <span className="text-sm text-gray-700">Items per page:</span>
+   552→          <select
+   553→            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+   554→            value={itemsPerPage}
+   555→            onChange={(e) => {
+   556→              setItemsPerPage(Number(e.target.value));
+   557→              setCurrentPage(1);
+   558→            }}
+   559→          >
+   560→            <option value={10}>10</option>
+   561→            <option value={20}>20</option>
+   562→            <option value={50}>50</option>
+   563→            <option value={100}>100</option>
+   564→          </select>
+   565→        </div>
+   566→
+   567→        <div className="flex items-center space-x-2">
+   568→          <button
+   569→            className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   570→            onClick={() => setCurrentPage(1)}
+   571→            disabled={currentPage === 1}
+   572→          >
+   573→            First
+   574→          </button>
+   575→          <button
+   576→            className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   577→            onClick={() => setCurrentPage(currentPage - 1)}
+   578→            disabled={currentPage === 1}
+   579→          >
+   580→            Previous
+   581→          </button>
+   582→          <span className="text-sm text-gray-700">
+   583→            Page {currentPage} of {totalPages || 1}
+   584→          </span>
+   585→          <button
+   586→            className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   587→            onClick={() => setCurrentPage(currentPage + 1)}
+   588→            disabled={currentPage === totalPages || totalPages === 0}
+   589→          >
+   590→            Next
+   591→          </button>
+   592→          <button
+   593→            className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   594→            onClick={() => setCurrentPage(totalPages)}
+   595→            disabled={currentPage === totalPages || totalPages === 0}
+   596→          >
+   597→            Last
+   598→          </button>
+   599→        </div>
+   600→      </div>
+   601→
+   602→      {/* Action Button */}
+   603→      <div className="mt-4 flex flex-col items-center space-y-2">
+   604→        <button
+   605→          className="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400"
+   606→          onClick={handleFetchDomains}
+   607→          disabled={selectedHostAccounts.size !== 1 || isLoading}
+   608→        >
+   609→          {isLoading ? 'Fetching domains...' : 'fetch domains_glacier'}
+   610→        </button>
+   611→        
+   612→        {fetchError && (
+   613→          <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md">
+   614→            Error: {fetchError}
+   615→          </div>
+   616→        )}
+   617→      </div>
+   618→
+   619→      {/* Domains Glacier Text Box */}
+   620→      <div className="mt-6">
+   621→        <div className="mb-2">
+   622→          <span className="text-sm font-bold text-gray-700">
+   623→            host_account.domains_glacier {selectedHostAccounts.size === 1 && (() => {
+   624→              const selectedId = Array.from(selectedHostAccounts)[0];
+   625→              const selectedAccount = data.find(account => account.id === selectedId);
+   626→              const companyName = selectedAccount?.host_company?.name || 'unknown';
+   627→              const username = selectedAccount?.username || 'unknown';
+   628→              return `(${companyName} - ${username})`;
+   629→            })()}
+   630→          </span>
+   631→        </div>
+   632→        <textarea
+   633→          className="w-full h-64 px-4 py-3 border border-gray-300 rounded-md text-sm font-mono resize-vertical focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+   634→          placeholder={selectedHostAccounts.size === 1 ? "Domain data will appear here after fetching..." : "Select exactly one host account to view domains_glacier data"}
+   635→          value={(() => {
+   636→            if (selectedHostAccounts.size === 1) {
+   637→              const selectedId = Array.from(selectedHostAccounts)[0];
+   638→              const selectedAccount = data.find(account => account.id === selectedId);
+   639→              return selectedAccount?.domains_glacier || '';
+   640→            }
+   641→            return '';
+   642→          })()}
+   643→          readOnly
+   644→        />
+   645→      </div>
+   646→    </div>
+   647→  );
+   648→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to modify the table to add company-specific checkboxes and selection functionality. Let me implement the changes:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/haccjar2/components/HostAccountsUITableV2.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    40→  const [currentPage, setCurrentPage] = useState(1);
+    41→  const [itemsPerPage, setItemsPerPage] = useState(20);
+    42→  const [sortField, setSortField] = useState<SortField>('id');
+    43→  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+    44→  const [selectedHostAccounts, setSelectedHostAccounts] = useState<Set<string>>(new Set());
+    45→  const [selectAll, setSelectAll] = useState(false);
+    46→  const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
+    47→  const [isLoading, setIsLoading] = useState(false);
+    48→  const [fetchError, setFetchError] = useState<string | null>(null);
+    49→
+    50→  // Inline editing state
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/haccjar2/components/HostAccountsUITableV2.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   122→      setSortOrder('asc');
+   123→    }
+   124→  };
+   125→
+   126→  // Handle select all checkbox
+   127→  const handleSelectAll = (checked: boolean) => {
+   128→    setSelectAll(checked);
+   129→    if (checked) {
+   130→      const allIds = new Set(paginatedData.map(item => item.id));
+   131→      setSelectedHostAccounts(allIds);
+   132→    } else {
+   133→      setSelectedHostAccounts(new Set());
+   134→    }
+   135→  };
+   136→
+   137→  // Handle individual checkbox
+   138→  const handleSelectHostAccount = (hostAccountId: string, checked: boolean) => {
+   139→    const newSelected = new Set(selectedHostAccounts);
+   140→    if (checked) {
+   141→      newSelected.add(hostAccountId);
+   142→    } else {
+   143→      newSelected.delete(hostAccountId);
+   144→      setSelectAll(false);
+   145→    }
+   146→    setSelectedHostAccounts(newSelected);
+   147→    
+   148→    // Check if all visible items are selected
+   149→    if (newSelected.size === paginatedData.length && paginatedData.every(item => newSelected.has(item.id))) {
+   150→      setSelectAll(true);
+   151→    }
+   152→  };
+   153→
+   154→  // Handle company checkbox selection
+   155→  const handleSelectCompany = (companyId: string, checked: boolean) => {
+   156→    const newSelected = new Set(selectedCompanies);
+   157→    if (checked) {
+   158→      newSelected.add(companyId);
+   159→    } else {
+   160→      newSelected.delete(companyId);
+   161→    }
+   162→    setSelectedCompanies(newSelected);
+   163→  };
+   164→
+   165→  const truncateText = (text: string | null, maxLength: number = 30) => {
+   166→    if (!text) return '-';
+   167→    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the new create host account function and update the table headers and body to include the company checkbox column:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/haccjar2/components/HostAccountsUITableV2.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   355→      handleCellCancel();
+   356→    }
+   357→  };
+   358→
+   359→  const handleFetchDomains = async () => {
+   360→    const selectedId = Array.from(selectedHostAccounts)[0];
+   361→    const selectedAccount = data.find(account => account.id === selectedId);
+   362→    
+   363→    if (!selectedAccount) {
+   364→      setFetchError('Selected account not found');
+   365→      return;
+   366→    }
+   367→
+   368→    setIsLoading(true);
+   369→    setFetchError(null);
+   370→
+   371→    try {
+   372→      console.log('Fetching domains for account:', selectedAccount);
+   373→      
+   374→      const response = await fetch('/api/fetch-domains', {
+   375→        method: 'POST',
+   376→        headers: {
+   377→          'Content-Type': 'application/json',
+   378→        },
+   379→        body: JSON.stringify({
+   380→          host_account_id: selectedAccount.id
+   381→        })
+   382→      });
+   383→
+   384→      const result = await response.json();
+   385→
+   386→      if (result.success) {
+   387→        console.log('Successfully fetched domains:', result);
+   388→        // Refresh the data to show updated domains_glacier
+   389→        if (onDataChange) {
+   390→          onDataChange();
+   391→        }
+   392→      } else {
+   393→        console.error('Error fetching domains:', result.error);
+   394→        setFetchError(result.error);
+   395→      }
+   396→    } catch (error) {
+   397→      console.error('Error calling fetch domains API:', error);
+   398→      setFetchError('Network error occurred while fetching domains');
+   399→    } finally {
+   400→      setIsLoading(false);
+   401→    }
+   402→  };
+   403→
+   404→  const handleCreateNewHostAccount = async () => {
+   405→    if (selectedCompanies.size !== 1) {
+   406→      setFetchError('Please select exactly one company to create a host account');
+   407→      return;
+   408→    }
+   409→
+   410→    setIsLoading(true);
+   411→    setFetchError(null);
+   412→
+   413→    try {
+   414→      const selectedCompanyId = Array.from(selectedCompanies)[0];
+   415→      const selectedCompanyData = data.find(item => item.host_company?.id === selectedCompanyId);
+   416→      
+   417→      if (!selectedCompanyData?.host_company) {
+   418→        setFetchError('Selected company not found');
+   419→        return;
+   420→      }
+   421→
+   422→      const supabase = createClient(
+   423→        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+   424→        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+   425→      );
+   426→
+   427→      // Create new host account
+   428→      const { data: newAccount, error } = await supabase
+   429→        .from('host_account')
+   430→        .insert([
+   431→          {
+   432→            fk_host_company_id: selectedCompanyId,
+   433→            fk_user_id: selectedCompanyData.host_company.fk_user_id,
+   434→            username: null,
+   435→            pass: null,
+   436→            hostacct_apikey1: null,
+   437→            hostacct_api_secret: null,
+   438→            api_management_url: null,
+   439→            domains_glacier: null
+   440→          }
+   441→        ])
+   442→        .select();
+   443→
+   444→      if (error) {
+   445→        console.error('Error creating host account:', error);
+   446→        setFetchError('Failed to create host account: ' + error.message);
+   447→        return;
+   448→      }
+   449→
+   450→      console.log('Successfully created new host account:', newAccount);
+   451→      
+   452→      // Refresh the data to show the new host account
+   453→      if (onDataChange) {
+   454→        onDataChange();
+   455→      }
+   456→
+   457→      // Clear company selection after successful creation
+   458→      setSelectedCompanies(new Set());
+   459→      
+   460→    } catch (error) {
+   461→      console.error('Error creating host account:', error);
+   462→      setFetchError('Network error occurred while creating host account');
+   463→    } finally {
+   464→      setIsLoading(false);
+   465→    }
+   466→  };
+   467→
+   468→  return (
+   469→    <div className="space-y-4">
+   470→      {/* Search */}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the table header to add the company checkbox column at the left:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/haccjar2/components/HostAccountsUITableV2.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   491→      {/* Table */}
+   492→      <div className="bg-white rounded-lg shadow overflow-hidden">
+   493→        <div className="overflow-x-auto">
+   494→          <table className="w-full text-sm">
+   495→            <thead className="bg-gray-50">
+   496→              <tr>
+   497→                {/* Company checkbox column */}
+   498→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   499→                  <span className="text-xs">Company ☐</span>
+   500→                </th>
+   501→                {/* Host Company columns on the left */}
+   502→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   503→                  company.id
+   504→                </th>
+   505→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   506→                  company.name
+   507→                </th>
+   508→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the table body to include the company checkbox and highlight functionality:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/haccjar2/components/HostAccountsUITableV2.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   569→                  account.fk_host_company_id {sortField === 'fk_host_company_id' && (sortOrder === 'asc' ? '↑' : '↓')}
+   570→                </th>
+   571→              </tr>
+   572→            </thead>
+   573→            <tbody className="bg-white divide-y divide-gray-200">
+   574→              {paginatedData.map((item) => {
+   575→                const isCompanySelected = item.host_company?.id && selectedCompanies.has(item.host_company.id);
+   576→                const companyColumnClass = isCompanySelected ? "px-4 py-2 bg-yellow-100" : "px-4 py-2";
+   577→                
+   578→                return (
+   579→                <tr key={item.id} className="hover:bg-gray-50">
+   580→                  {/* Company checkbox column */}
+   581→                  <td className="px-4 py-2 whitespace-nowrap">
+   582→                    {item.host_company?.id && (
+   583→                      <input
+   584→                        type="checkbox"
+   585→                        checked={selectedCompanies.has(item.host_company.id)}
+   586→                        onChange={(e) => handleSelectCompany(item.host_company!.id, e.target.checked)}
+   587→                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+   588→                      />
+   589→                    )}
+   590→                  </td>
+   591→                  {/* Host Company columns */}
+   592→                  <td className={`${companyColumnClass} whitespace-nowrap text-gray-900 text-xs`}>
+   593→                    {item.host_company ? truncateText(item.host_company.id, 8) + '...' : '-'}
+   594→                  </td>
+   595→                  {renderEditableCell(item, 'host_company_name', item.host_company?.name, `${companyColumnClass} text-gray-900 font-medium`)}
+   596→                  {renderEditableCell(item, 'host_company_portal_url1', item.host_company?.portal_url1, `${companyColumnClass} text-blue-600`, true)}
+   597→                  <td className={`${companyColumnClass} whitespace-nowrap text-gray-500 text-xs`}>
+   598→                    {item.host_company ? truncateText(item.host_company.fk_user_id, 8) + '...' : '-'}
+   599→                  </td>
+   600→                  {renderEditableCell(item, 'host_company_notes1', item.host_company?.notes1, `${companyColumnClass} text-gray-600`)}
+   601→                  {renderEditableCell(item, 'host_company_notes2', item.host_company?.notes2, `${companyColumnClass} text-gray-600`)}
+   602→                  {renderEditableCell(item, 'host_company_notes3', item.host_company?.notes3, `${companyColumnClass} text-gray-600`)}
+   603→                  {/* Separator column */}
+   604→                  <td className="px-2 bg-gray-200"></td>
+   605→                  {/* Checkbox column */}
+   606→                  <td className="px-4 py-2 whitespace-nowrap">
+```
+

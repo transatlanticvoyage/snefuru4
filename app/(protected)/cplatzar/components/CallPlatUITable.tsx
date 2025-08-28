@@ -44,6 +44,9 @@ export default function CallPlatUITable({ data, userId, onDataChange }: CallPlat
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
+  const [showCreateCompanyForm, setShowCreateCompanyForm] = useState(false);
+  const [newCompanyName, setNewCompanyName] = useState('');
+  const [newCompanyPortalUrl, setNewCompanyPortalUrl] = useState('');
   const supabase = createClientComponentClient();
 
   // Filter data based on search term
@@ -67,6 +70,71 @@ export default function CallPlatUITable({ data, userId, onDataChange }: CallPlat
       newSelected.delete(companyId);
     }
     setSelectedCompanies(newSelected);
+  };
+
+  const handleCreateNewCallPlatCompany = async () => {
+    if (!newCompanyName.trim()) {
+      setFetchError('Company name is required');
+      return;
+    }
+
+    setIsLoading(true);
+    setFetchError(null);
+
+    try {
+      // Get the user's internal ID first
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', userId)
+        .single();
+
+      if (userError || !userData) {
+        setFetchError('User not found');
+        return;
+      }
+
+      // Create new call platform company via API
+      const response = await fetch('/api/create_callplat_company', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_internal_id: userData.id,
+          cplatcompany_name: newCompanyName.trim(),
+          portal_url1: newCompanyPortalUrl.trim(),
+          note1: '',
+          note2: '',
+          note3: ''
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        setFetchError(result.error || 'Failed to create call platform company');
+        return;
+      }
+
+      console.log('Successfully created new call platform company:', result.data);
+      
+      // Reset form and hide it
+      setNewCompanyName('');
+      setNewCompanyPortalUrl('');
+      setShowCreateCompanyForm(false);
+      
+      // Refresh the data to show the new company
+      if (onDataChange) {
+        onDataChange();
+      }
+      
+    } catch (error) {
+      console.error('Error creating call platform company:', error);
+      setFetchError('Network error occurred while creating call platform company');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCreateNewCallPlatAccount = async () => {
@@ -226,23 +294,93 @@ export default function CallPlatUITable({ data, userId, onDataChange }: CallPlat
 
       {/* Action Buttons */}
       <div className="bg-white p-4 rounded-lg shadow">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={handleCreateNewCallPlatAccount}
-            disabled={selectedCompanies.size !== 1 || isLoading}
-            className={`px-4 py-2 rounded-md font-medium ${
-              selectedCompanies.size === 1 && !isLoading
-                ? 'bg-green-600 hover:bg-green-700 text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            {isLoading ? 'Creating...' : 'Create New Call Platform Account'}
-          </button>
-          
-          <div className="text-sm text-gray-600">
-            {selectedCompanies.size === 0 && 'Select exactly 1 company to create account'}
-            {selectedCompanies.size === 1 && 'Ready to create new account'}
-            {selectedCompanies.size > 1 && `${selectedCompanies.size} companies selected (select only 1)`}
+        <div className="space-y-4">
+          {/* Create New Company Section */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setShowCreateCompanyForm(!showCreateCompanyForm)}
+              disabled={isLoading}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium disabled:bg-gray-400"
+            >
+              {showCreateCompanyForm ? 'Cancel' : 'Create New Call Platform Company'}
+            </button>
+            
+            <div className="text-sm text-gray-600">
+              Add a new call platform provider (Nimbata, Ringba, Twilio, etc.)
+            </div>
+          </div>
+
+          {/* Create Company Form */}
+          {showCreateCompanyForm && (
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Company Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newCompanyName}
+                    onChange={(e) => setNewCompanyName(e.target.value)}
+                    placeholder="e.g., Nimbata, Ringba, Twilio"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Portal URL (optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={newCompanyPortalUrl}
+                    onChange={(e) => setNewCompanyPortalUrl(e.target.value)}
+                    placeholder="https://app.nimbata.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  onClick={() => setShowCreateCompanyForm(false)}
+                  disabled={isLoading}
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateNewCallPlatCompany}
+                  disabled={isLoading || !newCompanyName.trim()}
+                  className={`px-4 py-2 rounded-md font-medium ${
+                    !isLoading && newCompanyName.trim()
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {isLoading ? 'Creating...' : 'Create Company'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Create New Account Section */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleCreateNewCallPlatAccount}
+              disabled={selectedCompanies.size !== 1 || isLoading}
+              className={`px-4 py-2 rounded-md font-medium ${
+                selectedCompanies.size === 1 && !isLoading
+                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              {isLoading ? 'Creating...' : 'Create New Call Platform Account'}
+            </button>
+            
+            <div className="text-sm text-gray-600">
+              {selectedCompanies.size === 0 && 'Select exactly 1 company to create account'}
+              {selectedCompanies.size === 1 && 'Ready to create new account'}
+              {selectedCompanies.size > 1 && `${selectedCompanies.size} companies selected (select only 1)`}
+            </div>
           </div>
         </div>
       </div>

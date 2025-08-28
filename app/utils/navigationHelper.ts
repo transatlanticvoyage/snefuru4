@@ -297,7 +297,8 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
     { name: 'haccjar2', path: '/haccjar2' },
     { name: 'cdnjar', path: '/cdnjar' },
     { name: 'glacr', path: '/glacr' },
-    { name: '/planchjar', path: '/planchjar' }
+    { name: '/planchjar', path: '/planchjar' },
+    { name: 'cplatzar', path: '/cplatzar' }
   ];
 
   // Debug logging

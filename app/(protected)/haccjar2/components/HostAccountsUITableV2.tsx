@@ -13,14 +13,15 @@ interface HostCompany {
 }
 
 interface HostAccountRecord {
-  id: string; // UUID
+  id: string | null; // UUID - can be null for companies without accounts
   username: string | null;
   pass: string | null;
   hostacct_apikey1: string | null;
-  fk_user_id: string;
+  fk_user_id: string | null; // Can be null for companies without accounts
   fk_host_company_id: string | null;
   host_company: HostCompany | null;
   domains_glacier: string | null;
+  _is_company_only?: boolean; // Flag to indicate this is a company without account
 }
 
 interface HostAccountsUITableV2Props {
@@ -115,7 +116,8 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked);
     if (checked) {
-      const allIds = new Set(paginatedData.map(item => item.id));
+      // Only select items that have account IDs (not companies without accounts)
+      const allIds = new Set(paginatedData.filter(item => item.id).map(item => item.id!));
       setSelectedHostAccounts(allIds);
     } else {
       setSelectedHostAccounts(new Set());
@@ -123,7 +125,9 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   };
 
   // Handle individual checkbox
-  const handleSelectHostAccount = (hostAccountId: string, checked: boolean) => {
+  const handleSelectHostAccount = (hostAccountId: string | null, checked: boolean) => {
+    if (!hostAccountId) return; // Skip if no account ID (company without account)
+    
     const newSelected = new Set(selectedHostAccounts);
     if (checked) {
       newSelected.add(hostAccountId);
@@ -133,8 +137,9 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
     }
     setSelectedHostAccounts(newSelected);
     
-    // Check if all visible items are selected
-    if (newSelected.size === paginatedData.length && paginatedData.every(item => newSelected.has(item.id))) {
+    // Check if all visible items are selected (only count items with account IDs)
+    const itemsWithAccounts = paginatedData.filter(item => item.id);
+    if (newSelected.size === itemsWithAccounts.length && itemsWithAccounts.every(item => newSelected.has(item.id!))) {
       setSelectAll(true);
     }
   };
@@ -296,8 +301,12 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
+              {paginatedData.map((item, index) => (
+                <tr 
+                  key={item.id || `company-${item.host_company?.id || index}`} 
+                  className={`hover:bg-gray-50 ${item._is_company_only ? 'bg-yellow-50 border-l-4 border-yellow-400' : ''}`}
+                  title={item._is_company_only ? 'Company without host account - click to create account' : ''}
+                >
                   {/* Host Company columns */}
                   <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
                     {item.host_company ? truncateText(item.host_company.id, 8) + '...' : '-'}
@@ -333,31 +342,47 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   <td className="px-2 bg-gray-200"></td>
                   {/* Checkbox column */}
                   <td className="px-4 py-2 whitespace-nowrap">
-                    <input
-                      type="checkbox"
-                      checked={selectedHostAccounts.has(item.id)}
-                      onChange={(e) => handleSelectHostAccount(item.id, e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
+                    {item.id ? (
+                      <input
+                        type="checkbox"
+                        checked={selectedHostAccounts.has(item.id)}
+                        onChange={(e) => handleSelectHostAccount(item.id, e.target.checked)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <span className="text-xs text-gray-400">N/A</span>
+                    )}
                   </td>
                   {/* Host Account columns */}
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
-                    {truncateText(item.id, 8)}...
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only ? 'text-gray-400 italic' : 'text-gray-900'
+                  }`}>
+                    {item._is_company_only ? 'No Account' : (item.id ? truncateText(item.id, 8) + '...' : '-')}
                   </td>
-                  <td className="px-4 py-2 text-gray-900 font-medium">
-                    {item.username || '-'}
+                  <td className={`px-4 py-2 font-medium ${
+                    item._is_company_only ? 'text-gray-400 italic' : 'text-gray-900'
+                  }`}>
+                    {item._is_company_only ? 'No Account' : (item.username || '-')}
                   </td>
-                  <td className="px-4 py-2 text-gray-500">
-                    {maskPassword(item.pass)}
+                  <td className={`px-4 py-2 ${
+                    item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`}>
+                    {item._is_company_only ? 'No Account' : maskPassword(item.pass)}
                   </td>
-                  <td className="px-4 py-2 text-gray-500 font-mono text-xs">
-                    {maskApiKey(item.hostacct_apikey1)}
+                  <td className={`px-4 py-2 font-mono text-xs ${
+                    item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`}>
+                    {item._is_company_only ? 'No Account' : maskApiKey(item.hostacct_apikey1)}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-500 text-xs">
-                    {truncateText(item.fk_user_id, 8)}...
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`}>
+                    {item._is_company_only ? 'No Account' : (item.fk_user_id ? truncateText(item.fk_user_id, 8) + '...' : '-')}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-500 text-xs">
-                    {item.fk_host_company_id ? truncateText(item.fk_host_company_id, 8) + '...' : '-'}
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`}>
+                    {item._is_company_only ? 'No Account' : (item.fk_host_company_id ? truncateText(item.fk_host_company_id, 8) + '...' : '-')}
                   </td>
                 </tr>
               ))}

@@ -248,3 +248,15 @@ _**Agent (<synthetic>)**_
 
 API Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"Could not process image"},"request_id":"req_011CSYQUFFZLvHW1XunpYjZc"}
 
+---
+
+_**User**_
+
+tell me what to do to get the favicon successfully implemented . do i need to get a file and move it somewhere or rename it something inside the repo? 
+
+---
+
+_**Agent (<synthetic>)**_
+
+API Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"Could not process image"},"request_id":"req_011CSZY3bJoMmzoX4xKCTHiB"}
+
