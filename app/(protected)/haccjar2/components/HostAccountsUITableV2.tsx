@@ -44,11 +44,14 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   const [sortField, setSortField] = useState<SortField>('id');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [selectedHostAccounts, setSelectedHostAccounts] = useState<Set<string>>(new Set());
+  const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [editingCell, setEditingCell] = useState<{id: string, field: string} | null>(null);
   const [editValue, setEditValue] = useState<string>('');
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [createAccountError, setCreateAccountError] = useState<string | null>(null);
 
   // Filter and search logic
   const filteredData = useMemo(() => {
@@ -148,6 +151,18 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
     if (newSelected.size === itemsWithAccounts.length && itemsWithAccounts.every(item => newSelected.has(item.id!))) {
       setSelectAll(true);
     }
+  };
+
+  // Handle company checkbox selection
+  const handleSelectCompany = (companyId: string, checked: boolean) => {
+    const newSelected = new Set(selectedCompanies);
+    if (checked) {
+      newSelected.add(companyId);
+    } else {
+      newSelected.delete(companyId);
+    }
+    setSelectedCompanies(newSelected);
+    setCreateAccountError(null); // Clear any previous error when selection changes
   };
 
   // Inline editing functions (based on xpagesmanager1 pattern)
@@ -261,6 +276,58 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
       setFetchError('Network error occurred while fetching domains');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle creating new host account
+  const handleCreateHostAccount = async () => {
+    if (selectedCompanies.size !== 1) {
+      setCreateAccountError('Please select exactly one company to create a host account for');
+      return;
+    }
+
+    const selectedCompanyId = Array.from(selectedCompanies)[0];
+    const selectedCompany = data.find(item => item.host_company?.id === selectedCompanyId);
+
+    if (!selectedCompany?.host_company) {
+      setCreateAccountError('Selected company not found');
+      return;
+    }
+
+    setIsCreatingAccount(true);
+    setCreateAccountError(null);
+
+    try {
+      const response = await fetch('/api/create-host-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          host_company_id: selectedCompanyId,
+          user_id: selectedCompany.host_company.fk_user_id
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log('Successfully created host account:', result);
+        // Clear company selection
+        setSelectedCompanies(new Set());
+        // Refresh the data to show the new host account
+        if (onDataChange) {
+          onDataChange();
+        }
+      } else {
+        console.error('Error creating host account:', result.error);
+        setCreateAccountError(result.error);
+      }
+    } catch (error) {
+      console.error('Error calling create host account API:', error);
+      setCreateAccountError('Network error occurred while creating host account');
+    } finally {
+      setIsCreatingAccount(false);
     }
   };
 
@@ -428,12 +495,46 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
         Showing {paginatedData.length} of {sortedData.length} results
       </div>
 
+      {/* Create New Host Account Button */}
+      <div className="flex items-center justify-between">
+        <button
+          className={`px-6 py-3 rounded-md font-medium ${
+            selectedCompanies.size === 1
+              ? 'bg-green-600 text-white hover:bg-green-700'
+              : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
+          onClick={handleCreateHostAccount}
+          disabled={selectedCompanies.size !== 1 || isCreatingAccount}
+        >
+          {isCreatingAccount ? 'Creating Account...' : 'Create New Host Account'}
+        </button>
+        
+        <div className="text-sm text-gray-600">
+          {selectedCompanies.size === 0 && 'Select 1 company to create host account'}
+          {selectedCompanies.size === 1 && 'Ready to create host account'}
+          {selectedCompanies.size > 1 && `${selectedCompanies.size} companies selected - select exactly 1`}
+        </div>
+      </div>
+
+      {/* Create Account Error Display */}
+      {createAccountError && (
+        <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md">
+          Error: {createAccountError}
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
+                {/* Company Entity Checkbox column (far left) */}
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center">
+                    <span className="text-xs">Company</span>
+                  </div>
+                </th>
                 {/* Host Company columns on the left */}
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   company.id
@@ -513,14 +614,33 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   className={`hover:bg-gray-50 ${item._is_company_only ? 'bg-yellow-50 border-l-4 border-yellow-400' : ''}`}
                   title={item._is_company_only ? 'Company without host account - click to create account' : ''}
                 >
-                  {/* Host Company columns */}
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
+                  {/* Company Entity Checkbox column (far left) */}
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    {item.host_company?.id ? (
+                      <input
+                        type="checkbox"
+                        checked={selectedCompanies.has(item.host_company.id)}
+                        onChange={(e) => handleSelectCompany(item.host_company.id, e.target.checked)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <span className="text-xs text-gray-400">N/A</span>
+                    )}
+                  </td>
+                  {/* Host Company columns with yellow highlighting when company is selected */}
+                  <td className={`px-4 py-2 whitespace-nowrap text-gray-900 text-xs ${
+                    item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
+                  }`}>
                     {item.host_company ? truncateText(item.host_company.id, 8) + '...' : '-'}
                   </td>
-                  <td className="px-4 py-2 text-gray-900 font-medium">
+                  <td className={`px-4 py-2 text-gray-900 font-medium ${
+                    item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
+                  }`}>
                     {item.host_company?.name || '-'}
                   </td>
-                  <td className="px-4 py-2 text-blue-600 hover:text-blue-800">
+                  <td className={`px-4 py-2 text-blue-600 hover:text-blue-800 ${
+                    item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
+                  }`}>
                     {item.host_company?.portal_url1 ? (
                       <a 
                         href={item.host_company.portal_url1} 
@@ -532,16 +652,24 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                       </a>
                     ) : '-'}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-500 text-xs">
+                  <td className={`px-4 py-2 whitespace-nowrap text-gray-500 text-xs ${
+                    item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
+                  }`}>
                     {item.host_company ? truncateText(item.host_company.fk_user_id, 8) + '...' : '-'}
                   </td>
-                  <td className="px-4 py-2 text-gray-600">
+                  <td className={`px-4 py-2 text-gray-600 ${
+                    item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
+                  }`}>
                     {truncateText(item.host_company?.notes1 || null, 20)}
                   </td>
-                  <td className="px-4 py-2 text-gray-600">
+                  <td className={`px-4 py-2 text-gray-600 ${
+                    item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
+                  }`}>
                     {truncateText(item.host_company?.notes2 || null, 20)}
                   </td>
-                  <td className="px-4 py-2 text-gray-600">
+                  <td className={`px-4 py-2 text-gray-600 ${
+                    item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
+                  }`}>
                     {truncateText(item.host_company?.notes3 || null, 20)}
                   </td>
                   {/* Separator column */}
