@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface HostCompany {
   id: string;
@@ -17,6 +18,8 @@ interface HostAccountRecord {
   username: string | null;
   pass: string | null;
   hostacct_apikey1: string | null;
+  hostacct_api_secret: string | null;
+  api_management_url: string | null;
   fk_user_id: string | null; // Can be null for companies without accounts
   fk_host_company_id: string | null;
   host_company: HostCompany | null;
@@ -34,6 +37,7 @@ type SortField = keyof HostAccountRecord;
 type SortOrder = 'asc' | 'desc';
 
 export default function HostAccountsUITableV2({ data, onDataChange }: HostAccountsUITableV2Props) {
+  const supabase = createClientComponentClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
@@ -43,6 +47,8 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   const [selectAll, setSelectAll] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [editingCell, setEditingCell] = useState<{id: string, field: string} | null>(null);
+  const [editValue, setEditValue] = useState<string>('');
 
   // Filter and search logic
   const filteredData = useMemo(() => {
@@ -144,6 +150,59 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
     }
   };
 
+  // Inline editing functions (based on xpagesmanager1 pattern)
+  const updateHostAccountField = async (accountId: string, field: string, value: any) => {
+    try {
+      const { error } = await supabase
+        .from('host_account')
+        .update({ [field]: value })
+        .eq('id', accountId);
+
+      if (error) {
+        console.error('Error updating field:', error);
+        return;
+      }
+
+      // Refresh data after successful update
+      if (onDataChange) {
+        onDataChange();
+      }
+    } catch (error) {
+      console.error('Error updating field:', error);
+    }
+  };
+
+  const handleCellClick = (accountId: string, field: string, currentValue: any) => {
+    // Skip editing for companies without accounts or readonly fields
+    if (!accountId || field === 'id' || field === 'fk_user_id' || field === 'fk_host_company_id') {
+      return;
+    }
+    
+    setEditingCell({ id: accountId, field });
+    setEditValue(currentValue?.toString() || '');
+  };
+
+  const handleCellSave = async () => {
+    if (!editingCell) return;
+
+    const { id, field } = editingCell;
+    let processedValue: any = editValue;
+
+    // Process value - if empty string, set to null
+    if (editValue === '') {
+      processedValue = null;
+    }
+
+    await updateHostAccountField(id, field, processedValue);
+    setEditingCell(null);
+    setEditValue('');
+  };
+
+  const handleCellCancel = () => {
+    setEditingCell(null);
+    setEditValue('');
+  };
+
   const truncateText = (text: string | null, maxLength: number = 30) => {
     if (!text) return '-';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
@@ -203,6 +262,147 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Helper function to render editable cells (based on xpagesmanager1 pattern)
+  const renderEditableCell = (item: HostAccountRecord, field: string, value: any, className: string = '', maskFunction?: (val: any) => any) => {
+    const isEditing = editingCell?.id === item.id && editingCell?.field === field;
+    const isReadOnly = !item.id || field === 'id' || field === 'fk_user_id' || field === 'fk_host_company_id';
+    const isCompanyOnly = item._is_company_only;
+
+    if (isCompanyOnly) {
+      return (
+        <span className="text-gray-400 italic">No Account</span>
+      );
+    }
+
+    if (isEditing) {
+      return (
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleCellSave}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleCellSave();
+              if (e.key === 'Escape') handleCellCancel();
+            }}
+            className="w-full px-1 py-0.5 border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            autoFocus
+          />
+          <button
+            onClick={handleCellSave}
+            className="text-green-600 hover:text-green-800 text-sm"
+            title="Save"
+          >
+            ✓
+          </button>
+          <button
+            onClick={handleCellCancel}
+            className="text-red-600 hover:text-red-800 text-sm"
+            title="Cancel"
+          >
+            ✕
+          </button>
+        </div>
+      );
+    }
+
+    const displayValue = maskFunction ? maskFunction(value) : (value || '-');
+    
+    return (
+      <div
+        onClick={() => !isReadOnly && handleCellClick(item.id!, field, value)}
+        className={`min-w-[30px] min-h-[1.25rem] px-1 py-0.5 rounded break-words ${
+          !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+        } ${className}`}
+        title={!isReadOnly ? `${value?.toString() || ''} (Click to edit)` : value?.toString() || ''}
+      >
+        {displayValue}
+      </div>
+    );
+  };
+
+  // Helper function to render editable URL cells
+  const renderEditableURLCell = (item: HostAccountRecord, field: string, value: any) => {
+    const isEditing = editingCell?.id === item.id && editingCell?.field === field;
+    const isReadOnly = !item.id;
+    const isCompanyOnly = item._is_company_only;
+
+    if (isCompanyOnly) {
+      return (
+        <span className="text-gray-400 italic">No Account</span>
+      );
+    }
+
+    if (isEditing) {
+      return (
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleCellSave}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleCellSave();
+              if (e.key === 'Escape') handleCellCancel();
+            }}
+            className="w-full px-1 py-0.5 border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            autoFocus
+            placeholder="https://..."
+          />
+          <button
+            onClick={handleCellSave}
+            className="text-green-600 hover:text-green-800 text-sm"
+            title="Save"
+          >
+            ✓
+          </button>
+          <button
+            onClick={handleCellCancel}
+            className="text-red-600 hover:text-red-800 text-sm"
+            title="Cancel"
+          >
+            ✕
+          </button>
+        </div>
+      );
+    }
+
+    if (!value) {
+      return (
+        <div
+          onClick={() => !isReadOnly && handleCellClick(item.id!, field, value)}
+          className={`min-w-[30px] min-h-[1.25rem] px-1 py-0.5 rounded break-words ${
+            !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+          }`}
+          title={!isReadOnly ? 'Click to edit URL' : ''}
+        >
+          -
+        </div>
+      );
+    }
+
+    return (
+      <div
+        onClick={() => !isReadOnly && handleCellClick(item.id!, field, value)}
+        className={`min-w-[30px] min-h-[1.25rem] px-1 py-0.5 rounded break-words ${
+          !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+        }`}
+        title={!isReadOnly ? `${value} (Click to edit)` : value}
+      >
+        <a 
+          href={value} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="underline"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {truncateText(value, 30)}
+        </a>
+      </div>
+    );
   };
 
   return (
@@ -290,6 +490,12 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   account.hostacct_apikey1
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  hostacct_api_secret
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  api_management_url
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   account.fk_user_id
                 </th>
                 <th 
@@ -359,20 +565,30 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   }`}>
                     {item._is_company_only ? 'No Account' : (item.id ? truncateText(item.id, 8) + '...' : '-')}
                   </td>
-                  <td className={`px-4 py-2 font-medium ${
+                  <td className={`px-4 py-2 ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-900'
                   }`}>
-                    {item._is_company_only ? 'No Account' : (item.username || '-')}
+                    {renderEditableCell(item, 'username', item.username, 'font-medium')}
                   </td>
                   <td className={`px-4 py-2 ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
                   }`}>
-                    {item._is_company_only ? 'No Account' : maskPassword(item.pass)}
+                    {renderEditableCell(item, 'pass', item.pass, '', maskPassword)}
                   </td>
-                  <td className={`px-4 py-2 font-mono text-xs ${
+                  <td className={`px-4 py-2 ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
                   }`}>
-                    {item._is_company_only ? 'No Account' : maskApiKey(item.hostacct_apikey1)}
+                    {renderEditableCell(item, 'hostacct_apikey1', item.hostacct_apikey1, 'font-mono text-xs', maskApiKey)}
+                  </td>
+                  <td className={`px-4 py-2 ${
+                    item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`}>
+                    {renderEditableCell(item, 'hostacct_api_secret', item.hostacct_api_secret, 'font-mono text-xs', maskApiKey)}
+                  </td>
+                  <td className={`px-4 py-2 ${
+                    item._is_company_only ? 'text-gray-400 italic' : 'text-blue-600 hover:text-blue-800'
+                  }`}>
+                    {renderEditableURLCell(item, 'api_management_url', item.api_management_url)}
                   </td>
                   <td className={`px-4 py-2 whitespace-nowrap text-xs ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
@@ -388,7 +604,7 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
               ))}
               {paginatedData.length === 0 && (
                 <tr>
-                  <td colSpan={16} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={18} className="px-4 py-8 text-center text-gray-500">
                     No host accounts found
                   </td>
                 </tr>

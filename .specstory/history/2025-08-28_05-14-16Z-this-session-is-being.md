@@ -370,3 +370,928 @@ The /cplatzar page now mirrors the /haccjar2 functionality exactly but for call 
 
 The page is now fully functional and ready to be accessed at `/cplatzar`. All the core infrastructure is in place, and you can now add the specific API integrations for fetching phone numbers from the various call tracking platforms as needed.
 
+---
+
+_**User**_
+
+pleae add the ability for a user to add a new callplat_companies db row in their user account at /cplatzar 
+
+create new button above the "create new call platform account" button that says
+create new call platform company 
+
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add 'Create New Call Platform Company' functionality to /cplatzar page
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll add the ability for users to create new call platform companies. First, I need to create an API endpoint for creating new companies, then update the UI component to include the new button and functionality.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```typescript
+import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { user_internal_id, cplatcompany_name, portal_url1, note1, note2, note3 } = body;
+
+    if (!user_internal_id || !cplatcompany_name) {
+      return NextResponse.json(
+        { success: false, error: 'User internal ID and company name are required' },
+        { status: 400 }
+      );
+    }
+
+    // Initialize Supabase client with service role key
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    console.log('Creating new call platform company:', { user_internal_id, cplatcompany_name });
+
+    // Insert new call platform company
+    const { data: newCompany, error } = await supabase
+      .from('callplat_companies')
+      .insert([
+        {
+          cplatcompany_name: cplatcompany_name.trim(),
+          portal_url1: portal_url1?.trim() || '',
+          user_id: user_internal_id,
+          note1: note1?.trim() || '',
+          note2: note2?.trim() || '',
+          note3: note3?.trim() || ''
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating call platform company:', error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to create call platform company' },
+        { status: 500 }
+      );
+    }
+
+    console.log('Call platform company created successfully:', newCompany);
+
+    return NextResponse.json({
+      success: true,
+      data: newCompany
+    });
+
+  } catch (error) {
+    console.error('Create call platform company error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/api/create_callplat_company/route.ts
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll update the CallPlatUITable component to add the "Create New Call Platform Company" button above the existing "Create New Call Platform Account" button:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cplatzar/components/CallPlatUITable.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→
+     6→interface CallPlatAccount {
+     7→  cplatacct_id: string;
+     8→  cplatacct_username: string;
+     9→  cplatacct_api_key: string;
+    10→  cplatacct_api_secret: string;
+    11→  api_management_url: string;
+    12→  phone_numbers_glacier: string;
+    13→  created_at: string;
+    14→  updated_at: string;
+    15→}
+    16→
+    17→interface CallPlatCompany {
+    18→  cplatcompany_id: string;
+    19→  cplatcompany_name: string;
+    20→  portal_url1: string;
+    21→  user_id: string;
+    22→  note1: string;
+    23→  note2: string;
+    24→  note3: string;
+    25→  created_at: string;
+    26→  updated_at: string;
+    27→  callplat_accounts: CallPlatAccount[];
+    28→}
+    29→
+    30→interface CallPlatUITableProps {
+    31→  data: CallPlatCompany[];
+    32→  userId: string;
+    33→  onDataChange: () => void;
+    34→}
+    35→
+    36→export default function CallPlatUITable({ data, userId, onDataChange }: CallPlatUITableProps) {
+    37→  const [searchTerm, setSearchTerm] = useState('');
+    38→  const [editingCell, setEditingCell] = useState<{
+    39→    companyId?: string;
+    40→    accountId?: string;
+    41→    field: string;
+    42→  } | null>(null);
+    43→  const [editValue, setEditValue] = useState('');
+    44→  const [isLoading, setIsLoading] = useState(false);
+    45→  const [fetchError, setFetchError] = useState<string | null>(null);
+    46→  const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
+    47→  const supabase = createClientComponentClient();
+    48→
+    49→  // Filter data based on search term
+    50→  const filteredData = data.filter(company => {
+    51→    const searchLower = searchTerm.toLowerCase();
+    52→    return (
+    53→      company.cplatcompany_name?.toLowerCase().includes(searchLower) ||
+    54→      company.portal_url1?.toLowerCase().includes(searchLower) ||
+    55→      company.callplat_accounts?.some(account => 
+    56→        account.cplatacct_username?.toLowerCase().includes(searchLower) ||
+    57→        account.api_management_url?.toLowerCase().includes(searchLower)
+    58→      )
+    59→    );
+    60→  });
+    61→
+    62→  const handleSelectCompany = (companyId: string, checked: boolean) => {
+    63→    const newSelected = new Set(selectedCompanies);
+    64→    if (checked) {
+    65→      newSelected.add(companyId);
+    66→    } else {
+    67→      newSelected.delete(companyId);
+    68→    }
+    69→    setSelectedCompanies(newSelected);
+    70→  };
+    71→
+    72→  const handleCreateNewCallPlatAccount = async () => {
+    73→    if (selectedCompanies.size !== 1) return;
+    74→
+    75→    const selectedCompanyId = Array.from(selectedCompanies)[0];
+    76→    setIsLoading(true);
+    77→    setFetchError(null);
+    78→
+    79→    try {
+    80→      // Get the user's internal ID first
+    81→      const { data: userData, error: userError } = await supabase
+    82→        .from('users')
+    83→        .select('id')
+    84→        .eq('auth_id', userId)
+    85→        .single();
+    86→
+    87→      if (userError || !userData) {
+    88→        setFetchError('User not found');
+    89→        return;
+    90→      }
+    91→
+    92→      // Create new call platform account
+    93→      const { data: newAccount, error: insertError } = await supabase
+    94→        .from('callplat_accounts')
+    95→        .insert([
+    96→          {
+    97→            fk_callplat_company_id: selectedCompanyId,
+    98→            user_id: userData.id,
+    99→            cplatacct_username: '',
+   100→            cplatacct_api_key: '',
+   101→            cplatacct_api_secret: '',
+   102→            api_management_url: '',
+   103→            phone_numbers_glacier: ''
+   104→          }
+   105→        ])
+   106→        .select()
+   107→        .single();
+   108→
+   109→      if (insertError) {
+   110→        console.error('Error creating call platform account:', insertError);
+   111→        setFetchError('Failed to create call platform account');
+   112→        return;
+   113→      }
+   114→
+   115→      console.log('Successfully created new call platform account:', newAccount);
+   116→      
+   117→      // Refresh the data to show the new account
+   118→      if (onDataChange) {
+   119→        onDataChange();
+   120→      }
+   121→
+   122→      // Clear company selection after successful creation
+   123→      setSelectedCompanies(new Set());
+   124→      
+   125→    } catch (error) {
+   126→      console.error('Error creating call platform account:', error);
+   127→      setFetchError('Network error occurred while creating call platform account');
+   128→    } finally {
+   129→      setIsLoading(false);
+   130→    }
+   131→  };
+   132→
+   133→  const handleEdit = (companyId: string | undefined, accountId: string | undefined, field: string, currentValue: string) => {
+   134→    setEditingCell({ companyId, accountId, field });
+   135→    setEditValue(currentValue || '');
+   136→  };
+   137→
+   138→  const handleSave = async () => {
+   139→    if (!editingCell) return;
+   140→
+   141→    const { companyId, accountId, field } = editingCell;
+   142→    
+   143→    try {
+   144→      if (companyId && !accountId) {
+   145→        // Editing company field
+   146→        const { error } = await supabase
+   147→          .from('callplat_companies')
+   148→          .update({ [field]: editValue })
+   149→          .eq('cplatcompany_id', companyId);
+   150→
+   151→        if (error) {
+   152→          console.error('Error updating company:', error);
+   153→          setFetchError('Failed to update company');
+   154→          return;
+   155→        }
+   156→      } else if (accountId) {
+   157→        // Editing account field
+   158→        const { error } = await supabase
+   159→          .from('callplat_accounts')
+   160→          .update({ [field]: editValue })
+   161→          .eq('cplatacct_id', accountId);
+   162→
+   163→        if (error) {
+   164→          console.error('Error updating account:', error);
+   165→          setFetchError('Failed to update account');
+   166→          return;
+   167→        }
+   168→      }
+   169→
+   170→      setEditingCell(null);
+   171→      setEditValue('');
+   172→      onDataChange();
+   173→    } catch (error) {
+   174→      console.error('Error saving:', error);
+   175→      setFetchError('Network error occurred while saving');
+   176→    }
+   177→  };
+   178→
+   179→  const handleCancel = () => {
+   180→    setEditingCell(null);
+   181→    setEditValue('');
+   182→  };
+   183→
+   184→  const handleFetchPhoneNumbers = async (accountId: string, companyName: string) => {
+   185→    setIsLoading(true);
+   186→    setFetchError(null);
+   187→
+   188→    try {
+   189→      // For now, we'll add a placeholder. Later you can implement specific API calls
+   190→      // for Nimbata, Ringba, Twilio, etc.
+   191→      console.log(`Fetching phone numbers for ${companyName} account:`, accountId);
+   192→      
+   193→      // Placeholder implementation - you'll need to create specific API routes
+   194→      // const response = await fetch(`/api/fetch-phone-numbers/${companyName.toLowerCase()}`, {
+   195→      //   method: 'POST',
+   196→      //   headers: { 'Content-Type': 'application/json' },
+   197→      //   body: JSON.stringify({ account_id: accountId })
+   198→      // });
+   199→
+   200→      setFetchError('Phone number fetching not yet implemented. Please add API integration for ' + companyName);
+   201→    } catch (error) {
+   202→      console.error('Error fetching phone numbers:', error);
+   203→      setFetchError('Network error occurred while fetching phone numbers');
+   204→    } finally {
+   205→      setIsLoading(false);
+   206→    }
+   207→  };
+   208→
+   209→  return (
+   210→    <div className="space-y-4">
+   211→      {/* Search */}
+   212→      <div className="bg-white p-4 rounded-lg shadow">
+   213→        <div className="flex items-center space-x-4">
+   214→          <input
+   215→            type="text"
+   216→            placeholder="Search call platform accounts..."
+   217→            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+   218→            value={searchTerm}
+   219→            onChange={(e) => {
+   220→              setSearchTerm(e.target.value);
+   221→              setFetchError(null);
+   222→            }}
+   223→          />
+   224→        </div>
+   225→      </div>
+   226→
+   227→      {/* Action Buttons */}
+   228→      <div className="bg-white p-4 rounded-lg shadow">
+   229→        <div className="flex items-center space-x-4">
+   230→          <button
+   231→            onClick={handleCreateNewCallPlatAccount}
+   232→            disabled={selectedCompanies.size !== 1 || isLoading}
+   233→            className={`px-4 py-2 rounded-md font-medium ${
+   234→              selectedCompanies.size === 1 && !isLoading
+   235→                ? 'bg-green-600 hover:bg-green-700 text-white'
+   236→                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+   237→            }`}
+   238→          >
+   239→            {isLoading ? 'Creating...' : 'Create New Call Platform Account'}
+   240→          </button>
+   241→          
+   242→          <div className="text-sm text-gray-600">
+   243→            {selectedCompanies.size === 0 && 'Select exactly 1 company to create account'}
+   244→            {selectedCompanies.size === 1 && 'Ready to create new account'}
+   245→            {selectedCompanies.size > 1 && `${selectedCompanies.size} companies selected (select only 1)`}
+   246→          </div>
+   247→        </div>
+   248→      </div>
+   249→
+   250→      {/* Error Display */}
+   251→      {fetchError && (
+   252→        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+   253→          <p className="text-red-800">{fetchError}</p>
+   254→        </div>
+   255→      )}
+   256→
+   257→      {/* Data Table */}
+   258→      <div className="bg-white rounded-lg shadow overflow-hidden">
+   259→        <div className="overflow-x-auto">
+   260→          <table className="w-full">
+   261→            <thead className="bg-gray-50">
+   262→              <tr>
+   263→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   264→                  Select
+   265→                </th>
+   266→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   267→                  Company ID
+   268→                </th>
+   269→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   270→                  Company Name
+   271→                </th>
+   272→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   273→                  Portal URL
+   274→                </th>
+   275→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   276→                  Notes
+   277→                </th>
+   278→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   279→                  Account ID
+   280→                </th>
+   281→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   282→                  Username
+   283→                </th>
+   284→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   285→                  API Key
+   286→                </th>
+   287→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   288→                  API Secret
+   289→                </th>
+   290→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   291→                  Management URL
+   292→                </th>
+   293→                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+   294→                  Actions
+   295→                </th>
+   296→              </tr>
+   297→            </thead>
+   298→            <tbody className="bg-white divide-y divide-gray-200">
+   299→              {filteredData.length === 0 ? (
+   300→                <tr>
+   301→                  <td colSpan={11} className="px-4 py-8 text-center text-gray-500">
+   302→                    No call platform accounts found
+   303→                  </td>
+   304→                </tr>
+   305→              ) : (
+   306→                filteredData.map((company) => {
+   307→                  const isCompanySelected = selectedCompanies.has(company.cplatcompany_id);
+   308→                  const accounts = company.callplat_accounts || [];
+   309→                  const rowSpan = Math.max(1, accounts.length);
+   310→
+   311→                  if (accounts.length === 0) {
+   312→                    return (
+   313→                      <tr key={company.cplatcompany_id} className="hover:bg-gray-50">
+   314→                        <td className="px-4 py-4 whitespace-nowrap">
+   315→                          <input
+   316→                            type="checkbox"
+   317→                            checked={isCompanySelected}
+   318→                            onChange={(e) => handleSelectCompany(company.cplatcompany_id, e.target.checked)}
+   319→                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+   320→                          />
+   321→                        </td>
+   322→                        <td className={`px-4 py-4 whitespace-nowrap text-sm ${isCompanySelected ? 'bg-yellow-100' : ''}`}>
+   323→                          {company.cplatcompany_id}
+   324→                        </td>
+   325→                        <td className={`px-4 py-4 whitespace-nowrap text-sm ${isCompanySelected ? 'bg-yellow-100' : ''}`}>
+   326→                          {editingCell?.companyId === company.cplatcompany_id && editingCell?.field === 'cplatcompany_name' ? (
+   327→                            <input
+   328→                              type="text"
+   329→                              value={editValue}
+   330→                              onChange={(e) => setEditValue(e.target.value)}
+   331→                              onBlur={handleSave}
+   332→                              onKeyPress={(e) => e.key === 'Enter' && handleSave()}
+   333→                              className="w-full px-2 py-1 border border-gray-300 rounded"
+   334→                              autoFocus
+   335→                            />
+   336→                          ) : (
+   337→                            <span
+   338→                              onClick={() => handleEdit(company.cplatcompany_id, undefined, 'cplatcompany_name', company.cplatcompany_name)}
+   339→                              className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+   340→                            >
+   341→                              {company.cplatcompany_name || 'Click to edit'}
+   342→                            </span>
+   343→                          )}
+   344→                        </td>
+   345→                        <td className={`px-4 py-4 whitespace-nowrap text-sm ${isCompanySelected ? 'bg-yellow-100' : ''}`}>
+   346→                          {editingCell?.companyId === company.cplatcompany_id && editingCell?.field === 'portal_url1' ? (
+   347→                            <input
+   348→                              type="text"
+   349→                              value={editValue}
+   350→                              onChange={(e) => setEditValue(e.target.value)}
+   351→                              onBlur={handleSave}
+   352→                              onKeyPress={(e) => e.key === 'Enter' && handleSave()}
+   353→                              className="w-full px-2 py-1 border border-gray-300 rounded"
+   354→                              autoFocus
+   355→                            />
+   356→                          ) : (
+   357→                            <span
+   358→                              onClick={() => handleEdit(company.cplatcompany_id, undefined, 'portal_url1', company.portal_url1)}
+   359→                              className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+   360→                            >
+   361→                              {company.portal_url1 || 'Click to edit'}
+   362→                            </span>
+   363→                          )}
+   364→                        </td>
+   365→                        <td className={`px-4 py-4 whitespace-nowrap text-sm ${isCompanySelected ? 'bg-yellow-100' : ''}`}>
+   366→                          {company.note1 || company.note2 || company.note3 || '-'}
+   367→                        </td>
+   368→                        <td colSpan={6} className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+   369→                          No accounts configured
+   370→                        </td>
+   371→                      </tr>
+   372→                    );
+   373→                  }
+   374→
+   375→                  return accounts.map((account, index) => (
+   376→                    <tr key={`${company.cplatcompany_id}-${account.cplatacct_id}`} className="hover:bg-gray-50">
+   377→                      {index === 0 && (
+   378→                        <>
+   379→                          <td rowSpan={rowSpan} className="px-4 py-4 whitespace-nowrap">
+   380→                            <input
+   381→                              type="checkbox"
+   382→                              checked={isCompanySelected}
+   383→                              onChange={(e) => handleSelectCompany(company.cplatcompany_id, e.target.checked)}
+   384→                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+   385→                            />
+   386→                          </td>
+   387→                          <td rowSpan={rowSpan} className={`px-4 py-4 whitespace-nowrap text-sm ${isCompanySelected ? 'bg-yellow-100' : ''}`}>
+   388→                            {company.cplatcompany_id}
+   389→                          </td>
+   390→                          <td rowSpan={rowSpan} className={`px-4 py-4 whitespace-nowrap text-sm ${isCompanySelected ? 'bg-yellow-100' : ''}`}>
+   391→                            {editingCell?.companyId === company.cplatcompany_id && editingCell?.field === 'cplatcompany_name' ? (
+   392→                              <input
+   393→                                type="text"
+   394→                                value={editValue}
+   395→                                onChange={(e) => setEditValue(e.target.value)}
+   396→                                onBlur={handleSave}
+   397→                                onKeyPress={(e) => e.key === 'Enter' && handleSave()}
+   398→                                className="w-full px-2 py-1 border border-gray-300 rounded"
+   399→                                autoFocus
+   400→                              />
+   401→                            ) : (
+   402→                              <span
+   403→                                onClick={() => handleEdit(company.cplatcompany_id, undefined, 'cplatcompany_name', company.cplatcompany_name)}
+   404→                                className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+   405→                              >
+   406→                                {company.cplatcompany_name || 'Click to edit'}
+   407→                              </span>
+   408→                            )}
+   409→                          </td>
+   410→                          <td rowSpan={rowSpan} className={`px-4 py-4 whitespace-nowrap text-sm ${isCompanySelected ? 'bg-yellow-100' : ''}`}>
+   411→                            {editingCell?.companyId === company.cplatcompany_id && editingCell?.field === 'portal_url1' ? (
+   412→                              <input
+   413→                                type="text"
+   414→                                value={editValue}
+   415→                                onChange={(e) => setEditValue(e.target.value)}
+   416→                                onBlur={handleSave}
+   417→                                onKeyPress={(e) => e.key === 'Enter' && handleSave()}
+   418→                                className="w-full px-2 py-1 border border-gray-300 rounded"
+   419→                                autoFocus
+   420→                              />
+   421→                            ) : (
+   422→                              <span
+   423→                                onClick={() => handleEdit(company.cplatcompany_id, undefined, 'portal_url1', company.portal_url1)}
+   424→                                className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+   425→                              >
+   426→                                {company.portal_url1 || 'Click to edit'}
+   427→                              </span>
+   428→                            )}
+   429→                          </td>
+   430→                          <td rowSpan={rowSpan} className={`px-4 py-4 whitespace-nowrap text-sm ${isCompanySelected ? 'bg-yellow-100' : ''}`}>
+   431→                            {company.note1 || company.note2 || company.note3 || '-'}
+   432→                          </td>
+   433→                        </>
+   434→                      )}
+   435→                      
+   436→                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+   437→                        {account.cplatacct_id}
+   438→                      </td>
+   439→                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+   440→                        {editingCell?.accountId === account.cplatacct_id && editingCell?.field === 'cplatacct_username' ? (
+   441→                          <input
+   442→                            type="text"
+   443→                            value={editValue}
+   444→                            onChange={(e) => setEditValue(e.target.value)}
+   445→                            onBlur={handleSave}
+   446→                            onKeyPress={(e) => e.key === 'Enter' && handleSave()}
+   447→                            className="w-full px-2 py-1 border border-gray-300 rounded"
+   448→                            autoFocus
+   449→                          />
+   450→                        ) : (
+   451→                          <span
+   452→                            onClick={() => handleEdit(undefined, account.cplatacct_id, 'cplatacct_username', account.cplatacct_username)}
+   453→                            className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+   454→                          >
+   455→                            {account.cplatacct_username || 'Click to edit'}
+   456→                          </span>
+   457→                        )}
+   458→                      </td>
+   459→                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+   460→                        {editingCell?.accountId === account.cplatacct_id && editingCell?.field === 'cplatacct_api_key' ? (
+   461→                          <input
+   462→                            type="text"
+   463→                            value={editValue}
+   464→                            onChange={(e) => setEditValue(e.target.value)}
+   465→                            onBlur={handleSave}
+   466→                            onKeyPress={(e) => e.key === 'Enter' && handleSave()}
+   467→                            className="w-full px-2 py-1 border border-gray-300 rounded"
+   468→                            autoFocus
+   469→                          />
+   470→                        ) : (
+   471→                          <span
+   472→                            onClick={() => handleEdit(undefined, account.cplatacct_id, 'cplatacct_api_key', account.cplatacct_api_key)}
+   473→                            className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+   474→                          >
+   475→                            {account.cplatacct_api_key ? '••••••••' : 'Click to edit'}
+   476→                          </span>
+   477→                        )}
+   478→                      </td>
+   479→                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+   480→                        {editingCell?.accountId === account.cplatacct_id && editingCell?.field === 'cplatacct_api_secret' ? (
+   481→                          <input
+   482→                            type="text"
+   483→                            value={editValue}
+   484→                            onChange={(e) => setEditValue(e.target.value)}
+   485→                            onBlur={handleSave}
+   486→                            onKeyPress={(e) => e.key === 'Enter' && handleSave()}
+   487→                            className="w-full px-2 py-1 border border-gray-300 rounded"
+   488→                            autoFocus
+   489→                          />
+   490→                        ) : (
+   491→                          <span
+   492→                            onClick={() => handleEdit(undefined, account.cplatacct_id, 'cplatacct_api_secret', account.cplatacct_api_secret)}
+   493→                            className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+   494→                          >
+   495→                            {account.cplatacct_api_secret ? '••••••••' : 'Click to edit'}
+   496→                          </span>
+   497→                        )}
+   498→                      </td>
+   499→                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+   500→                        {editingCell?.accountId === account.cplatacct_id && editingCell?.field === 'api_management_url' ? (
+   501→                          <input
+   502→                            type="text"
+   503→                            value={editValue}
+   504→                            onChange={(e) => setEditValue(e.target.value)}
+   505→                            onBlur={handleSave}
+   506→                            onKeyPress={(e) => e.key === 'Enter' && handleSave()}
+   507→                            className="w-full px-2 py-1 border border-gray-300 rounded"
+   508→                            autoFocus
+   509→                          />
+   510→                        ) : (
+   511→                          <span
+   512→                            onClick={() => handleEdit(undefined, account.cplatacct_id, 'api_management_url', account.api_management_url)}
+   513→                            className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+   514→                          >
+   515→                            {account.api_management_url || 'Click to edit'}
+   516→                          </span>
+   517→                        )}
+   518→                      </td>
+   519→                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+   520→                        <button
+   521→                          onClick={() => handleFetchPhoneNumbers(account.cplatacct_id, company.cplatcompany_name)}
+   522→                          disabled={isLoading || !account.cplatacct_api_key}
+   523→                          className={`px-3 py-1 rounded text-xs font-medium ${
+   524→                            account.cplatacct_api_key && !isLoading
+   525→                              ? 'bg-blue-600 hover:bg-blue-700 text-white'
+   526→                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+   527→                          }`}
+   528→                        >
+   529→                          {isLoading ? 'Fetching...' : 'Fetch Numbers'}
+   530→                        </button>
+   531→                      </td>
+   532→                    </tr>
+   533→                  ));
+   534→                })
+   535→              )}
+   536→            </tbody>
+   537→          </table>
+   538→        </div>
+   539→      </div>
+   540→
+   541→      {/* Phone Numbers Glacier Display */}
+   542→      {filteredData.some(company => 
+   543→        company.callplat_accounts?.some(account => account.phone_numbers_glacier)
+   544→      ) && (
+   545→        <div className="bg-white p-4 rounded-lg shadow">
+   546→          <h3 className="text-lg font-medium mb-4">Phone Numbers Glacier</h3>
+   547→          <div className="space-y-4">
+   548→            {filteredData.map(company => 
+   549→              company.callplat_accounts
+   550→                ?.filter(account => account.phone_numbers_glacier)
+   551→                .map(account => (
+   552→                  <div key={account.cplatacct_id} className="border border-gray-200 rounded-lg p-4">
+   553→                    <div className="flex justify-between items-center mb-2">
+   554→                      <h4 className="font-medium">
+   555→                        {company.cplatcompany_name} - {account.cplatacct_username}
+   556→                      </h4>
+   557→                      <button
+   558→                        onClick={() => handleFetchPhoneNumbers(account.cplatacct_id, company.cplatcompany_name)}
+   559→                        disabled={isLoading}
+   560→                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:bg-gray-400"
+   561→                      >
+   562→                        Refresh Numbers
+   563→                      </button>
+   564→                    </div>
+   565→                    <textarea
+   566→                      value={account.phone_numbers_glacier || ''}
+   567→                      readOnly
+   568→                      className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm"
+   569→                      placeholder="Phone numbers will appear here after fetching from the call platform..."
+   570→                    />
+   571→                  </div>
+   572→                ))
+   573→            )}
+   574→          </div>
+   575→        </div>
+   576→      )}
+   577→    </div>
+   578→  );
+   579→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll update the CallPlatUITable component to add the "Create New Call Platform Company" button above the existing "Create New Call Platform Account" button:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cplatzar/components/CallPlatUITable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    42→  } | null>(null);
+    43→  const [editValue, setEditValue] = useState('');
+    44→  const [isLoading, setIsLoading] = useState(false);
+    45→  const [fetchError, setFetchError] = useState<string | null>(null);
+    46→  const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
+    47→  const [showCreateCompanyForm, setShowCreateCompanyForm] = useState(false);
+    48→  const [newCompanyName, setNewCompanyName] = useState('');
+    49→  const [newCompanyPortalUrl, setNewCompanyPortalUrl] = useState('');
+    50→  const supabase = createClientComponentClient();
+    51→
+    52→  // Filter data based on search term
+    53→  const filteredData = data.filter(company => {
+    54→    const searchLower = searchTerm.toLowerCase();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll add the function to handle creating new companies:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cplatzar/components/CallPlatUITable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    71→    }
+    72→    setSelectedCompanies(newSelected);
+    73→  };
+    74→
+    75→  const handleCreateNewCallPlatCompany = async () => {
+    76→    if (!newCompanyName.trim()) {
+    77→      setFetchError('Company name is required');
+    78→      return;
+    79→    }
+    80→
+    81→    setIsLoading(true);
+    82→    setFetchError(null);
+    83→
+    84→    try {
+    85→      // Get the user's internal ID first
+    86→      const { data: userData, error: userError } = await supabase
+    87→        .from('users')
+    88→        .select('id')
+    89→        .eq('auth_id', userId)
+    90→        .single();
+    91→
+    92→      if (userError || !userData) {
+    93→        setFetchError('User not found');
+    94→        return;
+    95→      }
+    96→
+    97→      // Create new call platform company via API
+    98→      const response = await fetch('/api/create_callplat_company', {
+    99→        method: 'POST',
+   100→        headers: {
+   101→          'Content-Type': 'application/json',
+   102→        },
+   103→        body: JSON.stringify({
+   104→          user_internal_id: userData.id,
+   105→          cplatcompany_name: newCompanyName.trim(),
+   106→          portal_url1: newCompanyPortalUrl.trim(),
+   107→          note1: '',
+   108→          note2: '',
+   109→          note3: ''
+   110→        }),
+   111→      });
+   112→
+   113→      const result = await response.json();
+   114→
+   115→      if (!result.success) {
+   116→        setFetchError(result.error || 'Failed to create call platform company');
+   117→        return;
+   118→      }
+   119→
+   120→      console.log('Successfully created new call platform company:', result.data);
+   121→      
+   122→      // Reset form and hide it
+   123→      setNewCompanyName('');
+   124→      setNewCompanyPortalUrl('');
+   125→      setShowCreateCompanyForm(false);
+   126→      
+   127→      // Refresh the data to show the new company
+   128→      if (onDataChange) {
+   129→        onDataChange();
+   130→      }
+   131→      
+   132→    } catch (error) {
+   133→      console.error('Error creating call platform company:', error);
+   134→      setFetchError('Network error occurred while creating call platform company');
+   135→    } finally {
+   136→      setIsLoading(false);
+   137→    }
+   138→  };
+   139→
+   140→  const handleCreateNewCallPlatAccount = async () => {
+   141→    if (selectedCompanies.size !== 1) return;
+   142→
+   143→    const selectedCompanyId = Array.from(selectedCompanies)[0];
+   144→    setIsLoading(true);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll update the Action Buttons section to include the new "Create New Call Platform Company" button above the existing button:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cplatzar/components/CallPlatUITable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   291→          />
+   292→        </div>
+   293→      </div>
+   294→
+   295→      {/* Action Buttons */}
+   296→      <div className="bg-white p-4 rounded-lg shadow">
+   297→        <div className="space-y-4">
+   298→          {/* Create New Company Section */}
+   299→          <div className="flex items-center space-x-4">
+   300→            <button
+   301→              onClick={() => setShowCreateCompanyForm(!showCreateCompanyForm)}
+   302→              disabled={isLoading}
+   303→              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium disabled:bg-gray-400"
+   304→            >
+   305→              {showCreateCompanyForm ? 'Cancel' : 'Create New Call Platform Company'}
+   306→            </button>
+   307→            
+   308→            <div className="text-sm text-gray-600">
+   309→              Add a new call platform provider (Nimbata, Ringba, Twilio, etc.)
+   310→            </div>
+   311→          </div>
+   312→
+   313→          {/* Create Company Form */}
+   314→          {showCreateCompanyForm && (
+   315→            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+   316→              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   317→                <div>
+   318→                  <label className="block text-sm font-medium text-gray-700 mb-1">
+   319→                    Company Name *
+   320→                  </label>
+   321→                  <input
+   322→                    type="text"
+   323→                    value={newCompanyName}
+   324→                    onChange={(e) => setNewCompanyName(e.target.value)}
+   325→                    placeholder="e.g., Nimbata, Ringba, Twilio"
+   326→                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+   327→                  />
+   328→                </div>
+   329→                <div>
+   330→                  <label className="block text-sm font-medium text-gray-700 mb-1">
+   331→                    Portal URL (optional)
+   332→                  </label>
+   333→                  <input
+   334→                    type="url"
+   335→                    value={newCompanyPortalUrl}
+   336→                    onChange={(e) => setNewCompanyPortalUrl(e.target.value)}
+   337→                    placeholder="https://app.nimbata.com"
+   338→                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+   339→                  />
+   340→                </div>
+   341→              </div>
+   342→              <div className="flex justify-end space-x-2 mt-4">
+   343→                <button
+   344→                  onClick={() => setShowCreateCompanyForm(false)}
+   345→                  disabled={isLoading}
+   346→                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md font-medium"
+   347→                >
+   348→                  Cancel
+   349→                </button>
+   350→                <button
+   351→                  onClick={handleCreateNewCallPlatCompany}
+   352→                  disabled={isLoading || !newCompanyName.trim()}
+   353→                  className={`px-4 py-2 rounded-md font-medium ${
+   354→                    !isLoading && newCompanyName.trim()
+   355→                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+   356→                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+   357→                  }`}
+   358→                >
+   359→                  {isLoading ? 'Creating...' : 'Create Company'}
+   360→                </button>
+   361→              </div>
+   362→            </div>
+   363→          )}
+   364→
+   365→          {/* Create New Account Section */}
+   366→          <div className="flex items-center space-x-4">
+   367→            <button
+   368→              onClick={handleCreateNewCallPlatAccount}
+   369→              disabled={selectedCompanies.size !== 1 || isLoading}
+   370→              className={`px-4 py-2 rounded-md font-medium ${
+   371→                selectedCompanies.size === 1 && !isLoading
+   372→                  ? 'bg-green-600 hover:bg-green-700 text-white'
+   373→                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+   374→              }`}
+   375→            >
+   376→              {isLoading ? 'Creating...' : 'Create New Call Platform Account'}
+   377→            </button>
+   378→            
+   379→            <div className="text-sm text-gray-600">
+   380→              {selectedCompanies.size === 0 && 'Select exactly 1 company to create account'}
+   381→              {selectedCompanies.size === 1 && 'Ready to create new account'}
+   382→              {selectedCompanies.size > 1 && `${selectedCompanies.size} companies selected (select only 1)`}
+   383→            </div>
+   384→          </div>
+   385→        </div>
+   386→      </div>
+   387→
+   388→      {/* Error Display */}
+   389→      {fetchError && (
+   390→        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add 'Create New Call Platform Company' functionality to /cplatzar page
+
+
