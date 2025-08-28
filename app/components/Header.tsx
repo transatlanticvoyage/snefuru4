@@ -10,11 +10,16 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useCustomColors } from '@/app/hooks/useCustomColors';
 import { createNavigationStructure } from '@/app/utils/navigationHelper';
 import { useRecentPages } from '@/app/hooks/useRecentPages';
+import AvatarDisplay from '@/app/components/profile/AvatarDisplay';
 
 interface NavItem {
   name: string;
   path?: string;
   children?: NavItem[];
+}
+
+interface UserSettings {
+  avatar_url?: string | null;
 }
 
 export default function Header() {
@@ -47,6 +52,7 @@ export default function Header() {
   const [navDropdowns, setNavDropdowns] = useState<{[key: string]: boolean}>({});
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [isNeptuneNavOpen, setIsNeptuneNavOpen] = useState(false);
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
   const { recentPages, clearRecents } = useRecentPages();
@@ -110,6 +116,35 @@ export default function Header() {
     fetchNavItems();
   }, []);
 
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      if (!user?.id) {
+        setUserSettings(null);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('avatar_url')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user avatar:', error);
+          setUserSettings(null);
+          return;
+        }
+
+        setUserSettings(data);
+      } catch (err) {
+        console.error('Error:', err);
+        setUserSettings(null);
+      }
+    };
+
+    fetchUserSettings();
+  }, [user, supabase]);
 
   const handleLogout = async () => {
     try {
@@ -667,9 +702,11 @@ export default function Header() {
                 onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
                 className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-white">
-                  {user?.email?.[0].toUpperCase() || 'U'}
-                </div>
+                <AvatarDisplay 
+                  avatarUrl={userSettings?.avatar_url}
+                  email={user?.email}
+                  size="sm"
+                />
               </button>
               {isUserDropdownOpen && (
                 <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50">

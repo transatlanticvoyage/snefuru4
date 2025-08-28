@@ -8,11 +8,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createNavigationStructure } from '@/app/utils/navigationHelper';
+import AvatarDisplay from '@/app/components/profile/AvatarDisplay';
 
 interface SidebarMenuProps {
   isOpen: boolean;
   onToggle: () => void;
   showToggleButton?: boolean; // Optional prop to hide the default toggle button
+}
+
+interface UserSettings {
+  avatar_url?: string | null;
 }
 
 interface NavItem {
@@ -28,6 +33,7 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
   const [expandedItems, setExpandedItems] = useState<{[key: string]: boolean}>({});
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const supabase = createClientComponentClient();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -67,6 +73,36 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
     };
 
     checkSidebarSetting();
+  }, [user, supabase]);
+
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      if (!user?.id) {
+        setUserSettings(null);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('avatar_url')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user avatar:', error);
+          setUserSettings(null);
+          return;
+        }
+
+        setUserSettings(data);
+      } catch (err) {
+        console.error('Error:', err);
+        setUserSettings(null);
+      }
+    };
+
+    fetchUserSettings();
   }, [user, supabase]);
 
   useEffect(() => {
@@ -289,10 +325,12 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               className="flex items-center w-full text-left hover:bg-gray-800 p-2 rounded transition-colors"
             >
-              <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center mr-3">
-                <span className="text-white text-sm font-medium">
-                  {user?.email?.charAt(0).toUpperCase()}
-                </span>
+              <div className="mr-3">
+                <AvatarDisplay 
+                  avatarUrl={userSettings?.avatar_url}
+                  email={user?.email}
+                  size="sm"
+                />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-white">{user?.email}</p>

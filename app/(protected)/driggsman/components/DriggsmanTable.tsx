@@ -3344,7 +3344,7 @@ export default function DriggsmanTable({
                 <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
                 <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
                 <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
-                <td className="h-8 border-r border-gray-300"></td>
+                <td className="h-8" style={{ borderRight: '2px solid black' }}></td>
                 {paginatedSites.map((site, index) => (
                   <>
                     <td
@@ -3983,6 +3983,7 @@ export default function DriggsmanTable({
                     <th
                       key={`${site.id}-vacuum`}
                       className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+                      style={{ borderLeft: '2px solid black' }}
                     >
                       <div className="flex flex-col items-center justify-center">
                         {/* Vacuum Icon */}
@@ -3996,14 +3997,17 @@ export default function DriggsmanTable({
                         >
                           <path d="M23 15v4c0 1.1-.9 2-2 2h-1v-6h3zm-4 0v6h-4v-6h4zm-5 0v6h-4v-6h4zm-5 0v6H8c-1.1 0-2-.9-2-2v-4h3zm-6-2c-.55 0-1-.45-1-1s.45-1 1-1h2.03c.25-1.67 1.67-2.96 3.4-2.96.56 0 1.08.14 1.54.38l5.12-5.12c.37-.38.88-.59 1.41-.59.78 0 1.5.63 1.5 1.41 0 .53-.21 1.04-.59 1.41L11.29 10.63c.24.46.38.98.38 1.54 0 1.73-1.29 3.15-2.96 3.4V13H3zm8.43-7.41c.2-.2.51-.2.71 0s.2.51 0 .71l-3.54 3.54c-.2.2-.51.2-.71 0s-.2-.51 0-.71l3.54-3.54z"/>
                         </svg>
-                        <div>**vacuum**</div>
+                        <div>
+                          wordpress<br/>
+                          vacuum
+                        </div>
                       </div>
                     </th>
                     {/* Scraper column */}
                     <th
                       key={`${site.id}-scraper`}
                       className="px-1 py-3 text-center text-xs font-bold text-gray-900"
-                      style={{ borderRight: '3px solid black' }}
+                      style={{ borderLeft: '2px solid black', borderRight: '3px solid black' }}
                     >
                       <div className="flex flex-col items-center justify-center">
                         {/* Scraper Icon */}
@@ -5509,25 +5513,25 @@ export default function DriggsmanTable({
             data-driggspack-popup
             className="fixed z-50 bg-white shadow-2xl border border-gray-300"
             style={{
-              top: 0,
-              left: driggspackPopup.position.left + 10, // 10px gap for the triangle
-              width: `calc(100vw - ${driggspackPopup.position.left + 10}px)`,
-              height: '100vh'
+              top: '10px',
+              left: '10px',
+              width: 'calc(100vw - 20px)',
+              height: 'calc(100vh - 20px)'
             }}
           >
-            {/* Triangular Connector (Caret/Arrow) */}
+            {/* Close Button */}
             <div
-              className="absolute bg-white border-l border-t border-gray-300"
+              className="absolute cursor-pointer flex items-center justify-center bg-gray-400 hover:bg-gray-500 transition-colors"
               style={{
-                left: '-6px',
-                top: driggspackPopup.position.top + 'px',
-                width: '12px',
-                height: '12px',
-                transform: 'rotate(-45deg)',
-                borderRight: 'none',
-                borderBottom: 'none'
+                top: '20px',
+                right: '20px',
+                width: '100px',
+                height: '100px'
               }}
-            ></div>
+              onClick={() => setDriggspackPopup(null)}
+            >
+              <div className="text-white text-4xl font-bold select-none">×</div>
+            </div>
             
             {/* Popup Content */}
             <div className="p-4 h-full overflow-auto">

@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import PlancheEditPopup from './PlancheEditPopup';
 
 // Dynamic import of NubraTablefaceKite
-const NubraTablefaceKite = dynamic(() => import('@/app/components/shared/NubraTablefaceKite'), {
+const NubraTablefaceKite = dynamic(() => import('@/app/utils/nubra-tableface-kite/NubraTablefaceKite'), {
   ssr: false
 });
 
@@ -38,6 +38,7 @@ export default function PlanchjarTable() {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [editValue, setEditValue] = useState<string>('');
   const [saving, setSaving] = useState<Set<number>>(new Set());
+  const [userInternalId, setUserInternalId] = useState<string | null>(null);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,15 +51,40 @@ export default function PlanchjarTable() {
   const [showPopup, setShowPopup] = useState(false);
   const [popupPlancheId, setPopupPlancheId] = useState<number | undefined>(undefined);
 
-  // Load data on component mount and when user changes
+  // Get internal user ID from users table
   useEffect(() => {
+    const getInternalUserId = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (!error && userData) {
+          setUserInternalId(userData.id);
+        }
+      } catch (err) {
+        console.error('Error getting internal user ID:', err);
+      }
+    };
+
     if (user?.id) {
-      loadPlanches();
+      getInternalUserId();
     }
   }, [user]);
 
+  // Load data when userInternalId is available
+  useEffect(() => {
+    if (userInternalId) {
+      loadPlanches();
+    }
+  }, [userInternalId]);
+
   const loadPlanches = async () => {
-    if (!user?.id) return;
+    if (!userInternalId) return;
     
     setLoading(true);
     setError(null);
@@ -67,7 +93,7 @@ export default function PlanchjarTable() {
       const { data, error } = await supabase
         .from('planches')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userInternalId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -170,7 +196,7 @@ export default function PlanchjarTable() {
 
   // Handle create new inline
   const handleCreateInline = async () => {
-    if (!user?.id) return;
+    if (!userInternalId) return;
     
     try {
       const { data, error } = await supabase
@@ -179,7 +205,7 @@ export default function PlanchjarTable() {
           planch_name: null,
           planch_desc: null,
           planch_datum: null,
-          user_id: user.id
+          user_id: userInternalId
         })
         .select()
         .single();
@@ -353,11 +379,11 @@ export default function PlanchjarTable() {
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="min-w-full" style={{ borderCollapse: 'collapse' }}>
             <thead className="bg-gray-50">
               <tr>
                 {/* Checkbox column */}
-                <th className="w-12 px-3 py-3">
+                <th className="w-12 px-3 py-3 border border-gray-300">
                   <div 
                     className="flex items-center justify-center cursor-pointer h-full w-full"
                     onClick={handleSelectAll}
@@ -373,37 +399,37 @@ export default function PlanchjarTable() {
                 </th>
                 
                 {/* Data columns */}
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left border border-gray-300">
                   <span className="font-bold text-xs lowercase text-gray-900">planch_id</span>
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left border border-gray-300">
                   <span className="font-bold text-xs lowercase text-gray-900">planch_name</span>
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left border border-gray-300">
                   <span className="font-bold text-xs lowercase text-gray-900">planch_desc</span>
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left border border-gray-300">
                   <span className="font-bold text-xs lowercase text-gray-900">planch_datum</span>
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left border border-gray-300">
                   <span className="font-bold text-xs lowercase text-gray-900">created_at</span>
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left border border-gray-300">
                   <span className="font-bold text-xs lowercase text-gray-900">updated_at</span>
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left border border-gray-300">
                   <span className="font-bold text-xs lowercase text-gray-900">user_id</span>
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left border border-gray-300">
                   <span className="font-bold text-xs lowercase text-gray-900">actions</span>
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white">
               {currentItems.map((planche) => (
                 <tr key={planche.planch_id} className="hover:bg-gray-50">
                   {/* Checkbox column */}
-                  <td className="w-12 px-3 py-4">
+                  <td className="w-12 px-3 py-4 border border-gray-300">
                     <div 
                       className="flex items-center justify-center cursor-pointer h-full w-full"
                       onClick={() => handleRowSelect(planche.planch_id)}
@@ -419,12 +445,12 @@ export default function PlanchjarTable() {
                   </td>
                   
                   {/* planch_id (read-only) */}
-                  <td className="px-4 py-4 text-sm text-gray-900">
+                  <td className="px-4 py-4 text-sm text-gray-900 border border-gray-300">
                     {planche.planch_id}
                   </td>
                   
                   {/* planch_name (editable) */}
-                  <td className="px-4 py-4 text-sm text-gray-900">
+                  <td className="px-4 py-4 text-sm text-gray-900 border border-gray-300">
                     {editingCell?.rowId === planche.planch_id && editingCell.field === 'planch_name' ? (
                       <div className="flex items-center space-x-2">
                         <input
@@ -463,7 +489,7 @@ export default function PlanchjarTable() {
                   </td>
                   
                   {/* planch_desc (editable) */}
-                  <td className="px-4 py-4 text-sm text-gray-900">
+                  <td className="px-4 py-4 text-sm text-gray-900 border border-gray-300">
                     {editingCell?.rowId === planche.planch_id && editingCell.field === 'planch_desc' ? (
                       <div className="flex items-center space-x-2">
                         <textarea
@@ -514,7 +540,7 @@ export default function PlanchjarTable() {
                   </td>
                   
                   {/* planch_datum (editable) */}
-                  <td className="px-4 py-4 text-sm text-gray-900">
+                  <td className="px-4 py-4 text-sm text-gray-900 border border-gray-300">
                     {editingCell?.rowId === planche.planch_id && editingCell.field === 'planch_datum' ? (
                       <div className="flex items-center space-x-2">
                         <textarea
@@ -565,22 +591,22 @@ export default function PlanchjarTable() {
                   </td>
                   
                   {/* created_at (read-only) */}
-                  <td className="px-4 py-4 text-sm text-gray-500">
+                  <td className="px-4 py-4 text-sm text-gray-500 border border-gray-300">
                     {new Date(planche.created_at).toLocaleString()}
                   </td>
                   
                   {/* updated_at (read-only) */}
-                  <td className="px-4 py-4 text-sm text-gray-500">
+                  <td className="px-4 py-4 text-sm text-gray-500 border border-gray-300">
                     {planche.updated_at ? new Date(planche.updated_at).toLocaleString() : '-'}
                   </td>
                   
                   {/* user_id (read-only) */}
-                  <td className="px-4 py-4 text-sm text-gray-500 font-mono">
+                  <td className="px-4 py-4 text-sm text-gray-500 font-mono border border-gray-300">
                     {planche.user_id?.substring(0, 8)}...
                   </td>
                   
                   {/* actions */}
-                  <td className="px-4 py-4 text-sm">
+                  <td className="px-4 py-4 text-sm border border-gray-300">
                     <button
                       onClick={() => handleEditPopup(planche.planch_id)}
                       className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs"

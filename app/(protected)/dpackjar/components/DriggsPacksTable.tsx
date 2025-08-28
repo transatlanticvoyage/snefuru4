@@ -34,6 +34,7 @@ export default function DriggsPacksTable() {
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [sortField, setSortField] = useState<keyof DriggsPacksRecord>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [userInternalId, setUserInternalId] = useState<string | null>(null);
   
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -85,8 +86,33 @@ export default function DriggsPacksTable() {
     if (user?.is_admin) return true;
     
     // Non-admin users can only edit "personal" realm records they created
-    return record.dpack_realm === 'personal' && record.user_id_created_by === user?.id;
+    return record.dpack_realm === 'personal' && record.user_id_created_by === userInternalId;
   };
+
+  // Get internal user ID from users table
+  useEffect(() => {
+    const getInternalUserId = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (!error && userData) {
+          setUserInternalId(userData.id);
+        }
+      } catch (err) {
+        console.error('Error getting internal user ID:', err);
+      }
+    };
+
+    if (user?.id) {
+      getInternalUserId();
+    }
+  }, [user]);
 
   useEffect(() => {
     fetchData();
@@ -261,6 +287,11 @@ export default function DriggsPacksTable() {
 
   // Create new record inline
   const createNewRecordInline = async () => {
+    if (!userInternalId) {
+      alert('User information not loaded. Please try again.');
+      return;
+    }
+
     try {
       const { data: newRecord, error } = await supabase
         .from('driggs_packs')
@@ -270,7 +301,7 @@ export default function DriggsPacksTable() {
           dpack_realm: user?.is_admin ? 'adminpublic' : 'personal',
           dpack_name: null,
           dpack_description: null,
-          user_id_created_by: user?.id || null
+          user_id_created_by: userInternalId
         }])
         .select('*')
         .single();
@@ -390,6 +421,11 @@ export default function DriggsPacksTable() {
 
   // Handle form submission for popup modal
   const handleCreateSubmit = async () => {
+    if (!userInternalId) {
+      alert('User information not loaded. Please try again.');
+      return;
+    }
+
     try {
       // Set default realm based on user permissions
       const defaultRealm = user?.is_admin ? 'adminpublic' : 'personal';
@@ -401,7 +437,7 @@ export default function DriggsPacksTable() {
         dpack_realm: finalRealm,
         dpack_name: formData.dpack_name.trim() || null,
         dpack_description: formData.dpack_description.trim() || null,
-        user_id_created_by: user?.id || null
+        user_id_created_by: userInternalId
       };
       
       const { error: insertError } = await supabase

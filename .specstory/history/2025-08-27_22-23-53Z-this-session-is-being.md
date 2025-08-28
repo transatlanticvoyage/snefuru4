@@ -550,3 +550,725 @@ const canEditRecord = (record: DriggsPacksRecord): boolean => {
 
 The permission system is now fully integrated into both the main table (DriggsPacksTable.tsx) and the expand editor (DriggsPacksExpandEditor.tsx), providing a complete user access control system for the driggs_packs functionality as requested.
 
+---
+
+_**User**_
+
+User provided an image (image/png).
+
+pleae give me sql to create this new db table
+
+[Image #1]
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Based on the table schema shown in your image, here's the SQL to create the `planches` table:
+
+```sql
+CREATE TABLE planches (
+    planch_id SERIAL PRIMARY KEY,
+    planch_name TEXT,
+    planch_desc TEXT,
+    planch_datum TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE,
+    user_id UUID,
+    CONSTRAINT fk_planches_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Add indexes for performance
+CREATE INDEX idx_planches_user_id ON planches(user_id);
+CREATE INDEX idx_planches_created_at ON planches(created_at);
+```
+
+This SQL creates:
+- A `planches` table with all the fields shown in your diagram
+- `planch_id` as a serial primary key (auto-incrementing)
+- Text fields for `planch_name`, `planch_desc`, and `planch_datum`
+- Timestamp fields with `created_at` defaulting to current time
+- Foreign key relationship to the `users` table
+- Performance indexes on commonly queried fields
+
+The table structure matches your diagram exactly and follows the same patterns used in your existing `driggs_packs` table.
+
+---
+
+_**User**_
+
+here is the desired table, remake it . itmight be the same as you just did. im not sure.
+
+create new db table        
+planches        
+        
+db table    field type    db field name
+planches    serial    planch_id
+planches    text    planch_name
+planches    text    planch_desc
+planches    text    planch_datum
+planches    timestamp    created_at
+planches    timestamp    updated_at
+planches    fk to users.id    user_id
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here's the SQL to create the `planches` table based on your specifications:
+
+```sql
+CREATE TABLE planches (
+    planch_id SERIAL PRIMARY KEY,
+    planch_name TEXT,
+    planch_desc TEXT,
+    planch_datum TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE,
+    user_id UUID,
+    CONSTRAINT fk_planches_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Add indexes for performance
+CREATE INDEX idx_planches_user_id ON planches(user_id);
+CREATE INDEX idx_planches_created_at ON planches(created_at);
+```
+
+This creates the exact table structure you specified:
+- `planch_id`: Serial primary key (auto-incrementing)
+- `planch_name`: Text field
+- `planch_desc`: Text field  
+- `planch_datum`: Text field
+- `created_at`: Timestamp with default to current time
+- `updated_at`: Timestamp (no default)
+- `user_id`: UUID foreign key to users.id table
+
+The indexes will help with performance when querying by user or creation date.
+
+---
+
+_**User**_
+
+i ran the sql
+
+
+pleaes create new page at 
+/planchjar
+
+then, for our page at
+/planchjar
+
+please create a ui table that displays every db column from the db table:
+planches
+
+
+//////////////////////////////////////////////////////////
+
+IMPORTANT NOTE: please make sure to only display db rows from the main db table of medium_posts for the user id of the currently logged-in user (which is held in field medium_posts.user_id
+
+
+//////////////////////////////////////////////////////////
+
+———————————————————————
+as an example for the styling we're trying to copy(as much as possible) build something similar to what is on our current page at /xpagesmanager1
+(in terms of general styling, etc.)
+
+
+———————————————————————
+please make sure there is a checkbox in the far left column of this ui table
+———————————————————————
+please make sure that the user can edit all fields (in a given row) directly in the ui table without having to open an editor popup for "item view"
+———————————————————————
+user must be able to to click and start typing/etc. with "inline editing" functionality for text based fields
+———————————————————————
+please place toggle switches in the ui table for boolean fields
+        
+———————————————————————
+immediate population in ui table upon "create new" functionality
+        
+please add a button above the ui table grid that says "create new (inline)"
+        
+when user clicks this button, the ui table grid will populate with a new row immediately without page refresh
+        
+user will then be able to instantly start editing obviously 
+———————————————————————
+please create another button that occurs just after the other create new button
+        
+this button will say "create new (popup)"
+        
+when user clicks this, an individual item editor popup will open for user to edit the db row's individual fields inside of
+        
+———————————————————————
+please place a dynamic call to the nubra-tableface-kite in our app, and place it directly before the start of the main ui table grid on the page
+        
+this kite is a label that simply labels the style of ui table grid we have constructed for our own reference
+———————————————————————
+please make sure there are pagination controls that feature 2 button bars
+1 for qty of results per page
+1 for specific page selected
+these should not be dropdowns
+        
+this pair of pagination controls should appear both below and above the ui table grid at the right side of it
+        
+please make sure the nubra tableface kite appears actually above the pagination controls where the pagination ctonrols appear above the ui table grid
+        
+please set the default pagination to 100 for this page
+        
+please give qty per page options of
+10
+20
+50
+100
+200
+500
+All
+———————————————————————
+please create a search box to the right of the pagination controls and append a square yellow clear button with the text "CL" on it
+———————————————————————
+please make sure the pagination and search box area occurs at the left side of the screen
+        
+———————————————————————
+please make sure that, for the top th header label cells that occur at the top of each column in the ui table grid, the following is true:
+        
+text is bold
+text is all lowercase
+text is the exact name of the db column it corresponds to (if it is a ui column that corresponds directly to a db column)
+        
+———————————————————————
+checkbox styling and functionality
+please make the checkboxes 20 px by 20 px square
+        
+please make the "clickable" area that user must click on , in order to select a row, be the entire table cell (whether a td in main table area or th for the "select all" checkbox)
+        
+so this will give the user a bigger area to click on 
+        
+        
+        
+———————————————————————
+please make sure that inside the pagination button bars, the individual buttons do not have space between them they should adjoin cleanly with no visual gap
+
+please make sure that none of these buttons have rounded corners except for the buttons on the ends of the button bars.
+
+please make sure that there are no rounded corners anywhere buttons adjoin.
+———————————————————————
+        
+the pagination button bars should show the same mouse behavior as when user is hovering over normal links. 
+
+there should also be a button bar hover bg color of light gray for the pagination button bars.
+        
+———————————————————————
+        
+please change the pagination text size to be 14 px . and then alter the top and bottom paddings only (not right and left) of the individual button bars to be 10 px
+        
+———————————————————————
+
+PAGE TO MIMMICK IN YOUR IMPLEMENTATION OF STYLES ETC (important)
+
+please view our page /filejar in order to see the implementation of exact styling that is desired for both the ui table grid itself and the other elements on the page, such as control systems appearing on the page above the ui table grid, etc.
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Create new /planchjar page structure
+- [ ] 🌡️ Build UI table with all planches columns
+- [ ] 🌡️ Add pagination and search controls
+- [ ] 🌡️ Add create buttons and popup functionality
+- [ ] 🌡️ Style according to /filejar reference
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll create the new `/planchjar` page following the same patterns as your existing pages. Let me start by examining the `/filejar` page structure to understand the styling:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/api/filejar/files/route.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/filejar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/filejar/components/FilejarTable.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/admin/filejar/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import MenjariButtonBarFileGunLinks from '@/app/components/MenjariButtonBarFileGunLinks';
+     7→import FilejarTable from './components/FilejarTable';
+     8→
+     9→export default function FilejarPage() {
+    10→  const { user } = useAuth();
+    11→  const router = useRouter();
+    12→
+    13→  useEffect(() => {
+    14→    if (!user) {
+    15→      router.push('/login');
+    16→      return;
+    17→    }
+    18→  }, [user, router]);
+    19→
+    20→  // Check if we're in production
+    21→  if (process.env.NODE_ENV === 'production') {
+    22→    return (
+    23→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    24→        <div className="text-center">
+    25→          <h1 className="text-2xl font-bold text-gray-800 mb-4">FileGun Files</h1>
+    26→          <p className="text-gray-600">This page is only available in development mode</p>
+    27→        </div>
+    28→      </div>
+    29→    );
+    30→  }
+    31→
+    32→  if (!user) {
+    33→    return (
+    34→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    35→        <div className="text-gray-500">Loading...</div>
+    36→      </div>
+    37→    );
+    38→  }
+    39→
+    40→  return (
+    41→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    42→      {/* Menjari Button Bar */}
+    43→      <div className="px-6 pb-0">
+    44→        <MenjariButtonBarFileGunLinks />
+    45→      </div>
+    46→      
+    47→      {/* Header */}
+    48→      <div className="bg-white border-b px-6 py-4">
+    49→        <div className="flex items-center justify-between">
+    50→          <div>
+    51→            <h1 className="text-2xl font-bold text-gray-800">📄 FileGun Files</h1>
+    52→          </div>
+    53→          <div className="text-right">
+    54→            <div className="text-sm text-gray-500">Environment: Development Only</div>
+    55→            <div className="text-xs text-gray-400">Project: Tregnar</div>
+    56→          </div>
+    57→        </div>
+    58→      </div>
+    59→
+    60→      {/* Main Content - Full Width FilejarTable */}
+    61→      <div className="flex-1 overflow-hidden">
+    62→        <FilejarTable />
+    63→      </div>
+    64→    </div>
+    65→  );
+    66→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me examine the FilejarTable component to understand the styling patterns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/admin/filejar/components/FilejarTable.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect, useMemo } from 'react';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→import dynamic from 'next/dynamic';
+     6→
+     7→const NubraTablefaceKite = dynamic(
+     8→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+     9→  { ssr: false }
+    10→);
+    11→
+    12→interface FilegunFile {
+    13→  file_id: number;
+    14→  file_path: string | null;
+    15→  file_name: string | null;
+    16→  file_parent_path: string | null;
+    17→  extension: string | null;
+    18→  mime_type: string | null;
+    19→  file_size: number | null;
+    20→  encoding: string | null;
+    21→  created_at: string;
+    22→  modified_at: string | null;
+    23→  last_accessed_at: string | null;
+    24→  file_system_created: string | null;
+    25→  file_system_modified: string | null;
+    26→  is_protected: boolean | null;
+    27→  permissions: string | null;
+    28→  owner_user: string | null;
+    29→  owner_group: string | null;
+    30→  is_hidden: boolean | null;
+    31→  is_executable: boolean | null;
+    32→  line_count: number | null;
+    33→  character_count: number | null;
+    34→  word_count: number | null;
+    35→  checksum: string | null;
+    36→  content_preview: string | null;
+    37→  is_code_file: boolean | null;
+    38→  programming_language: string | null;
+    39→  git_status: string | null;
+    40→  last_git_commit: string | null;
+    41→  tags: any;
+    42→  custom_metadata: any;
+    43→  user_notes: string | null;
+    44→  color_label: string | null;
+    45→  importance_level: number | null;
+    46→  sync_status: string | null;
+    47→  last_sync_at: string | null;
+    48→  is_zepulus_docs: boolean | null;
+    49→}
+    50→
+    51→export default function FilejarTable() {
+    52→  const [data, setData] = useState<FilegunFile[]>([]);
+    53→  const [loading, setLoading] = useState(true);
+    54→  const [error, setError] = useState<string | null>(null);
+    55→  const [searchTerm, setSearchTerm] = useState('');
+    56→  const [currentPage, setCurrentPage] = useState(1);
+    57→  const [itemsPerPage, setItemsPerPage] = useState(100);
+    58→  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    59→  const [sortField, setSortField] = useState<keyof FilegunFile>('created_at');
+    60→  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    61→  
+    62→  // Modal states
+    63→  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    64→  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    65→  const [editingRecord, setEditingRecord] = useState<FilegunFile | null>(null);
+    66→  
+    67→  // Inline editing states
+    68→  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
+    69→  const [editingValue, setEditingValue] = useState<string>('');
+    70→  
+    71→  // Form data for creating/editing
+    72→  const [formData, setFormData] = useState({
+    73→    file_path: '',
+    74→    file_name: '',
+    75→    file_parent_path: '',
+    76→    extension: '',
+    77→    mime_type: '',
+    78→    file_size: 0,
+    79→    encoding: '',
+    80→    modified_at: '',
+    81→    last_accessed_at: '',
+    82→    file_system_created: '',
+    83→    file_system_modified: '',
+    84→    is_protected: false,
+    85→    permissions: '',
+    86→    owner_user: '',
+    87→    owner_group: '',
+    88→    is_hidden: false,
+    89→    is_executable: false,
+    90→    line_count: 0,
+    91→    character_count: 0,
+    92→    word_count: 0,
+    93→    checksum: '',
+    94→    content_preview: '',
+    95→    is_code_file: false,
+    96→    programming_language: '',
+    97→    git_status: '',
+    98→    last_git_commit: '',
+    99→    tags: '',
+   100→    custom_metadata: '',
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me continue reading the FilejarTable to understand the pagination and table structure:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/admin/filejar/components/FilejarTable.tsx`
+
+Result:
+
+```
+400→        is_hidden: formData.is_hidden,
+   401→        is_executable: formData.is_executable,
+   402→        line_count: formData.line_count || null,
+   403→        character_count: formData.character_count || null,
+   404→        word_count: formData.word_count || null,
+   405→        checksum: formData.checksum?.trim() || null,
+   406→        content_preview: formData.content_preview?.trim() || null,
+   407→        is_code_file: formData.is_code_file,
+   408→        programming_language: formData.programming_language?.trim() || null,
+   409→        git_status: formData.git_status?.trim() || null,
+   410→        last_git_commit: formData.last_git_commit?.trim() || null,
+   411→        tags: tagsData,
+   412→        custom_metadata: metadataData,
+   413→        user_notes: formData.user_notes?.trim() || null,
+   414→        color_label: formData.color_label?.trim() || null,
+   415→        importance_level: formData.importance_level || 1,
+   416→        sync_status: formData.sync_status?.trim() || null,
+   417→        last_sync_at: formData.last_sync_at?.trim() || null
+   418→      };
+   419→      
+   420→      const { error: insertError } = await supabase
+   421→        .from('filegun_files')
+   422→        .insert([insertData]);
+   423→        
+   424→      if (insertError) throw insertError;
+   425→      
+   426→      setIsCreateModalOpen(false);
+   427→      resetForm();
+   428→      fetchData();
+   429→    } catch (err) {
+   430→      console.error('Error creating record:', err);
+   431→      alert(`Failed to create record: ${err instanceof Error ? err.message : 'Unknown error'}`);
+   432→    }
+   433→  };
+   434→
+   435→  // Reset form
+   436→  const resetForm = () => {
+   437→    setFormData({
+   438→      file_path: '',
+   439→      file_name: '',
+   440→      file_parent_path: '',
+   441→      extension: '',
+   442→      mime_type: '',
+   443→      file_size: 0,
+   444→      encoding: '',
+   445→      modified_at: '',
+   446→      last_accessed_at: '',
+   447→      file_system_created: '',
+   448→      file_system_modified: '',
+   449→      is_protected: false,
+   450→      permissions: '',
+   451→      owner_user: '',
+   452→      owner_group: '',
+   453→      is_hidden: false,
+   454→      is_executable: false,
+   455→      line_count: 0,
+   456→      character_count: 0,
+   457→      word_count: 0,
+   458→      checksum: '',
+   459→      content_preview: '',
+   460→      is_code_file: false,
+   461→      programming_language: '',
+   462→      git_status: '',
+   463→      last_git_commit: '',
+   464→      tags: '',
+   465→      custom_metadata: '',
+   466→      user_notes: '',
+   467→      color_label: '',
+   468→      importance_level: 1,
+   469→      sync_status: '',
+   470→      last_sync_at: ''
+   471→    });
+   472→  };
+   473→
+   474→  // Render cell content
+   475→  const renderCell = (item: FilegunFile, column: typeof columns[0]) => {
+   476→    const value = item[column.key];
+   477→    const isEditing = editingCell?.id === item.file_id && editingCell?.field === column.key;
+   478→    const isReadOnly = column.key === 'file_id' || column.key === 'created_at';
+   479→
+   480→    if (column.type === 'boolean' && !isReadOnly) {
+   481→      return (
+   482→        <button
+   483→          onClick={() => handleBooleanToggle(item.file_id, column.key as keyof FilegunFile, value as boolean | null)}
+   484→          className={`w-12 h-6 rounded-full transition-colors ${
+   485→            value === true ? 'bg-green-500' : 
+   486→            value === false ? 'bg-gray-300' : 'bg-yellow-300'
+   487→          }`}
+   488→        >
+   489→          <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+   490→            value === true ? 'translate-x-6' : 
+   491→            value === false ? 'translate-x-1' : 'translate-x-3'
+   492→          }`} />
+   493→        </button>
+   494→      );
+   495→    }
+   496→
+   497→    if (isEditing) {
+   498→      return (
+   499→        <div className="flex items-center space-x-2">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me look for the pagination controls and table rendering section:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/admin/filejar/components/FilejarTable.tsx`
+
+Result:
+
+```
+800→                      }`}
+   801→                      style={{ 
+   802→                        width: column.width,
+   803→                        minWidth: column.width,
+   804→                        maxWidth: column.width
+   805→                      }}
+   806→                      onClick={() => handleSort(column.key)}
+   807→                    >
+   808→                      <div className="flex items-center space-x-1">
+   809→                        <span 
+   810→                          className={`font-bold text-xs lowercase ${isReadOnly ? 'text-gray-500' : 'text-gray-900'}`}
+   811→                          style={{
+   812→                            wordBreak: 'break-all',
+   813→                            lineHeight: '1.1',
+   814→                            display: '-webkit-box',
+   815→                            WebkitLineClamp: 2,
+   816→                            WebkitBoxOrient: 'vertical',
+   817→                            overflow: 'hidden',
+   818→                            textOverflow: 'ellipsis',
+   819→                            maxHeight: '2.2em'
+   820→                          }}
+   821→                        >
+   822→                          {column.label.toLowerCase()}
+   823→                        </span>
+   824→                        {!isReadOnly && column.type !== 'boolean' && (
+   825→                          <span className="text-blue-500 text-xs" title="Click cells to edit">
+   826→                            ✎
+   827→                          </span>
+   828→                        )}
+   829→                        {sortField === column.key && (
+   830→                          <span className="text-gray-400">
+   831→                            {sortOrder === 'asc' ? '↑' : '↓'}
+   832→                          </span>
+   833→                        )}
+   834→                      </div>
+   835→                    </th>
+   836→                  );
+   837→                })}
+   838→              </tr>
+   839→            </thead>
+   840→            <tbody className="divide-y divide-gray-200">
+   841→              {paginatedData.map((item) => (
+   842→                <tr key={item.file_id} className="hover:bg-gray-50">
+   843→                  <td className="px-2 py-3 border border-gray-200">
+   844→                    <input
+   845→                      type="checkbox"
+   846→                      style={{ width: '20px', height: '20px' }}
+   847→                      checked={selectedRows.has(item.file_id)}
+   848→                      onChange={(e) => {
+   849→                        const newSelected = new Set(selectedRows);
+   850→                        if (e.target.checked) {
+   851→                          newSelected.add(item.file_id);
+   852→                        } else {
+   853→                          newSelected.delete(item.file_id);
+   854→                        }
+   855→                        setSelectedRows(newSelected);
+   856→                      }}
+   857→                    />
+   858→                  </td>
+   859→                  {columns.map((column, index) => {
+   860→                    const isFirstInGroup = column.group === 'booleans' && (index === 0 || columns[index - 1].group !== 'booleans');
+   861→                    const isLastInGroup = column.group === 'booleans' && (index === columns.length - 1 || columns[index + 1].group !== 'booleans');
+   862→                    const hasRightSeparator = column.separator === 'right';
+   863→                    
+   864→                    return (
+   865→                      <td
+   866→                        key={column.key}
+   867→                        className={`text-sm border border-gray-200 px-2 py-1 ${
+   868→                          isFirstInGroup ? 'border-l-4 border-l-black' : ''
+   869→                        } ${isLastInGroup ? 'border-r-4 border-r-black' : ''} ${
+   870→                          hasRightSeparator ? 'border-r-4 border-r-black' : ''
+   871→                        }`}
+   872→                        style={{ width: column.width }}
+   873→                      >
+   874→                        {renderCell(item, column)}
+   875→                      </td>
+   876→                    );
+   877→                  })}
+   878→                </tr>
+   879→              ))}
+   880→            </tbody>
+   881→          </table>
+   882→        </div>
+   883→      </div>
+   884→
+   885→      {/* Bottom Area */}
+   886→      <div className="bg-white border-t border-gray-200 px-4 py-2">
+   887→        <div className="flex justify-between items-center">
+   888→          <div className="flex items-center space-x-6">
+   889→            <div className="text-sm text-gray-600">
+   890→              {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} files
+   891→              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+   892→            </div>
+   893→            <PaginationControls />
+   894→            <div className="relative">
+   895→              <input
+   896→                type="text"
+   897→                placeholder="Search all fields..."
+   898→                value={searchTerm}
+   899→                onChange={(e) => {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me find the pagination controls component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/admin/filejar/components/FilejarTable.tsx`
+
+Result:
+
+```
+600→          >
+   601→            10
+   602→          </button>
+   603→          <button
+   604→            onClick={() => {
+   605→              setItemsPerPage(20);
+   606→              setCurrentPage(1);
+   607→            }}
+   608→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 20 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   609→          >
+   610→            20
+   611→          </button>
+   612→          <button
+   613→            onClick={() => {
+   614→              setItemsPerPage(50);
+   615→              setCurrentPage(1);
+   616→            }}
+   617→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 50 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   618→          >
+   619→            50
+   620→          </button>
+   621→          <button
+   622→            onClick={() => {
+   623→              setItemsPerPage(100);
+   624→              setCurrentPage(1);
+   625→            }}
+   626→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 100 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   627→          >
+   628→            100
+   629→          </button>
+   630→          <button
+   631→            onClick={() => {
+   632→              setItemsPerPage(200);
+   633→              setCurrentPage(1);
+   634→            }}
+   635→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 200 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   636→          >
+   637→            200
+   638→          </button>
+   639→          <button
+   640→            onClick={() => {
+   641→              setItemsPerPage(500);
+   642→              setCurrentPage(1);
+   643→            }}
+   644→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 500 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   645→          >
+   646→            500
+   647→          </button>
+   648→          <button
+   649→            onClick={() => {
+```
+
