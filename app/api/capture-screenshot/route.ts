@@ -29,7 +29,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     // Get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -60,12 +61,15 @@ export async function POST(request: NextRequest) {
     // Validate sitespren ownership
     const { data: sitesprenData, error: sitesprenError } = await supabase
       .from('sitespren')
-      .select('id, sitespren_base, snail_image_url, snail_image_version, snail_image_updated_at')
+      .select('id, sitespren_base, screenshot_url, screenshot_taken_at, screenshot_status')
       .eq('id', sitespren_id)
       .eq('fk_users_id', dbUser.id)
       .single();
 
+    console.log('🔍 Database query result:', { sitesprenData, sitesprenError, query: { id: sitespren_id, fk_users_id: dbUser.id } });
+
     if (sitesprenError || !sitesprenData) {
+      console.error('❌ Sitespren lookup failed:', { error: sitesprenError, sitesprenData, sitespren_id, user_id: dbUser.id });
       return NextResponse.json(
         { error: 'Sitespren site not found or access denied' },
         { status: 404 }
@@ -73,31 +77,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if we need to capture a new screenshot
-    if (!force_refresh && sitesprenData.snail_image_url) {
-      const lastUpdate = sitesprenData.snail_image_updated_at ? new Date(sitesprenData.snail_image_updated_at) : null;
+    if (!force_refresh && sitesprenData.screenshot_url) {
+      const lastUpdate = sitesprenData.screenshot_taken_at ? new Date(sitesprenData.screenshot_taken_at) : null;
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
       
       if (lastUpdate && lastUpdate > oneHourAgo) {
         console.log('⏰ Using cached screenshot (less than 1 hour old)');
         return NextResponse.json({
           success: true,
-          image_url: sitesprenData.snail_image_url,
-          version_number: sitesprenData.snail_image_version || 1,
+          image_url: sitesprenData.screenshot_url,
           cached: true
         });
       }
     }
 
-    // Determine next version number
-    const currentVersion = sitesprenData.snail_image_version || 0;
-    const nextVersion = currentVersion + 1;
+    // Since there's no version column in the schema, we'll use a timestamp-based approach
+    const nextVersion = Date.now();
 
-    // Sanitize sitespren_base for folder/file naming
-    const sanitizedSitesprenBase = sitesprenBase.replace(/[^a-zA-Z0-9]/g, '_');
-    
-    // Create folder structure: SitesprenImages/{user_id}/{sanitized_sitespren_base}/
-    const folderPath = `SitesprenImages/${dbUser.id}/${sanitizedSitesprenBase}`;
-    const fileName = `${sanitizedSitesprenBase}_snail_image_${nextVersion}.webp`;
+    // Use the actual sitespren_base including periods for folder naming
+    // Create folder structure: SitesprenSnailScreenshots/{user_id}/{sitespren_base}/
+    const folderPath = `SitesprenSnailScreenshots/${dbUser.id}/${sitespren_base}`;
+    const fileName = `${sitespren_base}_screenshot_${nextVersion}.jpg`;
     const fullPath = `${folderPath}/${fileName}`;
 
     console.log('📁 Screenshot storage path:', { folderPath, fileName, fullPath });
@@ -114,9 +114,9 @@ export async function POST(request: NextRequest) {
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('sitespren-images')
+      .from('bucket-images-b1')
       .upload(fullPath, screenshotBuffer, {
-        contentType: 'image/webp',
+        contentType: 'image/jpeg',
         upsert: true,
         cacheControl: '3600'
       });
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     // Get public URL for the uploaded image
     const { data: urlData } = supabase.storage
-      .from('sitespren-images')
+      .from('bucket-images-b1')
       .getPublicUrl(fullPath);
 
     const publicUrl = urlData.publicUrl;
@@ -140,9 +140,9 @@ export async function POST(request: NextRequest) {
     const { error: updateError } = await supabase
       .from('sitespren')
       .update({
-        snail_image_url: publicUrl,
-        snail_image_version: nextVersion,
-        snail_image_updated_at: new Date().toISOString()
+        screenshot_url: publicUrl,
+        screenshot_taken_at: new Date().toISOString(),
+        screenshot_status: 'completed'
       })
       .eq('id', sitespren_id);
 
@@ -151,15 +151,14 @@ export async function POST(request: NextRequest) {
       // Don't fail the request - screenshot was captured successfully
     }
 
-    // Clean up old versions (keep max 5)
-    await cleanupOldVersions(supabase, folderPath, sanitizedSitesprenBase, nextVersion);
+    // Clean up old versions (keep max 5) - commented out for now since we're using timestamp-based naming
+    // await cleanupOldVersions(supabase, folderPath, sanitizedSitesprenBase, nextVersion);
 
-    console.log('✅ Screenshot captured successfully:', { version: nextVersion, url: publicUrl });
+    console.log('✅ Screenshot captured successfully:', { url: publicUrl });
 
     return NextResponse.json({
       success: true,
-      image_url: publicUrl,
-      version_number: nextVersion
+      image_url: publicUrl
     });
 
   } catch (error) {
@@ -202,7 +201,9 @@ async function captureWebsiteScreenshot(sitesprenBase: string): Promise<Buffer |
     await page.setViewportSize({ width: 1920, height: 1080 });
 
     // Set user agent to avoid bot detection
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    await page.setExtraHTTPHeaders({
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    });
 
     // Navigate with timeout and wait for network idle
     await page.goto(url, { 
@@ -213,9 +214,9 @@ async function captureWebsiteScreenshot(sitesprenBase: string): Promise<Buffer |
     // Wait a bit more for dynamic content
     await page.waitForTimeout(2000);
 
-    // Take screenshot in WebP format for optimal compression
+    // Take screenshot in JPEG format for optimal compression
     const screenshot = await page.screenshot({
-      type: 'webp',
+      type: 'jpeg',
       quality: 80,
       fullPage: false // Viewport only for consistent 16:9 ratio
     });

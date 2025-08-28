@@ -32,6 +32,28 @@ export default function DriggsmanClient() {
     return false;
   });
 
+  // State for sites per view (columnsPerPage)
+  const [sitesPerView, setSitesPerView] = useState<number>(() => {
+    // Initialize from URL parameter
+    if (typeof window !== 'undefined') {
+      const urlParam = new URLSearchParams(window.location.search).get('sitesperview');
+      const value = urlParam ? parseInt(urlParam) : 1;
+      return [1, 2, 5, 10, 15, 20].includes(value) ? value : 1;
+    }
+    return 1;
+  });
+
+  // State for column page
+  const [specColumnPage, setSpecColumnPage] = useState<number>(() => {
+    // Initialize from URL parameter
+    if (typeof window !== 'undefined') {
+      const urlParam = new URLSearchParams(window.location.search).get('speccolumnpage');
+      const value = urlParam ? parseInt(urlParam) : 1;
+      return value > 0 ? value : 1;
+    }
+    return 1;
+  });
+
   // Controls state for pagination and search
   const [paginationControls, setPaginationControls] = useState<{
     PaginationControls: () => JSX.Element;
@@ -63,11 +85,53 @@ export default function DriggsmanClient() {
     }
   }, [showTundraChamber]);
 
-  // Initialize URL parameter on first load if missing
+  // Sync sitesPerView with URL parameter
   useEffect(() => {
     const currentParams = new URLSearchParams(window.location.search);
+    const currentParam = currentParams.get('sitesperview');
+    
+    // If parameter doesn't exist or state doesn't match URL, update URL
+    if (currentParam !== sitesPerView.toString()) {
+      currentParams.set('sitesperview', sitesPerView.toString());
+      const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+    }
+  }, [sitesPerView]);
+
+  // Sync specColumnPage with URL parameter
+  useEffect(() => {
+    const currentParams = new URLSearchParams(window.location.search);
+    const currentParam = currentParams.get('speccolumnpage');
+    
+    // If parameter doesn't exist or state doesn't match URL, update URL
+    if (currentParam !== specColumnPage.toString()) {
+      currentParams.set('speccolumnpage', specColumnPage.toString());
+      const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+    }
+  }, [specColumnPage]);
+
+  // Initialize URL parameters on first load if missing
+  useEffect(() => {
+    const currentParams = new URLSearchParams(window.location.search);
+    let needsUpdate = false;
+
     if (!currentParams.has('showtundrachamber')) {
       currentParams.set('showtundrachamber', 'no');
+      needsUpdate = true;
+    }
+
+    if (!currentParams.has('sitesperview')) {
+      currentParams.set('sitesperview', '1');
+      needsUpdate = true;
+    }
+
+    if (!currentParams.has('speccolumnpage')) {
+      currentParams.set('speccolumnpage', '1');
+      needsUpdate = true;
+    }
+
+    if (needsUpdate) {
       const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
       window.history.replaceState(null, '', newUrl);
     }
@@ -173,7 +237,7 @@ export default function DriggsmanClient() {
               className="bg-black rounded flex items-center"
               style={{
                 width: '280px',
-                height: '50px',
+                minHeight: '70px',
                 border: '1px solid red',
                 backgroundImage: `
                   radial-gradient(1px 1px at 25px 12px, #722F37, transparent),
@@ -198,7 +262,8 @@ export default function DriggsmanClient() {
                   radial-gradient(1px 1px at 250px 30px, #FFD700, transparent),
                   radial-gradient(2px 2px at 270px 40px, #ADD8E6, transparent)
                 `,
-                backgroundSize: '280px 50px'
+                backgroundSize: '280px 70px',
+                padding: '8px'
               }}
             >
               {/* Logo wrapper with minimal padding and left margin */}
@@ -224,17 +289,49 @@ export default function DriggsmanClient() {
                 />
               </div>
               
-              {/* Text wrapper moved closer to logo */}
+              {/* Text wrapper with stacked layout */}
               <div 
-                className="text-white font-bold text-xl flex items-center justify-center"
+                className="flex flex-col items-center justify-center"
                 style={{
                   flex: '1',
-                  fontSize: '20px',
-                  lineHeight: '1',
                   marginLeft: '-20px'
                 }}
               >
-                Andromeda Editor
+                {/* Tregnar text */}
+                <div 
+                  style={{
+                    color: '#20b2aa',
+                    fontSize: '14px',
+                    lineHeight: '1',
+                    marginBottom: '2px'
+                  }}
+                >
+                  tregnar
+                </div>
+                
+                {/* Andromeda Editor text */}
+                <div 
+                  className="text-white font-bold"
+                  style={{
+                    fontSize: '20px',
+                    lineHeight: '1',
+                    marginBottom: '4px'
+                  }}
+                >
+                  Andromeda Editor
+                </div>
+                
+                {/* View Tutorials button */}
+                <a
+                  href="/tutorials"
+                  className="bg-orange-500 hover:bg-orange-600 text-white rounded px-2 py-1 transition-colors"
+                  style={{
+                    fontSize: '14px',
+                    textDecoration: 'none'
+                  }}
+                >
+                  View Tutorials
+                </a>
               </div>
             </div>
             {/* Show Page Header Button - moved here as requested */}
@@ -268,6 +365,10 @@ export default function DriggsmanClient() {
           onShowCompetitorSitesChange={setShowCompetitorSites}
           showTundraChamber={showTundraChamber}
           onShowTundraChamberChange={setShowTundraChamber}
+          sitesPerView={sitesPerView}
+          onSitesPerViewChange={setSitesPerView}
+          specColumnPage={specColumnPage}
+          onSpecColumnPageChange={setSpecColumnPage}
         />
       </div>
     </div>

@@ -88,6 +88,13 @@ interface SitesprenSite {
   is_aff: boolean | null;
   is_other1: boolean | null;
   is_other2: boolean | null;
+  snailimage: string | null;
+  snail_image_url: string | null;
+  snail_image_status: string | null;
+  snail_image_error: string | null;
+  screenshot_url: string | null;
+  screenshot_taken_at: string | null;
+  screenshot_status: string | null;
   phone_section_separator?: string; // Visual separator only
 }
 
@@ -3373,32 +3380,6 @@ export default function DriggsmanTable({
                 It can be visible simultaneously with any of the other chambers.
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="border border-gray-200 rounded p-3 bg-white">
-                  <div className="text-xs font-medium text-gray-700 mb-2">Tundra Settings</div>
-                  <div className="space-y-2">
-                    <label className="flex items-center text-sm text-gray-600">
-                      <input type="checkbox" className="mr-2 w-4 h-4" />
-                      Enable Tundra Mode
-                    </label>
-                    <label className="flex items-center text-sm text-gray-600">
-                      <input type="checkbox" className="mr-2 w-4 h-4" />
-                      Show Frozen Assets
-                    </label>
-                  </div>
-                </div>
-                
-                <div className="border border-gray-200 rounded p-3 bg-white">
-                  <div className="text-xs font-medium text-gray-700 mb-2">Chamber Status</div>
-                  <div className="text-sm text-green-600">
-                    ✓ Chamber Active
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Independent of tabs 1-5
-                  </div>
-                </div>
-              </div>
-              
               {/* Horizontal Tab System inside Tundra Chamber */}
               <div className="mt-6 border-t border-gray-300 pt-4">
                 {/* Tab Headers */}
@@ -3439,25 +3420,68 @@ export default function DriggsmanTable({
                         Snail Image System for: <span className="font-medium text-gray-800">{paginatedSites[0].sitespren_base}</span>
                       </div>
                       
-                      {/* Screenshot Display Area - Square container for 16:9 screenshots */}
-                      <div className="w-full max-w-md mx-auto">
-                        <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
-                          <ScreenshotPreview
-                            sitesprenId={paginatedSites[0].id}
-                            sitesprenBase={paginatedSites[0].sitespren_base || ''}
-                            currentScreenshotUrl={paginatedSites[0].snail_image_url}
-                            screenshotStatus={paginatedSites[0].snail_image_status}
-                            screenshotError={paginatedSites[0].snail_image_error}
-                            onScreenshotUpdate={(data) => {
-                              // Update the site data when screenshot is captured
-                              console.log('Screenshot updated:', data);
-                            }}
-                          />
+                      {/* Dual Image Display Area - Interactive and Static side by side */}
+                      <div className="flex gap-6 justify-start">
+                        {/* Interactive Screenshot Capture Box */}
+                        <div className="flex-1 max-w-32">
+                          <div className="text-xs text-gray-600 mb-2 text-center font-medium">
+                            Interactive Screenshot Capture
+                          </div>
+                          <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+                            <ScreenshotPreview
+                              sitesprenId={paginatedSites[0].id}
+                              sitesprenBase={paginatedSites[0].sitespren_base || ''}
+                              currentScreenshotUrl={paginatedSites[0].screenshot_url}
+                              screenshotStatus={paginatedSites[0].screenshot_status}
+                              screenshotError={null}
+                              onScreenshotUpdate={(data) => {
+                                // Update the site data when screenshot is captured
+                                console.log('Screenshot updated:', data);
+                              }}
+                            />
+                          </div>
+                          <div className="text-xs text-gray-500 text-center mt-2">
+                            Click on the image area to capture or refresh screenshot
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="text-xs text-gray-500 text-center">
-                        Click on the image area to capture or refresh screenshot
+
+                        {/* Static Image Display Box */}
+                        <div className="flex-1 max-w-32">
+                          <div className="text-xs text-gray-600 mb-2 text-center font-medium">
+                            Static Database Image (screenshot_url field)
+                          </div>
+                          <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border-2 border-blue-200">
+                            {paginatedSites[0].screenshot_url ? (
+                              <img
+                                src={paginatedSites[0].screenshot_url}
+                                alt={`Static image from database for ${paginatedSites[0].sitespren_base}`}
+                                className="w-full h-full object-cover"
+                                onLoad={() => {
+                                  console.log('✅ Static image loaded successfully:', paginatedSites[0].screenshot_url);
+                                }}
+                                onError={(e) => {
+                                  console.error('❌ Static image failed to load:', {
+                                    imageUrl: paginatedSites[0].screenshot_url,
+                                    sitesprenBase: paginatedSites[0].sitespren_base,
+                                    error: e,
+                                    timestamp: new Date().toISOString()
+                                  });
+                                }}
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center h-full bg-gray-50">
+                                <div className="text-center p-4">
+                                  <div className="text-2xl mb-2 text-gray-400">📷</div>
+                                  <div className="text-xs text-gray-500">No static image</div>
+                                  <div className="text-xs text-gray-400">in screenshot_url field</div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-500 text-center mt-2">
+                            Read-only display from database field
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}

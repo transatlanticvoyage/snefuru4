@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 interface ScreenshotPreviewProps {
   sitesprenId: string;
@@ -37,6 +37,16 @@ export default function ScreenshotPreview({
     status: currentScreenshotUrl ? 'success' : 'idle'
   });
 
+  // Reset component state when sitesprenId changes (when switching column pages)
+  useEffect(() => {
+    setState({
+      loading: false,
+      error: screenshotError || null,
+      imageUrl: currentScreenshotUrl || null,
+      status: currentScreenshotUrl ? 'success' : 'idle'
+    });
+  }, [sitesprenId, currentScreenshotUrl, screenshotError]);
+
   const captureScreenshot = useCallback(async (forceRefresh = false) => {
     setState(prev => ({
       ...prev,
@@ -65,6 +75,12 @@ export default function ScreenshotPreview({
       }
 
       if (result.success && result.image_url) {
+        console.log('🖼️ Screenshot captured successfully:', {
+          imageUrl: result.image_url,
+          sitesprenBase,
+          timestamp: new Date().toISOString()
+        });
+
         setState({
           loading: false,
           error: null,
@@ -144,7 +160,16 @@ export default function ScreenshotPreview({
             src={state.imageUrl}
             alt={`Screenshot of ${sitesprenBase}`}
             className="w-full h-full object-cover rounded"
-            onError={() => {
+            onLoad={() => {
+              console.log('✅ Image loaded successfully:', state.imageUrl);
+            }}
+            onError={(e) => {
+              console.error('❌ Image failed to load:', {
+                imageUrl: state.imageUrl,
+                sitesprenBase,
+                error: e,
+                timestamp: new Date().toISOString()
+              });
               setState(prev => ({
                 ...prev,
                 error: 'Failed to load image',
@@ -181,6 +206,20 @@ export default function ScreenshotPreview({
   return (
     <div className="w-full h-full">
       {renderContent()}
+      {/* Debug panel - remove after fixing */}
+      {process.env.NODE_ENV === 'development' && state.imageUrl && (
+        <div className="absolute top-0 left-0 bg-black bg-opacity-75 text-white text-xs p-2 max-w-full overflow-hidden">
+          <div>Debug URL: {state.imageUrl.substring(0, 100)}...</div>
+          <a 
+            href={state.imageUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-300 underline"
+          >
+            Test URL in new tab
+          </a>
+        </div>
+      )}
     </div>
   );
 }
