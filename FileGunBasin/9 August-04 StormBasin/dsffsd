@@ -1,0 +1,28 @@
+pleae create the db schema for 2 different ddb tables that we need new
+
+
+they will be called:
+callplat_companies
+callplat_accounts
+
+their structure should mirror the naming conventions and relationship patterns of existing db tables:
+host_company
+host_account
+
+
+
+
+
+then pleaes create new page at 
+/cplatzar
+
+make this page mimick the entire look and function of the /hacctjar2 page 
+
+we do not need a field called domains_glacier in the sql for callplat_accounts
+
+we need a field called:
+phone_numbers_glacier
+
+that mimicks it in concept and in functionailty in the main big text box below the ui table grid (along with the fetch glacier button that accompanies it)
+
+in this case it will use the api of nimbata, ringba, twilio, etc. to fetch a list of phone numbers the user has in that account on that call platform

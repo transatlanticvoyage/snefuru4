@@ -565,3 +565,545 @@ _**User**_
 
 pleae study the /haccjar2 page and use supabase connection to study the related db schema for the page. this shouldnt take a long time. just store it in your memory for now 
 
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Study /haccjar2 page and its database schema
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/haccjar2`
+
+Error:
+
+```
+EISDIR: illegal operation on a directory, read
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/haccjar2/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/haccjar2/components/HostAccountsUITableV2.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/haccjar2/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/haccjar2/page.tsx`
+
+Result:
+
+```
+1→import { Metadata } from 'next';
+     2→import Haccjar2Client from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'haccjar2',
+     6→};
+     7→
+     8→export default function Haccjar2Page() {
+     9→  return <Haccjar2Client />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/haccjar2/pclient.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     6→import HostAccountsUITableV2 from './components/HostAccountsUITableV2';
+     7→
+     8→export default function Haccjar2Client() {
+     9→  const [hostAccountsData, setHostAccountsData] = useState<any[]>([]);
+    10→  const [loading, setLoading] = useState(true);
+    11→  const [error, setError] = useState<string | null>(null);
+    12→  const [userInternalId, setUserInternalId] = useState<string | null>(null);
+    13→  const { user } = useAuth();
+    14→  const supabase = createClientComponentClient();
+    15→
+    16→  useEffect(() => {
+    17→    const fetchHostAccountsData = async () => {
+    18→      if (!user?.id) {
+    19→        setLoading(false);
+    20→        return;
+    21→      }
+    22→
+    23→      try {
+    24→        // First get the internal user ID
+    25→        const { data: userData, error: userError } = await supabase
+    26→          .from('users')
+    27→          .select('id')
+    28→          .eq('auth_id', user.id)
+    29→          .single();
+    30→
+    31→        if (userError || !userData) {
+    32→          setError('User not found');
+    33→          setLoading(false);
+    34→          return;
+    35→        }
+    36→
+    37→        setUserInternalId(userData.id);
+    38→
+    39→        // Fetch user's host account data via API (bypasses RLS)
+    40→        console.log('Fetching host account data for user ID (V2):', userData.id);
+    41→        
+    42→        const response = await fetch(`/api/get_hostaccount_data_v2?user_internal_id=${userData.id}`);
+    43→        const result = await response.json();
+    44→
+    45→        console.log('API fetch result (V2):', result);
+    46→
+    47→        if (result.success) {
+    48→          console.log('Setting host account data (V2):', result.data);
+    49→          setHostAccountsData(result.data || []);
+    50→        } else {
+    51→          console.error('Error fetching host account (V2):', result.error);
+    52→          setError('Error fetching host account data');
+    53→        }
+    54→      } catch (err) {
+    55→        console.error('Error (V2):', err);
+    56→        setError('An error occurred');
+    57→      } finally {
+    58→        setLoading(false);
+    59→      }
+    60→    };
+    61→
+    62→    fetchHostAccountsData();
+    63→  }, [user?.id, supabase]);
+    64→
+    65→  // Function to refetch data after any modifications
+    66→  const refetchHostAccountsData = async () => {
+    67→    console.log('Refetching data (V2)...', { userId: user?.id, userInternalId });
+    68→    
+    69→    if (!user?.id || !userInternalId) {
+    70→      console.log('Missing user data for refetch (V2)');
+    71→      return;
+    72→    }
+    73→
+    74→    try {
+    75→      const response = await fetch(`/api/get_hostaccount_data_v2?user_internal_id=${userInternalId}`);
+    76→      const result = await response.json();
+    77→
+    78→      console.log('Refetch API result (V2):', result);
+    79→
+    80→      if (result.success) {
+    81→        console.log('Setting new data (V2):', result.data);
+    82→        setHostAccountsData(result.data || []);
+    83→      } else {
+    84→        console.error('Error in refetch (V2):', result.error);
+    85→      }
+    86→    } catch (err) {
+    87→      console.error('Error refetching data (V2):', err);
+    88→    }
+    89→  };
+    90→
+    91→  if (!user) {
+    92→    return (
+    93→      <div className="w-full p-4">
+    94→        <div className="text-center">
+    95→          <p>Please sign in to manage your host account.</p>
+    96→        </div>
+    97→      </div>
+    98→    );
+    99→  }
+   100→
+   101→  if (loading) {
+   102→    return (
+   103→      <div className="w-full p-4">
+   104→        <div className="text-center">
+   105→          <p>Loading host account data...</p>
+   106→        </div>
+   107→      </div>
+   108→    );
+   109→  }
+   110→
+   111→  if (error) {
+   112→    return (
+   113→      <div className="w-full p-4">
+   114→        <div className="text-center text-red-600">
+   115→          <p>Error: {error}</p>
+   116→        </div>
+   117→      </div>
+   118→    );
+   119→  }
+   120→
+   121→  return (
+   122→    <div className="w-full p-4">
+   123→      <div className="mb-6">
+   124→        <h1 className="text-3xl font-bold mb-2">Host Accounts Management V2</h1>
+   125→        <p className="text-gray-600">
+   126→          Manage your hosting provider and domain registrar accounts
+   127→        </p>
+   128→      </div>
+   129→
+   130→      {/* Host Accounts Table V2 */}
+   131→      <HostAccountsUITableV2 
+   132→        data={hostAccountsData} 
+   133→        userId={user.id}
+   134→        onDataChange={refetchHostAccountsData}
+   135→      />
+   136→    </div>
+   137→  );
+   138→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check the API endpoint to understand the database schema:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/api/get_hostaccount_data_v2/route.ts`
+
+Result:
+
+```
+1→import { createClient } from '@supabase/supabase-js';
+     2→import { NextRequest, NextResponse } from 'next/server';
+     3→
+     4→export async function GET(request: NextRequest) {
+     5→  try {
+     6→    // Initialize Supabase client with service role key
+     7→    const supabase = createClient(
+     8→      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+     9→      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    10→    );
+    11→
+    12→    // Get user_internal_id from query params
+    13→    const { searchParams } = new URL(request.url);
+    14→    const userInternalId = searchParams.get('user_internal_id');
+    15→
+    16→    if (!userInternalId) {
+    17→      return NextResponse.json(
+    18→        { success: false, error: 'User internal ID is required' },
+    19→        { status: 400 }
+    20→      );
+    21→    }
+    22→
+    23→    console.log('Fetching host account with company join for user ID (V2):', userInternalId);
+    24→
+    25→    // Fetch all host account records with joined host_company data
+    26→    const { data: hostAccounts, error } = await supabase
+    27→      .from('host_account')
+    28→      .select(`
+    29→        *,
+    30→        host_company:fk_host_company_id (
+    31→          id,
+    32→          name,
+    33→          portal_url1,
+    34→          fk_user_id,
+    35→          notes1,
+    36→          notes2,
+    37→          notes3
+    38→        )
+    39→      `)
+    40→      .eq('fk_user_id', userInternalId);
+    41→
+    42→    if (error) {
+    43→      console.error('Error fetching host account with join (V2):', error);
+    44→      return NextResponse.json(
+    45→        { success: false, error: 'Failed to fetch host account data' },
+    46→        { status: 500 }
+    47→      );
+    48→    }
+    49→
+    50→    console.log(`Found ${hostAccounts?.length || 0} host account records with company data for user (V2)`);
+    51→
+    52→    return NextResponse.json({
+    53→      success: true,
+    54→      data: hostAccounts || []
+    55→    });
+    56→
+    57→  } catch (error) {
+    58→    console.error('get_hostaccount_data_v2 API error:', error);
+    59→    return NextResponse.json(
+    60→      { success: false, error: 'Internal server error' },
+    61→      { status: 500 }
+    62→    );
+    63→  }
+    64→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check the table component to understand the full data structure:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/haccjar2/components/HostAccountsUITableV2.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useMemo } from 'react';
+     4→
+     5→interface HostCompany {
+     6→  id: string;
+     7→  name: string | null;
+     8→  portal_url1: string | null;
+     9→  fk_user_id: string;
+    10→  notes1: string | null;
+    11→  notes2: string | null;
+    12→  notes3: string | null;
+    13→}
+    14→
+    15→interface HostAccountRecord {
+    16→  id: string; // UUID
+    17→  username: string | null;
+    18→  pass: string | null;
+    19→  hostacct_apikey1: string | null;
+    20→  fk_user_id: string;
+    21→  fk_host_company_id: string | null;
+    22→  host_company: HostCompany | null;
+    23→}
+    24→
+    25→interface HostAccountsUITableV2Props {
+    26→  data: HostAccountRecord[];
+    27→  userId: string;
+    28→  onDataChange?: () => void;
+    29→}
+    30→
+    31→type SortField = keyof HostAccountRecord;
+    32→type SortOrder = 'asc' | 'desc';
+    33→
+    34→export default function HostAccountsUITableV2({ data, onDataChange }: HostAccountsUITableV2Props) {
+    35→  const [searchTerm, setSearchTerm] = useState('');
+    36→  const [currentPage, setCurrentPage] = useState(1);
+    37→  const [itemsPerPage, setItemsPerPage] = useState(20);
+    38→  const [sortField, setSortField] = useState<SortField>('id');
+    39→  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+    40→  const [selectedHostAccounts, setSelectedHostAccounts] = useState<Set<string>>(new Set());
+    41→  const [selectAll, setSelectAll] = useState(false);
+    42→
+    43→  // Filter and search logic
+    44→  const filteredData = useMemo(() => {
+    45→    return data.filter(item => {
+    46→      // Search filter
+    47→      const searchLower = searchTerm.toLowerCase();
+    48→      const matchesSearch = !searchTerm || 
+    49→        item.username?.toLowerCase().includes(searchLower) ||
+    50→        item.id?.toLowerCase().includes(searchLower) ||
+    51→        item.fk_host_company_id?.toLowerCase().includes(searchLower) ||
+    52→        item.host_company?.name?.toLowerCase().includes(searchLower) ||
+    53→        item.host_company?.portal_url1?.toLowerCase().includes(searchLower) ||
+    54→        item.host_company?.notes1?.toLowerCase().includes(searchLower) ||
+    55→        item.host_company?.notes2?.toLowerCase().includes(searchLower) ||
+    56→        item.host_company?.notes3?.toLowerCase().includes(searchLower);
+    57→
+    58→      return matchesSearch;
+    59→    });
+    60→  }, [data, searchTerm]);
+    61→
+    62→  // Sort logic
+    63→  const sortedData = useMemo(() => {
+    64→    const sorted = [...filteredData].sort((a, b) => {
+    65→      let aVal: any = a[sortField];
+    66→      let bVal: any = b[sortField];
+    67→
+    68→      // Handle null values
+    69→      if (aVal === null || aVal === undefined) aVal = '';
+    70→      if (bVal === null || bVal === undefined) bVal = '';
+    71→
+    72→      // Handle object values (like host_company) by converting to string
+    73→      if (typeof aVal === 'object') aVal = '';
+    74→      if (typeof bVal === 'object') bVal = '';
+    75→
+    76→      // Convert to lowercase for string comparison
+    77→      if (typeof aVal === 'string') {
+    78→        aVal = aVal.toLowerCase();
+    79→        bVal = (bVal as string).toLowerCase();
+    80→      }
+    81→
+    82→      if (sortOrder === 'asc') {
+    83→        return aVal > bVal ? 1 : -1;
+    84→      } else {
+    85→        return aVal < bVal ? 1 : -1;
+    86→      }
+    87→    });
+    88→
+    89→    return sorted;
+    90→  }, [filteredData, sortField, sortOrder]);
+    91→
+    92→  // Pagination logic
+    93→  const paginatedData = useMemo(() => {
+    94→    const startIndex = (currentPage - 1) * itemsPerPage;
+    95→    const endIndex = startIndex + itemsPerPage;
+    96→    return sortedData.slice(startIndex, endIndex);
+    97→  }, [sortedData, currentPage, itemsPerPage]);
+    98→
+    99→  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+   100→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me check if there are any database queries or additional schema information:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Analyze haccjar2 database schema using Supabase
+
+`SUPABASE_URL=https://jerylujyofmmjukwlwvn.supabase.co SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcnlsdWp5b2ZtbWp1a3dsd3ZuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDQyNTE1MCwiZXhwIjoyMDcwMDAxMTUwfQ.09zsgogOOCZeaJ9R6K5D4q2_jzKXFh54f-CNBfwrEQc node -e "
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+async function analyzeHaccjar2Schema() {
+  try {
+    console.log('🔍 ANALYZING HACCJAR2 DATABASE SCHEMA');
+    console.log('===================================');
+    
+    // 1. Analyze host_account table
+    console.log('\n📋 HOST_ACCOUNT TABLE:');
+    const { data: hostAccountData, error: hostError } = await supabase
+      .from('host_account')
+      .select('*')
+      .limit(1);
+    
+    if (!hostError && hostAccountData && hostAccountData.length > 0) {
+      console.log('Host Account fields:');
+      Object.keys(hostAccountData[0]).forEach(field => {
+        const value = hostAccountData[0][field];
+        const type = value === null ? 'null' : typeof value;
+        console.log('  - ' + field + ': ' + type);
+      });
+    } else {
+      console.log('No host_account data or error:', hostError?.message);
+    }
+    
+    // 2. Analyze host_company table
+    console.log('\n📋 HOST_COMPANY TABLE:');
+    const { data: hostCompanyData, error: companyError } = await supabase
+      .from('host_company')
+      .select('*')
+      .limit(1);
+    
+    if (!companyError && hostCompanyData && hostCompanyData.length > 0) {
+      console.log('Host Company fields:');
+      Object.keys(hostCompanyData[0]).forEach(field => {
+        const value = hostCompanyData[0][field];
+        const type = value === null ? 'null' : typeof value;
+        console.log('  - ' + field + ': ' + type);
+      });
+    } else {
+      console.log('No host_company data or error:', companyError?.message);
+    }
+    
+    // 3. Get counts for both tables
+    const { count: hostAccountCount } = await supabase
+      .from('host_account')
+      .select('*', { count: 'exact', head: true });
+    
+    const { count: hostCompanyCount } = await supabase
+      .from('host_company')
+      .select('*', { count: 'exact', head: true });
+    
+    console.log('\n📊 TABLE STATISTICS:');
+    console.log('host_account records:', hostAccountCount);
+    console.log('host_company records:', hostCompanyCount);
+    
+    // 4. Test the join query used by the API
+    console.log('\n🔗 JOIN QUERY TEST:');
+    const { data: joinData, error: joinError } = await supabase
+      .from('host_account')
+      .select(`
+        *,
+        host_company:fk_host_company_id (
+          id,
+          name,
+          portal_url1,
+          fk_user_id,
+          notes1,
+          notes2,
+          notes3
+        )
+      `)
+      .limit(3);
+    
+    if (!joinError && joinData) {
+      console.log('Join query successful, returned', joinData.length, 'records');
+      if (joinData.length > 0) {
+        console.log('Sample joined record structure:');
+        const sample = joinData[0];
+        Object.keys(sample).forEach(key => {
+          if (key === 'host_company') {
+            console.log('  - host_company: object with fields:', 
+              sample.host_company ? Object.keys(sample.host_company).join(', ') : 'null');
+          } else {
+            console.log('  - ' + key + ':', typeof sample[key]);
+          }
+        });
+      }
+    } else {
+      console.log('Join query error:', joinError?.message);
+    }
+    
+    console.log('\n✅ HACCJAR2 SCHEMA ANALYSIS COMPLETE');
+    
+  } catch (err) {
+    console.error('💥 Error:', err.message);
+  }
+}
+
+analyzeHaccjar2Schema();"`
+
+Result:
+
+```
+🔍 ANALYZING HACCJAR2 DATABASE SCHEMA
+===================================
+
+📋 HOST_ACCOUNT TABLE:
+Host Account fields:
+  - username: string
+  - pass: null
+  - hostacct_apikey1: null
+  - fk_user_id: string
+  - fk_host_company_id: string
+  - id: string
+  - domains_glacier: null
+
+📋 HOST_COMPANY TABLE:
+Host Company fields:
+  - name: string
+  - portal_url1: string
+  - fk_user_id: string
+  - notes1: null
+  - notes2: null
+  - notes3: null
+  - id: string
+
+📊 TABLE STATISTICS:
+host_account records: 4
+host_company records: 7
+
+🔗 JOIN QUERY TEST:
+Join query successful, returned 3 records
+Sample joined record structure:
+  - username: string
+  - pass: object
+  - hostacct_apikey1: object
+  - fk_user_id: string
+  - fk_host_company_id: string
+  - id: string
+  - domains_glacier: object
+
+✅ HACCJAR2 SCHEMA ANALYSIS COMPLETE
+(eval):2: no matches found: *,
+```
+
