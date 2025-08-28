@@ -25,7 +25,98 @@ export default function PlanchjarClient() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
   const [showNozzlePopup, setShowNozzlePopup] = useState(false);
+  const [nozzleContent, setNozzleContent] = useState<string>('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Generate sharkintax format output
+  const generateSharkintaxOutput = async (dpackDatum: string, siteName: string) => {
+    if (!userInternalId || !siteName) return;
+
+    try {
+      // Get sitespren data for the specified site
+      const { data: siteData, error } = await supabase
+        .from('sitespren')
+        .select('*')
+        .eq('fk_users_id', userInternalId)
+        .eq('sitespren_base', siteName)
+        .single();
+
+      if (error || !siteData) {
+        console.error('Error fetching site data:', error);
+        return;
+      }
+
+      // Parse dpack_datum to get field list
+      const fields = dpackDatum.split('\n').map(field => field.trim()).filter(field => field);
+      
+      let output = '';
+      
+      for (const field of fields) {
+        // Check if this is a section header (doesn't start with 'driggs_' or 'sitespren_')
+        const isSection = !field.startsWith('driggs_') && !field.startsWith('sitespren_') && field.includes('section');
+        
+        output += '===================================\n';
+        output += field + '\n';
+        output += '-----------------------------------\n';
+        
+        if (!isSection) {
+          // Get the actual value from siteData
+          const value = siteData[field as keyof typeof siteData] || '';
+          output += value + '\n';
+        } else {
+          output += '\n'; // Empty line for sections
+        }
+      }
+      
+      setNozzleContent(output);
+      setShowNozzlePopup(true);
+    } catch (err) {
+      console.error('Error generating sharkintax output:', err);
+    }
+  };
+
+  // Generate walrustax format output
+  const generateWalrustaxOutput = async (dpackDatum: string, siteName: string) => {
+    if (!userInternalId || !siteName) return;
+
+    try {
+      // Get sitespren data for the specified site
+      const { data: siteData, error } = await supabase
+        .from('sitespren')
+        .select('*')
+        .eq('fk_users_id', userInternalId)
+        .eq('sitespren_base', siteName)
+        .single();
+
+      if (error || !siteData) {
+        console.error('Error fetching site data:', error);
+        return;
+      }
+
+      // Parse dpack_datum to get field list
+      const fields = dpackDatum.split('\n').map(field => field.trim()).filter(field => field);
+      
+      let output = '';
+      
+      for (const field of fields) {
+        // Check if this is a section header
+        const isSection = !field.startsWith('driggs_') && !field.startsWith('sitespren_') && field.includes('section');
+        
+        if (isSection) {
+          output += field + '\n';
+        } else {
+          // Get the actual value from siteData
+          const value = siteData[field as keyof typeof siteData] || '';
+          output += field + '\t' + value + '\n';
+        }
+      }
+      
+      setNozzleContent(output);
+      setShowNozzlePopup(true);
+    } catch (err) {
+      console.error('Error generating walrustax output:', err);
+    }
+  };
 
   // Get internal user ID from users table
   useEffect(() => {
@@ -270,7 +361,11 @@ export default function PlanchjarClient() {
         <div className="flex flex-col flex-1">
           {/* Dpackjar Content */}
           <div className="flex-1 overflow-hidden">
-            <DriggsPacksTable />
+            <DriggsPacksTable 
+              selectedSite={selectedSite}
+              onSharkintaxClick={generateSharkintaxOutput}
+              onWalrustaxClick={generateWalrustaxOutput}
+            />
           </div>
         </div>
       )}
@@ -293,6 +388,8 @@ export default function PlanchjarClient() {
           {/* Large Codebox Area */}
           <div className="flex-1 px-6 pb-6">
             <textarea
+              value={nozzleContent}
+              onChange={(e) => setNozzleContent(e.target.value)}
               className="w-full h-full p-4 bg-gray-900 text-green-400 font-mono text-sm border border-gray-600 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter code here..."
               spellCheck="false"

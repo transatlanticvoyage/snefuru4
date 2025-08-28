@@ -25,7 +25,13 @@ interface DriggsPacksRecord {
   is_flagged: boolean | null;
 }
 
-export default function DriggsPacksTable() {
+interface DriggsPacksTableProps {
+  selectedSite?: string;
+  onSharkintaxClick?: (dpackDatum: string, siteName: string) => void;
+  onWalrustaxClick?: (dpackDatum: string, siteName: string) => void;
+}
+
+export default function DriggsPacksTable({ selectedSite, onSharkintaxClick, onWalrustaxClick }: DriggsPacksTableProps) {
   const { user } = useAuth();
   const [data, setData] = useState<DriggsPacksRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -850,11 +856,25 @@ export default function DriggsPacksTable() {
                 </td>
                 <td className="px-2 py-4 text-sm text-gray-900" style={{ border: '1px solid gray' }}>
                   <div className="flex flex-col gap-1">
-                    <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
+                    <button 
+                      onClick={() => {
+                        if (onSharkintaxClick && selectedSite && record.dpack_datum) {
+                          onSharkintaxClick(record.dpack_datum, selectedSite);
+                        }
+                      }}
+                      className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors"
+                    >
                       sharkintax - equal signs and hyphens
                     </button>
-                    <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
-                      vertical transposed csv paste
+                    <button 
+                      onClick={() => {
+                        if (onWalrustaxClick && selectedSite && record.dpack_datum) {
+                          onWalrustaxClick(record.dpack_datum, selectedSite);
+                        }
+                      }}
+                      className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors"
+                    >
+                      walrustax - vertical transposed csv paste
                     </button>
                     <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
                       vertical transposed csv download
