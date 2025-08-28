@@ -19,6 +19,7 @@ interface PlancheRecord {
   created_at: string;
   updated_at: string | null;
   user_id: string | null;
+  is_starred: boolean | null;
 }
 
 interface EditingCell {
@@ -192,6 +193,38 @@ export default function PlanchjarTable() {
   const cancelEdit = () => {
     setEditingCell(null);
     setEditValue('');
+  };
+
+  // Toggle star status with immediate UI update
+  const toggleStar = async (id: number, currentValue: boolean | null) => {
+    const newValue = !currentValue;
+    
+    // Optimistically update UI immediately
+    setPlanches(prev => prev.map(item => 
+      item.planch_id === id ? { ...item, is_starred: newValue } : item
+    ));
+    
+    // Update database
+    try {
+      const { error } = await supabase
+        .from('planches')
+        .update({ is_starred: newValue })
+        .eq('planch_id', id);
+
+      if (error) {
+        console.error('Error updating star:', error);
+        // Revert optimistic update on error
+        setPlanches(prev => prev.map(item => 
+          item.planch_id === id ? { ...item, is_starred: currentValue } : item
+        ));
+      }
+    } catch (error) {
+      console.error('Error updating star:', error);
+      // Revert optimistic update on error
+      setPlanches(prev => prev.map(item => 
+        item.planch_id === id ? { ...item, is_starred: currentValue } : item
+      ));
+    }
   };
 
   // Handle create new inline
@@ -398,6 +431,11 @@ export default function PlanchjarTable() {
                   </div>
                 </th>
                 
+                {/* Star column */}
+                <th className="w-12 px-2 py-3 text-center border border-gray-300">
+                  <span className="text-lg">⭐</span>
+                </th>
+                
                 {/* Data columns */}
                 <th className="px-4 py-3 text-left border border-gray-300">
                   <span className="font-bold text-xs lowercase text-gray-900">planch_id</span>
@@ -441,6 +479,32 @@ export default function PlanchjarTable() {
                         className="pointer-events-none"
                         style={{ width: '20px', height: '20px' }}
                       />
+                    </div>
+                  </td>
+                  
+                  {/* Star column */}
+                  <td className="px-2 py-4 text-center border border-gray-300">
+                    <div className="flex items-center justify-center">
+                      <div
+                        onClick={() => toggleStar(planche.planch_id, planche.is_starred)}
+                        className="cursor-pointer hover:scale-110 transition-transform duration-200 p-1"
+                        title={planche.is_starred ? "Click to unstar" : "Click to star"}
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          className={planche.is_starred ? "text-red-600" : "text-gray-400"}
+                        >
+                          <path
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                            fill={planche.is_starred ? "currentColor" : "none"}
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
                     </div>
                   </td>
                   

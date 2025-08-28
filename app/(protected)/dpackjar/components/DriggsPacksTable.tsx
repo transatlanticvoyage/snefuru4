@@ -21,6 +21,7 @@ interface DriggsPacksRecord {
   user_id_created_by: string | null;
   created_at: string;
   updated_at: string | null;
+  is_starred: boolean | null;
 }
 
 export default function DriggsPacksTable() {
@@ -67,7 +68,7 @@ export default function DriggsPacksTable() {
       
       const { data: fetchedData, error } = await supabase
         .from('driggs_packs')
-        .select('dpack_id, dpack_datum, dpack_note, dpack_realm, dpack_name, dpack_description, user_id_created_by, created_at, updated_at')
+        .select('dpack_id, dpack_datum, dpack_note, dpack_realm, dpack_name, dpack_description, user_id_created_by, created_at, updated_at, is_starred')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -283,6 +284,38 @@ export default function DriggsPacksTable() {
         </div>
       </div>
     );
+  };
+
+  // Toggle star status with immediate UI update
+  const toggleStar = async (id: number, currentValue: boolean | null) => {
+    const newValue = !currentValue;
+    
+    // Optimistically update UI immediately
+    setData(prev => prev.map(item => 
+      item.dpack_id === id ? { ...item, is_starred: newValue } : item
+    ));
+    
+    // Update database
+    try {
+      const { error } = await supabase
+        .from('driggs_packs')
+        .update({ is_starred: newValue })
+        .eq('dpack_id', id);
+
+      if (error) {
+        console.error('Error updating star:', error);
+        // Revert optimistic update on error
+        setData(prev => prev.map(item => 
+          item.dpack_id === id ? { ...item, is_starred: currentValue } : item
+        ));
+      }
+    } catch (error) {
+      console.error('Error updating star:', error);
+      // Revert optimistic update on error
+      setData(prev => prev.map(item => 
+        item.dpack_id === id ? { ...item, is_starred: currentValue } : item
+      ));
+    }
   };
 
   // Create new record inline
@@ -561,6 +594,11 @@ export default function DriggsPacksTable() {
                 </div>
               </th>
               
+              {/* Star column */}
+              <th className="w-12 px-2 py-3 text-center" style={{ border: '1px solid gray' }}>
+                <span className="text-lg">⭐</span>
+              </th>
+              
               {/* Data columns */}
               {['dpack_id', 'dpack_datum', 'dpack_note', 'dpack_realm', 'dpack_name', 'dpack_description', 'created_at', 'updated_at'].map(field => (
                 <th
@@ -607,8 +645,34 @@ export default function DriggsPacksTable() {
                   </div>
                 </td>
 
+                {/* Star column */}
+                <td className="px-2 py-4 text-center" style={{ border: '1px solid gray' }}>
+                  <div className="flex items-center justify-center">
+                    <div
+                      onClick={() => toggleStar(record.dpack_id, record.is_starred)}
+                      className="cursor-pointer hover:scale-110 transition-transform duration-200 p-1"
+                      title={record.is_starred ? "Click to unstar" : "Click to star"}
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        className={record.is_starred ? "text-red-600" : "text-gray-400"}
+                      >
+                        <path
+                          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                          fill={record.is_starred ? "currentColor" : "none"}
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </td>
+
                 {/* Data fields */}
-                {Object.entries(record).map(([field, value]) => {
+                {Object.entries(record).filter(([field]) => field !== 'is_starred').map(([field, value]) => {
                   const isEditing = editingCell?.id === record.dpack_id && editingCell?.field === field;
                   const isReadonly = field === 'dpack_id' || field === 'created_at' || field === 'updated_at';
                   
