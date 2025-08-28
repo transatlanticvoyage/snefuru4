@@ -22,6 +22,7 @@ interface DriggsPacksRecord {
   created_at: string;
   updated_at: string | null;
   is_starred: boolean | null;
+  is_flagged: boolean | null;
 }
 
 export default function DriggsPacksTable() {
@@ -68,7 +69,7 @@ export default function DriggsPacksTable() {
       
       const { data: fetchedData, error } = await supabase
         .from('driggs_packs')
-        .select('dpack_id, dpack_datum, dpack_note, dpack_realm, dpack_name, dpack_description, user_id_created_by, created_at, updated_at, is_starred')
+        .select('dpack_id, dpack_datum, dpack_note, dpack_realm, dpack_name, dpack_description, user_id_created_by, created_at, updated_at, is_starred, is_flagged')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -314,6 +315,38 @@ export default function DriggsPacksTable() {
       // Revert optimistic update on error
       setData(prev => prev.map(item => 
         item.dpack_id === id ? { ...item, is_starred: currentValue } : item
+      ));
+    }
+  };
+
+  // Toggle flag status with immediate UI update
+  const toggleFlag = async (id: number, currentValue: boolean | null) => {
+    const newValue = !currentValue;
+    
+    // Optimistically update UI immediately
+    setData(prev => prev.map(item => 
+      item.dpack_id === id ? { ...item, is_flagged: newValue } : item
+    ));
+    
+    // Update database
+    try {
+      const { error } = await supabase
+        .from('driggs_packs')
+        .update({ is_flagged: newValue })
+        .eq('dpack_id', id);
+
+      if (error) {
+        console.error('Error updating flag:', error);
+        // Revert optimistic update on error
+        setData(prev => prev.map(item => 
+          item.dpack_id === id ? { ...item, is_flagged: currentValue } : item
+        ));
+      }
+    } catch (error) {
+      console.error('Error updating flag:', error);
+      // Revert optimistic update on error
+      setData(prev => prev.map(item => 
+        item.dpack_id === id ? { ...item, is_flagged: currentValue } : item
       ));
     }
   };
@@ -599,8 +632,43 @@ export default function DriggsPacksTable() {
                 <span className="text-lg">⭐</span>
               </th>
               
+              {/* Flag column */}
+              <th className="w-12 px-2 py-3 text-center" style={{ border: '1px solid gray' }}>
+                <span className="text-lg">🚩</span>
+              </th>
+              
               {/* Data columns */}
-              {['dpack_id', 'dpack_datum', 'dpack_note', 'dpack_realm', 'dpack_name', 'dpack_description', 'created_at', 'updated_at'].map(field => (
+              {['dpack_id', 'dpack_datum'].map(field => (
+                <th
+                  key={field}
+                  onClick={() => handleSort(field as keyof DriggsPacksRecord)}
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  style={{ border: '1px solid gray' }}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>{field}</span>
+                    {sortField === field && (
+                      <span className="text-blue-500">
+                        {sortOrder === 'asc' ? '↑' : '↓'}
+                      </span>
+                    )}
+                  </div>
+                </th>
+              ))}
+              
+              {/* New custom columns */}
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider" style={{ border: '1px solid gray' }}>
+                asn planch
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider" style={{ border: '1px solid gray' }}>
+                format
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider" style={{ border: '1px solid gray' }}>
+                export
+              </th>
+              
+              {/* Remaining data columns */}
+              {['dpack_note', 'dpack_realm', 'dpack_name', 'dpack_description', 'created_at', 'updated_at'].map(field => (
                 <th
                   key={field}
                   onClick={() => handleSort(field as keyof DriggsPacksRecord)}
@@ -671,8 +739,34 @@ export default function DriggsPacksTable() {
                   </div>
                 </td>
 
-                {/* Data fields */}
-                {Object.entries(record).filter(([field]) => field !== 'is_starred').map(([field, value]) => {
+                {/* Flag column */}
+                <td className="px-2 py-4 text-center" style={{ border: '1px solid gray' }}>
+                  <div className="flex items-center justify-center">
+                    <div
+                      onClick={() => toggleFlag(record.dpack_id, record.is_flagged)}
+                      className="cursor-pointer hover:scale-110 transition-transform duration-200 p-1"
+                      title={record.is_flagged ? "Click to unflag" : "Click to flag"}
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        className={record.is_flagged ? "text-red-600" : "text-gray-400"}
+                      >
+                        <path
+                          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                          fill={record.is_flagged ? "currentColor" : "none"}
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </td>
+
+                {/* Data fields - First part: dpack_id and dpack_datum */}
+                {Object.entries(record).filter(([field]) => field !== 'is_starred' && field !== 'is_flagged' && (field === 'dpack_id' || field === 'dpack_datum')).map(([field, value]) => {
                   const isEditing = editingCell?.id === record.dpack_id && editingCell?.field === field;
                   const isReadonly = field === 'dpack_id' || field === 'created_at' || field === 'updated_at';
                   
@@ -714,6 +808,67 @@ export default function DriggsPacksTable() {
                       </td>
                     );
                   }
+                  
+                  return (
+                    <td
+                      key={field}
+                      className={`px-6 py-4 text-sm ${isReadonly ? 'text-gray-500' : 'text-gray-900 cursor-pointer hover:bg-gray-50'}`}
+                      onClick={() => !isReadonly && handleCellClick(record.dpack_id, field, value)}
+                      style={{ border: '1px solid gray' }}
+                    >
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editingValue}
+                          onChange={(e) => setEditingValue(e.target.value)}
+                          onBlur={handleCellSave}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleCellSave();
+                            if (e.key === 'Escape') handleCellCancel();
+                          }}
+                          className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          autoFocus
+                        />
+                      ) : (
+                        <div className={`${!isReadonly ? 'hover:bg-yellow-50' : ''} p-1 rounded`}>
+                          {field === 'created_at' || field === 'updated_at' 
+                            ? value ? new Date(value).toLocaleString() : 'N/A'
+                            : value || (isReadonly ? 'N/A' : 'Click to edit')
+                          }
+                        </div>
+                      )}
+                    </td>
+                  );
+                })}
+                
+                {/* New dummy columns */}
+                <td className="px-6 py-4 text-sm text-gray-900" style={{ border: '1px solid gray' }}>
+                  -
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-900" style={{ border: '1px solid gray' }}>
+                  -
+                </td>
+                <td className="px-2 py-4 text-sm text-gray-900" style={{ border: '1px solid gray' }}>
+                  <div className="flex flex-col gap-1">
+                    <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
+                      equal signs and hyphens
+                    </button>
+                    <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
+                      vertical transposed csv paste
+                    </button>
+                    <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
+                      vertical transposed csv download
+                    </button>
+                    <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
+                      vertical transposed xls download
+                    </button>
+                  </div>
+                </td>
+                
+                {/* Remaining data fields */}
+                {Object.entries(record).filter(([field]) => field !== 'is_starred' && field !== 'is_flagged' && field !== 'dpack_id' && field !== 'dpack_datum').map(([field, value]) => {
+                  const isEditing = editingCell?.id === record.dpack_id && editingCell?.field === field;
+                  const isReadonly = field === 'dpack_id' || field === 'created_at' || field === 'updated_at';
                   
                   return (
                     <td
