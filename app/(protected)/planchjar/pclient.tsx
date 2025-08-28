@@ -18,7 +18,7 @@ export default function PlanchjarClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClientComponentClient();
-  const [activeTab, setActiveTab] = useState<'planchjar' | 'dpackjar'>('planchjar');
+  const [activeTab, setActiveTab] = useState<'planchjartab' | 'dpackjartab'>('planchjartab');
   const [selectedSite, setSelectedSite] = useState<string>('');
   const [searchText, setSearchText] = useState<string>('');
   const [filteredSites, setFilteredSites] = useState<SitesprenRecord[]>([]);
@@ -51,14 +51,27 @@ export default function PlanchjarClient() {
     }
   }, [user, supabase]);
 
-  // Handle URL parameter on load
+  // Handle URL parameters on load
   useEffect(() => {
     const site = searchParams.get('site');
+    const tab = searchParams.get('tab');
+    
+    // Set default tab if not present or invalid
+    const validTab = (tab === 'planchjartab' || tab === 'dpackjartab') ? tab : 'planchjartab';
+    setActiveTab(validTab);
+    
     if (site) {
       setSelectedSite(site);
       setSearchText(site);
     }
-  }, [searchParams]);
+    
+    // Ensure URL always has the tab parameter
+    const newParams = new URLSearchParams(searchParams.toString());
+    if (!newParams.get('tab') || (newParams.get('tab') !== 'planchjartab' && newParams.get('tab') !== 'dpackjartab')) {
+      newParams.set('tab', validTab);
+      router.replace(`/planchjar?${newParams.toString()}`);
+    }
+  }, [searchParams, router]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -112,9 +125,10 @@ export default function PlanchjarClient() {
     setSelectedSite(site);
     setSearchText(site);
     setShowDropdown(false);
-    // Update URL
+    // Update URL with both site and current tab
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set('site', site);
+    newParams.set('tab', activeTab);
     router.push(`/planchjar?${newParams.toString()}`);
   };
 
@@ -129,6 +143,14 @@ export default function PlanchjarClient() {
     if (value !== selectedSite) {
       setSelectedSite('');
     }
+  };
+
+  const handleTabChange = (newTab: 'planchjartab' | 'dpackjartab') => {
+    setActiveTab(newTab);
+    // Update URL with new tab parameter
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('tab', newTab);
+    router.push(`/planchjar?${newParams.toString()}`);
   };
 
   if (!user) {
@@ -146,9 +168,9 @@ export default function PlanchjarClient() {
         <div className="flex items-center">
           <div className="flex">
             <button
-              onClick={() => setActiveTab('planchjar')}
+              onClick={() => handleTabChange('planchjartab')}
               className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'planchjar'
+                activeTab === 'planchjartab'
                   ? 'border-blue-500 text-blue-600 bg-blue-50'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
@@ -156,9 +178,9 @@ export default function PlanchjarClient() {
               Tab 1 - Planchjar
             </button>
             <button
-              onClick={() => setActiveTab('dpackjar')}
+              onClick={() => handleTabChange('dpackjartab')}
               className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'dpackjar'
+                activeTab === 'dpackjartab'
                   ? 'border-blue-500 text-blue-600 bg-blue-50'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
@@ -209,7 +231,7 @@ export default function PlanchjarClient() {
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'planchjar' ? (
+      {activeTab === 'planchjartab' ? (
         <div className="flex flex-col flex-1">
           {/* Menjari Button Bar */}
           <div className="px-6 pb-0">
