@@ -205,6 +205,10 @@ interface DriggsmanTableProps {
   onShowCompetitorSitesChange?: (show: boolean) => void;
   showTundraChamber?: boolean;
   onShowTundraChamberChange?: (show: boolean) => void;
+  sitesPerView?: number;
+  onSitesPerViewChange?: (count: number) => void;
+  specColumnPage?: number;
+  onSpecColumnPageChange?: (page: number) => void;
 }
 
 // Helper component for vacuum/zarpscrape cell display
@@ -350,7 +354,11 @@ export default function DriggsmanTable({
   onShowVerificationColumnChange,
   onShowCompetitorSitesChange,
   showTundraChamber = false,
-  onShowTundraChamberChange
+  onShowTundraChamberChange,
+  sitesPerView = 1,
+  onSitesPerViewChange,
+  specColumnPage = 1,
+  onSpecColumnPageChange
 }: DriggsmanTableProps) {
   const searchParams = useSearchParams();
   const [sites, setSites] = useState<SitesprenSite[]>([]);
@@ -361,9 +369,11 @@ export default function DriggsmanTable({
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   
-  // Column pagination for sites
-  const [currentColumnPage, setCurrentColumnPage] = useState(1);
-  const [columnsPerPage, setColumnsPerPage] = useState(1);
+  // Column pagination for sites (connected to URL params via props)
+  const currentColumnPage = specColumnPage;
+  const setCurrentColumnPage = onSpecColumnPageChange || (() => {});
+  const columnsPerPage = sitesPerView;
+  const setColumnsPerPage = onSitesPerViewChange || (() => {});
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ field: string; siteId: string } | null>(null);

@@ -3,7 +3,6 @@ import SitejarClient from './pclient';
 
 export const metadata: Metadata = {
   title: 'Sitejar',
-  description: 'Sitejar page',
 };
 
 export default function SitejarPage() {
