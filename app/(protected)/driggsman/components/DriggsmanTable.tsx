@@ -12,6 +12,7 @@ import ZarpoMedallion from './zarpomedallion/ZarpoMedallion';
 import Chatdori from '@/app/components/Chatdori';
 import DriggsActionsFeedback from '@/app/components/DriggsActionsFeedback';
 import { SitesglubFetcher } from './SitesglubFetchingFunctions';
+import ScreenshotPreview from './ScreenshotPreview';
 
 const DrenjariButtonBarDriggsmanLinks = dynamic(
   () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
@@ -3427,9 +3428,45 @@ export default function DriggsmanTable({
                 
                 {/* Tab Content */}
                 <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-                  <div className="text-base font-bold" style={{ fontSize: '16px' }}>
-                    ntab1 chamber
+                  <div className="text-base font-bold mb-4" style={{ fontSize: '16px' }}>
+                    ntab1 chamber - Website Screenshot
                   </div>
+                  
+                  {/* Screenshot Preview Area */}
+                  {paginatedSites[0] && (
+                    <div className="space-y-4">
+                      <div className="text-sm text-gray-600 mb-2">
+                        Snail Image System for: <span className="font-medium text-gray-800">{paginatedSites[0].sitespren_base}</span>
+                      </div>
+                      
+                      {/* Screenshot Display Area - Square container for 16:9 screenshots */}
+                      <div className="w-full max-w-md mx-auto">
+                        <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+                          <ScreenshotPreview
+                            sitesprenId={paginatedSites[0].id}
+                            sitesprenBase={paginatedSites[0].sitespren_base || ''}
+                            currentScreenshotUrl={paginatedSites[0].snail_image_url}
+                            screenshotStatus={paginatedSites[0].snail_image_status}
+                            screenshotError={paginatedSites[0].snail_image_error}
+                            onScreenshotUpdate={(data) => {
+                              // Update the site data when screenshot is captured
+                              console.log('Screenshot updated:', data);
+                            }}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="text-xs text-gray-500 text-center">
+                        Click on the image area to capture or refresh screenshot
+                      </div>
+                    </div>
+                  )}
+                  
+                  {!paginatedSites[0] && (
+                    <div className="text-center text-gray-500 py-8">
+                      No sites available for screenshot capture
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
