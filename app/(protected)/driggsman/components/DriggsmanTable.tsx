@@ -3419,8 +3419,16 @@ export default function DriggsmanTable({
                 
                 {/* Tab Content */}
                 <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-                  <div className="text-base font-bold mb-4" style={{ fontSize: '16px' }}>
-                    ntab1 chamber - Website Screenshot
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="text-base font-bold" style={{ fontSize: '16px' }}>
+                      ntab1 chamber - Website Screenshot
+                    </div>
+                    <a 
+                      href={`/planchjar?tab=dpackjartab&site=${paginatedSites[0]?.sitespren_base || ''}`}
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors duration-200"
+                    >
+                      /planchjar
+                    </a>
                   </div>
                   
                   {/* Screenshot Preview Area */}
