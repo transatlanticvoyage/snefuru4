@@ -3398,7 +3398,7 @@ export default function DriggsmanTable({
                     ntab1
                   </button>
                   <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
-                    ntab2
+                    wp vacuum
                   </button>
                   <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
                     ntab3
@@ -4010,23 +4010,9 @@ export default function DriggsmanTable({
                         </div>
                       </div>
                       
-                      {/* Original medallion content - positioned to preserve appearance */}
-                      <div className="flex items-center justify-start h-full space-x-1" style={{ position: 'relative', zIndex: 2, marginRight: '430px' }}>
-                        <DriggsPackMedallion 
-                          driggspackNumber={1}
-                          siteId={site.id}
-                          onZzClick={handleDriggspackClick}
-                        />
-                        <DriggsPackMedallion 
-                          driggspackNumber={2}
-                          siteId={site.id}
-                          onZzClick={handleDriggspackClick}
-                        />
-                        <DriggsPackMedallion 
-                          driggspackNumber={3}
-                          siteId={site.id}
-                          onZzClick={handleDriggspackClick}
-                        />
+                      {/* Dash filler content */}
+                      <div className="flex items-center justify-center h-full">
+                        <span className="text-gray-400">-</span>
                       </div>
                     </td>
                     {/* Empty status column for medallion row */}
@@ -4050,33 +4036,23 @@ export default function DriggsmanTable({
                       style={{ width: '12px', minWidth: '12px', maxWidth: '12px' }}
                     >
                     </td>
-                    {/* Vacuum medallion column */}
+                    {/* Dash filler column */}
                     <td 
-                      key={`vacuum-medallion-${site.id}`}
+                      key={`dash-filler-${site.id}`}
                       className="h-8 border-r border-gray-300 p-1"
                     >
                       <div className="flex items-center justify-center h-full">
-                        <VacuumMedallion 
-                          siteId={site.id}
-                          onMedallionClick={handleVacuumMedallionClick}
-                          onFiller1aClick={handleVacuumFiller1aClick}
-                          onFiller1bClick={handleVacuumFiller1bClick}
-                        />
+                        <span className="text-gray-400">-</span>
                       </div>
                     </td>
-                    {/* Zarpo scraper medallion column */}
+                    {/* Dash filler column */}
                     <td 
-                      key={`zarpo-medallion-${site.id}`}
+                      key={`zarpo-dash-filler-${site.id}`}
                       className="h-8 p-1"
                       style={{ borderRight: '3px solid black' }}
                     >
                       <div className="flex items-center justify-center h-full">
-                        <ZarpoMedallion 
-                          siteId={site.id}
-                          onMedallionClick={handleZarpoMedallionClick}
-                          onFiller1aClick={handleZarpoFiller1aClick}
-                          onFiller1bClick={handleZarpoFiller1bClick}
-                        />
+                        <span className="text-gray-400">-</span>
                       </div>
                     </td>
                   </>
