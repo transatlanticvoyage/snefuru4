@@ -206,20 +206,7 @@ export default function ScreenshotPreview({
   return (
     <div className="w-full h-full">
       {renderContent()}
-      {/* Debug panel - remove after fixing */}
-      {process.env.NODE_ENV === 'development' && state.imageUrl && (
-        <div className="absolute top-0 left-0 bg-black bg-opacity-75 text-white text-xs p-2 max-w-full overflow-hidden">
-          <div>Debug URL: {state.imageUrl.substring(0, 100)}...</div>
-          <a 
-            href={state.imageUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-blue-300 underline"
-          >
-            Test URL in new tab
-          </a>
-        </div>
-      )}
+
     </div>
   );
 }

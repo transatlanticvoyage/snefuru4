@@ -3501,6 +3501,90 @@ export default function DriggsmanTable({
                           </div>
                         </div>
                       </div>
+                      
+                      {/* dp1-dp5 Table */}
+                      <div className="mt-6">
+                        <table style={{
+                          borderCollapse: 'collapse',
+                          border: '1px solid #9ca3af',
+                          margin: '0 auto'
+                        }}>
+                          <tbody>
+                            <tr>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp1</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp1</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp2</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp2</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp3</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp3</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp4</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp4</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp5</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp5</td>
+                            </tr>
+                            <tr>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>shark</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>walrus</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>shark</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>walrus</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>shark</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>walrus</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>shark</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>walrus</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>shark</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>walrus</td>
+                            </tr>
+                            <tr>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                            </tr>
+                            <tr>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
+                            </tr>
+                            <tr>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>csv</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>csv</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>csv</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>csv</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>csv</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>csv</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>csv</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>csv</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>csv</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>csv</td>
+                            </tr>
+                            <tr>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>sql</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>sql</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>sql</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>sql</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>sql</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>sql</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>sql</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>sql</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>sql</td>
+                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>sql</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
                   
