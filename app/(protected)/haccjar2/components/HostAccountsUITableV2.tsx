@@ -526,41 +526,52 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
             <thead className="bg-gray-50">
+              {/* DB Table Names Row */}
+              <tr>
+                <th className="px-4 py-2 text-center text-xs font-bold text-gray-700 bg-blue-100" style={{ border: '1px solid #d1d5db' }} colSpan={8}>
+                  host_company
+                </th>
+                <th className="px-2 bg-gray-300" style={{ border: '1px solid #d1d5db' }}></th>
+                <th className="px-4 py-2 text-center text-xs font-bold text-gray-700 bg-green-100" style={{ border: '1px solid #d1d5db' }} colSpan={9}>
+                  host_account
+                </th>
+              </tr>
+              {/* Column Names Row */}
               <tr>
                 {/* Company Entity Checkbox column (far left) */}
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
                   <div className="flex items-center">
                     <span className="text-xs">Company</span>
                   </div>
                 </th>
                 {/* Host Company columns on the left */}
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  company.id
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  id
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  company.name
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  name
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  company.portal_url1
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  portal_url1
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  company.fk_user_id
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  fk_user_id
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  company.notes1
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  notes1
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  company.notes2
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  notes2
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  company.notes3
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  notes3
                 </th>
                 {/* Separator column */}
-                <th className="px-2 bg-gray-200"></th>
+                <th className="px-2 bg-gray-200" style={{ border: '1px solid #d1d5db' }}></th>
                 {/* Checkbox column */}
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -575,35 +586,38 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                 <th 
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('id')}
+                  style={{ border: '1px solid #d1d5db' }}
                 >
-                  account.id {sortField === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  id {sortField === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('username')}
+                  style={{ border: '1px solid #d1d5db' }}
                 >
-                  account.username {sortField === 'username' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  username {sortField === 'username' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  account.pass
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  pass
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  account.hostacct_apikey1
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  hostacct_apikey1
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
                   hostacct_api_secret
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
                   api_management_url
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  account.fk_user_id
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  fk_user_id
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('fk_host_company_id')}
+                  style={{ border: '1px solid #d1d5db' }}
                 >
-                  account.fk_host_company_id {sortField === 'fk_host_company_id' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  fk_host_company_id {sortField === 'fk_host_company_id' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
               </tr>
             </thead>
@@ -615,7 +629,7 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   title={item._is_company_only ? 'Company without host account - click to create account' : ''}
                 >
                   {/* Company Entity Checkbox column (far left) */}
-                  <td className="px-4 py-2 whitespace-nowrap">
+                  <td className="px-4 py-2 whitespace-nowrap" style={{ border: '1px solid #d1d5db' }}>
                     {item.host_company?.id ? (
                       <input
                         type="checkbox"
@@ -630,17 +644,17 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   {/* Host Company columns with yellow highlighting when company is selected */}
                   <td className={`px-4 py-2 whitespace-nowrap text-gray-900 text-xs ${
                     item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {item.host_company ? truncateText(item.host_company.id, 8) + '...' : '-'}
                   </td>
                   <td className={`px-4 py-2 text-gray-900 font-medium ${
                     item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {item.host_company?.name || '-'}
                   </td>
                   <td className={`px-4 py-2 text-blue-600 hover:text-blue-800 ${
                     item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {item.host_company?.portal_url1 ? (
                       <a 
                         href={item.host_company.portal_url1} 
@@ -654,28 +668,28 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   </td>
                   <td className={`px-4 py-2 whitespace-nowrap text-gray-500 text-xs ${
                     item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {item.host_company ? truncateText(item.host_company.fk_user_id, 8) + '...' : '-'}
                   </td>
                   <td className={`px-4 py-2 text-gray-600 ${
                     item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {truncateText(item.host_company?.notes1 || null, 20)}
                   </td>
                   <td className={`px-4 py-2 text-gray-600 ${
                     item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {truncateText(item.host_company?.notes2 || null, 20)}
                   </td>
                   <td className={`px-4 py-2 text-gray-600 ${
                     item.host_company?.id && selectedCompanies.has(item.host_company.id) ? 'bg-yellow-200' : ''
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {truncateText(item.host_company?.notes3 || null, 20)}
                   </td>
                   {/* Separator column */}
-                  <td className="px-2 bg-gray-200"></td>
+                  <td className="px-2 bg-gray-200" style={{ border: '1px solid #d1d5db' }}></td>
                   {/* Checkbox column */}
-                  <td className="px-4 py-2 whitespace-nowrap">
+                  <td className="px-4 py-2 whitespace-nowrap" style={{ border: '1px solid #d1d5db' }}>
                     {item.id ? (
                       <input
                         type="checkbox"
@@ -690,42 +704,42 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   {/* Host Account columns */}
                   <td className={`px-4 py-2 whitespace-nowrap text-xs ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-900'
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {item._is_company_only ? 'No Account' : (item.id ? truncateText(item.id, 8) + '...' : '-')}
                   </td>
                   <td className={`px-4 py-2 ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-900'
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {renderEditableCell(item, 'username', item.username, 'font-medium')}
                   </td>
                   <td className={`px-4 py-2 ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {renderEditableCell(item, 'pass', item.pass, '', maskPassword)}
                   </td>
                   <td className={`px-4 py-2 ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {renderEditableCell(item, 'hostacct_apikey1', item.hostacct_apikey1, 'font-mono text-xs', maskApiKey)}
                   </td>
                   <td className={`px-4 py-2 ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {renderEditableCell(item, 'hostacct_api_secret', item.hostacct_api_secret, 'font-mono text-xs', maskApiKey)}
                   </td>
                   <td className={`px-4 py-2 ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-blue-600 hover:text-blue-800'
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {renderEditableURLCell(item, 'api_management_url', item.api_management_url)}
                   </td>
                   <td className={`px-4 py-2 whitespace-nowrap text-xs ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {item._is_company_only ? 'No Account' : (item.fk_user_id ? truncateText(item.fk_user_id, 8) + '...' : '-')}
                   </td>
                   <td className={`px-4 py-2 whitespace-nowrap text-xs ${
                     item._is_company_only ? 'text-gray-400 italic' : 'text-gray-500'
-                  }`}>
+                  }`} style={{ border: '1px solid #d1d5db' }}>
                     {item._is_company_only ? 'No Account' : (item.fk_host_company_id ? truncateText(item.fk_host_company_id, 8) + '...' : '-')}
                   </td>
                 </tr>
