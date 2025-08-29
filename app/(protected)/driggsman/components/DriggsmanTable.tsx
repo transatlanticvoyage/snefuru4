@@ -397,6 +397,9 @@ export default function DriggsmanTable({
   // Call platform dropdown states
   const [callPlatforms, setCallPlatforms] = useState<CallPlatform[]>([]);
   const [platformDropdownOpen, setPlatformDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
+  
+  // Tundra chamber tab state
+  const [activeTundraTab, setActiveTundraTab] = useState<'ntab1' | 'ntab2' | 'ntab3' | 'ntab4' | 'ntab5' | 'ntab6' | 'ntab7'>('ntab1');
   const [platformsLoaded, setPlatformsLoaded] = useState(false);
   const [platformsLoading, setPlatformsLoading] = useState(false);
   
@@ -3394,149 +3397,219 @@ export default function DriggsmanTable({
               <div className="mt-6 border-t border-gray-300 pt-4">
                 {/* Tab Headers */}
                 <div className="flex border-b border-gray-200">
-                  <button className="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600 bg-blue-50">
+                  <button 
+                    className={`px-4 py-2 text-sm font-medium ${activeTundraTab === 'ntab1' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}
+                    onClick={() => setActiveTundraTab('ntab1')}
+                  >
                     ntab1
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    className={`px-4 py-2 text-sm font-medium ${activeTundraTab === 'ntab2' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}
+                    onClick={() => setActiveTundraTab('ntab2')}
+                  >
                     wp vacuum
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
-                    ntab3
+                  <button 
+                    className={`px-4 py-2 text-sm font-medium ${activeTundraTab === 'ntab3' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}
+                    onClick={() => setActiveTundraTab('ntab3')}
+                  >
+                    frontend zarpo scraper
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    className={`px-4 py-2 text-sm font-medium ${activeTundraTab === 'ntab4' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}
+                    onClick={() => setActiveTundraTab('ntab4')}
+                  >
                     ntab4
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    className={`px-4 py-2 text-sm font-medium ${activeTundraTab === 'ntab5' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}
+                    onClick={() => setActiveTundraTab('ntab5')}
+                  >
                     ntab5
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    className={`px-4 py-2 text-sm font-medium ${activeTundraTab === 'ntab6' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}
+                    onClick={() => setActiveTundraTab('ntab6')}
+                  >
                     ntab6
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    className={`px-4 py-2 text-sm font-medium ${activeTundraTab === 'ntab7' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}
+                    onClick={() => setActiveTundraTab('ntab7')}
+                  >
                     ntab7
                   </button>
                 </div>
                 
                 {/* Tab Content */}
                 <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-                  <div className="text-base font-bold mb-4" style={{ fontSize: '16px' }}>
-                    ntab1 chamber - Website Screenshot
-                  </div>
-                  
-                  {/* Screenshot Preview Area */}
-                  {paginatedSites[0] && (
-                    <div className="space-y-4">
-                      <div className="text-sm text-gray-600 mb-2">
-                        Snail Image System for: <span className="font-medium text-gray-800">{paginatedSites[0].sitespren_base}</span>
+                  {/* ntab1 - Website Screenshot */}
+                  {activeTundraTab === 'ntab1' && (
+                    <>
+                      <div className="text-base font-bold mb-4" style={{ fontSize: '16px' }}>
+                        ntab1 chamber - Website Screenshot
                       </div>
                       
-                      {/* Dual Image Display Area with Medallions */}
-                      <div className="flex gap-6 justify-start">
-                        {/* Interactive Screenshot Capture Box */}
-                        <div className="flex-1 max-w-32">
-                          <div className="text-xs text-gray-600 mb-2 text-center font-medium">
-                            Interactive Screenshot Capture
+                      {/* Screenshot Preview Area */}
+                      {paginatedSites[0] && (
+                        <div className="space-y-4">
+                          <div className="text-sm text-gray-600 mb-2">
+                            Snail Image System for: <span className="font-medium text-gray-800">{paginatedSites[0].sitespren_base}</span>
                           </div>
-                          <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
-                            <ScreenshotPreview
-                              sitesprenId={paginatedSites[0].id}
-                              sitesprenBase={paginatedSites[0].sitespren_base || ''}
-                              currentScreenshotUrl={paginatedSites[0].screenshot_url}
-                              screenshotStatus={paginatedSites[0].screenshot_status}
-                              screenshotError={null}
-                              onScreenshotUpdate={(data) => {
-                                // Update the site data when screenshot is captured
-                                console.log('Screenshot updated:', data);
-                              }}
-                            />
-                          </div>
-                          <div className="text-xs text-gray-500 text-center mt-2">
-                            Click on the image area to capture or refresh screenshot
-                          </div>
-                        </div>
-
-                        {/* Static Image Display Box */}
-                        <div className="flex-1 max-w-32">
-                          <div className="text-xs text-gray-600 mb-2 text-center font-medium">
-                            Static Database Image (screenshot_url field)
-                          </div>
-                          <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border-2 border-blue-200">
-                            {paginatedSites[0].screenshot_url ? (
-                              <img
-                                src={paginatedSites[0].screenshot_url}
-                                alt={`Static image from database for ${paginatedSites[0].sitespren_base}`}
-                                className="w-full h-full object-cover"
-                                onLoad={() => {
-                                  console.log('✅ Static image loaded successfully:', paginatedSites[0].screenshot_url);
-                                }}
-                                onError={(e) => {
-                                  console.error('❌ Static image failed to load:', {
-                                    imageUrl: paginatedSites[0].screenshot_url,
-                                    sitesprenBase: paginatedSites[0].sitespren_base,
-                                    error: e,
-                                    timestamp: new Date().toISOString()
-                                  });
-                                }}
-                              />
-                            ) : (
-                              <div className="flex items-center justify-center h-full bg-gray-50">
-                                <div className="text-center p-4">
-                                  <div className="text-2xl mb-2 text-gray-400">📷</div>
-                                  <div className="text-xs text-gray-500">No static image</div>
-                                  <div className="text-xs text-gray-400">in screenshot_url field</div>
-                                </div>
+                          
+                          {/* Dual Image Display Area with Medallions */}
+                          <div className="flex gap-6 justify-start">
+                            {/* Interactive Screenshot Capture Box */}
+                            <div className="flex-1 max-w-32">
+                              <div className="text-xs text-gray-600 mb-2 text-center font-medium">
+                                Interactive Screenshot Capture
                               </div>
-                            )}
-                          </div>
-                          <div className="text-xs text-gray-500 text-center mt-2">
-                            Read-only display from database field
+                              <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+                                <ScreenshotPreview
+                                  sitesprenId={paginatedSites[0].id}
+                                  sitesprenBase={paginatedSites[0].sitespren_base || ''}
+                                  currentScreenshotUrl={paginatedSites[0].screenshot_url}
+                                  screenshotStatus={paginatedSites[0].screenshot_status}
+                                  screenshotError={null}
+                                  onScreenshotUpdate={(data) => {
+                                    // Update the site data when screenshot is captured
+                                    console.log('Screenshot updated:', data);
+                                  }}
+                                />
+                              </div>
+                              <div className="text-xs text-gray-500 text-center mt-2">
+                                Click on the image area to capture or refresh screenshot
+                              </div>
+                            </div>
+
+                            {/* Static Image Display Box */}
+                            <div className="flex-1 max-w-32">
+                              <div className="text-xs text-gray-600 mb-2 text-center font-medium">
+                                Static Database Image (screenshot_url field)
+                              </div>
+                              <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border-2 border-blue-200">
+                                {paginatedSites[0].screenshot_url ? (
+                                  <img
+                                    src={paginatedSites[0].screenshot_url}
+                                    alt={`Static image from database for ${paginatedSites[0].sitespren_base}`}
+                                    className="w-full h-full object-cover"
+                                    onLoad={() => {
+                                      console.log('✅ Static image loaded successfully:', paginatedSites[0].screenshot_url);
+                                    }}
+                                    onError={(e) => {
+                                      console.error('❌ Static image failed to load:', {
+                                        imageUrl: paginatedSites[0].screenshot_url,
+                                        sitesprenBase: paginatedSites[0].sitespren_base,
+                                        error: e,
+                                        timestamp: new Date().toISOString()
+                                      });
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="flex items-center justify-center h-full bg-gray-50">
+                                    <div className="text-center p-4">
+                                      <div className="text-2xl mb-2 text-gray-400">📷</div>
+                                      <div className="text-xs text-gray-500">No static image</div>
+                                      <div className="text-xs text-gray-400">in screenshot_url field</div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-500 text-center mt-2">
+                                Read-only display from database field
+                              </div>
+                            </div>
+
+                            {/* Medallion Tables - Moved from table headers */}
+                            <div className="flex flex-col gap-4 ml-6">
+                              {/* Driggs Pack Medallions (zz1_medal, zz2_medal, zz3_medal) */}
+                              <div className="flex gap-2">
+                                {paginatedSites.map((site) => (
+                                  <React.Fragment key={`medallion-group-${site.id}`}>
+                                    <DriggsPackMedallion 
+                                      driggspackNumber={1}
+                                      siteId={site.id}
+                                      onZzClick={handleDriggspackClick}
+                                    />
+                                    <DriggsPackMedallion 
+                                      driggspackNumber={2}
+                                      siteId={site.id}
+                                      onZzClick={handleDriggspackClick}
+                                    />
+                                    <DriggsPackMedallion 
+                                      driggspackNumber={3}
+                                      siteId={site.id}
+                                      onZzClick={handleDriggspackClick}
+                                    />
+                                  </React.Fragment>
+                                ))}
+                              </div>
+                            </div>
                           </div>
                         </div>
+                      )}
+                    </>
+                  )}
 
-                        {/* Medallion Tables - Moved from table headers */}
-                        <div className="flex flex-col gap-4 ml-6">
-                          {/* Driggs Pack Medallions (zz1_medal, zz2_medal, zz3_medal) */}
-                          <div className="flex gap-2">
-                            {paginatedSites.map((site) => (
-                              <React.Fragment key={`medallion-group-${site.id}`}>
-                                <DriggsPackMedallion 
-                                  driggspackNumber={1}
-                                  siteId={site.id}
-                                  onZzClick={handleDriggspackClick}
-                                />
-                                <DriggsPackMedallion 
-                                  driggspackNumber={2}
-                                  siteId={site.id}
-                                  onZzClick={handleDriggspackClick}
-                                />
-                                <DriggsPackMedallion 
-                                  driggspackNumber={3}
-                                  siteId={site.id}
-                                  onZzClick={handleDriggspackClick}
-                                />
-                              </React.Fragment>
-                            ))}
-                          </div>
+                  {/* ntab2 - WP Vacuum */}
+                  {activeTundraTab === 'ntab2' && (
+                    <>
+                      <div className="text-base font-bold mb-4" style={{ fontSize: '16px' }}>
+                        ntab2 chamber - WP Vacuum
+                      </div>
+                      
+                      {/* Vacuum Medallions */}
+                      <div className="flex flex-col gap-4">
+                        <div className="flex gap-2">
+                          {paginatedSites.map((site) => (
+                            <VacuumMedallion 
+                              key={`vacuum-${site.id}`}
+                              siteId={site.id}
+                              onMedallionClick={handleVacuumMedallionClick}
+                              onFiller1aClick={handleVacuumFiller1aClick}
+                              onFiller1bClick={handleVacuumFiller1bClick}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
 
-                          {/* Vacuum and Zarpo Medallions */}
-                          <div className="flex gap-2">
-                            {paginatedSites.map((site) => (
-                              <React.Fragment key={`vacuum-zarpo-${site.id}`}>
-                                <VacuumMedallion 
-                                  siteId={site.id}
-                                  onMedallionClick={handleVacuumMedallionClick}
-                                  onFiller1aClick={handleVacuumFiller1aClick}
-                                  onFiller1bClick={handleVacuumFiller1bClick}
-                                />
-                                <ZarpoMedallion 
-                                  siteId={site.id}
-                                  onMedallionClick={handleZarpoMedallionClick}
-                                  onFiller1aClick={handleZarpoFiller1aClick}
-                                  onFiller1bClick={handleZarpoFiller1bClick}
-                                />
-                              </React.Fragment>
-                            ))}
-                          </div>
+                  {/* ntab3 - Frontend Zarpo Scraper */}
+                  {activeTundraTab === 'ntab3' && (
+                    <>
+                      <div className="text-base font-bold mb-4" style={{ fontSize: '16px' }}>
+                        ntab3 chamber - Frontend Zarpo Scraper
+                      </div>
+                      
+                      {/* Zarpo Medallions */}
+                      <div className="flex flex-col gap-4">
+                        <div className="flex gap-2">
+                          {paginatedSites.map((site) => (
+                            <ZarpoMedallion 
+                              key={`zarpo-${site.id}`}
+                              siteId={site.id}
+                              onMedallionClick={handleZarpoMedallionClick}
+                              onFiller1aClick={handleZarpoFiller1aClick}
+                              onFiller1bClick={handleZarpoFiller1bClick}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* ntab4-7 - Placeholder tabs */}
+                  {(activeTundraTab === 'ntab4' || activeTundraTab === 'ntab5' || activeTundraTab === 'ntab6' || activeTundraTab === 'ntab7') && (
+                    <>
+                      <div className="text-base font-bold mb-4" style={{ fontSize: '16px' }}>
+                        {activeTundraTab} chamber - Coming Soon
+                      </div>
+                      <div className="text-gray-500 text-center py-8">
+                        Content for {activeTundraTab} will be added here
+                      </div>
+                    </>
+                  )}
 
                           {/* Tundra Box Div */}
                           <div className="mt-2">

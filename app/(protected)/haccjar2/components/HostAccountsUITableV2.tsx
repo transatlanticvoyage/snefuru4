@@ -13,6 +13,34 @@ interface HostCompany {
   notes3: string | null;
 }
 
+interface HostPlan {
+  id: string;
+  paymentdate_first: string | null;
+  payment_method: string | null;
+  price: number | null;
+  currency: string | null;
+  price_term: string | null;
+  subscribed: boolean | null;
+  cc_added: boolean | null;
+  paymentdate_next: string | null;
+  fk_user_id: string;
+  ue_identifier_1: string | null;
+  fk_host_account_id: string;
+}
+
+interface HostPanel {
+  id: string;
+  panel_url1: string | null;
+  panel_user: string | null;
+  panel_pass: string | null;
+  panel_type: string | null;
+  panel_ns: string | null;
+  fk_user_id: string;
+  panel_note1: string | null;
+  flag_nsduplicate: boolean | null;
+  fk_host_plan_id: string;
+}
+
 interface HostAccountRecord {
   id: string | null; // UUID - can be null for companies without accounts
   username: string | null;
@@ -24,7 +52,11 @@ interface HostAccountRecord {
   fk_host_company_id: string | null;
   host_company: HostCompany | null;
   domains_glacier: string | null;
+  host_plan: HostPlan | null; // Can be null for accounts without plans
+  host_panel: HostPanel | null; // Can be null for plans without panels
   _is_company_only?: boolean; // Flag to indicate this is a company without account
+  _is_account_only?: boolean; // Flag to indicate this is an account without plan
+  _is_plan_only?: boolean; // Flag to indicate this is a plan without panel
 }
 
 interface HostAccountsUITableV2Props {
@@ -45,6 +77,8 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [selectedHostAccounts, setSelectedHostAccounts] = useState<Set<string>>(new Set());
   const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
+  const [selectedHostPlans, setSelectedHostPlans] = useState<Set<string>>(new Set());
+  const [selectedHostPanels, setSelectedHostPanels] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -52,6 +86,10 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   const [editValue, setEditValue] = useState<string>('');
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [createAccountError, setCreateAccountError] = useState<string | null>(null);
+  const [isCreatingPlan, setIsCreatingPlan] = useState(false);
+  const [createPlanError, setCreatePlanError] = useState<string | null>(null);
+  const [isCreatingPanel, setIsCreatingPanel] = useState(false);
+  const [createPanelError, setCreatePanelError] = useState<string | null>(null);
 
   // Filter and search logic
   const filteredData = useMemo(() => {
@@ -66,7 +104,16 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
         item.host_company?.portal_url1?.toLowerCase().includes(searchLower) ||
         item.host_company?.notes1?.toLowerCase().includes(searchLower) ||
         item.host_company?.notes2?.toLowerCase().includes(searchLower) ||
-        item.host_company?.notes3?.toLowerCase().includes(searchLower);
+        item.host_company?.notes3?.toLowerCase().includes(searchLower) ||
+        item.host_plan?.payment_method?.toLowerCase().includes(searchLower) ||
+        item.host_plan?.currency?.toLowerCase().includes(searchLower) ||
+        item.host_plan?.price_term?.toLowerCase().includes(searchLower) ||
+        item.host_plan?.ue_identifier_1?.toLowerCase().includes(searchLower) ||
+        item.host_panel?.panel_url1?.toLowerCase().includes(searchLower) ||
+        item.host_panel?.panel_user?.toLowerCase().includes(searchLower) ||
+        item.host_panel?.panel_type?.toLowerCase().includes(searchLower) ||
+        item.host_panel?.panel_ns?.toLowerCase().includes(searchLower) ||
+        item.host_panel?.panel_note1?.toLowerCase().includes(searchLower);
 
       return matchesSearch;
     });
@@ -163,6 +210,32 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
     }
     setSelectedCompanies(newSelected);
     setCreateAccountError(null); // Clear any previous error when selection changes
+  };
+
+  // Handle host plan checkbox selection
+  const handleSelectHostPlan = (planId: string | null, checked: boolean) => {
+    if (!planId) return; // Skip if no plan ID
+    
+    const newSelected = new Set(selectedHostPlans);
+    if (checked) {
+      newSelected.add(planId);
+    } else {
+      newSelected.delete(planId);
+    }
+    setSelectedHostPlans(newSelected);
+  };
+
+  // Handle host panel checkbox selection
+  const handleSelectHostPanel = (panelId: string | null, checked: boolean) => {
+    if (!panelId) return; // Skip if no panel ID
+    
+    const newSelected = new Set(selectedHostPanels);
+    if (checked) {
+      newSelected.add(panelId);
+    } else {
+      newSelected.delete(panelId);
+    }
+    setSelectedHostPanels(newSelected);
   };
 
   // Inline editing functions (based on xpagesmanager1 pattern)
@@ -328,6 +401,96 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
       setCreateAccountError('Network error occurred while creating host account');
     } finally {
       setIsCreatingAccount(false);
+    }
+  };
+
+  const handleCreateHostPlan = async () => {
+    if (selectedHostAccounts.size !== 1) {
+      setCreatePlanError('Please select exactly one host account to create a host plan for');
+      return;
+    }
+    const selectedAccountId = Array.from(selectedHostAccounts)[0];
+    const selectedAccount = data.find(item => item.id === selectedAccountId);
+    if (!selectedAccount || selectedAccount._is_company_only) {
+      setCreatePlanError('Selected host account not found');
+      return;
+    }
+    setIsCreatingPlan(true);
+    setCreatePlanError(null);
+    try {
+      const response = await fetch('/api/create-host-plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          host_account_id: selectedAccountId,
+          user_id: selectedAccount.fk_user_id
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        console.log('Successfully created host plan:', result);
+        // Clear account selection
+        setSelectedHostAccounts(new Set());
+        // Refresh the data to show the new host plan
+        if (onDataChange) {
+          onDataChange();
+        }
+      } else {
+        console.error('Error creating host plan:', result.error);
+        setCreatePlanError(result.error);
+      }
+    } catch (error) {
+      console.error('Error calling create host plan API:', error);
+      setCreatePlanError('Network error occurred while creating host plan');
+    } finally {
+      setIsCreatingPlan(false);
+    }
+  };
+
+  const handleCreateHostPanel = async () => {
+    if (selectedHostPlans.size !== 1) {
+      setCreatePanelError('Please select exactly one host plan to create a host panel for');
+      return;
+    }
+    const selectedPlanId = Array.from(selectedHostPlans)[0];
+    const selectedPlan = data.find(item => item.host_plan?.id === selectedPlanId);
+    if (!selectedPlan?.host_plan || selectedPlan._is_company_only || selectedPlan._is_account_only) {
+      setCreatePanelError('Selected host plan not found');
+      return;
+    }
+    setIsCreatingPanel(true);
+    setCreatePanelError(null);
+    try {
+      const response = await fetch('/api/create-host-panel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          host_plan_id: selectedPlanId,
+          user_id: selectedPlan.host_plan.fk_user_id
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        console.log('Successfully created host panel:', result);
+        // Clear plan selection
+        setSelectedHostPlans(new Set());
+        // Refresh the data to show the new host panel
+        if (onDataChange) {
+          onDataChange();
+        }
+      } else {
+        console.error('Error creating host panel:', result.error);
+        setCreatePanelError(result.error);
+      }
+    } catch (error) {
+      console.error('Error calling create host panel API:', error);
+      setCreatePanelError('Network error occurred while creating host panel');
+    } finally {
+      setIsCreatingPanel(false);
     }
   };
 
@@ -523,6 +686,62 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
         </div>
       )}
 
+      {/* Create New Host Plan Button */}
+      <div className="flex items-center justify-between mt-6">
+        <button
+          className={`px-6 py-3 rounded-md font-medium ${
+            selectedHostAccounts.size === 1
+              ? 'bg-purple-600 text-white hover:bg-purple-700'
+              : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
+          onClick={handleCreateHostPlan}
+          disabled={selectedHostAccounts.size !== 1 || isCreatingPlan}
+        >
+          {isCreatingPlan ? 'Creating Plan...' : 'Create New Host Plan'}
+        </button>
+        
+        <div className="text-sm text-gray-600">
+          {selectedHostAccounts.size === 0 && 'Select 1 host account to create host plan'}
+          {selectedHostAccounts.size === 1 && 'Ready to create host plan'}
+          {selectedHostAccounts.size > 1 && `${selectedHostAccounts.size} host accounts selected - select exactly 1`}
+        </div>
+      </div>
+
+      {/* Create Plan Error Display */}
+      {createPlanError && (
+        <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md">
+          Error: {createPlanError}
+        </div>
+      )}
+
+      {/* Create New Host Panel Button */}
+      <div className="flex items-center justify-between mt-6">
+        <button
+          className={`px-6 py-3 rounded-md font-medium ${
+            selectedHostPlans.size === 1
+              ? 'bg-orange-600 text-white hover:bg-orange-700'
+              : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
+          onClick={handleCreateHostPanel}
+          disabled={selectedHostPlans.size !== 1 || isCreatingPanel}
+        >
+          {isCreatingPanel ? 'Creating Panel...' : 'Create New Host Panel'}
+        </button>
+        
+        <div className="text-sm text-gray-600">
+          {selectedHostPlans.size === 0 && 'Select 1 host plan to create host panel'}
+          {selectedHostPlans.size === 1 && 'Ready to create host panel'}
+          {selectedHostPlans.size > 1 && `${selectedHostPlans.size} host plans selected - select exactly 1`}
+        </div>
+      </div>
+
+      {/* Create Panel Error Display */}
+      {createPanelError && (
+        <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md">
+          Error: {createPanelError}
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
@@ -536,6 +755,14 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                 <th className="px-2 bg-gray-300" style={{ border: '1px solid #d1d5db' }}></th>
                 <th className="px-4 py-2 text-center text-xs font-bold text-gray-700 bg-green-100" style={{ border: '1px solid #d1d5db' }} colSpan={9}>
                   host_account
+                </th>
+                <th className="px-2 bg-gray-300" style={{ border: '1px solid #d1d5db' }}></th>
+                <th className="px-4 py-2 text-center text-xs font-bold text-gray-700 bg-purple-100" style={{ border: '1px solid #d1d5db' }} colSpan={10}>
+                  host_plan
+                </th>
+                <th className="px-2 bg-gray-300" style={{ border: '1px solid #d1d5db' }}></th>
+                <th className="px-4 py-2 text-center text-xs font-bold text-gray-700 bg-orange-100" style={{ border: '1px solid #d1d5db' }} colSpan={8}>
+                  host_panel
                 </th>
               </tr>
               {/* Column Names Row */}
@@ -618,6 +845,72 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   style={{ border: '1px solid #d1d5db' }}
                 >
                   fk_host_company_id {sortField === 'fk_host_company_id' && (sortOrder === 'asc' ? '↑' : '↓')}
+                </th>
+                {/* Separator column */}
+                <th className="px-2 bg-gray-200" style={{ border: '1px solid #d1d5db' }}></th>
+                {/* Plan Entity Checkbox column */}
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  <div className="flex items-center">
+                    <span className="text-xs">Plan</span>
+                  </div>
+                </th>
+                {/* Host Plan columns */}
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  plan_id
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  paymentdate_first
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  payment_method
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  price
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  currency
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  price_term
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  subscribed
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  paymentdate_next
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  fk_host_account_id
+                </th>
+                {/* Separator column */}
+                <th className="px-2 bg-gray-200" style={{ border: '1px solid #d1d5db' }}></th>
+                {/* Panel Entity Checkbox column */}
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  <div className="flex items-center">
+                    <span className="text-xs">Panel</span>
+                  </div>
+                </th>
+                {/* Host Panel columns */}
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  panel_id
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  panel_url1
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  panel_user
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  panel_pass
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  panel_type
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  panel_ns
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
+                  fk_host_plan_id
                 </th>
               </tr>
             </thead>
@@ -742,11 +1035,129 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   }`} style={{ border: '1px solid #d1d5db' }}>
                     {item._is_company_only ? 'No Account' : (item.fk_host_company_id ? truncateText(item.fk_host_company_id, 8) + '...' : '-')}
                   </td>
+
+                  {/* Separator column */}
+                  <td className="px-2 bg-gray-300" style={{ border: '1px solid #d1d5db' }}></td>
+
+                  {/* Host Plan checkbox */}
+                  <td className="px-4 py-2 whitespace-nowrap" style={{ border: '1px solid #d1d5db' }}>
+                    {item.host_plan?.id && !(item._is_company_only || item._is_account_only) ? (
+                      <input
+                        type="checkbox"
+                        checked={selectedHostPlans.has(item.host_plan.id)}
+                        onChange={(e) => handleSelectHostPlan(item.host_plan.id, e.target.checked)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <span className="text-xs text-gray-400">N/A</span>
+                    )}
+                  </td>
+
+                  {/* Host Plan columns */}
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only ? 'No Plan' : (item.host_plan?.id ? truncateText(item.host_plan.id, 8) + '...' : '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only ? 'No Plan' : (item.host_plan?.paymentdate_first || '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only ? 'No Plan' : (item.host_plan?.payment_method || '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only ? 'No Plan' : (item.host_plan?.price || '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only ? 'No Plan' : (item.host_plan?.currency || '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only ? 'No Plan' : (item.host_plan?.price_term || '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only ? 'No Plan' : (item.host_plan?.subscribed !== undefined ? (item.host_plan.subscribed ? 'Yes' : 'No') : '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only ? 'No Plan' : (item.host_plan?.paymentdate_next || '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only ? 'No Plan' : (item.host_plan?.fk_host_account_id ? truncateText(item.host_plan.fk_host_account_id, 8) + '...' : '-')}
+                  </td>
+
+                  {/* Separator column */}
+                  <td className="px-2 bg-gray-300" style={{ border: '1px solid #d1d5db' }}></td>
+
+                  {/* Host Panel checkbox */}
+                  <td className="px-4 py-2 whitespace-nowrap" style={{ border: '1px solid #d1d5db' }}>
+                    {item.host_panel?.id && !(item._is_company_only || item._is_account_only || item._is_plan_only) ? (
+                      <input
+                        type="checkbox"
+                        checked={selectedHostPanels.has(item.host_panel.id)}
+                        onChange={(e) => handleSelectHostPanel(item.host_panel.id, e.target.checked)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <span className="text-xs text-gray-400">N/A</span>
+                    )}
+                  </td>
+
+                  {/* Host Panel columns */}
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only || item._is_plan_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only || item._is_plan_only ? 'No Panel' : (item.host_panel?.id ? truncateText(item.host_panel.id, 8) + '...' : '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only || item._is_plan_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only || item._is_plan_only ? 'No Panel' : (item.host_panel?.panel_url1 ? truncateText(item.host_panel.panel_url1, 20) + '...' : '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only || item._is_plan_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only || item._is_plan_only ? 'No Panel' : (item.host_panel?.panel_user || '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only || item._is_plan_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only || item._is_plan_only ? 'No Panel' : (item.host_panel?.panel_pass ? '••••••••' : '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only || item._is_plan_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only || item._is_plan_only ? 'No Panel' : (item.host_panel?.panel_type || '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only || item._is_plan_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only || item._is_plan_only ? 'No Panel' : (item.host_panel?.panel_ns || '-')}
+                  </td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-xs ${
+                    item._is_company_only || item._is_account_only || item._is_plan_only ? 'text-gray-400 italic' : 'text-gray-500'
+                  }`} style={{ border: '1px solid #d1d5db' }}>
+                    {item._is_company_only || item._is_account_only || item._is_plan_only ? 'No Panel' : (item.host_panel?.fk_host_plan_id ? truncateText(item.host_panel.fk_host_plan_id, 8) + '...' : '-')}
+                  </td>
                 </tr>
               ))}
               {paginatedData.length === 0 && (
                 <tr>
-                  <td colSpan={18} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={36} className="px-4 py-8 text-center text-gray-500">
                     No host accounts found
                   </td>
                 </tr>
