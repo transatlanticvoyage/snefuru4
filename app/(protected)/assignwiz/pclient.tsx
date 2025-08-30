@@ -46,7 +46,8 @@ export default function AssignwizClient() {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
-    // Extract URL parameters
+    // Extract URL parameters - tractor_name is the leftmost parameter
+    const tractorNameParam = searchParams?.get('tractor_name') || '';
     const typeParam = searchParams?.get('type') || '';
     const siteParam = searchParams?.get('site') || '';
     const userParam = searchParams?.get('user') || '';
@@ -55,10 +56,31 @@ export default function AssignwizClient() {
     setSite(siteParam);
     setUser(userParam);
     
-    if (typeParam && siteParam && userParam) {
-      loadData(typeParam);
+    // tractor_name is required and must be present
+    if (!tractorNameParam) {
+      setError('Missing required parameter: tractor_name');
+      setLoading(false);
+      return;
+    }
+    
+    // For site_to_cnc_tractor, we only need tractor_name and site
+    if (tractorNameParam === 'site_to_cnc_tractor') {
+      if (siteParam) {
+        setLoading(false);
+      } else {
+        setError('Missing required parameter for site_to_cnc_tractor: site');
+        setLoading(false);
+      }
+    }
+    // For other tractor types, we need all parameters
+    else if (tractorNameParam === 'all' || typeParam) {
+      if (typeParam && siteParam && userParam) {
+        loadData(typeParam);
+      } else {
+        setError('Missing required parameters: type, site, or user');
+        setLoading(false);
+      }
     } else {
-      setError('Missing required parameters: type, site, or user');
       setLoading(false);
     }
   }, [searchParams]);
@@ -233,6 +255,191 @@ export default function AssignwizClient() {
     );
   }
 
+  // Get tractor name from URL parameters
+  const tractorName = searchParams?.get('tractor_name') || '';
+
+  // Render site_to_cnc_tractor chamber interface
+  if (tractorName === 'site_to_cnc_tractor') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-4xl mx-auto px-6 py-4">
+            <h1 className="text-2xl font-bold text-gray-900">Assignment Wizard - Site to CNC Tractor</h1>
+            <div className="text-sm text-gray-600 mt-1">
+              Site assignment interface for CNC tractor operations
+            </div>
+          </div>
+        </div>
+
+        {/* site_to_cnc_tractor Chamber */}
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h2 className="text-gray-900 mb-4" style={{ fontWeight: 'bold', fontSize: '16px' }}>
+              site_to_cnc_tractor
+            </h2>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Site Parameter:
+              </label>
+              <input
+                type="text"
+                value={site}
+                readOnly
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none"
+                placeholder="Site parameter will appear here"
+              />
+            </div>
+            <div className="text-sm text-gray-500">
+              This interface is specifically designed for site-to-CNC tractor operations. The site parameter is automatically populated from the URL.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render all tractor interfaces when tractor_name is "all"
+  if (tractorName === 'all') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-4xl mx-auto px-6 py-4">
+            <h1 className="text-2xl font-bold text-gray-900">Assignment Wizard - All Tractor Interfaces</h1>
+            <div className="text-sm text-gray-600 mt-1">
+              Complete assignment interface showing all available tractor operations
+            </div>
+          </div>
+        </div>
+
+        {/* All Tractor Interfaces */}
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          {/* site_to_cnc_tractor Chamber */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 className="text-gray-900 mb-4" style={{ fontWeight: 'bold', fontSize: '16px' }}>
+              site_to_cnc_tractor
+            </h2>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Site Parameter:
+              </label>
+              <input
+                type="text"
+                value={site}
+                readOnly
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none"
+                placeholder="Site parameter will appear here"
+              />
+            </div>
+          </div>
+
+          {/* Original Assignment Interface */}
+          <div className="bg-white rounded-lg shadow-sm border">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {type ? `${getTypeLabel()} Assignment` : 'Assignment Interface'}
+              </h2>
+              {site && (
+                <div className="text-sm text-gray-600 mt-1">
+                  Assigning {type ? getTypeLabel() : 'data'} for site: <span className="font-medium">{site}</span>
+                </div>
+              )}
+            </div>
+            
+            {type && (
+              <>
+                {/* Search */}
+                <div className="px-6 py-4">
+                  <input
+                    type="text"
+                    placeholder={`Search ${getTypeLabel().toLowerCase()}s...`}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Data List */}
+                <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+                  {filteredData.length === 0 ? (
+                    <div className="px-6 py-8 text-center text-gray-500">
+                      No {getTypeLabel().toLowerCase()}s found
+                    </div>
+                  ) : (
+                    filteredData.map((item) => {
+                      const id = item.city_id || item.industry_id || item.cncg_id;
+                      const name = item.city_name || item.industry_name || item.cncg_name;
+                      const description = item.state_code || item.industry_category || item.cncg_description;
+                      
+                      return (
+                        <div 
+                          key={id}
+                          className="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                          onClick={() => handleSelection(id)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-gray-900">{name}</div>
+                              {description && (
+                                <div className="text-sm text-gray-500">{description}</div>
+                              )}
+                            </div>
+                            <div className="text-sm text-gray-400">ID: {id}</div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Feedback */}
+          {feedback && (
+            <div className={`mt-6 p-4 rounded-lg ${
+              feedback.type === 'success' 
+                ? 'bg-green-50 border border-green-200 text-green-800' 
+                : 'bg-red-50 border border-red-200 text-red-800'
+            }`}>
+              {feedback.message}
+            </div>
+          )}
+        </div>
+
+        {/* Confirmation Modal */}
+        {showConfirmation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Confirm Assignment
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to assign {getTypeLabel()} ID <span className="font-medium">{selectedValue}</span> to site <span className="font-medium">{site}</span>?
+              </p>
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleCancel}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmation}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Default render for specific tractor types (legacy behavior)
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
