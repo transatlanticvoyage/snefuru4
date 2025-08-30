@@ -699,8 +699,8 @@ export default function DriggsPacksTable({ selectedSite, onSharkintaxClick, onWa
               return (
               <tr 
                 key={record.dpack_id} 
-                className={`hover:bg-gray-50 ${!canEdit ? 'opacity-60 bg-gray-25' : ''}`}
-                title={!canEdit ? 'Read-only: Admin permissions required' : ''}
+                className="hover:bg-gray-50"
+                title={!canEdit ? 'Read-only: Admin permissions required for editing' : ''}
               >
                 {/* Checkbox */}
                 <td 
@@ -860,9 +860,18 @@ export default function DriggsPacksTable({ selectedSite, onSharkintaxClick, onWa
                       onClick={() => {
                         if (onSharkintaxClick && selectedSite && record.dpack_datum) {
                           onSharkintaxClick(record.dpack_datum, selectedSite);
+                        } else if (!selectedSite) {
+                          alert('Please select a site first to use this feature');
+                        } else if (!record.dpack_datum) {
+                          alert('This pack has no data to export');
                         }
                       }}
-                      className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors"
+                      className={`px-2 py-1 text-xs rounded border transition-colors ${
+                        selectedSite && record.dpack_datum 
+                          ? 'bg-blue-100 hover:bg-blue-200 text-blue-700 border-blue-300' 
+                          : 'bg-gray-100 text-gray-500 border-gray-300 cursor-not-allowed'
+                      }`}
+                      disabled={!selectedSite || !record.dpack_datum}
                     >
                       sharkintax - equal signs and hyphens
                     </button>
@@ -870,16 +879,39 @@ export default function DriggsPacksTable({ selectedSite, onSharkintaxClick, onWa
                       onClick={() => {
                         if (onWalrustaxClick && selectedSite && record.dpack_datum) {
                           onWalrustaxClick(record.dpack_datum, selectedSite);
+                        } else if (!selectedSite) {
+                          alert('Please select a site first to use this feature');
+                        } else if (!record.dpack_datum) {
+                          alert('This pack has no data to export');
                         }
                       }}
-                      className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors"
+                      className={`px-2 py-1 text-xs rounded border transition-colors ${
+                        selectedSite && record.dpack_datum 
+                          ? 'bg-green-100 hover:bg-green-200 text-green-700 border-green-300' 
+                          : 'bg-gray-100 text-gray-500 border-gray-300 cursor-not-allowed'
+                      }`}
+                      disabled={!selectedSite || !record.dpack_datum}
                     >
                       walrustax - vertical transposed csv paste
                     </button>
-                    <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
+                    <button 
+                      className={`px-2 py-1 text-xs rounded border transition-colors ${
+                        selectedSite && record.dpack_datum 
+                          ? 'bg-purple-100 hover:bg-purple-200 text-purple-700 border-purple-300' 
+                          : 'bg-gray-100 text-gray-500 border-gray-300 cursor-not-allowed'
+                      }`}
+                      disabled={!selectedSite || !record.dpack_datum}
+                    >
                       vertical transposed csv download
                     </button>
-                    <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
+                    <button 
+                      className={`px-2 py-1 text-xs rounded border transition-colors ${
+                        selectedSite && record.dpack_datum 
+                          ? 'bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-300' 
+                          : 'bg-gray-100 text-gray-500 border-gray-300 cursor-not-allowed'
+                      }`}
+                      disabled={!selectedSite || !record.dpack_datum}
+                    >
                       vertical transposed xls download
                     </button>
                   </div>

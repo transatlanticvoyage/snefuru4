@@ -414,6 +414,176 @@ export default function DriggsmanTable({
     setShowCopyFeedback(false);
     setCopyFeedbackMessage('');
   };
+
+  // Handle dp5 shark C cell click - copy sharkintax output to clipboard
+  const handleDp5SharkCClick = async () => {
+    try {
+      // Get the current site from URL parameters
+      const site = searchParams?.get('sitesentered');
+      if (!site) {
+        console.error('No site found in URL parameters');
+        return;
+      }
+
+      // Get the user's internal ID
+      if (!userInternalId) {
+        console.error('User internal ID not available');
+        return;
+      }
+
+      // Fetch the dpack_datum for dpack_id 5
+      const { data: dpackData, error: dpackError } = await supabase
+        .from('driggs_packs')
+        .select('dpack_datum')
+        .eq('dpack_id', 5)
+        .single();
+
+      if (dpackError || !dpackData?.dpack_datum) {
+        console.error('Error fetching dpack data:', dpackError);
+        return;
+      }
+
+      // Get sitespren data for the specified site
+      const { data: siteData, error: siteError } = await supabase
+        .from('sitespren')
+        .select('*')
+        .eq('fk_users_id', userInternalId)
+        .eq('sitespren_base', site)
+        .single();
+
+      if (siteError || !siteData) {
+        console.error('Error fetching site data:', siteError);
+        return;
+      }
+
+      // Parse dpack_datum to get field list
+      const fields = dpackData.dpack_datum.split('\n').map(field => field.trim()).filter(field => field);
+      
+      // Generate sharkintax format output
+      let output = '';
+      
+      for (const field of fields) {
+        // Check if this is a section header (doesn't start with 'driggs_' or 'sitespren_')
+        const isSection = !field.startsWith('driggs_') && !field.startsWith('sitespren_') && field.includes('section');
+        
+        output += '===================================\n';
+        output += field + '\n';
+        output += '-----------------------------------\n';
+        
+        if (!isSection) {
+          // Get the actual value from siteData
+          const value = siteData[field as keyof typeof siteData] || '';
+          output += value + '\n';
+        } else {
+          output += '\n'; // Empty line for sections
+        }
+      }
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(output);
+      
+      // Show feedback
+      setCopyFeedbackMessage('Sharkintax output copied to clipboard!');
+      setShowCopyFeedback(true);
+      
+      // Hide feedback after 3 seconds
+      setTimeout(() => {
+        setShowCopyFeedback(false);
+        setCopyFeedbackMessage('');
+      }, 3000);
+
+    } catch (err) {
+      console.error('Error in handleDp5WalrusCClick:', err);
+      setCopyFeedbackMessage('Error copying to clipboard');
+      setShowCopyFeedback(true);
+      setTimeout(() => {
+        setShowCopyFeedback(false);
+        setCopyFeedbackMessage('');
+      }, 3000);
+    }
+  };
+
+  // Handle dp5 walrus C cell click - copy walrustax output to clipboard
+  const handleDp5WalrusCClick = async () => {
+    try {
+      // Get the current site from URL parameters
+      const site = searchParams?.get('sitesentered');
+      if (!site) {
+        console.error('No site found in URL parameters');
+        return;
+      }
+
+      // Get the user's internal ID
+      if (!userInternalId) {
+        console.error('User internal ID not available');
+        return;
+      }
+
+      // Fetch the dpack_datum for dpack_id 5
+      const { data: dpackData, error: dpackError } = await supabase
+        .from('driggs_packs')
+        .select('dpack_datum')
+        .eq('dpack_id', 5)
+        .single();
+
+      if (dpackError || !dpackData?.dpack_datum) {
+        console.error('Error fetching dpack data:', dpackError);
+        return;
+      }
+
+      // Get sitespren data for the specified site
+      const { data: siteData, error: siteError } = await supabase
+        .from('sitespren')
+        .select('*')
+        .eq('fk_users_id', userInternalId)
+        .eq('sitespren_base', site)
+        .single();
+
+      if (siteError || !siteData) {
+        console.error('Error fetching site data:', siteError);
+        return;
+      }
+
+      // Parse dpack_datum to get field list
+      const fields = dpackData.dpack_datum.split('\n').map(field => field.trim()).filter(field => field);
+      
+      // Generate walrustax format output (tab-separated)
+      let output = '';
+      
+      for (const field of fields) {
+        // Check if this is a section header (doesn't start with 'driggs_' or 'sitespren_')
+        const isSection = !field.startsWith('driggs_') && !field.startsWith('sitespren_') && field.includes('section');
+        
+        if (!isSection) {
+          // Get the actual value from siteData
+          const value = siteData[field as keyof typeof siteData] || '';
+          output += field + '\t' + value + '\n';
+        }
+      }
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(output);
+      
+      // Show feedback
+      setCopyFeedbackMessage('Walrustax output copied to clipboard!');
+      setShowCopyFeedback(true);
+      
+      // Hide feedback after 3 seconds
+      setTimeout(() => {
+        setShowCopyFeedback(false);
+        setCopyFeedbackMessage('');
+      }, 3000);
+
+    } catch (err) {
+      console.error('Error in handleDp5WalrusCClick:', err);
+      setCopyFeedbackMessage('Error copying to clipboard');
+      setShowCopyFeedback(true);
+      setTimeout(() => {
+        setShowCopyFeedback(false);
+        setCopyFeedbackMessage('');
+      }, 3000);
+    }
+  };
   
   // Address species dropdown states
   const [addressSpecies, setAddressSpecies] = useState<AddressSpecies[]>([]);
@@ -3502,8 +3672,72 @@ export default function DriggsmanTable({
                         </div>
                       </div>
                       
+                      {/* City-Niche Combination Fields */}
+                      <div className="mt-6 mb-4">
+                        <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px' }}>
+                          city-niche-combination:
+                        </div>
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-3">
+                            <span style={{ fontSize: '14px' }}>sitespren.rel_cncglub_id</span>
+                            <input 
+                              type="text" 
+                              className="px-2 py-1 border border-gray-300 rounded text-sm w-20"
+                              placeholder="ID"
+                            />
+                            <a 
+                              href={`/assignwiz?type=cncglub&site=${searchParams?.get('sitesentered') || ''}&user=${userInternalId || ''}`}
+                              className="text-blue-600 hover:text-blue-800 text-sm underline"
+                              target="_blank"
+                            >
+                              /assignwiz
+                            </a>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <span style={{ fontSize: '14px' }}>sitespren.rel_city_id</span>
+                            <input 
+                              type="text" 
+                              className="px-2 py-1 border border-gray-300 rounded text-sm w-20"
+                              placeholder="ID"
+                            />
+                            <a 
+                              href={`/assignwiz?type=city&site=${searchParams?.get('sitesentered') || ''}&user=${userInternalId || ''}`}
+                              className="text-blue-600 hover:text-blue-800 text-sm underline"
+                              target="_blank"
+                            >
+                              /assignwiz
+                            </a>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <span style={{ fontSize: '14px' }}>sitespren.rel_industry_id</span>
+                            <input 
+                              type="text" 
+                              className="px-2 py-1 border border-gray-300 rounded text-sm w-20"
+                              placeholder="ID"
+                            />
+                            <a 
+                              href={`/assignwiz?type=industry&site=${searchParams?.get('sitesentered') || ''}&user=${userInternalId || ''}`}
+                              className="text-blue-600 hover:text-blue-800 text-sm underline"
+                              target="_blank"
+                            >
+                              /assignwiz
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      
                       {/* dp1-dp5 Table */}
                       <div className="mt-6">
+                        {/* transit_table label */}
+                        <div style={{ 
+                          fontSize: '16px', 
+                          fontWeight: 'bold', 
+                          marginBottom: '8px',
+                          textAlign: 'left'
+                        }}>
+                          transit_table
+                        </div>
+                        
                         <table style={{
                           borderCollapse: 'collapse',
                           border: '1px solid #9ca3af',
@@ -3543,8 +3777,28 @@ export default function DriggsmanTable({
                               <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
                               <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
                               <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
-                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
-                              <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>c</td>
+                              <td 
+                                style={{ 
+                                  padding: '3px', 
+                                  border: '1px solid #9ca3af', 
+                                  textAlign: 'center',
+                                  cursor: 'pointer',
+                                  backgroundColor: '#f3f4f6'
+                                }}
+                                onClick={handleDp5SharkCClick}
+                                title="Click to copy sharkintax output to clipboard"
+                              >c</td>
+                              <td 
+                                style={{ 
+                                  padding: '3px', 
+                                  border: '1px solid #9ca3af', 
+                                  textAlign: 'center',
+                                  cursor: 'pointer',
+                                  backgroundColor: '#f3f4f6'
+                                }}
+                                onClick={handleDp5WalrusCClick}
+                                title="Click to copy walrustax output to clipboard"
+                              >c</td>
                             </tr>
                             <tr>
                               <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center' }}>xls</td>
