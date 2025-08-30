@@ -3735,7 +3735,7 @@ export default function DriggsmanTable({
                           marginBottom: '8px',
                           textAlign: 'left'
                         }}>
-                          transit_table
+                          transit_table:
                         </div>
                         
                         <table style={{
