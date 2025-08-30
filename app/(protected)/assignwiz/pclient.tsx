@@ -44,6 +44,24 @@ export default function AssignwizClient() {
   // UI states
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  
+  // Selection chambers state
+  const [showCncglubChamber, setShowCncglubChamber] = useState(false);
+  const [showCityChamber, setShowCityChamber] = useState(false);
+  const [showIndustryChamber, setShowIndustryChamber] = useState(false);
+  
+  // Search terms for each chamber
+  const [cncglubSearchTerm, setCncglubSearchTerm] = useState('');
+  const [citySearchTerm, setCitySearchTerm] = useState('');
+  const [industrySearchTerm, setIndustrySearchTerm] = useState('');
+  
+  // Selected values for each relationship
+  const [selectedCncglubId, setSelectedCncglubId] = useState<number | null>(null);
+  const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
+  const [selectedIndustryId, setSelectedIndustryId] = useState<number | null>(null);
+
+  // Auto-discovery state for cncglub matches
+  const [autoDiscoveredCncglub, setAutoDiscoveredCncglub] = useState<Cncglub | null>(null);
 
   useEffect(() => {
     // Extract URL parameters - tractor_name is the leftmost parameter
@@ -72,12 +90,12 @@ export default function AssignwizClient() {
         setLoading(false);
       }
     }
-    // For other tractor types, we need all parameters
-    else if (tractorNameParam === 'all' || typeParam) {
-      if (typeParam && siteParam && userParam) {
-        loadData(typeParam);
+    // For tractor_name=all, we only need site parameter
+    else if (tractorNameParam === 'all') {
+      if (siteParam) {
+        setLoading(false);
       } else {
-        setError('Missing required parameters: type, site, or user');
+        setError('Missing required parameter: site');
         setLoading(false);
       }
     } else {
@@ -99,6 +117,30 @@ export default function AssignwizClient() {
     }
   }, [searchTerm, cities, industries, cncglubs]);
 
+  // Load all data when tractorName is 'all'
+  useEffect(() => {
+    const tractorName = searchParams?.get('tractor_name');
+    if (tractorName === 'all') {
+      const loadAllData = async () => {
+        try {
+          await loadCities();
+          await loadIndustries();
+          await loadCncglubs();
+        } catch (err) {
+          setError(`Failed to load data: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      };
+      loadAllData();
+    }
+  }, [searchParams]);
+
+  // Auto-discovery trigger: run when both city and industry have values
+  useEffect(() => {
+    if (selectedCityId && selectedIndustryId) {
+      autoDiscoverCncglub(selectedCityId, selectedIndustryId);
+    }
+  }, [selectedCityId, selectedIndustryId]);
+
   const loadData = async (dataType: string) => {
     try {
       setLoading(true);
@@ -117,7 +159,7 @@ export default function AssignwizClient() {
           setError(`Unknown type: ${dataType}`);
       }
     } catch (err) {
-      setError(`Failed to load data: ${err}`);
+      setError(`Failed to load data: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setLoading(false);
     }
@@ -126,7 +168,7 @@ export default function AssignwizClient() {
   const loadCities = async () => {
     const { data, error } = await supabase
       .from('cities')
-      .select('city_id, city_name, state_code, country_code')
+      .select('city_id, city_name, state_code, country')
       .order('city_name');
     
     if (error) throw error;
@@ -137,7 +179,7 @@ export default function AssignwizClient() {
   const loadIndustries = async () => {
     const { data, error } = await supabase
       .from('industries')
-      .select('industry_id, industry_name, industry_category')
+      .select('industry_id, industry_name, industry_description')
       .order('industry_name');
     
     if (error) throw error;
@@ -148,12 +190,52 @@ export default function AssignwizClient() {
   const loadCncglubs = async () => {
     const { data, error } = await supabase
       .from('cncglub')
-      .select('cncg_id, cncg_name, cncg_description')
-      .order('cncg_name');
+      .select(`
+        cncg_id, 
+        rel_city_id, 
+        rel_industry_id,
+        cities:rel_city_id(city_name, state_code),
+        industries:rel_industry_id(industry_name)
+      `)
+      .order('cncg_id');
     
     if (error) throw error;
     setCncglubs(data || []);
     setFilteredData(data || []);
+  };
+
+  // Auto-discovery function to find cncglub matches based on city and industry
+  const autoDiscoverCncglub = async (cityId: number | null, industryId: number | null) => {
+    if (!cityId || !industryId) {
+      setAutoDiscoveredCncglub(null);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('cncglub')
+        .select(`
+          cncg_id, 
+          rel_city_id, 
+          rel_industry_id,
+          cities:rel_city_id(city_name, state_code),
+          industries:rel_industry_id(industry_name)
+        `)
+        .eq('rel_city_id', cityId)
+        .eq('rel_industry_id', industryId)
+        .limit(1)
+        .single();
+
+      if (error) {
+        // No match found, clear auto-discovery
+        setAutoDiscoveredCncglub(null);
+        return;
+      }
+
+      setAutoDiscoveredCncglub(data);
+    } catch (err) {
+      setAutoDiscoveredCncglub(null);
+    }
   };
 
   const getCurrentData = () => {
@@ -395,6 +477,312 @@ export default function AssignwizClient() {
               </>
             )}
           </div>
+
+          {/* New Assignment Interface - Three Selection Areas */}
+          <div className="mt-8 border-t pt-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Site Relationship Assignments</h3>
+            <div className="space-y-4">
+              
+              {/* sitespren.rel_cncglub_id Assignment */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-medium text-gray-700">sitespren.rel_cncglub_id</h4>
+                  <span className="text-sm text-gray-500">ID</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={selectedCncglubId || ''}
+                    readOnly
+                    placeholder="No CNCGLUB assigned"
+                    className="px-3 py-2 border border-gray-300 rounded-l-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white flex-1"
+                  />
+                  <a
+                    href="/assignwiz"
+                    className="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 border border-blue-200 text-sm transition-colors duration-150"
+                  >
+                    /assignwiz
+                  </a>
+                  <button
+                    onClick={() => setShowCncglubChamber(!showCncglubChamber)}
+                    className="px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border border-yellow-400 text-sm transition-colors duration-150"
+                  >
+                    select from search table
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (autoDiscoveredCncglub) {
+                        setSelectedCncglubId(autoDiscoveredCncglub.cncg_id);
+                      }
+                    }}
+                    disabled={!autoDiscoveredCncglub}
+                    className={`px-3 py-2 text-sm transition-colors duration-150 ${
+                      autoDiscoveredCncglub 
+                        ? 'bg-green-400 hover:bg-green-500 text-black font-bold border border-green-400' 
+                        : 'bg-gray-200 text-gray-500 border border-gray-300 cursor-not-allowed'
+                    }`}
+                  >
+                    insert the auto-discovered match
+                  </button>
+                  <input
+                    type="text"
+                    value={autoDiscoveredCncglub ? `ID: ${autoDiscoveredCncglub.cncg_id} - ${autoDiscoveredCncglub.cities?.city_name}, ${autoDiscoveredCncglub.cities?.state_code} - ${autoDiscoveredCncglub.industries?.industry_name}` : 'No auto-discovery available'}
+                    readOnly
+                    placeholder="Auto-discovered match will appear here"
+                    className="px-3 py-2 border border-gray-300 rounded-r-md text-sm focus:outline-none bg-gray-100 text-gray-600 min-w-[300px]"
+                  />
+                </div>
+              </div>
+
+              {/* sitespren.rel_city_id Assignment */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-medium text-gray-700">sitespren.rel_city_id</h4>
+                  <span className="text-sm text-gray-500">ID</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={selectedCityId || ''}
+                    readOnly
+                    placeholder="No City assigned"
+                    className="px-3 py-2 border border-gray-300 rounded-l-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white flex-1"
+                  />
+                  <a
+                    href="/assignwiz"
+                    className="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 border border-blue-200 text-sm transition-colors duration-150"
+                  >
+                    /assignwiz
+                  </a>
+                  <button
+                    onClick={() => setShowCityChamber(!showCityChamber)}
+                    className="px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border border-yellow-400 rounded-r-md text-sm transition-colors duration-150"
+                  >
+                    select
+                  </button>
+                </div>
+              </div>
+
+              {/* sitespren.rel_industry_id Assignment */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-medium text-gray-700">sitespren.rel_industry_id</h4>
+                  <span className="text-sm text-gray-500">ID</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={selectedIndustryId || ''}
+                    readOnly
+                    placeholder="No Industry assigned"
+                    className="px-3 py-2 border border-gray-300 rounded-l-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white flex-1"
+                  />
+                  <a
+                    href="/assignwiz"
+                    className="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 border border-blue-200 text-sm transition-colors duration-150"
+                  >
+                    /assignwiz
+                  </a>
+                  <button
+                    onClick={() => setShowIndustryChamber(!showIndustryChamber)}
+                    className="px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border border-yellow-400 rounded-r-md text-sm transition-colors duration-150"
+                  >
+                    select
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Dynamic Selection Chambers */}
+          
+          {/* CNCGLUB Selection Chamber */}
+          {showCncglubChamber && (
+            <div className="mt-6 border border-gray-300 rounded-lg bg-white p-6">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Select CNCGLUB</h4>
+              
+              {/* Search Box */}
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="Search CNCGLUB records..."
+                  value={cncglubSearchTerm}
+                  onChange={(e) => setCncglubSearchTerm(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* CNCGLUB Table */}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Info</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {cncglubs
+                      .filter(item => 
+                        !cncglubSearchTerm || 
+                        item.cncg_id.toString().includes(cncglubSearchTerm.toLowerCase()) ||
+                        (item.rel_city_id && item.rel_city_id.toString().includes(cncglubSearchTerm.toLowerCase()))
+                      )
+                      .slice(0, 10)
+                      .map((item) => (
+                        <tr key={item.cncg_id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {item.cncg_id}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            City ID: {item.rel_city_id || 'N/A'}, Industry ID: {item.rel_industry_id || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <button
+                              onClick={() => {
+                                setSelectedCncglubId(item.cncg_id);
+                                setShowCncglubChamber(false);
+                              }}
+                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
+                            >
+                              Select
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* City Selection Chamber */}
+          {showCityChamber && (
+            <div className="mt-6 border border-gray-300 rounded-lg bg-white p-6">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Select City</h4>
+              
+              {/* Search Box */}
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="Search cities..."
+                  value={citySearchTerm}
+                  onChange={(e) => setCitySearchTerm(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Cities Table */}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {cities
+                      .filter(item => 
+                        !citySearchTerm || 
+                        item.city_name.toLowerCase().includes(citySearchTerm.toLowerCase()) ||
+                        (item.state_full && item.state_full.toLowerCase().includes(citySearchTerm.toLowerCase())) ||
+                        item.city_id.toString().includes(citySearchTerm.toLowerCase())
+                      )
+                      .slice(0, 10)
+                      .map((item) => (
+                        <tr key={item.city_id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {item.city_id}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {item.city_name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {item.state_code || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <button
+                              onClick={() => {
+                                setSelectedCityId(item.city_id);
+                                setShowCityChamber(false);
+                              }}
+                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
+                            >
+                              Select
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Industry Selection Chamber */}
+          {showIndustryChamber && (
+            <div className="mt-6 border border-gray-300 rounded-lg bg-white p-6">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Select Industry</h4>
+              
+              {/* Search Box */}
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="Search industries..."
+                  value={industrySearchTerm}
+                  onChange={(e) => setIndustrySearchTerm(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Industries Table */}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {industries
+                      .filter(item => 
+                        !industrySearchTerm || 
+                        item.industry_name.toLowerCase().includes(industrySearchTerm.toLowerCase()) ||
+                        item.industry_id.toString().includes(industrySearchTerm.toLowerCase())
+                      )
+                      .slice(0, 10)
+                      .map((item) => (
+                        <tr key={item.industry_id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {item.industry_id}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {item.industry_name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <button
+                              onClick={() => {
+                                setSelectedIndustryId(item.industry_id);
+                                setShowIndustryChamber(false);
+                              }}
+                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
+                            >
+                              Select
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {/* Feedback */}
           {feedback && (

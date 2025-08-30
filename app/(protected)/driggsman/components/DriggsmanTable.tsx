@@ -3686,7 +3686,7 @@ export default function DriggsmanTable({
                               placeholder="ID"
                             />
                             <a 
-                              href={`/assignwiz?tractor_name=all&type=cncglub&site=${searchParams?.get('sitesentered') || ''}&user=${userInternalId || ''}`}
+                              href={`/assignwiz?tractor_name=all&site=${searchParams?.get('sitesentered') || ''}`}
                               className="text-blue-600 hover:text-blue-800 text-sm underline"
                               target="_blank"
                             >
@@ -3701,7 +3701,7 @@ export default function DriggsmanTable({
                               placeholder="ID"
                             />
                             <a 
-                              href={`/assignwiz?tractor_name=all&type=city&site=${searchParams?.get('sitesentered') || ''}&user=${userInternalId || ''}`}
+                              href={`/assignwiz?tractor_name=all&site=${searchParams?.get('sitesentered') || ''}`}
                               className="text-blue-600 hover:text-blue-800 text-sm underline"
                               target="_blank"
                             >
@@ -3716,7 +3716,7 @@ export default function DriggsmanTable({
                               placeholder="ID"
                             />
                             <a 
-                              href={`/assignwiz?tractor_name=all&type=industry&site=${searchParams?.get('sitesentered') || ''}&user=${userInternalId || ''}`}
+                              href={`/assignwiz?tractor_name=all&site=${searchParams?.get('sitesentered') || ''}`}
                               className="text-blue-600 hover:text-blue-800 text-sm underline"
                               target="_blank"
                             >
