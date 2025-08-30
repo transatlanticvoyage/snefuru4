@@ -60,6 +60,11 @@ export default function AssignwizClient() {
   const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
   const [selectedIndustryId, setSelectedIndustryId] = useState<number | null>(null);
 
+  // Raw text values for each relationship (when user types instead of selecting)
+  const [rawCncglubText, setRawCncglubText] = useState<string>('');
+  const [rawCityText, setRawCityText] = useState<string>('');
+  const [rawIndustryText, setRawIndustryText] = useState<string>('');
+
   // Auto-discovery state for cncglub matches
   const [autoDiscoveredCncglub, setAutoDiscoveredCncglub] = useState<Cncglub | null>(null);
 
@@ -133,6 +138,44 @@ export default function AssignwizClient() {
       loadAllData();
     }
   }, [searchParams]);
+
+  // Load existing site data when site parameter is available
+  useEffect(() => {
+    const tractorName = searchParams?.get('tractor_name');
+    const siteParam = searchParams?.get('site');
+    
+    if (tractorName === 'all' && siteParam) {
+      const loadSiteData = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('sitespren')
+            .select('rel_cncglub_id, rel_city_id, rel_industry_id, driggs_city, driggs_industry, driggs_category')
+            .eq('sitespren_base', siteParam)
+            .single();
+
+          if (error) {
+            // Site not found or no data - this is OK, just use empty values
+            return;
+          }
+
+          // Populate the ID fields with existing values
+          if (data.rel_cncglub_id) setSelectedCncglubId(data.rel_cncglub_id);
+          if (data.rel_city_id) setSelectedCityId(data.rel_city_id);
+          if (data.rel_industry_id) setSelectedIndustryId(data.rel_industry_id);
+
+          // Populate raw text fields with existing text values
+          if (data.driggs_city) setRawCityText(data.driggs_city);
+          if (data.driggs_industry) setRawIndustryText(data.driggs_industry);
+          if (data.driggs_category) setRawCncglubText(data.driggs_category);
+
+        } catch (err) {
+          // If there's an error loading site data, just continue with empty values
+          console.error('Error loading site data:', err);
+        }
+      };
+      loadSiteData();
+    }
+  }, [searchParams, site]);
 
   // Auto-discovery trigger: run when both city and industry have values
   useEffect(() => {
@@ -309,6 +352,58 @@ export default function AssignwizClient() {
     setSelectedValue(null);
   };
 
+  const handleSaveRelationships = async () => {
+    try {
+      // Prepare the update data with both selected IDs and raw text fields
+      const updateData: { [key: string]: number | string | null } = {};
+      
+      // Handle relationship IDs (from dropdown selections)
+      if (selectedCityId) updateData.rel_city_id = selectedCityId;
+      if (selectedIndustryId) updateData.rel_industry_id = selectedIndustryId;
+      if (selectedCncglubId) updateData.rel_cncglub_id = selectedCncglubId;
+
+      // Handle raw text values (from direct text input)
+      if (rawCityText.trim()) updateData.driggs_city = rawCityText.trim();
+      if (rawIndustryText.trim()) updateData.driggs_industry = rawIndustryText.trim();
+      if (rawCncglubText.trim()) updateData.driggs_category = rawCncglubText.trim();
+
+      // Allow saving even with no selections (will clear existing assignments)
+      if (Object.keys(updateData).length === 0) {
+        setFeedback({ type: 'success', message: 'No changes to save - all assignments cleared' });
+        return;
+      }
+
+      // If site parameter is available, update that specific site
+      if (site) {
+        const { error } = await supabase
+          .from('sitespren')
+          .update(updateData)
+          .eq('sitespren_base', site);
+
+        if (error) throw error;
+
+        const savedFields = Object.keys(updateData).join(', ');
+        setFeedback({ 
+          type: 'success', 
+          message: `Successfully saved assignments (${savedFields}) for site ${site}` 
+        });
+      } else {
+        // If no specific site, just show what would be saved
+        const savedFields = Object.keys(updateData).join(', ');
+        setFeedback({ 
+          type: 'success', 
+          message: `Assignment selections ready to save: ${savedFields}` 
+        });
+      }
+
+    } catch (err) {
+      setFeedback({ 
+        type: 'error', 
+        message: `Failed to save assignments: ${err}` 
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -399,9 +494,17 @@ export default function AssignwizClient() {
         <div className="max-w-4xl mx-auto px-6 py-8">
           {/* site_to_cnc_tractor Chamber */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <h2 className="text-gray-900 mb-4" style={{ fontWeight: 'bold', fontSize: '16px' }}>
-              site_to_cnc_tractor
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-gray-900" style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                site_to_cnc_tractor
+              </h2>
+              <button
+                onClick={handleSaveRelationships}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                Save Assignments
+              </button>
+            </div>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Site Parameter:
@@ -493,8 +596,13 @@ export default function AssignwizClient() {
                   <input
                     type="text"
                     value={selectedCncglubId || ''}
-                    readOnly
-                    placeholder="No CNCGLUB assigned"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const numericValue = value ? parseInt(value) : null;
+                      setSelectedCncglubId(numericValue);
+                      setRawCncglubText(''); // Clear raw text when ID is manually entered
+                    }}
+                    placeholder="No CNCGLUB assigned - type ID or select from table"
                     className="px-3 py-2 border border-gray-300 rounded-l-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white flex-1"
                   />
                   <a
@@ -544,8 +652,13 @@ export default function AssignwizClient() {
                   <input
                     type="text"
                     value={selectedCityId || ''}
-                    readOnly
-                    placeholder="No City assigned"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const numericValue = value ? parseInt(value) : null;
+                      setSelectedCityId(numericValue);
+                      setRawCityText(''); // Clear raw text when ID is manually entered
+                    }}
+                    placeholder="No City assigned - type ID or select from table"
                     className="px-3 py-2 border border-gray-300 rounded-l-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white flex-1"
                   />
                   <a
@@ -573,8 +686,13 @@ export default function AssignwizClient() {
                   <input
                     type="text"
                     value={selectedIndustryId || ''}
-                    readOnly
-                    placeholder="No Industry assigned"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const numericValue = value ? parseInt(value) : null;
+                      setSelectedIndustryId(numericValue);
+                      setRawIndustryText(''); // Clear raw text when ID is manually entered
+                    }}
+                    placeholder="No Industry assigned - type ID or select from table"
                     className="px-3 py-2 border border-gray-300 rounded-l-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white flex-1"
                   />
                   <a
@@ -601,15 +719,28 @@ export default function AssignwizClient() {
             <div className="mt-6 border border-gray-300 rounded-lg bg-white p-6">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Select CNCGLUB</h4>
               
-              {/* Search Box */}
-              <div className="mb-4">
-                <input
-                  type="text"
-                  placeholder="Search CNCGLUB records..."
-                  value={cncglubSearchTerm}
-                  onChange={(e) => setCncglubSearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
+              {/* Search Box with Raw Text Entry */}
+              <div className="mb-4 space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Search CNCGLUB records or enter custom text:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Search CNCGLUB records or type custom category..."
+                    value={cncglubSearchTerm}
+                    onChange={(e) => {
+                      setCncglubSearchTerm(e.target.value);
+                      setRawCncglubText(e.target.value);
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                {rawCncglubText && (
+                  <div className="text-sm text-blue-600">
+                    💡 Custom text: "{rawCncglubText}" will be saved if you don't select from table below
+                  </div>
+                )}
               </div>
 
               {/* CNCGLUB Table */}
@@ -642,6 +773,7 @@ export default function AssignwizClient() {
                             <button
                               onClick={() => {
                                 setSelectedCncglubId(item.cncg_id);
+                                setRawCncglubText(''); // Clear raw text when dropdown selection is made
                                 setShowCncglubChamber(false);
                               }}
                               className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
@@ -662,15 +794,28 @@ export default function AssignwizClient() {
             <div className="mt-6 border border-gray-300 rounded-lg bg-white p-6">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Select City</h4>
               
-              {/* Search Box */}
-              <div className="mb-4">
-                <input
-                  type="text"
-                  placeholder="Search cities..."
-                  value={citySearchTerm}
-                  onChange={(e) => setCitySearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
+              {/* Search Box with Raw Text Entry */}
+              <div className="mb-4 space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Search cities or enter custom city:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Search cities or type custom city name..."
+                    value={citySearchTerm}
+                    onChange={(e) => {
+                      setCitySearchTerm(e.target.value);
+                      setRawCityText(e.target.value);
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                {rawCityText && (
+                  <div className="text-sm text-blue-600">
+                    💡 Custom text: "{rawCityText}" will be saved if you don't select from table below
+                  </div>
+                )}
               </div>
 
               {/* Cities Table */}
@@ -708,6 +853,7 @@ export default function AssignwizClient() {
                             <button
                               onClick={() => {
                                 setSelectedCityId(item.city_id);
+                                setRawCityText(''); // Clear raw text when dropdown selection is made
                                 setShowCityChamber(false);
                               }}
                               className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
@@ -728,15 +874,28 @@ export default function AssignwizClient() {
             <div className="mt-6 border border-gray-300 rounded-lg bg-white p-6">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Select Industry</h4>
               
-              {/* Search Box */}
-              <div className="mb-4">
-                <input
-                  type="text"
-                  placeholder="Search industries..."
-                  value={industrySearchTerm}
-                  onChange={(e) => setIndustrySearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
+              {/* Search Box with Raw Text Entry */}
+              <div className="mb-4 space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Search industries or enter custom industry:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Search industries or type custom industry name..."
+                    value={industrySearchTerm}
+                    onChange={(e) => {
+                      setIndustrySearchTerm(e.target.value);
+                      setRawIndustryText(e.target.value);
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                {rawIndustryText && (
+                  <div className="text-sm text-blue-600">
+                    💡 Custom text: "{rawIndustryText}" will be saved if you don't select from table below
+                  </div>
+                )}
               </div>
 
               {/* Industries Table */}
@@ -769,6 +928,7 @@ export default function AssignwizClient() {
                             <button
                               onClick={() => {
                                 setSelectedIndustryId(item.industry_id);
+                                setRawIndustryText(''); // Clear raw text when dropdown selection is made
                                 setShowIndustryChamber(false);
                               }}
                               className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"

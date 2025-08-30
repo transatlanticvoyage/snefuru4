@@ -95,6 +95,9 @@ interface SitesprenSite {
   screenshot_url: string | null;
   screenshot_taken_at: string | null;
   screenshot_status: string | null;
+  rel_cncglub_id: number | null;
+  rel_city_id: number | null;
+  rel_industry_id: number | null;
   phone_section_separator?: string; // Visual separator only
 }
 
@@ -3683,7 +3686,9 @@ export default function DriggsmanTable({
                             <input 
                               type="text" 
                               className="px-2 py-1 border border-gray-300 rounded text-sm w-20"
+                              value={paginatedSites[0]?.rel_cncglub_id?.toString() || ''}
                               placeholder="ID"
+                              readOnly
                             />
                             <a 
                               href={`/assignwiz?tractor_name=all&site=${searchParams?.get('sitesentered') || ''}`}
@@ -3698,7 +3703,9 @@ export default function DriggsmanTable({
                             <input 
                               type="text" 
                               className="px-2 py-1 border border-gray-300 rounded text-sm w-20"
+                              value={paginatedSites[0]?.rel_city_id?.toString() || ''}
                               placeholder="ID"
+                              readOnly
                             />
                             <a 
                               href={`/assignwiz?tractor_name=all&site=${searchParams?.get('sitesentered') || ''}`}
@@ -3713,7 +3720,9 @@ export default function DriggsmanTable({
                             <input 
                               type="text" 
                               className="px-2 py-1 border border-gray-300 rounded text-sm w-20"
+                              value={paginatedSites[0]?.rel_industry_id?.toString() || ''}
                               placeholder="ID"
+                              readOnly
                             />
                             <a 
                               href={`/assignwiz?tractor_name=all&site=${searchParams?.get('sitesentered') || ''}`}
