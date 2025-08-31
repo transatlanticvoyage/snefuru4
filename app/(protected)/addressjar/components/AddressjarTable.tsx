@@ -80,9 +80,17 @@ interface AddressjarTableProps {
     ColumnPaginationBar1: () => JSX.Element | null;
     ColumnPaginationBar2: () => JSX.Element | null;
   }) => void;
+  useColumnFiltering?: boolean;
+  filteredColumns?: string[];
+  wolfExclusionBandColumns?: string[];
 }
 
-export default function AddressjarTable({ onColumnPaginationRender }: AddressjarTableProps) {
+export default function AddressjarTable({ 
+  onColumnPaginationRender,
+  useColumnFiltering = false,
+  filteredColumns = [],
+  wolfExclusionBandColumns = []
+}: AddressjarTableProps) {
   const { user } = useAuth();
   const [data, setData] = useState<AddressData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -138,8 +146,147 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
 
   const supabase = createClientComponentClient();
 
-  // Define columns - addresspren on left, org entities, then addressglub on right
-  const columns = [
+  // Column Name Mapper - Maps user-friendly names to actual column keys
+  const columnNameMapper = useMemo(() => ({
+    // AddressGlub columns (addressglub.*)
+    'addressglub.is_po_box': 'is_po_box',
+    'addressglub.is_apartment': 'is_apartment',
+    'addressglub.is_suite': 'is_suite',
+    'addressglub.data_source': 'data_source',
+    'addressglub.addressglub_id': 'addressglub_id',
+    'addressglub.full_address_input': 'full_address_input',
+    'addressglub.street_1': 'street_1',
+    'addressglub.street_2': 'street_2',
+    'addressglub.city': 'city',
+    'addressglub.state_code': 'state_code',
+    'addressglub.state_full': 'state_full',
+    'addressglub.zip_code': 'zip_code',
+    'addressglub.country_code': 'country_code',
+    'addressglub.country': 'country',
+    'addressglub.street_1_clean': 'street_1_clean',
+    'addressglub.full_address_formatted': 'full_address_formatted',
+    'addressglub.latitude': 'latitude',
+    'addressglub.longitude': 'longitude',
+    'addressglub.is_validated': 'is_validated',
+    'addressglub.validation_source': 'validation_source',
+    'addressglub.validation_accuracy': 'validation_accuracy',
+    'addressglub.plus_four': 'plus_four',
+    'addressglub.fk_city_id': 'fk_city_id',
+    'addressglub.fk_address_species_id': 'fk_address_species_id',
+    'addressglub.addressglub_usage_count': 'addressglub_usage_count',
+    'addressglub.quality_score': 'quality_score',
+    'addressglub.confidence_level': 'confidence_level',
+    'addressglub.is_business': 'is_business',
+    'addressglub.is_residential': 'is_residential',
+    'addressglub.source_reference': 'source_reference',
+    'addressglub.addressglub_created_at': 'addressglub_created_at',
+    'addressglub.addressglub_updated_at': 'addressglub_updated_at',
+    'addressglub.address_hash': 'address_hash',
+
+    // AddressPren columns (addresspren.*)
+    'addresspren.addresspren_id': 'addresspren_id',
+    'addresspren.user_id': 'user_id',
+    'addresspren.address_label': 'address_label',
+    'addresspren.fk_addressglub_id': 'fk_addressglub_id',
+    'addresspren.internal_notes': 'internal_notes',
+    'addresspren.address_purpose': 'address_purpose',
+    'addresspren.is_primary': 'is_primary',
+    'addresspren.is_active': 'is_active',
+    'addresspren.is_favorite': 'is_favorite',
+    'addresspren.last_used_at': 'last_used_at',
+    'addresspren.usage_count': 'usage_count',
+    'addresspren.sharing_permissions': 'sharing_permissions',
+    'addresspren.addresspren_created_at': 'addresspren_created_at',
+    'addresspren.addresspren_updated_at': 'addresspren_updated_at',
+
+    // Org Entity columns (org.*)
+    'org.starred': 'org_is_starred',
+    'org.flagged': 'org_is_flagged',
+    'org.circled': 'org_is_circled',
+    'org.squared': 'org_is_squared',
+    'org.triangled': 'org_is_triangled',
+    'org_entities.starred': 'org_is_starred',
+    'org_entities.flagged': 'org_is_flagged',
+    'org_entities.circled': 'org_is_circled',
+    'org_entities.squared': 'org_is_squared',
+    'org_entities.triangled': 'org_is_triangled',
+
+    // Related Sites columns
+    'related_sites.internal': 'related_sites_internal',
+    'related_sites.external': 'related_sites_external',
+    'sites.internal': 'related_sites_internal',
+    'sites.external': 'related_sites_external',
+
+    // Direct mappings (allow exact column names too)
+    'is_po_box': 'is_po_box',
+    'is_apartment': 'is_apartment',
+    'is_suite': 'is_suite',
+    'data_source': 'data_source',
+    'addressglub_id': 'addressglub_id',
+    'full_address_input': 'full_address_input',
+    'street_1': 'street_1',
+    'street_2': 'street_2',
+    'city': 'city',
+    'state_code': 'state_code',
+    'state_full': 'state_full',
+    'zip_code': 'zip_code',
+    'country_code': 'country_code',
+    'country': 'country',
+    'street_1_clean': 'street_1_clean',
+    'full_address_formatted': 'full_address_formatted',
+    'latitude': 'latitude',
+    'longitude': 'longitude',
+    'is_validated': 'is_validated',
+    'validation_source': 'validation_source',
+    'validation_accuracy': 'validation_accuracy',
+    'plus_four': 'plus_four',
+    'fk_city_id': 'fk_city_id',
+    'fk_address_species_id': 'fk_address_species_id',
+    'addressglub_usage_count': 'addressglub_usage_count',
+    'quality_score': 'quality_score',
+    'confidence_level': 'confidence_level',
+    'is_business': 'is_business',
+    'is_residential': 'is_residential',
+    'source_reference': 'source_reference',
+    'addressglub_created_at': 'addressglub_created_at',
+    'addressglub_updated_at': 'addressglub_updated_at',
+    'address_hash': 'address_hash',
+    'addresspren_id': 'addresspren_id',
+    'user_id': 'user_id',
+    'address_label': 'address_label',
+    'fk_addressglub_id': 'fk_addressglub_id',
+    'internal_notes': 'internal_notes',
+    'address_purpose': 'address_purpose',
+    'is_primary': 'is_primary',
+    'is_active': 'is_active',
+    'is_favorite': 'is_favorite',
+    'last_used_at': 'last_used_at',
+    'usage_count': 'usage_count',
+    'sharing_permissions': 'sharing_permissions',
+    'addresspren_created_at': 'addresspren_created_at',
+    'addresspren_updated_at': 'addresspren_updated_at',
+    'org_is_starred': 'org_is_starred',
+    'org_is_flagged': 'org_is_flagged',
+    'org_is_circled': 'org_is_circled',
+    'org_is_squared': 'org_is_squared',
+    'org_is_triangled': 'org_is_triangled',
+    'related_sites_internal': 'related_sites_internal',
+    'related_sites_external': 'related_sites_external'
+  }), []);
+
+  // Reverse mapper - for debugging and display (actual column key -> user-friendly name)
+  const reverseColumnNameMapper = useMemo(() => {
+    const reverse: Record<string, string> = {};
+    Object.entries(columnNameMapper).forEach(([userFriendly, actual]) => {
+      if (!reverse[actual]) { // Only set if not already set (prioritize first match)
+        reverse[actual] = userFriendly;
+      }
+    });
+    return reverse;
+  }, [columnNameMapper]);
+
+  // Define columns - addresspren on left, org entities, then addressglub on right (memoized)
+  const columns = useMemo(() => [
     // addresspren columns
     { key: 'addresspren_id' as keyof AddressData, label: 'addresspren_id', type: 'number', readOnly: true, width: '120px', group: 'addresspren' },
     { key: 'fk_addressglub_id' as keyof AddressData, label: 'fk_addressglub_id', type: 'number', width: '140px', group: 'addresspren' },
@@ -197,10 +344,10 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     { key: 'addressglub_created_at' as keyof AddressData, label: 'created_at', type: 'datetime', readOnly: true, width: '160px', group: 'addressglub' },
     { key: 'addressglub_updated_at' as keyof AddressData, label: 'updated_at', type: 'datetime', readOnly: true, width: '160px', group: 'addressglub' },
     { key: 'address_hash' as keyof AddressData, label: 'address_hash', type: 'text', readOnly: true, width: '200px', group: 'addressglub' }
-  ];
+  ], []); // Empty dependency array since columns are static
 
-  // WolfExclusionBand - Sticky columns that are excluded from pagination
-  const wolfExclusionBandColumns = [
+  // WolfExclusionBand - Sticky columns that are excluded from pagination (use prop or default) (memoized)
+  const defaultWolfExclusionBandColumns = useMemo(() => [
     { key: 'addresspren_id' as keyof AddressData, label: 'addresspren_id', type: 'number', readOnly: true, width: '120px', group: 'addresspren' },
     { key: 'fk_addressglub_id' as keyof AddressData, label: 'fk_addressglub_id', type: 'number', width: '140px', group: 'addresspren' },
     { key: 'address_label' as keyof AddressData, label: 'address_label', type: 'text', width: '150px', group: 'addresspren' },
@@ -215,20 +362,62 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     { key: 'related_sites_internal' as any, label: 'related sites (internal)', type: 'text', width: '120px', group: 'addresspren' },
     { key: 'related_sites_external' as any, label: 'related sites (external)', type: 'text', width: '120px', group: 'addresspren' },
     { key: 'full_address_input' as keyof AddressData, label: 'full_address_input', type: 'text', width: 'auto', minWidth: '450px', group: 'addressglub', separator: 'right' }
-  ];
+  ], []); // Empty dependency array since wolf exclusion band columns are static
 
-  // Paginated columns - exclude WolfExclusionBand columns
-  const paginatedColumns = columns.filter(column => 
-    !wolfExclusionBandColumns.some(wolfCol => wolfCol.key === column.key)
-  );
+  // Get wolf exclusion band columns - either from props or use default (memoized)
+  const actualWolfExclusionBandColumns = useMemo(() => {
+    return wolfExclusionBandColumns.length > 0 
+      ? defaultWolfExclusionBandColumns.filter(col => wolfExclusionBandColumns.includes(col.key as string))
+      : defaultWolfExclusionBandColumns;
+  }, [wolfExclusionBandColumns, defaultWolfExclusionBandColumns]);
 
-  // Column pagination logic
-  const totalColumnPages = Math.ceil(paginatedColumns.length / columnsPerPage);
-  const startColumnIndex = (currentColumnPage - 1) * columnsPerPage;
-  const visiblePaginatedColumns = paginatedColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
-  
-  // Combined visible columns: WolfExclusionBand + paginated columns
-  const visibleColumns = [...wolfExclusionBandColumns, ...visiblePaginatedColumns];
+  // Calculate visible columns based on mode
+  const visibleColumns = useMemo(() => {
+    if (useColumnFiltering && filteredColumns.length > 0) {
+      // Column filtering mode - use wolf exclusion band + mapped filtered columns
+      console.log('Filtering columns with user input:', filteredColumns); // Debug log
+      
+      const filteredColumnObjects = filteredColumns
+        .map(userColumnName => {
+          // Map user-friendly name to actual column key
+          const actualColumnKey = columnNameMapper[userColumnName.trim()] || userColumnName.trim();
+          console.log(`Mapping: "${userColumnName}" -> "${actualColumnKey}"`); // Debug log
+          
+          // Find the actual column definition
+          const foundColumn = columns.find(col => col.key === actualColumnKey);
+          
+          if (!foundColumn) {
+            console.warn(`Column not found for key: "${actualColumnKey}" (original: "${userColumnName}")`); // Debug log
+          }
+          
+          return foundColumn;
+        })
+        .filter(Boolean); // Remove undefined entries
+      
+      console.log('Mapped column objects:', filteredColumnObjects); // Debug log
+      
+      return [...actualWolfExclusionBandColumns, ...filteredColumnObjects];
+    } else {
+      // Pagination mode - use original logic
+      const paginatedColumns = columns.filter(column => 
+        !actualWolfExclusionBandColumns.some(wolfCol => wolfCol.key === column.key)
+      );
+
+      const totalColumnPages = Math.ceil(paginatedColumns.length / columnsPerPage);
+      const startColumnIndex = (currentColumnPage - 1) * columnsPerPage;
+      const visiblePaginatedColumns = paginatedColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+      
+      return [...actualWolfExclusionBandColumns, ...visiblePaginatedColumns];
+    }
+  }, [useColumnFiltering, filteredColumns, actualWolfExclusionBandColumns, columns, currentColumnPage, columnsPerPage, columnNameMapper]);
+
+  // Paginated columns - exclude WolfExclusionBand columns (for pagination mode only) (memoized)
+  const paginatedColumns = useMemo(() => columns.filter(column => 
+    !actualWolfExclusionBandColumns.some(wolfCol => wolfCol.key === column.key)
+  ), [columns, actualWolfExclusionBandColumns]);
+
+  // Column pagination logic (for pagination mode only) (memoized)
+  const totalColumnPages = useMemo(() => Math.ceil(paginatedColumns.length / columnsPerPage), [paginatedColumns, columnsPerPage]);
 
   // Column Pagination Components
   // Bar 1: Columns per page quantity selector
@@ -414,15 +603,24 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     );
   };
 
-  // Pass pagination components to parent
+  // Pass pagination components to parent (only in pagination mode)
   useEffect(() => {
     if (onColumnPaginationRender) {
-      onColumnPaginationRender({
-        ColumnPaginationBar1,
-        ColumnPaginationBar2
-      });
+      if (useColumnFiltering) {
+        // In column filtering mode, don't show pagination controls
+        onColumnPaginationRender({
+          ColumnPaginationBar1: () => null,
+          ColumnPaginationBar2: () => null
+        });
+      } else {
+        // In pagination mode, show pagination controls
+        onColumnPaginationRender({
+          ColumnPaginationBar1,
+          ColumnPaginationBar2
+        });
+      }
     }
-  }, [onColumnPaginationRender, currentColumnPage, totalColumnPages, columnsPerPage]);
+  }, [onColumnPaginationRender, useColumnFiltering, currentColumnPage, totalColumnPages, columnsPerPage]);
 
   // Fetch data from Supabase
   const fetchData = async () => {

@@ -28,6 +28,18 @@ export default function AddressjarClient() {
     ColumnPaginationBar2: () => JSX.Element | null;
   } | null>(null);
   
+  // Define wolf exclusion band columns (always shown leftmost)
+  const wolfExclusionBandColumns = [
+    'addresspren_id',
+    'fk_addressglub_id', 
+    'address_label',
+    'org_is_starred',
+    'org_is_flagged',
+    'org_is_circled',
+    'org_is_squared',
+    'org_is_triangled'
+  ];
+  
   // PillarShift Column Template System modal state
   const [isPillarShiftModalOpen, setIsPillarShiftModalOpen] = useState(false);
   const [sheafData, setSheafData] = useState<string>('');
@@ -41,6 +53,12 @@ export default function AddressjarClient() {
   const [coltempsLoading, setColtempsLoading] = useState(false);
   const [coltempsError, setColtempsError] = useState<string | null>(null);
   const [actualUserId, setActualUserId] = useState<string | null>(null);
+  
+  // Coltemps selector state
+  const [isColtempsPopupOpen, setIsColtempsPopupOpen] = useState(false);
+  const [selectedColtemp, setSelectedColtemp] = useState<any | null>(null);
+  const [columnSystemMode, setColumnSystemMode] = useState<'pagination' | 'coltemps'>('pagination');
+  const [filteredColumns, setFilteredColumns] = useState<string[]>([]);
 
   // Function to ensure addressjar UTG exists and fetch sheaf data
   const fetchSheafData = async () => {
@@ -271,21 +289,32 @@ export default function AddressjarClient() {
 
   // Function to fetch coltemps data
   const fetchColtempsData = async () => {
-    if (!actualUserId) return;
+    console.log('fetchColtempsData called, actualUserId:', actualUserId); // Debug log
+    
+    if (!actualUserId) {
+      console.log('No actualUserId, returning early'); // Debug log
+      setColtempsError('User ID not available');
+      return;
+    }
     
     setColtempsLoading(true);
     setColtempsError(null);
     
     try {
+      console.log('Fetching coltemps with query:', `fk_user_id.eq.${actualUserId},coltemp_category.eq.adminpublic`); // Debug log
+      
       const { data, error } = await supabase
         .from('coltemps')
         .select('*')
-        .eq('rel_utg_id', 'utg_addressjar')
         .or(`fk_user_id.eq.${actualUserId},coltemp_category.eq.adminpublic`)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase query error:', error); // Debug log
+        throw error;
+      }
 
+      console.log('Fetched coltemps data:', data, 'Count:', data?.length || 0); // Debug log
       setColtempsData(data || []);
     } catch (err) {
       console.error('Error fetching coltemps data:', err);
@@ -293,6 +322,37 @@ export default function AddressjarClient() {
     } finally {
       setColtempsLoading(false);
     }
+  };
+  
+  // Function to select a coltemp and apply its column configuration
+  const selectColtemp = (coltemp: any) => {
+    console.log('Selecting coltemp:', coltemp); // Debug log
+    setSelectedColtemp(coltemp);
+    
+    // Parse the nubra_lake_of_ui_columns to get filtered columns
+    if (coltemp.nubra_lake_of_ui_columns) {
+      const columnLines = coltemp.nubra_lake_of_ui_columns
+        .split('\n')
+        .map((line: string) => line.trim())
+        .filter((line: string) => line.length > 0);
+      
+      console.log('Parsed column lines from nubra_lake:', columnLines); // Debug log
+      setFilteredColumns(columnLines);
+    } else {
+      console.log('No nubra_lake_of_ui_columns data found'); // Debug log
+      setFilteredColumns([]);
+    }
+    
+    setIsColtempsPopupOpen(false);
+    setColumnSystemMode('coltemps');
+    console.log('Column system mode set to coltemps'); // Debug log
+  };
+  
+  // Function to clear coltemp selection
+  const clearColtempSelection = () => {
+    setSelectedColtemp(null);
+    setFilteredColumns([]);
+    setColumnSystemMode('pagination');
   };
 
   useEffect(() => {
@@ -364,17 +424,76 @@ export default function AddressjarClient() {
               use the pillarshift coltemp system
             </button>
             
-            {/* Column Pagination Button Bars */}
-            {columnPaginationControls && (
-              <>
-                <div className="flex items-center">
-                  {columnPaginationControls.ColumnPaginationBar1()}
-                </div>
-                <div className="flex items-center">
-                  {columnPaginationControls.ColumnPaginationBar2()}
-                </div>
-              </>
-            )}
+            {/* Column System Selector - Either/Or Radio System */}
+            <div className="flex items-center border border-gray-300 rounded-lg p-2 bg-gray-50">
+              <div className="flex items-center mr-4">
+                <input
+                  type="radio"
+                  id="column-pagination"
+                  name="column-system"
+                  value="pagination"
+                  checked={columnSystemMode === 'pagination'}
+                  onChange={() => {
+                    setColumnSystemMode('pagination');
+                    clearColtempSelection();
+                  }}
+                  className="mr-2"
+                />
+                <label htmlFor="column-pagination" className="text-sm font-medium text-gray-700 mr-4">
+                  Column Pagination
+                </label>
+                
+                {columnSystemMode === 'pagination' && columnPaginationControls && (
+                  <>
+                    <div className="flex items-center mr-2">
+                      {columnPaginationControls.ColumnPaginationBar1()}
+                    </div>
+                    <div className="flex items-center">
+                      {columnPaginationControls.ColumnPaginationBar2()}
+                    </div>
+                  </>
+                )}
+              </div>
+              
+              <div className="border-l border-gray-300 h-8 mx-4"></div>
+              
+              <div className="flex items-center">
+                <input
+                  type="radio"
+                  id="column-coltemps"
+                  name="column-system"
+                  value="coltemps"
+                  checked={columnSystemMode === 'coltemps'}
+                  onChange={() => setColumnSystemMode('coltemps')}
+                  className="mr-2"
+                />
+                <label htmlFor="column-coltemps" className="text-sm font-medium text-gray-700 mr-4">
+                  <strong>Select a Coltemp:</strong>
+                </label>
+                
+                {columnSystemMode === 'coltemps' && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        fetchColtempsData();
+                        setIsColtempsPopupOpen(true);
+                      }}
+                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+                    >
+                      {selectedColtemp ? `Selected: ${selectedColtemp.coltemp_name || 'Unnamed'}` : 'Choose Template'}
+                    </button>
+                    {selectedColtemp && (
+                      <button
+                        onClick={clearColtempSelection}
+                        className="px-2 py-1 bg-gray-500 hover:bg-gray-600 text-white text-sm rounded transition-colors"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <DrenjariButtonBarDriggsmanLinks />
@@ -384,7 +503,12 @@ export default function AddressjarClient() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
-        <AddressjarTable onColumnPaginationRender={setColumnPaginationControls} />
+        <AddressjarTable 
+          onColumnPaginationRender={setColumnPaginationControls}
+          useColumnFiltering={columnSystemMode === 'coltemps'}
+          filteredColumns={filteredColumns}
+          wolfExclusionBandColumns={wolfExclusionBandColumns}
+        />
       </div>
 
       {/* PillarShift Column Template System Modal */}
@@ -613,6 +737,132 @@ export default function AddressjarClient() {
               {activeTab === 'rtab7' && (
                 <div className="flex-1 flex items-center justify-center">
                   <p className="text-gray-500">rtab7 content coming soon</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Coltemps Selector Popup Modal */}
+      {isColtempsPopupOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-[90vw] max-w-6xl h-[80vh] flex flex-col p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Select a Column Template</h2>
+              <button
+                onClick={() => setIsColtempsPopupOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-auto">
+              {coltempsLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-500">Loading column templates...</p>
+                </div>
+              ) : coltempsError ? (
+                <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                  Error: {coltempsError}
+                </div>
+              ) : coltempsData.length === 0 ? (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-500">No column templates available</p>
+                </div>
+              ) : (
+                <table className="w-full border-collapse">
+                  <thead className="bg-gray-50 sticky top-0">
+                    <tr>
+                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Display Name</th>
+                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Columns Config</th>
+                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>
+                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Default</th>
+                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {coltempsData.map((coltemp) => (
+                      <tr key={coltemp.coltemp_id} className="hover:bg-gray-50">
+                        <td className="border border-gray-200 px-3 py-2">
+                          <button
+                            onClick={() => selectColtemp(coltemp)}
+                            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors"
+                          >
+                            Select
+                          </button>
+                        </td>
+                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-900">
+                          {coltemp.coltemp_id}
+                        </td>
+                        <td className="border border-gray-200 px-3 py-2 text-sm font-medium text-gray-900">
+                          {coltemp.coltemp_name || 'Unnamed'}
+                        </td>
+                        <td className="border border-gray-200 px-3 py-2 text-sm">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            coltemp.coltemp_category === 'adminpublic' 
+                              ? 'bg-purple-100 text-purple-800'
+                              : 'bg-green-100 text-green-800'
+                          }`}>
+                            {coltemp.coltemp_category || 'user'}
+                          </span>
+                        </td>
+                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-900">
+                          {coltemp.coltemp_display_name || '-'}
+                        </td>
+                        <td className="border border-gray-200 px-3 py-2 text-sm">
+                          {coltemp.nubra_lake_of_ui_columns ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                              {coltemp.nubra_lake_of_ui_columns.split('\n').filter((l: string) => l.trim()).length} columns
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">No config</span>
+                          )}
+                        </td>
+                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-900">
+                          {coltemp.fk_user_id === actualUserId ? (
+                            <span className="text-blue-600 font-medium">You</span>
+                          ) : coltemp.coltemp_category === 'adminpublic' ? (
+                            <span className="text-purple-600">Admin</span>
+                          ) : (
+                            <span className="text-gray-500">Other</span>
+                          )}
+                        </td>
+                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-900">
+                          {coltemp.is_default ? '✓' : '-'}
+                        </td>
+                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-500">
+                          {new Date(coltemp.created_at).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+            
+            <div className="mt-4 text-sm text-gray-500">
+              Showing {coltempsData.length} templates (your templates + adminpublic)
+              {actualUserId && (
+                <div className="mt-1">
+                  Debug - Your User ID: {actualUserId}
+                </div>
+              )}
+              {coltempsLoading && (
+                <div className="mt-1 text-blue-600">
+                  Loading...
+                </div>
+              )}
+              {coltempsError && (
+                <div className="mt-1 text-red-600">
+                  Error: {coltempsError}
                 </div>
               )}
             </div>

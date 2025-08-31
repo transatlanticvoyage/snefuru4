@@ -266,3 +266,62 @@ each <th> and <td> in this table should have padding of 0 px on all 4 sides.
 	
 each of the inner wrapper divs should have a padding of 4 px on all sides by default
 
+
+==========================================================
+============== SEPARATOR =================================
+==========================================================
+
+MASSIVE PROMPT ABOUT INTEGRATING NUBRA COLTEMP LAKE SYSTEM
+
+please inspect the coltemps db table and find the db row with rel_utg_id of
+"utg_addressjar". you will see i have placed the following info for that row
+ in the nubra lake db row:
+
+addressglub.is_po_box
+addressglub.is_apartment
+addressglub.is_suite
+addressglub.data_source
+
+
+
+please create a new dropdown on the /addressjar page that says:
+select a coltemp: (in bold text)
+then in the dropdown itself display all rows from db table coltemps that
+have coltemp_category of "adminpublic" value exact and coltemps where
+fk_user_id is a match to the currently logged in user. these are the
+coltemps that must be listed in the dropdown. actually, do not make a
+dropdown, make a custom popup that displays a ui table grid with various db
+columns. include all the db columns from the db table coltemps. allow user
+to select a coltemp from the custom popup selector table. then make the
+actual table we have alter its display of ui columns in the main ui table
+grid on /addressjar according to the contents of the nubra lake db column.
+please examine the coltemps db table and find the row where i have entered
+the above pasted column configuration text and saved it. the system must
+work to filter the table by the user's specified custom config in the lake
+field (when selected form the dropdown). please note that our new droopdown
+option must be in an "either / or" paradigm in relation to the column
+pagination button bars. the user can use either the "2 column pagination
+button bars" OR they can use the coltemps dropdown (special ui table popup
+selector) but they can't use both at the same time. they're exclusive to
+each other. please place the new coltemps selector button near the coltemp
+pagination system and display a radio button and wrapper div for both
+systems that indicates visually to user that only one of the systems can be
+used at a time. please note that the config of columns that the user sets in
+ the lake, must respect column order as specified by user top-to-bottom in
+the lake field(this must correspond to left to right in the ui table grid
+where user will view the columns).
+
+also pelase note that all columns in the wolf exclusion band for the
+addressjar ui table grid, will still show in their left-most position in the
+ ui table even when the user selects a specific custom coltemp. everything
+they specify in the coltemp must come after (to the right of) everything in
+the wolf exclusion band
+
+if they want to list a specific column multiple times, they can list it in
+the lake, and the frontend should reneder this succesfully also
+
+
+==========================================================
+============== SEPARATOR =================================
+==========================================================
+
