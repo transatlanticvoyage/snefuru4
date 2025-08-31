@@ -648,6 +648,9 @@ export default function DriggsmanTable({
   const [sitesglubData, setSitesglubData] = useState<Map<string, Sitesglub>>(new Map());
   const [sitesglubLoading, setSitesglubLoading] = useState<Map<string, Set<string>>>(new Map()); // Map<domain, Set<fieldNames>>
   
+  // City population data state
+  const [cityPopulationData, setCityPopulationData] = useState<Map<string, number | null>>(new Map());
+  
   // Domain registrar popup state
   const [registrarPopupOpen, setRegistrarPopupOpen] = useState<string | null>(null);
   const [allHostAccounts, setAllHostAccounts] = useState<any[]>([]);
@@ -844,6 +847,13 @@ export default function DriggsmanTable({
     // Removed: fetchCallPlatforms(), fetchCitationGigs(), fetchAddressSpecies()
     // These will be loaded lazily when dropdown is first opened
   }, []);
+
+  // Fetch city population data when sites change
+  useEffect(() => {
+    if (sites.length > 0) {
+      fetchCityPopulationData();
+    }
+  }, [sites]);
 
   // Re-filter sites when manual sites change or filtering states change
   useEffect(() => {
@@ -1235,6 +1245,35 @@ export default function DriggsmanTable({
       setSitesglubData(sitesglubMap);
     } catch (err) {
       console.error('Error in fetchSitesglubData:', err);
+    }
+  };
+
+  // Function to fetch city population data
+  const fetchCityPopulationData = async () => {
+    try {
+      // Get all unique city IDs from current sites
+      const cityIds = [...new Set(sites.map(site => site.rel_city_id).filter(id => id !== null))];
+      
+      if (cityIds.length === 0) return;
+
+      const { data: citiesData, error } = await supabase
+        .from('cities')
+        .select('city_id, city_population')
+        .in('city_id', cityIds);
+      
+      if (error) {
+        console.error('Error fetching city population data:', error);
+        return;
+      }
+      
+      // Store city population data in a Map for quick lookup by city ID
+      const populationMap = new Map<string, number | null>();
+      citiesData?.forEach(city => {
+        populationMap.set(city.city_id.toString(), city.city_population);
+      });
+      setCityPopulationData(populationMap);
+    } catch (err) {
+      console.error('Error in fetchCityPopulationData:', err);
     }
   };
 
@@ -3676,7 +3715,7 @@ export default function DriggsmanTable({
                       </div>
                       
                       {/* City-Niche Combination Fields */}
-                      <div className="mt-6 mb-4">
+                      <div className="mt-6 mb-4" style={{ border: '1px solid black', padding: '16px' }}>
                         <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px' }}>
                           city-niche-combination:
                         </div>
@@ -3730,6 +3769,12 @@ export default function DriggsmanTable({
                             }}>
                               city wok
                             </div>
+                            <div style={{
+                              fontSize: '14px',
+                              marginLeft: '8px'
+                            }}>
+                              cities.city_population: {cityPopulationData.get(paginatedSites[0]?.rel_city_id?.toString() || '') || 'Loading...'}
+                            </div>
                           </div>
                           <div className="flex items-center space-x-3">
                             <span style={{ fontSize: '14px' }}>sitespren.rel_industry_id</span>
@@ -3774,7 +3819,7 @@ export default function DriggsmanTable({
                         <table style={{
                           borderCollapse: 'collapse',
                           border: '1px solid #9ca3af',
-                          margin: '0 auto'
+                          margin: '0'
                         }}>
                           <tbody>
                             <tr>
