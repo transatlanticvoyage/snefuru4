@@ -10,6 +10,11 @@ const DrenjariButtonBarDriggsmanLinks = dynamic(
   { ssr: false }
 );
 
+const AddressprenTable = dynamic(
+  () => import('./components/AddressprenTable'),
+  { ssr: false }
+);
+
 export default function AddressjarClient() {
   const { user } = useAuth();
   const router = useRouter();
@@ -45,9 +50,9 @@ export default function AddressjarClient() {
         </div>
       </div>
 
-      {/* Main Content - Mostly blank */}
-      <div className="flex-1">
-        {/* Intentionally left blank for future feature implementation */}
+      {/* Main Content */}
+      <div className="flex-1 p-6">
+        <AddressprenTable />
       </div>
     </div>
   );
