@@ -5,6 +5,7 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import Header from '../components/Header';
 import SidebarMenu from '../components/SidebarMenu';
 import SelectedRowStyles from '../components/SelectedRowStyles';
+import '../styles/shenfur_th_cells_db_table_row.css';
 
 export default function ProtectedLayout({
   children,

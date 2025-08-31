@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -19,6 +19,12 @@ const AddressjarTable = dynamic(
 export default function AddressjarClient() {
   const { user } = useAuth();
   const router = useRouter();
+  
+  // Column pagination control state
+  const [columnPaginationControls, setColumnPaginationControls] = useState<{
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  } | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -40,10 +46,22 @@ export default function AddressjarClient() {
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-gray-800">
               <strong>Address Constellation System</strong>
             </h1>
+            
+            {/* Column Pagination Button Bars */}
+            {columnPaginationControls && (
+              <>
+                <div className="flex items-center">
+                  {columnPaginationControls.ColumnPaginationBar1()}
+                </div>
+                <div className="flex items-center">
+                  {columnPaginationControls.ColumnPaginationBar2()}
+                </div>
+              </>
+            )}
           </div>
           <div className="flex items-center space-x-4">
             <DrenjariButtonBarDriggsmanLinks />
@@ -53,7 +71,7 @@ export default function AddressjarClient() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
-        <AddressjarTable />
+        <AddressjarTable onColumnPaginationRender={setColumnPaginationControls} />
       </div>
     </div>
   );

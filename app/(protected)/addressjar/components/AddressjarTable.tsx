@@ -69,7 +69,14 @@ interface AddressData {
   address_hash: string | null;
 }
 
-export default function AddressjarTable() {
+interface AddressjarTableProps {
+  onColumnPaginationRender?: (controls: {
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  }) => void;
+}
+
+export default function AddressjarTable({ onColumnPaginationRender }: AddressjarTableProps) {
   const { user } = useAuth();
   const [data, setData] = useState<AddressData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,6 +87,10 @@ export default function AddressjarTable() {
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [sortField, setSortField] = useState<keyof AddressData>('addresspren_created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  // Column pagination states
+  const [columnsPerPage, setColumnsPerPage] = useState(12);
+  const [currentColumnPage, setCurrentColumnPage] = useState(1);
   
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -164,6 +175,205 @@ export default function AddressjarTable() {
     { key: 'addressglub_updated_at' as keyof AddressData, label: 'updated_at', type: 'datetime', readOnly: true, width: '160px', group: 'addressglub' },
     { key: 'address_hash' as keyof AddressData, label: 'address_hash', type: 'text', readOnly: true, width: '200px', group: 'addressglub' }
   ];
+
+  // Column pagination logic
+  const totalColumnPages = Math.ceil(columns.length / columnsPerPage);
+  const startColumnIndex = (currentColumnPage - 1) * columnsPerPage;
+  const visibleColumns = columns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+
+  // Column Pagination Components
+  // Bar 1: Columns per page quantity selector
+  const ColumnPaginationBar1 = () => {
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Cols/page:</span>
+          <button
+            onClick={() => {
+              setColumnsPerPage(6);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${
+              columnsPerPage === 6 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 6 ? '#f8f782' : undefined
+            }}
+          >
+            6
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(8);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 8 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 8 ? '#f8f782' : undefined
+            }}
+          >
+            8
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(10);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 10 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 10 ? '#f8f782' : undefined
+            }}
+          >
+            10
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(12);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 12 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 12 ? '#f8f782' : undefined
+            }}
+          >
+            12
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(15);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 15 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 15 ? '#f8f782' : undefined
+            }}
+          >
+            15
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(columns.length);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${
+              columnsPerPage === columns.length ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === columns.length ? '#f8f782' : undefined
+            }}
+          >
+            All
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Bar 2: Current column page selector
+  const ColumnPaginationBar2 = () => {
+    if (totalColumnPages <= 1) return null;
+    
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Col page:</span>
+          <button
+            onClick={() => setCurrentColumnPage(1)}
+            disabled={currentColumnPage === 1}
+            className="px-2 py-2.5 text-sm border rounded-l -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            First
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(currentColumnPage - 1)}
+            disabled={currentColumnPage === 1}
+            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Prev
+          </button>
+          
+          {Array.from({ length: Math.min(5, totalColumnPages) }, (_, i) => {
+            const pageNum = Math.max(1, Math.min(totalColumnPages - 4, currentColumnPage - 2)) + i;
+            if (pageNum > totalColumnPages) return null;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentColumnPage(pageNum)}
+                className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+                  currentColumnPage === pageNum 
+                    ? 'text-black border-black' 
+                    : 'bg-white hover:bg-gray-200'
+                }`}
+                style={{ 
+                  fontSize: '14px', 
+                  paddingTop: '10px', 
+                  paddingBottom: '10px',
+                  backgroundColor: currentColumnPage === pageNum ? '#f8f782' : undefined
+                }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          
+          <button
+            onClick={() => setCurrentColumnPage(currentColumnPage + 1)}
+            disabled={currentColumnPage === totalColumnPages}
+            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Next
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(totalColumnPages)}
+            disabled={currentColumnPage === totalColumnPages}
+            className="px-2 py-2.5 text-sm border rounded-r disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Last
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Pass pagination components to parent
+  useEffect(() => {
+    if (onColumnPaginationRender) {
+      onColumnPaginationRender({
+        ColumnPaginationBar1,
+        ColumnPaginationBar2
+      });
+    }
+  }, [onColumnPaginationRender, currentColumnPage, totalColumnPages, columnsPerPage]);
 
   // Fetch data from Supabase
   const fetchData = async () => {
@@ -377,10 +587,50 @@ export default function AddressjarTable() {
     if (!user?.id) return;
 
     try {
+      // First create an addressglub entry
+      const { data: addressglubData, error: addressglubError } = await supabase
+        .from('addressglub')
+        .insert([{
+          street_1: 'New Address',
+          street_2: null,
+          city: 'New City',
+          state_code: null,
+          state_full: null,
+          zip_code: null,
+          country_code: 'USA',
+          country: 'United States',
+          street_1_clean: null,
+          full_address_formatted: null,
+          latitude: null,
+          longitude: null,
+          is_validated: false,
+          validation_source: null,
+          validation_accuracy: null,
+          plus_four: null,
+          fk_city_id: null,
+          fk_address_species_id: null,
+          usage_count: 0,
+          quality_score: null,
+          confidence_level: null,
+          is_business: false,
+          is_residential: false,
+          is_po_box: false,
+          is_apartment: false,
+          is_suite: false,
+          data_source: 'manual',
+          source_reference: null,
+          address_hash: null
+        }])
+        .select()
+        .single();
+
+      if (addressglubError) throw addressglubError;
+
+      // Now create the addresspren entry linked to the addressglub entry
       const newRecord = {
         user_id: user.id,
         address_label: 'New Address',
-        fk_addressglub_id: null,
+        fk_addressglub_id: addressglubData.addressglub_id,
         street_1_override: '',
         street_2_override: '',
         city_override: '',
@@ -428,39 +678,39 @@ export default function AddressjarTable() {
         addresspren_created_at: insertedData.created_at,
         addresspren_updated_at: insertedData.updated_at,
         
-        // addressglub fields (all null for new record)
-        addressglub_id: null,
-        street_1: null,
-        street_2: null,
-        city: null,
-        state_code: null,
-        state_full: null,
-        zip_code: null,
-        country_code: null,
-        country: null,
-        street_1_clean: null,
-        full_address_formatted: null,
-        latitude: null,
-        longitude: null,
-        is_validated: null,
-        validation_source: null,
-        validation_accuracy: null,
-        plus_four: null,
-        fk_city_id: null,
-        fk_address_species_id: null,
-        addressglub_usage_count: null,
-        quality_score: null,
-        confidence_level: null,
-        is_business: null,
-        is_residential: null,
-        is_po_box: null,
-        is_apartment: null,
-        is_suite: null,
-        data_source: null,
-        source_reference: null,
-        addressglub_created_at: null,
-        addressglub_updated_at: null,
-        address_hash: null
+        // addressglub fields (from created record)
+        addressglub_id: addressglubData.addressglub_id,
+        street_1: addressglubData.street_1,
+        street_2: addressglubData.street_2,
+        city: addressglubData.city,
+        state_code: addressglubData.state_code,
+        state_full: addressglubData.state_full,
+        zip_code: addressglubData.zip_code,
+        country_code: addressglubData.country_code,
+        country: addressglubData.country,
+        street_1_clean: addressglubData.street_1_clean,
+        full_address_formatted: addressglubData.full_address_formatted,
+        latitude: addressglubData.latitude,
+        longitude: addressglubData.longitude,
+        is_validated: addressglubData.is_validated,
+        validation_source: addressglubData.validation_source,
+        validation_accuracy: addressglubData.validation_accuracy,
+        plus_four: addressglubData.plus_four,
+        fk_city_id: addressglubData.fk_city_id,
+        fk_address_species_id: addressglubData.fk_address_species_id,
+        addressglub_usage_count: addressglubData.usage_count,
+        quality_score: addressglubData.quality_score,
+        confidence_level: addressglubData.confidence_level,
+        is_business: addressglubData.is_business,
+        is_residential: addressglubData.is_residential,
+        is_po_box: addressglubData.is_po_box,
+        is_apartment: addressglubData.is_apartment,
+        is_suite: addressglubData.is_suite,
+        data_source: addressglubData.data_source,
+        source_reference: addressglubData.source_reference,
+        addressglub_created_at: addressglubData.created_at,
+        addressglub_updated_at: addressglubData.updated_at,
+        address_hash: addressglubData.address_hash
       };
 
       // Add to local data at the beginning
@@ -480,10 +730,50 @@ export default function AddressjarTable() {
     if (!user?.id) return;
 
     try {
+      // First create an addressglub entry
+      const { data: addressglubData, error: addressglubError } = await supabase
+        .from('addressglub')
+        .insert([{
+          street_1: formData.street_1_override?.trim() || 'New Address',
+          street_2: formData.street_2_override?.trim() || null,
+          city: formData.city_override?.trim() || 'New City',
+          state_code: formData.state_code_override?.trim() || null,
+          state_full: formData.state_full_override?.trim() || null,
+          zip_code: formData.zip_code_override?.trim() || null,
+          country_code: formData.country_override?.trim() || 'USA',
+          country: 'United States',
+          street_1_clean: null,
+          full_address_formatted: null,
+          latitude: null,
+          longitude: null,
+          is_validated: false,
+          validation_source: null,
+          validation_accuracy: null,
+          plus_four: null,
+          fk_city_id: null,
+          fk_address_species_id: null,
+          usage_count: 0,
+          quality_score: null,
+          confidence_level: null,
+          is_business: false,
+          is_residential: false,
+          is_po_box: false,
+          is_apartment: false,
+          is_suite: false,
+          data_source: 'manual',
+          source_reference: null,
+          address_hash: null
+        }])
+        .select()
+        .single();
+
+      if (addressglubError) throw addressglubError;
+
+      // Now create the addresspren entry linked to the addressglub entry
       const insertData = {
         user_id: user.id,
         address_label: formData.address_label?.trim() || null,
-        fk_addressglub_id: formData.fk_addressglub_id,
+        fk_addressglub_id: addressglubData.addressglub_id,
         street_1_override: formData.street_1_override?.trim() || null,
         street_2_override: formData.street_2_override?.trim() || null,
         city_override: formData.city_override?.trim() || null,
@@ -773,17 +1063,17 @@ export default function AddressjarTable() {
       {/* Table */}
       <div className="bg-white overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-200" style={{ tableLayout: 'fixed' }}>
+          <table className="w-full border-collapse border border-gray-200 utg_addressjar" style={{ tableLayout: 'fixed' }}>
             <thead className="bg-gray-50">
               {/* Table source row */}
-              <tr>
-                <th className="px-2 py-2 text-left border border-gray-200" style={{ width: '50px' }}>
+              <tr className="shenfur_db_table_name_tr">
+                <th className="px-2 py-2 text-left border border-gray-200 shenfur_db_table_name_row_th for_db_field_none for_db_table_none" style={{ width: '50px' }}>
                   <span className="text-xs">-</span>
                 </th>
-                {columns.map((column) => (
+                {visibleColumns.map((column) => (
                   <th
                     key={`source-${column.key}`}
-                    className={`text-left border border-gray-200 px-2 py-2 ${
+                    className={`text-left border border-gray-200 px-2 py-2 shenfur_db_table_name_row_th for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
                       column.separator === 'right' ? 'border-r-4 border-r-blue-500' : ''
                     }`}
                     style={column.width ? { 
@@ -800,7 +1090,7 @@ export default function AddressjarTable() {
               </tr>
               {/* Column names row */}
               <tr>
-                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '50px' }}>
+                <th className="px-2 py-3 text-left border border-gray-200 for_db_field_none for_db_table_none" style={{ width: '50px' }}>
                   <div 
                     className="w-full h-full flex items-center justify-center cursor-pointer"
                     onClick={() => {
@@ -819,10 +1109,10 @@ export default function AddressjarTable() {
                     />
                   </div>
                 </th>
-                {columns.map((column) => (
+                {visibleColumns.map((column) => (
                   <th
                     key={column.key}
-                    className={`text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1 ${
+                    className={`text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1 for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
                       column.separator === 'right' ? 'border-r-4 border-r-blue-500' : ''
                     }`}
                     style={column.width ? { 
@@ -847,7 +1137,7 @@ export default function AddressjarTable() {
             <tbody className="bg-white">
               {paginatedData.map((item) => (
                 <tr key={item.addresspren_id} className="hover:bg-gray-50">
-                  <td className="px-2 py-1 border border-gray-200">
+                  <td className="px-2 py-1 border border-gray-200 for_db_field_none for_db_table_none">
                     <div 
                       className="w-full h-full flex items-center justify-center cursor-pointer"
                       onClick={() => {
@@ -868,10 +1158,10 @@ export default function AddressjarTable() {
                       />
                     </div>
                   </td>
-                  {columns.map((column) => (
+                  {visibleColumns.map((column) => (
                     <td 
                       key={column.key} 
-                      className={`border border-gray-200 ${
+                      className={`border border-gray-200 for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
                         column.separator === 'right' ? 'border-r-4 border-r-blue-500' : ''
                       }`}
                       style={column.width ? { 

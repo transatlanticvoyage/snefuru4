@@ -1,2 +1,26 @@
 /* shenfur_th_cells_db_table_row.css */
 /* CSS for database table row styling */
+
+
+/*=========== GLOBAL DB Table BG Colors And Textures ======================================================*/
+tr.shenfur_db_table_name_tr th.for_db_table_addresspren {background-color:#c7d1f5;}
+
+
+/* table.utg_addressjar tr.shenfur_db_table_name_tr th.for_db_field_addresspren_addresspren_id {background-color:#000;}*/
+
+
+
+table.utg_addressjar tr.shenfur_db_table_name_tr th.for_db_table_addresspren {background-color:#c7d1f5;}
+
+/* ==========================================================*/
+
+
+/*
+for_db_field_addresspren_addresspren_id
+for_db_field_addresspren_address_label
+for_db_field_addressglub_addressglub_id
+etc 
+*/
+
+
+

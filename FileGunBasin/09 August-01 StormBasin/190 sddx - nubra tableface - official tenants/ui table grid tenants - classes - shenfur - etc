@@ -1,0 +1,40 @@
+/* shenfur_th_cells_db_table_row.css */
+/* CSS for database table row styling */
+
+
+
+table.utg_addressjar th.shenfur_db_table_name_row_th {}
+
+
+==========================================================
+
+please update every <th> and <td> in the ui table grid to now have the following classes (below are examples):
+
+for_db_field_addresspren_addresspren_id
+for_db_field_addresspren_address_label
+for_db_field_addressglub_addressglub_id
+etc
+
+
+we will use the prefix of:
+for_db_field_
+
+the following, that please insert the db table name and db field name(db column name) that the ui column of the <td>/<th> corresponds to
+
+if there is no specific db column that it corresponds to, such as for checkbox or other fields, please place the class of:
+for_db_field_none
+
+==========================================================
+
+please add a class to every <th> and <td> in the table to represent the "db table" that is related to the "db field(column)" that the ui column corresponds to 
+
+if there is no specific db column that the ui column corresponds to, then just put:
+for_db_table_none
+
+but most values will be like:
+for_db_table_addresspren
+for_db_table_addressglub
+
+==========================================================
+
+
