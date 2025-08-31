@@ -8,6 +8,7 @@ interface UiTableGrid {
   utg_name: string;
   utg_columns_definition_location: string | null;
   utg_description: string | null;
+  sheaf_ui_columns_base_foundation: any;
   rel_xpage_id: number | null;
   rel_xpage: string | null;
   main_db_table: string | null;
@@ -60,12 +61,23 @@ export default function UiTableGridsTable() {
   const [editingCell, setEditingCell] = useState<{ id: string; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
   
+  // UTG ID warning states
+  const [utgIdWarningData, setUtgIdWarningData] = useState<{ id: string; field: string; value: string } | null>(null);
+  const [showFirstWarning, setShowFirstWarning] = useState(false);
+  const [showSecondWarning, setShowSecondWarning] = useState(false);
+  
+  // JSON Editor states
+  const [isJsonEditorOpen, setIsJsonEditorOpen] = useState(false);
+  const [jsonEditorData, setJsonEditorData] = useState<{ recordId: string; value: string } | null>(null);
+  const [jsonEditValue, setJsonEditValue] = useState('');
+  
   // Form data
   const [formData, setFormData] = useState({
     utg_id: '',
     utg_name: '',
     utg_columns_definition_location: '',
     utg_description: '',
+    sheaf_ui_columns_base_foundation: '',
     rel_xpage_id: null as number | null,
     rel_xpage: '',
     main_db_table: '',
@@ -193,13 +205,24 @@ export default function UiTableGridsTable() {
           return;
         }
       }
+
+      let sheafUiColumnsBaseFoundationData = null;
+      if (formData.sheaf_ui_columns_base_foundation && formData.sheaf_ui_columns_base_foundation.trim()) {
+        try {
+          sheafUiColumnsBaseFoundationData = JSON.parse(formData.sheaf_ui_columns_base_foundation);
+        } catch (parseError) {
+          alert('Invalid JSON in sheaf_ui_columns_base_foundation field. Please check the format.');
+          return;
+        }
+      }
       
       const { error: insertError } = await supabase
         .from('utgs')
         .insert([{
           ...formData,
           associated_files: associatedFilesData,
-          header_rows_definition_fantasy: headerRowsDefinitionFantasyData
+          header_rows_definition_fantasy: headerRowsDefinitionFantasyData,
+          sheaf_ui_columns_base_foundation: sheafUiColumnsBaseFoundationData
         }]);
         
       if (insertError) throw insertError;
@@ -207,6 +230,33 @@ export default function UiTableGridsTable() {
       setIsCreateModalOpen(false);
       resetForm();
       fetchData();
+    } catch (err) {
+      console.error('Error creating record:', err);
+      alert(`Failed to create record: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
+  // Handle inline create
+  const handleCreateInline = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('utgs')
+        .insert({
+          utg_id: `new_utg_${Date.now()}`,
+          utg_name: 'New UTG'
+        })
+        .select('*')
+        .single();
+
+      if (error) throw error;
+      
+      // Add the new record to the beginning of the data array
+      setData(prev => [data, ...prev]);
+      
+      // Start editing the utg_name field of the new record
+      setTimeout(() => {
+        startInlineEdit(data.utg_id, 'utg_name', data.utg_name || '');
+      }, 100);
     } catch (err) {
       console.error('Error creating record:', err);
       alert(`Failed to create record: ${err instanceof Error ? err.message : String(err)}`);
@@ -237,13 +287,24 @@ export default function UiTableGridsTable() {
           return;
         }
       }
+
+      let sheafUiColumnsBaseFoundationData = null;
+      if (formData.sheaf_ui_columns_base_foundation && formData.sheaf_ui_columns_base_foundation.trim()) {
+        try {
+          sheafUiColumnsBaseFoundationData = JSON.parse(formData.sheaf_ui_columns_base_foundation);
+        } catch (parseError) {
+          alert('Invalid JSON in sheaf_ui_columns_base_foundation field. Please check the format.');
+          return;
+        }
+      }
       
       const { error: updateError } = await supabase
         .from('utgs')
         .update({
           ...formData,
           associated_files: associatedFilesData,
-          header_rows_definition_fantasy: headerRowsDefinitionFantasyData
+          header_rows_definition_fantasy: headerRowsDefinitionFantasyData,
+          sheaf_ui_columns_base_foundation: sheafUiColumnsBaseFoundationData
         })
         .eq('utg_id', editingRecord.utg_id);
         
@@ -291,6 +352,7 @@ export default function UiTableGridsTable() {
       utg_name: record.utg_name,
       utg_columns_definition_location: record.utg_columns_definition_location || '',
       utg_description: record.utg_description || '',
+      sheaf_ui_columns_base_foundation: record.sheaf_ui_columns_base_foundation ? JSON.stringify(record.sheaf_ui_columns_base_foundation) : '',
       rel_xpage_id: record.rel_xpage_id,
       rel_xpage: record.rel_xpage || '',
       main_db_table: record.main_db_table || '',
@@ -317,6 +379,7 @@ export default function UiTableGridsTable() {
       utg_name: '',
       utg_columns_definition_location: '',
       utg_description: '',
+      sheaf_ui_columns_base_foundation: '',
       rel_xpage_id: null,
       rel_xpage: '',
       main_db_table: '',
@@ -337,8 +400,14 @@ export default function UiTableGridsTable() {
 
   // Handle inline editing
   const startInlineEdit = (id: string, field: string, currentValue: any) => {
-    setEditingCell({ id, field });
-    setEditingValue(currentValue || '');
+    if (field === 'utg_id') {
+      // Show first warning for utg_id editing
+      setUtgIdWarningData({ id, field, value: currentValue || '' });
+      setShowFirstWarning(true);
+    } else {
+      setEditingCell({ id, field });
+      setEditingValue(currentValue || '');
+    }
   };
 
   const saveInlineEdit = async () => {
@@ -450,7 +519,7 @@ export default function UiTableGridsTable() {
 
   // Define column order
   const columnOrder = [
-    'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'rel_xpage_id', 'rel_xpage',
+    'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'sheaf_ui_columns_base_foundation', 'rel_xpage_id', 'rel_xpage',
     'main_db_table', 'sql_view', 'associated_files', 'utg_class', 'created_at', 'updated_at',
     'is_active', 'sort_order', 'horomi_active', 'vertomi_active', 'header_rows_definition_fantasy',
     'filters_notes', 'pagination_notes', 'searchbox_notes', 'utg_columns_definition_file_link'
@@ -494,12 +563,20 @@ export default function UiTableGridsTable() {
             <option value={100}>100 per page</option>
           </select>
         </div>
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          Create New Entry
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleCreateInline}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+          >
+            Create New (Inline)
+          </button>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Create New Entry
+          </button>
+        </div>
       </div>
       
       {/* Table */}
@@ -606,6 +683,27 @@ export default function UiTableGridsTable() {
                               📄
                             </button>
                           )}
+                        </div>
+                      ) : key === 'sheaf_ui_columns_base_foundation' ? (
+                        // Special handling for sheaf_ui_columns_base_foundation - JSON popup editor
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${value ? 'bg-green-500' : 'bg-gray-300'}`} 
+                                 title={value ? 'Has data' : 'Empty'}></div>
+                            <span className="text-xs text-gray-600">
+                              {value ? 'JSON Data' : 'Empty'}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setJsonEditorData({ recordId: row.utg_id, value: value ? JSON.stringify(value, null, 2) : '' });
+                              setJsonEditValue(value ? JSON.stringify(value, null, 2) : '');
+                              setIsJsonEditorOpen(true);
+                            }}
+                            className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded"
+                          >
+                            Popup Editor
+                          </button>
                         </div>
                       ) : key === 'rel_xpage_id' ? (
                         // Special dropdown for xpage relationship
@@ -748,6 +846,16 @@ export default function UiTableGridsTable() {
                   onChange={(e) => setFormData({...formData, utg_description: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                   rows={3}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">sheaf_ui_columns_base_foundation</label>
+                <textarea
+                  value={formData.sheaf_ui_columns_base_foundation}
+                  onChange={(e) => setFormData({...formData, sheaf_ui_columns_base_foundation: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm"
+                  rows={6}
+                  placeholder='{"base_column_order": ["table.column1", "table.column2"], "wolf_exclusion_band": [], "column_groups": {}}'
                 />
               </div>
               <div>
@@ -959,6 +1067,16 @@ export default function UiTableGridsTable() {
                   onChange={(e) => setFormData({...formData, utg_description: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                   rows={3}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">sheaf_ui_columns_base_foundation</label>
+                <textarea
+                  value={formData.sheaf_ui_columns_base_foundation}
+                  onChange={(e) => setFormData({...formData, sheaf_ui_columns_base_foundation: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm"
+                  rows={6}
+                  placeholder='{"base_column_order": ["table.column1", "table.column2"], "wolf_exclusion_band": [], "column_groups": {}}'
                 />
               </div>
               <div>
@@ -1196,6 +1314,205 @@ export default function UiTableGridsTable() {
                   </button>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* JSON Editor Modal */}
+      {isJsonEditorOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-[90vw] h-[85vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Sheaf UI Columns Base Foundation Editor
+              </h3>
+              <button
+                onClick={() => {
+                  setIsJsonEditorOpen(false);
+                  setJsonEditorData(null);
+                  setJsonEditValue('');
+                }}
+                className="w-8 h-8 bg-red-600 hover:bg-red-700 text-white rounded flex items-center justify-center text-lg font-bold"
+                title="Close JSON Editor"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 p-4 overflow-hidden">
+              <div className="h-full flex flex-col">
+                <div className="mb-4 flex items-center gap-4">
+                  <label className="text-sm font-medium text-gray-700">JSON Content:</label>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(jsonEditValue);
+                      alert('JSON copied to clipboard!');
+                    }}
+                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded"
+                  >
+                    Copy JSON
+                  </button>
+                  <button
+                    onClick={() => {
+                      try {
+                        const formatted = JSON.stringify(JSON.parse(jsonEditValue), null, 2);
+                        setJsonEditValue(formatted);
+                      } catch (e) {
+                        alert('Invalid JSON format - cannot format');
+                      }
+                    }}
+                    className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded"
+                  >
+                    Format JSON
+                  </button>
+                </div>
+                <textarea
+                  value={jsonEditValue}
+                  onChange={(e) => setJsonEditValue(e.target.value)}
+                  className="flex-1 w-full p-3 border border-gray-300 rounded-md font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Enter JSON data here..."
+                />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 p-4 border-t">
+              <button
+                onClick={() => {
+                  setIsJsonEditorOpen(false);
+                  setJsonEditorData(null);
+                  setJsonEditValue('');
+                }}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    let jsonData = null;
+                    if (jsonEditValue.trim()) {
+                      jsonData = JSON.parse(jsonEditValue);
+                    }
+
+                    if (jsonEditorData) {
+                      const { error } = await supabase
+                        .from('utgs')
+                        .update({ sheaf_ui_columns_base_foundation: jsonData })
+                        .eq('utg_id', jsonEditorData.recordId);
+
+                      if (error) throw error;
+
+                      // Update local data
+                      setData(prevData =>
+                        prevData.map(item =>
+                          item.utg_id === jsonEditorData.recordId
+                            ? { ...item, sheaf_ui_columns_base_foundation: jsonData }
+                            : item
+                        )
+                      );
+
+                      setIsJsonEditorOpen(false);
+                      setJsonEditorData(null);
+                      setJsonEditValue('');
+                      alert('JSON saved successfully!');
+                    }
+                  } catch (e) {
+                    if (e instanceof SyntaxError) {
+                      alert('Invalid JSON format. Please check your syntax.');
+                    } else {
+                      console.error('Error saving JSON:', e);
+                      alert('Failed to save JSON data.');
+                    }
+                  }
+                }}
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+              >
+                Save JSON
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* First UTG ID Warning Modal */}
+      {showFirstWarning && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md">
+            <h3 className="text-lg font-bold text-red-600 mb-4">⚠️ WARNING: Edit UTG ID</h3>
+            <p className="text-gray-700 mb-6">
+              You are about to edit a UTG ID. This is a <strong>critical operation</strong> that could break references and relationships in the system.
+            </p>
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to continue?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowFirstWarning(false);
+                  setUtgIdWarningData(null);
+                }}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowFirstWarning(false);
+                  setShowSecondWarning(true);
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                I Understand, Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Second UTG ID Warning Modal */}
+      {showSecondWarning && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md">
+            <h3 className="text-lg font-bold text-red-600 mb-4">🚨 FINAL WARNING: Edit UTG ID</h3>
+            <p className="text-gray-700 mb-4">
+              <strong>This is your final warning!</strong>
+            </p>
+            <p className="text-gray-700 mb-6">
+              Editing the UTG ID could:
+              <br />• Break existing references
+              <br />• Cause data inconsistencies
+              <br />• Affect system functionality
+            </p>
+            <p className="text-gray-700 mb-6">
+              <strong>Are you absolutely certain you want to proceed?</strong>
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowSecondWarning(false);
+                  setUtgIdWarningData(null);
+                }}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (utgIdWarningData) {
+                    setEditingCell({ id: utgIdWarningData.id, field: utgIdWarningData.field });
+                    setEditingValue(utgIdWarningData.value);
+                  }
+                  setShowSecondWarning(false);
+                  setUtgIdWarningData(null);
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                YES, PROCEED WITH EDIT
+              </button>
             </div>
           </div>
         </div>
