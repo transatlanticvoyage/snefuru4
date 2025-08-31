@@ -7,7 +7,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { createNavigationStructure } from '@/app/utils/navigationHelper';
+import { getSystem2Navigation } from '@/app/config/navigation/system2Navigation';
 import AvatarDisplay from '@/app/components/profile/AvatarDisplay';
 import LayoutSystemSwitcher from '@/app/components/layout-systems/LayoutSystemSwitcher';
 
@@ -107,22 +107,22 @@ export default function Sidebar2({ isOpen, onToggle, showToggleButton = true }: 
   }, [user, supabase]);
 
   useEffect(() => {
-    // Fetch navigation items when component mounts
-    const fetchNavItems = async () => {
+    // Load system2 navigation
+    const loadNavigation = async () => {
       try {
-        const response = await fetch('/api/navigation');
-        const data = await response.json();
+        const data = await getSystem2Navigation();
         setNavItems(data);
         
         // Create navigation structure using shared utility
+        const { createNavigationStructure } = require('@/app/utils/navigationHelper');
         const navStructure = createNavigationStructure(data);
         setNavigationStructure(navStructure);
       } catch (error) {
-        console.error('Error fetching navigation:', error);
+        console.error('Error loading system2 navigation:', error);
       }
     };
 
-    fetchNavItems();
+    loadNavigation();
   }, []);
 
   useEffect(() => {

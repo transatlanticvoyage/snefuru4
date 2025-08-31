@@ -8,7 +8,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useCustomColors } from '@/app/hooks/useCustomColors';
-import { createNavigationStructure } from '@/app/utils/navigationHelper';
+import { getSystem3Navigation, createSystem3NavigationStructure } from '@/app/config/navigation/system3Navigation';
 import { useRecentPages } from '@/app/hooks/useRecentPages';
 import AvatarDisplay from '@/app/components/profile/AvatarDisplay';
 
@@ -99,21 +99,19 @@ export default function Header3() {
 
 
   useEffect(() => {
-    // Fetch navigation items when component mounts
-    const fetchNavItems = async () => {
+    // Load system3 navigation
+    const loadNavigation = async () => {
       try {
-        console.log('Fetching navigation items...');
-        const response = await fetch('/api/navigation');
-        console.log('Navigation response:', response);
-        const data = await response.json();
-        console.log('Navigation data:', data);
+        console.log('Loading system3 navigation...');
+        const data = await getSystem3Navigation();
+        console.log('System3 navigation data:', data);
         setNavItems(data);
       } catch (error) {
-        console.error('Error fetching navigation:', error);
+        console.error('Error loading system3 navigation:', error);
       }
     };
 
-    fetchNavItems();
+    loadNavigation();
   }, []);
 
   useEffect(() => {
@@ -179,82 +177,9 @@ export default function Header3() {
     }
   };
 
-  // Split navigation items into 2 rows, with break after panjar3
+  // Use system3 navigation structure for advanced admin users
   const splitNavItems = () => {
-    const { adminMenuItem, specialFirstItem, oldAllGroupItem, plutoJetstreamItem, hardcodedNavItems } = createNavigationStructure(navItems);
-
-    // Create the OPEN FULL NAV button item
-    const openFullNavButton: NavItem = {
-      name: 'OPEN FULL NAV',
-      path: undefined // No path - this will be handled as a button
-    };
-
-    // Create the recents menu item
-    const recentsChildren: NavItem[] = [];
-    
-    // Add recent pages
-    recentPages.forEach((page, index) => {
-      recentsChildren.push({
-        name: page.title,
-        path: page.path
-      });
-    });
-    
-    // Add separator and clear option if there are recent pages
-    if (recentPages.length > 0) {
-      recentsChildren.push({
-        name: '---recents-separator---',
-        path: undefined // No link - separator
-      });
-      recentsChildren.push({
-        name: 'Clear All',
-        path: undefined, // Special handling for clear action
-        clearAction: true
-      } as NavItem & { clearAction?: boolean });
-    }
-    
-    // If no recent pages, show message
-    if (recentPages.length === 0) {
-      recentsChildren.push({
-        name: 'No recent pages',
-        path: undefined
-      });
-    }
-
-    const recentsMenuItem: NavItem = {
-      name: 'recents',
-      children: recentsChildren
-    };
-
-    // Create the favorites menu item
-    const favoritesMenuItem: NavItem = {
-      name: 'favorites',
-      children: [
-        {
-          name: 'No favorites yet',
-          path: undefined
-        }
-      ]
-    };
-
-    // Create the final nav items array with OPEN FULL NAV button first, then recents, then favorites, then admin, pluto jetstream, then special item, then oldallgroup, then hardcoded items
-    const finalNavItems = [openFullNavButton, recentsMenuItem, favoritesMenuItem, adminMenuItem, plutoJetstreamItem, specialFirstItem, oldAllGroupItem, ...hardcodedNavItems];
-
-    const panjar3Index = finalNavItems.findIndex(item => item.name === 'panjar3');
-    if (panjar3Index === -1) {
-      // If panjar3 not found, split roughly in half
-      const midPoint = Math.ceil(finalNavItems.length / 2);
-      return {
-        firstRow: finalNavItems.slice(0, midPoint),
-        secondRow: finalNavItems.slice(midPoint)
-      };
-    } else {
-      // Split after panjar3 (include panjar3 in first row)
-      return {
-        firstRow: finalNavItems.slice(0, panjar3Index + 1),
-        secondRow: finalNavItems.slice(panjar3Index + 1)
-      };
-    }
+    return createSystem3NavigationStructure(navItems);
   };
 
   const renderNavItem = (item: NavItem) => {

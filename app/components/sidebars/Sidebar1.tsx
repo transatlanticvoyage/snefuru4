@@ -7,7 +7,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { createNavigationStructure } from '@/app/utils/navigationHelper';
+import { system1Navigation } from '@/app/config/navigation/system1Navigation';
 import AvatarDisplay from '@/app/components/profile/AvatarDisplay';
 import LayoutSystemSwitcher from '@/app/components/layout-systems/LayoutSystemSwitcher';
 
@@ -32,19 +32,13 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
   const router = useRouter();
   const [shouldShow, setShouldShow] = useState(false);
   const [expandedItems, setExpandedItems] = useState<{[key: string]: boolean}>({});
-  const [navItems, setNavItems] = useState<NavItem[]>([]);
+  const [navItems] = useState<NavItem[]>(system1Navigation);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const supabase = createClientComponentClient();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // Navigation structure will be created from the shared utility
-  const [navigationStructure, setNavigationStructure] = useState<{
-    adminMenuItem: NavItem;
-    specialFirstItem: NavItem;
-    oldAllGroupItem: NavItem;
-    hardcodedNavItems: NavItem[];
-  } | null>(null);
+  // Navigation structure is now static from system1Navigation config
 
   useEffect(() => {
     const checkSidebarSetting = async () => {
@@ -106,24 +100,7 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
     fetchUserSettings();
   }, [user, supabase]);
 
-  useEffect(() => {
-    // Fetch navigation items when component mounts
-    const fetchNavItems = async () => {
-      try {
-        const response = await fetch('/api/navigation');
-        const data = await response.json();
-        setNavItems(data);
-        
-        // Create navigation structure using shared utility
-        const navStructure = createNavigationStructure(data);
-        setNavigationStructure(navStructure);
-      } catch (error) {
-        console.error('Error fetching navigation:', error);
-      }
-    };
-
-    fetchNavItems();
-  }, []);
+  // Navigation is now static from system1Navigation config
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -253,16 +230,7 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
 
   // Organize all navigation items
   const getAllNavItems = () => {
-    if (!navigationStructure) return [];
-    
-    const items = [
-      navigationStructure.adminMenuItem, 
-      navigationStructure.specialFirstItem, 
-      navigationStructure.oldAllGroupItem,
-      ...navigationStructure.hardcodedNavItems
-    ];
-    
-    return items;
+    return navItems;
   };
 
   if (!shouldShow) {
