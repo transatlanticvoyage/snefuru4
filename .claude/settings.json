@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(\"**/node_modules/**\")",
+      "Read(\"**/.git/**\")",
+      "Read(\"**/.next/**\")",
+      "Read(\"**/.turbo/**\")",
+      "Read(\"**/build/**\")",
+      "Read(\"**/dist/**\")",
+      "Read(\"**/.cache/**\")",
+      "Read(\"**/coverage/**\")",
+      "Read(\"**/logs/**\")",
+      "Read(\"**/*.log\")",
+      "Read(\"**/*.min.*\")",
+      "Read(\"**/*.map\")",
+      "Read(\"**/*.lock\")",
+      "Read(\"**/*.zip\")",
+      "Read(\"**/*.tar\")",
+      "Read(\"**/*.tar.gz\")",
+      "Read(\"**/*.png\")",
+      "Read(\"**/*.jpg\")",
+      "Read(\"**/*.jpeg\")",
+      "Read(\"**/*.gif\")",
+      "Read(\"**/*.mp4\")",
+      "Read(\"**/*.mov\")",
+      "Read(\"**/*.pdf\")",
+      "Read(\"**/*.csv\")",
+      "Read(\"**/*.sqlite\")",
+      "Read(\"**/*.db\")",
+      "Read(\"public/**\")",
+      "Read(\"storybook-static/**\")",
+      "Read(\".next/**\")",
+      "Read(\".vercel/**\")"
+    ]
+  }
+}

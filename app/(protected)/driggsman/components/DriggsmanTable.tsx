@@ -3697,6 +3697,14 @@ export default function DriggsmanTable({
                             >
                               /assignwiz
                             </a>
+                            <div style={{
+                              backgroundColor: '#ffffff',
+                              border: '1px solid black',
+                              padding: '6px',
+                              fontSize: '14px'
+                            }}>
+                              cnc wok
+                            </div>
                           </div>
                           <div className="flex items-center space-x-3">
                             <span style={{ fontSize: '14px' }}>sitespren.rel_city_id</span>
@@ -3714,6 +3722,14 @@ export default function DriggsmanTable({
                             >
                               /assignwiz
                             </a>
+                            <div style={{
+                              backgroundColor: '#ffffff',
+                              border: '1px solid black',
+                              padding: '6px',
+                              fontSize: '14px'
+                            }}>
+                              city wok
+                            </div>
                           </div>
                           <div className="flex items-center space-x-3">
                             <span style={{ fontSize: '14px' }}>sitespren.rel_industry_id</span>
@@ -3731,6 +3747,14 @@ export default function DriggsmanTable({
                             >
                               /assignwiz
                             </a>
+                            <div style={{
+                              backgroundColor: '#ffffff',
+                              border: '1px solid black',
+                              padding: '6px',
+                              fontSize: '14px'
+                            }}>
+                              industry wok
+                            </div>
                           </div>
                         </div>
                       </div>
