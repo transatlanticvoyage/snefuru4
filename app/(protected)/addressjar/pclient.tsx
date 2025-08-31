@@ -33,6 +33,8 @@ export default function AddressjarClient() {
   const [sheafData, setSheafData] = useState<string>('');
   const [sheafLoading, setSheafLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('rtab1');
+  const [monolithData, setMonolithData] = useState<string>('');
+  const [monolithLoading, setMonolithLoading] = useState(false);
 
   // Function to ensure addressjar UTG exists and fetch sheaf data
   const fetchSheafData = async () => {
@@ -188,6 +190,79 @@ export default function AddressjarClient() {
     }
   };
 
+  // Function to generate monolith from current sheaf
+  const generateMonolithFromSheaf = async () => {
+    setMonolithLoading(true);
+    try {
+      // First fetch the current sheaf data
+      const { data, error } = await supabase
+        .from('utgs')
+        .select('sheaf_ui_columns_base_foundation')
+        .eq('utg_id', 'addressjar')
+        .single();
+
+      if (error) throw error;
+
+      if (!data?.sheaf_ui_columns_base_foundation?.columns) {
+        throw new Error('No sheaf column data found');
+      }
+
+      // Process sheaf data to create monolith text format
+      const columns = data.sheaf_ui_columns_base_foundation.columns;
+      
+      // Sort columns by order field
+      const sortedColumns = [...columns].sort((a, b) => (a.order || 0) - (b.order || 0));
+      
+      // Generate monolith text format
+      let monolithText = '';
+      sortedColumns.forEach((column) => {
+        // Skip separator columns
+        if (column.type === 'separator') return;
+        
+        // Format: (checkbox) group.column_name
+        const group = column.group || 'unknown';
+        const columnName = column.id || column.name || 'unknown';
+        monolithText += `☐ ${group}.${columnName}\n`;
+      });
+
+      // Update the database with the generated monolith
+      const { error: updateError } = await supabase
+        .from('utgs')
+        .update({ monolith_of_ui_columns: monolithText })
+        .eq('utg_id', 'addressjar');
+
+      if (updateError) throw updateError;
+
+      // Set the monolith data for display
+      setMonolithData(monolithText);
+      
+      console.log('Generated monolith from sheaf successfully');
+    } catch (error) {
+      console.error('Error generating monolith:', error);
+      setMonolithData(`Error generating monolith: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setMonolithLoading(false);
+    }
+  };
+
+  // Function to fetch existing monolith data
+  const fetchMonolithData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('utgs')
+        .select('monolith_of_ui_columns')
+        .eq('utg_id', 'addressjar')
+        .single();
+
+      if (error) throw error;
+
+      setMonolithData(data?.monolith_of_ui_columns || '');
+    } catch (error) {
+      console.error('Error fetching monolith data:', error);
+      setMonolithData('Error loading monolith data');
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       router.push('/login');
@@ -218,6 +293,7 @@ export default function AddressjarClient() {
               onClick={() => {
                 setIsPillarShiftModalOpen(true);
                 fetchSheafData();
+                fetchMonolithData();
               }}
               className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors"
             >
@@ -319,9 +395,45 @@ export default function AddressjarClient() {
               
               {/* Other tab contents */}
               {activeTab === 'rtab2' && (
-                <div className="flex-1 flex items-center justify-center">
-                  <p className="text-gray-500">rtab2 content coming soon</p>
-                </div>
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="text-sm font-medium text-gray-700">
+                      Monolith of UI Columns (Text Format)
+                    </label>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={generateMonolithFromSheaf}
+                        disabled={monolithLoading}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {monolithLoading ? 'Generating...' : 'Generate Monolith from Current Sheaf'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(monolithData);
+                          alert('Monolith data copied to clipboard!');
+                        }}
+                        disabled={!monolithData}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        1 click copy
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <p className="text-xs text-gray-500 mb-3">
+                    <strong>NoteToSelf:</strong> must make this an admin only feature in the future
+                  </p>
+                  
+                  <div className="flex-1 min-h-0">
+                    <textarea
+                      value={monolithData}
+                      readOnly
+                      className="w-full h-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none bg-gray-50 overflow-auto"
+                      placeholder="Click 'Generate Monolith from Current Sheaf' to create column list..."
+                    />
+                  </div>
+                </>
               )}
               
               {activeTab === 'rtab3' && (

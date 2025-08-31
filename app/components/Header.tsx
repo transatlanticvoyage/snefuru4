@@ -268,7 +268,7 @@ export default function Header() {
         >
           <button
             onClick={() => toggleNavDropdown(item.name)}
-            className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700 focus:outline-none"
+            className="inline-flex items-center px-2 py-1 text-sm font-medium text-gray-900 hover:text-gray-700 focus:outline-none"
           >
             {item.name === 'admin' && (
               <svg 
@@ -621,7 +621,7 @@ export default function Header() {
         return (
           <span
             key={item.name}
-            className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-500"
+            className="inline-flex items-center px-2 py-1 text-sm font-medium text-gray-500"
           >
             {item.name}
           </span>
@@ -632,7 +632,7 @@ export default function Header() {
         <Link
           key={item.name}
           href={item.path}
-          className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700"
+          className="inline-flex items-center px-2 py-1 text-sm font-medium text-gray-900 hover:text-gray-700"
         >
           {item.name}
         </Link>
@@ -656,7 +656,7 @@ export default function Header() {
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20"> {/* Increased height for 2 rows */}
+        <div className="flex justify-between h-24"> {/* Increased height for 2 rows */}
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center space-x-3">
@@ -683,7 +683,7 @@ export default function Header() {
                 </span>
               </Link>
             </div>
-            <nav className="ml-6 flex flex-col justify-center space-y-1"> {/* Changed to flex-col with space-y-1 */}
+            <nav className="ml-6 flex flex-col justify-center space-y-0"> {/* Changed to flex-col with no vertical spacing */}
               {/* First row */}
               <div className="flex space-x-8">
                 {firstRow.map((item) => renderNavItem(item))}
