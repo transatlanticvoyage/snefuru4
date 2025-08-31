@@ -33,10 +33,15 @@ export function LayoutSystemProvider({ children }: LayoutSystemProviderProps) {
   const [availableSystems, setAvailableSystems] = useState<LayoutSystemConfig[]>([]);
   const [userPermissions, setUserPermissions] = useState<{ is_admin?: boolean }>({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
   const supabase = createClientComponentClient();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleHeaderVisibilityChange = (visible: boolean) => {
+    setHeaderVisible(visible);
   };
 
   useEffect(() => {
@@ -129,10 +134,8 @@ export function LayoutSystemProvider({ children }: LayoutSystemProviderProps) {
 
   // Get current header and sidebar components
   const currentConfig = LAYOUT_SYSTEMS[currentSystem];
-  console.log('Current system:', currentSystem, 'Config:', currentConfig);
   const HeaderComponent = HEADER_COMPONENTS[currentConfig?.header as keyof typeof HEADER_COMPONENTS] || HEADER_COMPONENTS.Header1;
   const SidebarComponent = SIDEBAR_COMPONENTS[currentConfig?.sidebar as keyof typeof SIDEBAR_COMPONENTS] || SIDEBAR_COMPONENTS.Sidebar1;
-  console.log('Using components:', currentConfig?.header, currentConfig?.sidebar);
 
   const contextValue: LayoutSystemContextType = {
     currentSystem,
@@ -145,12 +148,12 @@ export function LayoutSystemProvider({ children }: LayoutSystemProviderProps) {
     <LayoutSystemContext.Provider value={contextValue}>
       <div className={`min-h-screen bg-gray-50 snefuru-app-container ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="snefuru-sidebar-wrapper">
-          <SidebarComponent isOpen={sidebarOpen} onToggle={toggleSidebar} />
+          <SidebarComponent isOpen={sidebarOpen} onToggle={toggleSidebar} onHeaderVisibilityChange={handleHeaderVisibilityChange} />
         </div>
         
         <div className="snefuru-content-wrapper">
-          <HeaderComponent />
-          <main className="pt-0 pb-6 px-4">
+          {headerVisible && <HeaderComponent />}
+          <main className={`pb-6 px-4 ${headerVisible ? 'pt-0' : 'pt-4'}`}>
             {children}
           </main>
         </div>

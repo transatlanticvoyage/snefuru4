@@ -10,11 +10,14 @@ import { useRouter } from 'next/navigation';
 import { system1Navigation } from '@/app/config/navigation/system1Navigation';
 import AvatarDisplay from '@/app/components/profile/AvatarDisplay';
 import LayoutSystemSwitcher from '@/app/components/layout-systems/LayoutSystemSwitcher';
+import HeaderVisibilityToggle from '@/app/components/layout-systems/HeaderVisibilityToggle';
+import { BezelButton } from '@/app/components/bezel-visibility-system';
 
 interface SidebarMenuProps {
   isOpen: boolean;
   onToggle: () => void;
   showToggleButton?: boolean; // Optional prop to hide the default toggle button
+  onHeaderVisibilityChange: (visible: boolean) => void;
 }
 
 interface UserSettings {
@@ -27,7 +30,7 @@ interface NavItem {
   children?: NavItem[];
 }
 
-export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true }: SidebarMenuProps) {
+export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true, onHeaderVisibilityChange }: SidebarMenuProps) {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const [shouldShow, setShouldShow] = useState(false);
@@ -288,6 +291,9 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
           </button>
         </div>
 
+        {/* Header Visibility Toggle */}
+        <HeaderVisibilityToggle onToggle={onHeaderVisibilityChange} />
+
         {/* User Profile Section */}
         <div className="p-4 border-b border-gray-700">
           <div className="relative" ref={userMenuRef}>
@@ -420,6 +426,9 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
           </svg>
         </button>
       )}
+
+      {/* Bezel Button - always visible below hamburger */}
+      <BezelButton showButton={true} />
     </>
   );
 }
