@@ -36,6 +36,7 @@ interface AddressData {
   
   // addressglub fields (joined)
   addressglub_id: number | null;
+  full_address_input: string | null;
   street_1: string | null;
   street_2: string | null;
   city: string | null;
@@ -124,7 +125,7 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     // addresspren columns
     { key: 'addresspren_id' as keyof AddressData, label: 'addresspren_id', type: 'number', readOnly: true, width: '120px', group: 'addresspren' },
     { key: 'address_label' as keyof AddressData, label: 'address_label', type: 'text', width: '150px', group: 'addresspren' },
-    { key: 'fk_addressglub_id' as keyof AddressData, label: 'fk_addressglub_id', type: 'number', width: '140px', group: 'addresspren' },
+    { key: 'fk_addressglub_id' as keyof AddressData, label: 'fk_addressglub_id', type: 'number', width: '140px', group: 'addresspren', separator: 'right' },
     { key: 'street_1_override' as keyof AddressData, label: 'street_1_override', type: 'text', width: '180px', group: 'addresspren' },
     { key: 'street_2_override' as keyof AddressData, label: 'street_2_override', type: 'text', width: '180px', group: 'addresspren' },
     { key: 'city_override' as keyof AddressData, label: 'city_override', type: 'text', width: '150px', group: 'addresspren' },
@@ -143,14 +144,15 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     
     // addressglub columns
     { key: 'addressglub_id' as keyof AddressData, label: 'addressglub_id', type: 'number', readOnly: true, width: '120px', group: 'addressglub' },
-    { key: 'street_1' as keyof AddressData, label: 'street_1', type: 'text', readOnly: true, width: '200px', group: 'addressglub' },
-    { key: 'street_2' as keyof AddressData, label: 'street_2', type: 'text', readOnly: true, width: '200px', group: 'addressglub' },
-    { key: 'city' as keyof AddressData, label: 'city', type: 'text', readOnly: true, width: '150px', group: 'addressglub' },
-    { key: 'state_code' as keyof AddressData, label: 'state_code', type: 'text', readOnly: true, width: '100px', group: 'addressglub' },
-    { key: 'state_full' as keyof AddressData, label: 'state_full', type: 'text', readOnly: true, width: '150px', group: 'addressglub' },
-    { key: 'zip_code' as keyof AddressData, label: 'zip_code', type: 'text', readOnly: true, width: '100px', group: 'addressglub' },
-    { key: 'country_code' as keyof AddressData, label: 'country_code', type: 'text', readOnly: true, width: '100px', group: 'addressglub' },
-    { key: 'country' as keyof AddressData, label: 'country', type: 'text', readOnly: true, width: '150px', group: 'addressglub' },
+    { key: 'full_address_input' as keyof AddressData, label: 'full_address_input', type: 'text', width: '300px', group: 'addressglub' },
+    { key: 'street_1' as keyof AddressData, label: 'street_1', type: 'text', width: '200px', group: 'addressglub' },
+    { key: 'street_2' as keyof AddressData, label: 'street_2', type: 'text', width: '200px', group: 'addressglub' },
+    { key: 'city' as keyof AddressData, label: 'city', type: 'text', width: '150px', group: 'addressglub' },
+    { key: 'state_code' as keyof AddressData, label: 'state_code', type: 'text', width: '100px', group: 'addressglub' },
+    { key: 'state_full' as keyof AddressData, label: 'state_full', type: 'text', width: '150px', group: 'addressglub' },
+    { key: 'zip_code' as keyof AddressData, label: 'zip_code', type: 'text', width: '100px', group: 'addressglub' },
+    { key: 'country_code' as keyof AddressData, label: 'country_code', type: 'text', width: '100px', group: 'addressglub' },
+    { key: 'country' as keyof AddressData, label: 'country', type: 'text', width: '150px', group: 'addressglub' },
     { key: 'street_1_clean' as keyof AddressData, label: 'street_1_clean', type: 'text', readOnly: true, width: '200px', group: 'addressglub' },
     { key: 'full_address_formatted' as keyof AddressData, label: 'full_address_formatted', type: 'text', readOnly: true, width: '300px', group: 'addressglub' },
     { key: 'latitude' as keyof AddressData, label: 'latitude', type: 'number', readOnly: true, width: '120px', group: 'addressglub' },
@@ -158,7 +160,7 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     { key: 'is_validated' as keyof AddressData, label: 'is_validated', type: 'boolean', readOnly: true, width: '100px', group: 'addressglub' },
     { key: 'validation_source' as keyof AddressData, label: 'validation_source', type: 'text', readOnly: true, width: '150px', group: 'addressglub' },
     { key: 'validation_accuracy' as keyof AddressData, label: 'validation_accuracy', type: 'text', readOnly: true, width: '150px', group: 'addressglub' },
-    { key: 'plus_four' as keyof AddressData, label: 'plus_four', type: 'text', readOnly: true, width: '100px', group: 'addressglub' },
+    { key: 'plus_four' as keyof AddressData, label: 'plus_four', type: 'text', width: '100px', group: 'addressglub' },
     { key: 'fk_city_id' as keyof AddressData, label: 'fk_city_id', type: 'number', readOnly: true, width: '100px', group: 'addressglub' },
     { key: 'fk_address_species_id' as keyof AddressData, label: 'fk_address_species_id', type: 'number', readOnly: true, width: '180px', group: 'addressglub' },
     { key: 'addressglub_usage_count' as keyof AddressData, label: 'usage_count', type: 'number', readOnly: true, width: '120px', group: 'addressglub' },
@@ -169,17 +171,32 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     { key: 'is_po_box' as keyof AddressData, label: 'is_po_box', type: 'boolean', readOnly: true, width: '100px', group: 'addressglub' },
     { key: 'is_apartment' as keyof AddressData, label: 'is_apartment', type: 'boolean', readOnly: true, width: '120px', group: 'addressglub' },
     { key: 'is_suite' as keyof AddressData, label: 'is_suite', type: 'boolean', readOnly: true, width: '100px', group: 'addressglub' },
-    { key: 'data_source' as keyof AddressData, label: 'data_source', type: 'text', readOnly: true, width: '120px', group: 'addressglub' },
-    { key: 'source_reference' as keyof AddressData, label: 'source_reference', type: 'text', readOnly: true, width: '180px', group: 'addressglub' },
+    { key: 'data_source' as keyof AddressData, label: 'data_source', type: 'text', width: '120px', group: 'addressglub' },
+    { key: 'source_reference' as keyof AddressData, label: 'source_reference', type: 'text', width: '180px', group: 'addressglub' },
     { key: 'addressglub_created_at' as keyof AddressData, label: 'created_at', type: 'datetime', readOnly: true, width: '160px', group: 'addressglub' },
     { key: 'addressglub_updated_at' as keyof AddressData, label: 'updated_at', type: 'datetime', readOnly: true, width: '160px', group: 'addressglub' },
     { key: 'address_hash' as keyof AddressData, label: 'address_hash', type: 'text', readOnly: true, width: '200px', group: 'addressglub' }
   ];
 
+  // WolfExclusionBand - Sticky columns that are excluded from pagination
+  const wolfExclusionBandColumns = [
+    { key: 'addresspren_id' as keyof AddressData, label: 'addresspren_id', type: 'number', readOnly: true, width: '120px', group: 'addresspren' },
+    { key: 'address_label' as keyof AddressData, label: 'address_label', type: 'text', width: '150px', group: 'addresspren' },
+    { key: 'fk_addressglub_id' as keyof AddressData, label: 'fk_addressglub_id', type: 'number', width: '140px', group: 'addresspren', separator: 'right' }
+  ];
+
+  // Paginated columns - exclude WolfExclusionBand columns
+  const paginatedColumns = columns.filter(column => 
+    !wolfExclusionBandColumns.some(wolfCol => wolfCol.key === column.key)
+  );
+
   // Column pagination logic
-  const totalColumnPages = Math.ceil(columns.length / columnsPerPage);
+  const totalColumnPages = Math.ceil(paginatedColumns.length / columnsPerPage);
   const startColumnIndex = (currentColumnPage - 1) * columnsPerPage;
-  const visibleColumns = columns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+  const visiblePaginatedColumns = paginatedColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+  
+  // Combined visible columns: WolfExclusionBand + paginated columns
+  const visibleColumns = [...wolfExclusionBandColumns, ...visiblePaginatedColumns];
 
   // Column Pagination Components
   // Bar 1: Columns per page quantity selector
@@ -420,6 +437,7 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
         
         // addressglub fields
         addressglub_id: addr.addressglub?.addressglub_id || null,
+        full_address_input: addr.addressglub?.full_address_input || null,
         street_1: addr.addressglub?.street_1 || null,
         street_2: addr.addressglub?.street_2 || null,
         city: addr.addressglub?.city || null,
@@ -533,12 +551,40 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
         processedValue = editingValue === '' ? null : editingValue;
       }
 
-      const { error } = await supabase
-        .from('addresspren')
-        .update({ [editingCell.field]: processedValue })
-        .eq('addresspren_id', editingCell.id);
+      // Determine which table to update based on column group
+      const currentItem = data.find(item => item.addresspren_id === editingCell.id);
+      if (!currentItem) throw new Error('Item not found');
 
-      if (error) throw error;
+      if (column?.group === 'addressglub') {
+        if (!currentItem.addressglub_id) {
+          throw new Error('No addressglub record linked to this addresspren record. Cannot edit addressglub fields.');
+        }
+        
+        // Update addressglub table
+        console.log('Updating addressglub table:', {
+          field: editingCell.field,
+          value: processedValue,
+          addressglub_id: currentItem.addressglub_id
+        });
+        
+        const { error } = await supabase
+          .from('addressglub')
+          .update({ [editingCell.field]: processedValue })
+          .eq('addressglub_id', currentItem.addressglub_id);
+
+        if (error) {
+          console.error('Addressglub update error:', error);
+          throw error;
+        }
+      } else {
+        // Update addresspren table
+        const { error } = await supabase
+          .from('addresspren')
+          .update({ [editingCell.field]: processedValue })
+          .eq('addresspren_id', editingCell.id);
+
+        if (error) throw error;
+      }
 
       // Update local data
       setData(data.map(item => 
@@ -565,12 +611,28 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     const newValue = currentValue === null ? true : !currentValue;
     
     try {
-      const { error } = await supabase
-        .from('addresspren')
-        .update({ [field]: newValue })
-        .eq('addresspren_id', id);
+      // Determine which table to update based on column group
+      const column = columns.find(col => col.key === field);
+      const currentItem = data.find(item => item.addresspren_id === id);
+      if (!currentItem) throw new Error('Item not found');
 
-      if (error) throw error;
+      if (column?.group === 'addressglub') {
+        // Update addressglub table
+        const { error } = await supabase
+          .from('addressglub')
+          .update({ [field]: newValue })
+          .eq('addressglub_id', currentItem.addressglub_id);
+
+        if (error) throw error;
+      } else {
+        // Update addresspren table
+        const { error } = await supabase
+          .from('addresspren')
+          .update({ [field]: newValue })
+          .eq('addresspren_id', id);
+
+        if (error) throw error;
+      }
 
       // Update local data
       setData(data.map(item => 
@@ -591,6 +653,7 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
       const { data: addressglubData, error: addressglubError } = await supabase
         .from('addressglub')
         .insert([{
+          full_address_input: null,
           street_1: 'New Address',
           street_2: null,
           city: 'New City',
@@ -680,6 +743,7 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
         
         // addressglub fields (from created record)
         addressglub_id: addressglubData.addressglub_id,
+        full_address_input: addressglubData.full_address_input,
         street_1: addressglubData.street_1,
         street_2: addressglubData.street_2,
         city: addressglubData.city,
@@ -734,6 +798,7 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
       const { data: addressglubData, error: addressglubError } = await supabase
         .from('addressglub')
         .insert([{
+          full_address_input: null,
           street_1: formData.street_1_override?.trim() || 'New Address',
           street_2: formData.street_2_override?.trim() || null,
           city: formData.city_override?.trim() || 'New City',
@@ -1074,13 +1139,16 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                   <th
                     key={`source-${column.key}`}
                     className={`text-left border border-gray-200 px-2 py-2 shenfur_db_table_name_row_th for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
-                      column.separator === 'right' ? 'border-r-4 border-r-blue-500' : ''
+                      column.separator === 'right' ? 'border-r-4 border-r-black' : ''
                     }`}
-                    style={column.width ? { 
-                      width: column.width, 
-                      maxWidth: column.width, 
-                      minWidth: column.width 
-                    } : {}}
+                    style={{
+                      ...(column.width ? { 
+                        width: column.width, 
+                        maxWidth: column.width, 
+                        minWidth: column.width 
+                      } : {}),
+                      ...(column.separator === 'right' ? { borderRightWidth: '3px', borderRightColor: '#000' } : {})
+                    }}
                   >
                     <span className="font-bold text-xs lowercase">
                       {column.group === 'addresspren' ? 'addresspren' : 'addressglub'}
@@ -1113,13 +1181,16 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                   <th
                     key={column.key}
                     className={`text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1 for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
-                      column.separator === 'right' ? 'border-r-4 border-r-blue-500' : ''
+                      column.separator === 'right' ? 'border-r-4 border-r-black' : ''
                     }`}
-                    style={column.width ? { 
-                      width: column.width, 
-                      maxWidth: column.width, 
-                      minWidth: column.width 
-                    } : {}}
+                    style={{
+                      ...(column.width ? { 
+                        width: column.width, 
+                        maxWidth: column.width, 
+                        minWidth: column.width 
+                      } : {}),
+                      ...(column.separator === 'right' ? { borderRightWidth: '3px', borderRightColor: '#000' } : {})
+                    }}
                     onClick={() => handleSort(column.key)}
                   >
                     <div className="flex items-center space-x-1">
@@ -1162,13 +1233,16 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                     <td 
                       key={column.key} 
                       className={`border border-gray-200 for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
-                        column.separator === 'right' ? 'border-r-4 border-r-blue-500' : ''
+                        column.separator === 'right' ? 'border-r-4 border-r-black' : ''
                       }`}
-                      style={column.width ? { 
-                        width: column.width, 
-                        maxWidth: column.width, 
-                        minWidth: column.width 
-                      } : {}}
+                      style={{
+                        ...(column.width ? { 
+                          width: column.width, 
+                          maxWidth: column.width, 
+                          minWidth: column.width 
+                        } : {}),
+                        ...(column.separator === 'right' ? { borderRightWidth: '3px', borderRightColor: '#000' } : {})
+                      }}
                     >
                       {renderCell(item, column)}
                     </td>
