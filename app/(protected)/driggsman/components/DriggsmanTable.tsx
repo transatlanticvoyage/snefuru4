@@ -3804,23 +3804,25 @@ export default function DriggsmanTable({
                         </div>
                       </div>
                       
-                      {/* dp1-dp5 Table */}
-                      <div className="mt-6">
-                        {/* transit_table label */}
-                        <div style={{ 
-                          fontSize: '16px', 
-                          fontWeight: 'bold', 
-                          marginBottom: '8px',
-                          textAlign: 'left'
-                        }}>
-                          transit_table:
-                        </div>
-                        
-                        <table style={{
-                          borderCollapse: 'collapse',
-                          border: '1px solid #9ca3af',
-                          margin: '0'
-                        }}>
+                      {/* dp1-dp5 Table, Medallions, and Tundra Container */}
+                      <div className="mt-6 flex gap-6">
+                        {/* Transit Table Section */}
+                        <div>
+                          {/* transit_table label */}
+                          <div style={{ 
+                            fontSize: '16px', 
+                            fontWeight: 'bold', 
+                            marginBottom: '8px',
+                            textAlign: 'left'
+                          }}>
+                            transit_table:
+                          </div>
+                          
+                          <table style={{
+                            borderCollapse: 'collapse',
+                            border: '1px solid #9ca3af',
+                            margin: '0'
+                          }}>
                           <tbody>
                             <tr>
                               <td style={{ padding: '3px', border: '1px solid #9ca3af', textAlign: 'center', fontWeight: 'bold' }}>dp1</td>
@@ -3916,6 +3918,279 @@ export default function DriggsmanTable({
                             </tr>
                           </tbody>
                         </table>
+                        </div>
+                        
+                        {/* Migrated Medallions Section */}
+                        <div style={{ border: '1px solid black', padding: '16px' }}>
+                          <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px' }}>
+                            migrated medallions box
+                          </div>
+                          
+                          {/* Migrated DriggsPackMedallions (zz1, zz2, zz3) */}
+                          <div className="flex items-center space-x-2 mb-4">
+                            <span className="text-sm font-medium">zz1, zz2, zz3:</span>
+                            <DriggsPackMedallion 
+                              driggspackNumber={1}
+                              siteId={paginatedSites[0]?.id || ''}
+                              onZzClick={handleDriggspackClick}
+                            />
+                            <DriggsPackMedallion 
+                              driggspackNumber={2}
+                              siteId={paginatedSites[0]?.id || ''}
+                              onZzClick={handleDriggspackClick}
+                            />
+                            <DriggsPackMedallion 
+                              driggspackNumber={3}
+                              siteId={paginatedSites[0]?.id || ''}
+                              onZzClick={handleDriggspackClick}
+                            />
+                          </div>
+                          
+                          {/* Migrated VacuumMedallion */}
+                          <div className="flex items-center space-x-2 mb-4">
+                            <span className="text-sm font-medium">Vacuum:</span>
+                            <VacuumMedallion 
+                              siteId={paginatedSites[0]?.id || ''}
+                              onMedallionClick={handleVacuumMedallionClick}
+                              onFiller1aClick={handleVacuumFiller1aClick}
+                              onFiller1bClick={handleVacuumFiller1bClick}
+                            />
+                          </div>
+                          
+                          {/* Migrated ZarpoMedallion */}
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm font-medium">Zarpo:</span>
+                            <ZarpoMedallion 
+                              siteId={paginatedSites[0]?.id || ''}
+                              onMedallionClick={handleZarpoMedallionClick}
+                              onFiller1aClick={handleZarpoFiller1aClick}
+                              onFiller1bClick={handleZarpoFiller1bClick}
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Migrated Tundra Box Section */}
+                        <div style={{ border: '1px solid black', padding: '16px', minWidth: '450px' }}>
+                          <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px' }}>
+                            migrated tundra box div
+                          </div>
+                          
+                          {/* Migrated Tundra box content */}
+                          {paginatedSites[0] && (
+                            <div 
+                              className="tundra_box"
+                              style={{
+                                position: 'relative',
+                                width: '100%',
+                                border: '1px solid black',
+                                backgroundColor: 'white',
+                                padding: '8px',
+                                minHeight: '200px'
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                {/* Tundra landscape SVG icon */}
+                                <svg 
+                                  width="24" 
+                                  height="24" 
+                                  viewBox="0 0 24 24" 
+                                  fill="none" 
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  style={{ color: 'black' }}
+                                >
+                                  {/* Tundra ground/horizon */}
+                                  <path 
+                                    d="M2 18h20v4H2z" 
+                                    fill="currentColor"
+                                  />
+                                  {/* Rolling hills/tundra landscape */}
+                                  <path 
+                                    d="M2 18c3-2 7-3 10 0s7-2 10 0v-2c-3 2-7 3-10 0s-7 2-10 0z" 
+                                    fill="currentColor"
+                                    opacity="0.7"
+                                  />
+                                  {/* Northern lights/aurora effect */}
+                                  <path 
+                                    d="M4 8c2 1 4-1 6 0s4-1 6 0s4-1 6 0M5 5c2 1 4-1 6 0s4-1 6 0s3-1 5 0" 
+                                    stroke="currentColor" 
+                                    strokeWidth="1.5" 
+                                    strokeLinecap="round"
+                                    opacity="0.8"
+                                  />
+                                  {/* Sparse vegetation dots */}
+                                  <circle cx="6" cy="16" r="1" fill="currentColor" opacity="0.6"/>
+                                  <circle cx="12" cy="17" r="0.8" fill="currentColor" opacity="0.6"/>
+                                  <circle cx="18" cy="16" r="1.2" fill="currentColor" opacity="0.6"/>
+                                </svg>
+                                <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'black' }}>
+                                  tundra_box_div
+                                </span>
+                              </div>
+                              
+                              {/* 3x3 Table */}
+                              <div style={{ overflow: 'auto' }}>
+                                <table style={{
+                                  border: '1px solid #d1d5db',
+                                  borderCollapse: 'collapse',
+                                  width: '100%',
+                                  fontSize: '12px',
+                                  tableLayout: 'auto'
+                                }}>
+                                  <tbody>
+                                    <tr>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1a</td>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1b</td>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1c</td>
+                                    </tr>
+                                    <tr>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>2a</td>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>sitesglub.ns_full</td>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>
+                                        {(() => {
+                                          if (!paginatedSites[0].sitespren_base) return 'NULL';
+                                          
+                                          const isLoading = sitesglubLoading.get(paginatedSites[0].sitespren_base)?.has('ns_full');
+                                          const value = sitesglubData.get(paginatedSites[0].sitespren_base)?.ns_full;
+                                          
+                                          if (isLoading) {
+                                            return (
+                                              <div className="flex items-center justify-center">
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                              </div>
+                                            );
+                                          }
+                                          
+                                          return (
+                                            <button
+                                              className="hover:bg-gray-100 cursor-pointer min-w-0 text-center bg-transparent border-0 p-0 m-0"
+                                              onClick={() => fetchSitesglubMetric(paginatedSites[0].sitespren_base!, 'ns_full')}
+                                              title="Click to refresh ns_full data"
+                                            >
+                                              {value || 'NULL'}
+                                            </button>
+                                          );
+                                        })()}
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>3a</td>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>sitesglub.ip_address</td>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>
+                                        {(() => {
+                                          if (!paginatedSites[0].sitespren_base) return 'NULL';
+                                          
+                                          const isLoading = sitesglubLoading.get(paginatedSites[0].sitespren_base)?.has('ip_address');
+                                          const value = sitesglubData.get(paginatedSites[0].sitespren_base)?.ip_address;
+                                          
+                                          if (isLoading) {
+                                            return (
+                                              <div className="flex items-center justify-center">
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                              </div>
+                                            );
+                                          }
+                                          
+                                          return (
+                                            <button
+                                              className="hover:bg-gray-100 cursor-pointer min-w-0 text-center bg-transparent border-0 p-0 m-0"
+                                              onClick={() => fetchSitesglubMetric(paginatedSites[0].sitespren_base!, 'ip_address')}
+                                              title="Click to refresh ip_address data"
+                                            >
+                                              {value || 'NULL'}
+                                            </button>
+                                          );
+                                        })()}
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>4a</td>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>dom reg acct</td>
+                                      <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'left', fontSize: '10px', maxWidth: '150px', wordWrap: 'break-word' }}>
+                                        {(() => {
+                                          if (!paginatedSites[0].fk_domreg_hostaccount) {
+                                            return (
+                                              <div className="flex items-center justify-between w-full">
+                                                <span className="text-gray-400">No registrar set</span>
+                                                <button
+                                                  onClick={() => {
+                                                    setRegistrarPopupOpen(paginatedSites[0].id);
+                                                    fetchHostAccountsForPopup();
+                                                  }}
+                                                  className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+                                                  title="Set host account"
+                                                >
+                                                  ⚙️
+                                                </button>
+                                              </div>
+                                            );
+                                          }
+
+                                          // Find the registrar info from allHostAccounts
+                                          const registrarInfo = allHostAccounts.find(acc => acc.host_account_id === paginatedSites[0].fk_domreg_hostaccount);
+                                          
+                                          if (registrarInfo) {
+                                            return (
+                                              <div className="flex items-center justify-between w-full">
+                                                <div className="flex items-center gap-1">
+                                                  <span className="text-xs font-medium text-gray-900">
+                                                    {registrarInfo.company_name}
+                                                  </span>
+                                                  <span className="text-xs text-gray-500">
+                                                    {registrarInfo.username}
+                                                  </span>
+                                                </div>
+                                                <div className="flex gap-1">
+                                                  {registrarInfo.portal_url && (
+                                                    <a
+                                                      href={registrarInfo.portal_url}
+                                                      target="_blank"
+                                                      rel="noopener noreferrer"
+                                                      className="text-xs px-1 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                      title="Open portal"
+                                                    >
+                                                      🔗
+                                                    </a>
+                                                  )}
+                                                  <button
+                                                    onClick={() => {
+                                                      setRegistrarPopupOpen(paginatedSites[0].id);
+                                                      fetchHostAccountsForPopup();
+                                                    }}
+                                                    className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+                                                    title="Change host account"
+                                                  >
+                                                    ⚙️
+                                                  </button>
+                                                </div>
+                                              </div>
+                                            );
+                                          }
+
+                                          // Fallback if registrar ID exists but not found in allHostAccounts
+                                          return (
+                                            <div className="flex items-center justify-between w-full">
+                                              <span className="text-xs text-gray-400">Unknown registrar</span>
+                                              <button
+                                                onClick={() => {
+                                                  setRegistrarPopupOpen(paginatedSites[0].id);
+                                                  fetchHostAccountsForPopup();
+                                                }}
+                                                className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+                                                title="Change host account"
+                                              >
+                                                ⚙️
+                                              </button>
+                                            </div>
+                                          );
+                                        })()}
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -3953,239 +4228,11 @@ export default function DriggsmanTable({
                       className="h-8 px-2 border-r border-gray-300 relative"
                       style={{ minWidth: '600px', width: '600px' }}
                     >
-                      {/* Tundra box - positioned on right */}
-                      <div 
-                        className="tundra_box"
-                        style={{
-                          position: 'absolute',
-                          right: '0',
-                          top: '0',
-                          bottom: '0',
-                          width: '410px',
-                          border: '1px solid black',
-                          backgroundColor: 'white',
-                          zIndex: 1,
-                          padding: '0'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'absolute', top: '4px', left: '4px' }}>
-                          {/* Tundra landscape SVG icon */}
-                          <svg 
-                            width="24" 
-                            height="24" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            xmlns="http://www.w3.org/2000/svg"
-                            style={{ color: 'black' }}
-                          >
-                            {/* Tundra ground/horizon */}
-                            <path 
-                              d="M2 18h20v4H2z" 
-                              fill="currentColor"
-                            />
-                            {/* Rolling hills/tundra landscape */}
-                            <path 
-                              d="M2 18c3-2 7-3 10 0s7-2 10 0v-2c-3 2-7 3-10 0s-7 2-10 0z" 
-                              fill="currentColor"
-                              opacity="0.7"
-                            />
-                            {/* Northern lights/aurora effect */}
-                            <path 
-                              d="M4 8c2 1 4-1 6 0s4-1 6 0s4-1 6 0M5 5c2 1 4-1 6 0s4-1 6 0s3-1 5 0" 
-                              stroke="currentColor" 
-                              strokeWidth="1.5" 
-                              strokeLinecap="round"
-                              opacity="0.8"
-                            />
-                            {/* Sparse vegetation dots */}
-                            <circle cx="6" cy="16" r="1" fill="currentColor" opacity="0.6"/>
-                            <circle cx="12" cy="17" r="0.8" fill="currentColor" opacity="0.6"/>
-                            <circle cx="18" cy="16" r="1.2" fill="currentColor" opacity="0.6"/>
-                          </svg>
-                          <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'black' }}>
-                            tundra_box_div
-                          </span>
-                        </div>
-                        
-                        {/* 3x3 Table */}
-                        <div style={{ position: 'absolute', top: '35px', left: '4px', right: '4px' }}>
-                          <table style={{
-                            border: '1px solid #d1d5db',
-                            borderCollapse: 'collapse',
-                            width: '100%',
-                            fontSize: '12px'
-                          }}>
-                            <tbody>
-                              <tr>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1a</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1b</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1c</td>
-                              </tr>
-                              <tr>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>2a</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>sitesglub.ns_full</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>
-                                  {(() => {
-                                    if (!site.sitespren_base) return 'NULL';
-                                    
-                                    const isLoading = sitesglubLoading.get(site.sitespren_base)?.has('ns_full');
-                                    const value = sitesglubData.get(site.sitespren_base)?.ns_full;
-                                    
-                                    if (isLoading) {
-                                      return (
-                                        <div className="flex items-center justify-center">
-                                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                                        </div>
-                                      );
-                                    }
-                                    
-                                    return (
-                                      <button
-                                        className="hover:bg-gray-100 cursor-pointer min-w-0 text-center bg-transparent border-0 p-0 m-0"
-                                        onClick={() => fetchSitesglubMetric(site.sitespren_base!, 'ns_full')}
-                                        title="Click to refresh ns_full data"
-                                      >
-                                        {value || 'NULL'}
-                                      </button>
-                                    );
-                                  })()}
-                                </td>
-                              </tr>
-                              <tr>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>3a</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>sitesglub.ip_address</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>
-                                  {(() => {
-                                    if (!site.sitespren_base) return 'NULL';
-                                    
-                                    const isLoading = sitesglubLoading.get(site.sitespren_base)?.has('ip_address');
-                                    const value = sitesglubData.get(site.sitespren_base)?.ip_address;
-                                    
-                                    if (isLoading) {
-                                      return (
-                                        <div className="flex items-center justify-center">
-                                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                                        </div>
-                                      );
-                                    }
-                                    
-                                    return (
-                                      <button
-                                        className="hover:bg-gray-100 cursor-pointer min-w-0 text-center bg-transparent border-0 p-0 m-0"
-                                        onClick={() => fetchSitesglubMetric(site.sitespren_base!, 'ip_address')}
-                                        title="Click to refresh ip_address data"
-                                      >
-                                        {value || 'NULL'}
-                                      </button>
-                                    );
-                                  })()}
-                                </td>
-                              </tr>
-                              <tr>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>4a</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>dom reg acct</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'left', fontSize: '10px', minWidth: '200px' }}>
-                                  {(() => {
-                                    if (!site.fk_domreg_hostaccount) {
-                                      return (
-                                        <div className="flex items-center justify-between w-full">
-                                          <span className="text-gray-400">No registrar set</span>
-                                          <button
-                                            onClick={() => {
-                                              setRegistrarPopupOpen(site.id);
-                                              fetchHostAccountsForPopup();
-                                            }}
-                                            className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
-                                            title="Set host account"
-                                          >
-                                            ⚙️
-                                          </button>
-                                        </div>
-                                      );
-                                    }
-
-                                    // Find the registrar info from allHostAccounts
-                                    const registrarInfo = allHostAccounts.find(acc => acc.host_account_id === site.fk_domreg_hostaccount);
-                                    
-                                    if (registrarInfo) {
-                                      return (
-                                        <div className="flex items-center justify-between w-full">
-                                          <div className="flex items-center gap-1">
-                                            <span className="text-xs font-medium text-gray-900">
-                                              {registrarInfo.company_name}
-                                            </span>
-                                            <span className="text-xs text-gray-500">
-                                              {registrarInfo.username}
-                                            </span>
-                                          </div>
-                                          <div className="flex gap-1">
-                                            {registrarInfo.portal_url && (
-                                              <a
-                                                href={registrarInfo.portal_url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-xs px-1 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                                title="Open portal"
-                                              >
-                                                🔗
-                                              </a>
-                                            )}
-                                            <button
-                                              onClick={() => {
-                                                setRegistrarPopupOpen(site.id);
-                                                fetchHostAccountsForPopup();
-                                              }}
-                                              className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
-                                              title="Change host account"
-                                            >
-                                              ⚙️
-                                            </button>
-                                          </div>
-                                        </div>
-                                      );
-                                    }
-
-                                    // Fallback if registrar ID exists but not found in allHostAccounts
-                                    return (
-                                      <div className="flex items-center justify-between w-full">
-                                        <span className="text-xs text-gray-400">Unknown registrar</span>
-                                        <button
-                                          onClick={() => {
-                                            setRegistrarPopupOpen(site.id);
-                                            fetchHostAccountsForPopup();
-                                          }}
-                                          className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
-                                          title="Change host account"
-                                        >
-                                          ⚙️
-                                        </button>
-                                      </div>
-                                    );
-                                  })()}
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
+                      {/* Empty div - tundra box moved to migrated section */}
                       
-                      {/* Original medallion content - positioned to preserve appearance */}
-                      <div className="flex items-center justify-start h-full space-x-1" style={{ position: 'relative', zIndex: 2, marginRight: '430px' }}>
-                        <DriggsPackMedallion 
-                          driggspackNumber={1}
-                          siteId={site.id}
-                          onZzClick={handleDriggspackClick}
-                        />
-                        <DriggsPackMedallion 
-                          driggspackNumber={2}
-                          siteId={site.id}
-                          onZzClick={handleDriggspackClick}
-                        />
-                        <DriggsPackMedallion 
-                          driggspackNumber={3}
-                          siteId={site.id}
-                          onZzClick={handleDriggspackClick}
-                        />
+                      {/* Filler text replacing medallions */}
+                      <div className="flex items-center justify-center h-full">
+                        (filler)
                       </div>
                     </td>
                     {/* Empty status column for medallion row */}
@@ -4215,12 +4262,7 @@ export default function DriggsmanTable({
                       className="h-8 border-r border-gray-300 p-1"
                     >
                       <div className="flex items-center justify-center h-full">
-                        <VacuumMedallion 
-                          siteId={site.id}
-                          onMedallionClick={handleVacuumMedallionClick}
-                          onFiller1aClick={handleVacuumFiller1aClick}
-                          onFiller1bClick={handleVacuumFiller1bClick}
-                        />
+                        (filler)
                       </div>
                     </td>
                     {/* Zarpo scraper medallion column */}
@@ -4230,12 +4272,7 @@ export default function DriggsmanTable({
                       style={{ borderRight: '3px solid black' }}
                     >
                       <div className="flex items-center justify-center h-full">
-                        <ZarpoMedallion 
-                          siteId={site.id}
-                          onMedallionClick={handleZarpoMedallionClick}
-                          onFiller1aClick={handleZarpoFiller1aClick}
-                          onFiller1bClick={handleZarpoFiller1bClick}
-                        />
+                        (filler)
                       </div>
                     </td>
                   </>
