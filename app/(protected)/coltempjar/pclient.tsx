@@ -175,15 +175,19 @@ export default function ColtempjarClient() {
         .from('coltemps')
         .select('*');
       
-      // If not admin, filter to only user's records and adminpublic
+      // ONLY filter if user is NOT admin
       if (!userIsAdmin && user?.id) {
+        // Regular users see only their own records + adminpublic records
         query = query.or(`fk_user_id.eq.${user.id},coltemp_category.eq.adminpublic`);
       }
+      // If userIsAdmin is TRUE, no filtering applied - get ALL records
       
       const { data: coltemps, error } = await query.order('coltemp_id', { ascending: true });
 
       if (error) throw error;
       setData(coltemps || []);
+      
+      console.log(`Fetched ${coltemps?.length || 0} coltemp records (isAdmin: ${userIsAdmin})`);
       
       // Fetch live counts for all coltemps
       await fetchLiveCounts(coltemps || []);
