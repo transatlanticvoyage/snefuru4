@@ -1123,7 +1123,7 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
         <div className="flex items-center justify-between w-full" style={{ minWidth: '350px' }}>
           <div
             onClick={() => !isReadOnly && handleCellClick(item.addresspren_id, column.key, value)}
-            className={`flex-1 px-2 py-1 ${!isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} whitespace-nowrap overflow-visible`}
+            className={`flex-1 ${!isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} whitespace-nowrap overflow-visible`}
             title={value?.toString() || ''}
           >
             {column.type === 'datetime' && value ? 
@@ -1191,7 +1191,7 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     return (
       <div
         onClick={() => !isReadOnly && handleCellClick(item.addresspren_id, column.key, value)}
-        className={`px-2 py-1 ${!isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} truncate`}
+        className={`${!isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} truncate`}
         title={value?.toString() || ''}
       >
         {column.type === 'datetime' && value ? 
@@ -1366,13 +1366,15 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
             <thead className="bg-gray-50">
               {/* Table source row */}
               <tr className="shenfur_db_table_name_tr">
-                <th className="px-2 py-2 text-left border border-gray-200 shenfur_db_table_name_row_th for_db_field_none for_db_table_none" style={{ width: '50px' }}>
-                  <span className="text-xs">-</span>
+                <th className="text-left border border-gray-200 shenfur_db_table_name_row_th for_db_field_none for_db_table_none" style={{ width: '50px' }}>
+                  <div className="cell_inner_wrapper_div">
+                    <span className="text-xs">-</span>
+                  </div>
                 </th>
                 {visibleColumns.map((column) => (
                   <th
                     key={`source-${column.key}`}
-                    className={`text-left border border-gray-200 px-2 py-2 shenfur_db_table_name_row_th for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
+                    className={`text-left border border-gray-200 shenfur_db_table_name_row_th for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
                       column.separator === 'right' ? 'border-r-4 border-r-black' : ''
                     }`}
                     style={{
@@ -1388,39 +1390,43 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                       ...(column.separator === 'right' ? { borderRightWidth: '3px', borderRightColor: '#000' } : {})
                     }}
                   >
-                    <span className="font-bold text-xs lowercase">
-                      {column.type === 'separator' ? '' : 
-                       column.group === 'org_entities' ? 'org' :
-                       column.group === 'addresspren' ? 'addresspren' : 'addressglub'}
-                    </span>
+                    <div className="cell_inner_wrapper_div">
+                      <span className="font-bold text-xs lowercase">
+                        {column.type === 'separator' ? '' : 
+                         column.group === 'org_entities' ? 'org' :
+                         column.group === 'addresspren' ? 'addresspren' : 'addressglub'}
+                      </span>
+                    </div>
                   </th>
                 ))}
               </tr>
               {/* Column names row */}
               <tr>
-                <th className="px-2 py-3 text-left border border-gray-200 for_db_field_none for_db_table_none" style={{ width: '50px' }}>
-                  <div 
-                    className="w-full h-full flex items-center justify-center cursor-pointer"
-                    onClick={() => {
-                      if (selectedRows.size === paginatedData.length && paginatedData.length > 0) {
-                        setSelectedRows(new Set());
-                      } else {
-                        setSelectedRows(new Set(paginatedData.map(item => item.addresspren_id)));
-                      }
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      style={{ width: '20px', height: '20px' }}
-                      checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
-                      onChange={() => {}} // Handled by div onClick
-                    />
+                <th className="text-left border border-gray-200 for_db_field_none for_db_table_none" style={{ width: '50px' }}>
+                  <div className="cell_inner_wrapper_div">
+                    <div 
+                      className="w-full h-full flex items-center justify-center cursor-pointer"
+                      onClick={() => {
+                        if (selectedRows.size === paginatedData.length && paginatedData.length > 0) {
+                          setSelectedRows(new Set());
+                        } else {
+                          setSelectedRows(new Set(paginatedData.map(item => item.addresspren_id)));
+                        }
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        style={{ width: '20px', height: '20px' }}
+                        checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
+                        onChange={() => {}} // Handled by div onClick
+                      />
+                    </div>
                   </div>
                 </th>
                 {visibleColumns.map((column) => (
                   <th
                     key={column.key}
-                    className={`text-left ${column.type === 'separator' || column.type === 'org_entity' ? 'cursor-default' : 'cursor-pointer hover:bg-gray-100'} border border-gray-200 px-2 py-1 for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
+                    className={`text-left ${column.type === 'separator' || column.type === 'org_entity' ? 'cursor-default' : 'cursor-pointer hover:bg-gray-100'} border border-gray-200 for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
                       column.separator === 'right' ? 'border-r-4 border-r-black' : ''
                     }`}
                     style={{
@@ -1442,8 +1448,9 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                       }
                     }}
                   >
-                    <div className="flex items-center justify-center space-x-1">
-                      {column.type === 'org_entity' ? (
+                    <div className="cell_inner_wrapper_div">
+                      <div className="flex items-center justify-center space-x-1">
+                        {column.type === 'org_entity' ? (
                         <button
                           className="flex items-center justify-center w-full h-full hover:bg-gray-200 transition-colors cursor-pointer"
                           onClick={() => {
@@ -1532,6 +1539,7 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                           )}
                         </>
                       )}
+                      </div>
                     </div>
                   </th>
                 ))}
@@ -1540,25 +1548,27 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
             <tbody className="bg-white">
               {paginatedData.map((item) => (
                 <tr key={item.addresspren_id} className="hover:bg-gray-50">
-                  <td className="px-2 py-1 border border-gray-200 for_db_field_none for_db_table_none">
-                    <div 
-                      className="w-full h-full flex items-center justify-center cursor-pointer"
-                      onClick={() => {
-                        const newSelected = new Set(selectedRows);
-                        if (newSelected.has(item.addresspren_id)) {
-                          newSelected.delete(item.addresspren_id);
-                        } else {
-                          newSelected.add(item.addresspren_id);
-                        }
-                        setSelectedRows(newSelected);
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        style={{ width: '20px', height: '20px' }}
-                        checked={selectedRows.has(item.addresspren_id)}
-                        onChange={() => {}} // Handled by div onClick
-                      />
+                  <td className="border border-gray-200 for_db_field_none for_db_table_none">
+                    <div className="cell_inner_wrapper_div">
+                      <div 
+                        className="w-full h-full flex items-center justify-center cursor-pointer"
+                        onClick={() => {
+                          const newSelected = new Set(selectedRows);
+                          if (newSelected.has(item.addresspren_id)) {
+                            newSelected.delete(item.addresspren_id);
+                          } else {
+                            newSelected.add(item.addresspren_id);
+                          }
+                          setSelectedRows(newSelected);
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          style={{ width: '20px', height: '20px' }}
+                          checked={selectedRows.has(item.addresspren_id)}
+                          onChange={() => {}} // Handled by div onClick
+                        />
+                      </div>
                     </div>
                   </td>
                   {visibleColumns.map((column) => (
@@ -1580,7 +1590,9 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                         ...(column.separator === 'right' ? { borderRightWidth: '3px', borderRightColor: '#000' } : {})
                       }}
                     >
-                      {renderCell(item, column)}
+                      <div className="cell_inner_wrapper_div">
+                        {renderCell(item, column)}
+                      </div>
                     </td>
                   ))}
                 </tr>

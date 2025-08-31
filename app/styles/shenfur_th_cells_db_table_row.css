@@ -24,23 +24,25 @@ etc
 */
 
 /* ============================================================================================== */
-/* TABLE COLUMN WIDTH AND HEADER TEXT OVERFLOW RULES                                             */
-/* This section handles header text overflow behavior only                                       */
+/* CELL INNER WRAPPER DIV STYLING                                                                */
+/* Remove padding from table cells and apply to inner wrapper divs                               */
 /* ============================================================================================== */
 
-/* TH content should break once then overflow invisibly - but maintain normal table layout */
-table.utg_addressjar th span {
-  display: inline-block;
-  line-height: 1.2;
-  max-height: 2.4em; /* Allow for 2 lines maximum */
-  overflow: hidden;
-  word-break: break-word;
-  hyphens: none;
-  -webkit-hyphens: none;
-  -ms-hyphens: none;
+/* Remove padding from table cells themselves */
+table.utg_addressjar th,
+table.utg_addressjar td {
+  padding: 0;
 }
 
-/* END TABLE COLUMN WIDTH AND HEADER TEXT OVERFLOW RULES */
+/* Apply padding and styling to inner wrapper divs */
+table.utg_addressjar .cell_inner_wrapper_div {
+  padding: 4px 8px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* END CELL INNER WRAPPER DIV STYLING */
 /* ============================================================================================== */
 
 
