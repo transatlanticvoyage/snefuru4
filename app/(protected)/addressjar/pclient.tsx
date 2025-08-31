@@ -35,6 +35,11 @@ export default function AddressjarClient() {
   const [activeTab, setActiveTab] = useState('rtab1');
   const [monolithData, setMonolithData] = useState<string>('');
   const [monolithLoading, setMonolithLoading] = useState(false);
+  
+  // Coltemps data state
+  const [coltempsData, setColtempsData] = useState<any[]>([]);
+  const [coltempsLoading, setColtempsLoading] = useState(false);
+  const [coltempsError, setColtempsError] = useState<string | null>(null);
 
   // Function to ensure addressjar UTG exists and fetch sheaf data
   const fetchSheafData = async () => {
@@ -219,10 +224,10 @@ export default function AddressjarClient() {
         // Skip separator columns
         if (column.type === 'separator') return;
         
-        // Format: (checkbox) group.column_name
+        // Format: group.column_name
         const group = column.group || 'unknown';
         const columnName = column.id || column.name || 'unknown';
-        monolithText += `☐ ${group}.${columnName}\n`;
+        monolithText += `${group}.${columnName}\n`;
       });
 
       // Update the database with the generated monolith
@@ -263,6 +268,32 @@ export default function AddressjarClient() {
     }
   };
 
+  // Function to fetch coltemps data
+  const fetchColtempsData = async () => {
+    if (!user?.id) return;
+    
+    setColtempsLoading(true);
+    setColtempsError(null);
+    
+    try {
+      const { data, error } = await supabase
+        .from('coltemps')
+        .select('*')
+        .eq('rel_utg_id', 'utg_addressjar')
+        .or(`fk_user_id.eq.${user.id},coltemp_category.eq.adminpublic`)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setColtempsData(data || []);
+    } catch (err) {
+      console.error('Error fetching coltemps data:', err);
+      setColtempsError(err instanceof Error ? err.message : 'Failed to fetch coltemps data');
+    } finally {
+      setColtempsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       router.push('/login');
@@ -294,6 +325,7 @@ export default function AddressjarClient() {
                 setIsPillarShiftModalOpen(true);
                 fetchSheafData();
                 fetchMonolithData();
+                fetchColtempsData();
               }}
               className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors"
             >
@@ -437,8 +469,94 @@ export default function AddressjarClient() {
               )}
               
               {activeTab === 'rtab3' && (
-                <div className="flex-1 flex items-center justify-center">
-                  <p className="text-gray-500">rtab3 content coming soon</p>
+                <div className="flex-1 flex flex-col min-h-0">
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="text-sm font-medium text-gray-700">
+                      Column Templates (coltemps) for addressjar
+                    </label>
+                    <button
+                      onClick={fetchColtempsData}
+                      disabled={coltempsLoading}
+                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {coltempsLoading ? 'Loading...' : 'Refresh'}
+                    </button>
+                  </div>
+                  
+                  {coltempsError && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                      Error: {coltempsError}
+                    </div>
+                  )}
+                  
+                  <div className="flex-1 min-h-0 overflow-auto">
+                    {coltempsLoading ? (
+                      <div className="flex items-center justify-center h-32">
+                        <p className="text-gray-500">Loading coltemps data...</p>
+                      </div>
+                    ) : coltempsData.length === 0 ? (
+                      <div className="flex items-center justify-center h-32">
+                        <p className="text-gray-500">No column templates found for addressjar</p>
+                      </div>
+                    ) : (
+                      <div className="border border-gray-200 rounded-lg overflow-hidden">
+                        <table className="w-full border-collapse">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                              <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                              <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                              <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
+                              <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UTG</th>
+                              <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                              <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {coltempsData.map((coltemp, index) => (
+                              <tr key={coltemp.coltemp_id || index} className="hover:bg-gray-50">
+                                <td className="border border-gray-200 px-3 py-2 text-sm text-gray-900">
+                                  {coltemp.coltemp_id}
+                                </td>
+                                <td className="border border-gray-200 px-3 py-2 text-sm text-gray-900 font-medium">
+                                  {coltemp.coltemp_name || 'Unnamed'}
+                                </td>
+                                <td className="border border-gray-200 px-3 py-2 text-sm">
+                                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                    coltemp.coltemp_category === 'adminpublic' 
+                                      ? 'bg-purple-100 text-purple-800'
+                                      : 'bg-green-100 text-green-800'
+                                  }`}>
+                                    {coltemp.coltemp_category || 'user'}
+                                  </span>
+                                </td>
+                                <td className="border border-gray-200 px-3 py-2 text-sm text-gray-900">
+                                  {coltemp.fk_user_id === user?.id ? (
+                                    <span className="text-blue-600 font-medium">You</span>
+                                  ) : (
+                                    <span className="text-gray-500">{coltemp.fk_user_id?.substring(0, 8)}...</span>
+                                  )}
+                                </td>
+                                <td className="border border-gray-200 px-3 py-2 text-sm text-gray-500">
+                                  {coltemp.rel_utg_id}
+                                </td>
+                                <td className="border border-gray-200 px-3 py-2 text-sm text-gray-500">
+                                  {coltemp.created_at ? new Date(coltemp.created_at).toLocaleDateString() : 'N/A'}
+                                </td>
+                                <td className="border border-gray-200 px-3 py-2 text-sm text-gray-500 max-w-xs truncate">
+                                  {coltemp.coltemp_description || 'No description'}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-4 text-xs text-gray-500">
+                    Showing {coltempsData.length} column templates for rel_utg_id = "utg_addressjar"
+                  </div>
                 </div>
               )}
               

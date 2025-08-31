@@ -9,6 +9,7 @@ interface UiTableGrid {
   utg_columns_definition_location: string | null;
   utg_description: string | null;
   sheaf_ui_columns_base_foundation: any;
+  monolith_of_ui_columns: string | null;
   rel_xpage_id: number | null;
   rel_xpage: string | null;
   main_db_table: string | null;
@@ -71,6 +72,11 @@ export default function UiTableGridsTable() {
   const [jsonEditorData, setJsonEditorData] = useState<{ recordId: string; value: string } | null>(null);
   const [jsonEditValue, setJsonEditValue] = useState('');
   
+  // Text Editor states (for monolith)
+  const [isTextEditorOpen, setIsTextEditorOpen] = useState(false);
+  const [textEditorData, setTextEditorData] = useState<{ recordId: string; value: string; fieldName: string } | null>(null);
+  const [textEditValue, setTextEditValue] = useState('');
+  
   // Form data
   const [formData, setFormData] = useState({
     utg_id: '',
@@ -78,6 +84,7 @@ export default function UiTableGridsTable() {
     utg_columns_definition_location: '',
     utg_description: '',
     sheaf_ui_columns_base_foundation: '',
+    monolith_of_ui_columns: '',
     rel_xpage_id: null as number | null,
     rel_xpage: '',
     main_db_table: '',
@@ -353,6 +360,7 @@ export default function UiTableGridsTable() {
       utg_columns_definition_location: record.utg_columns_definition_location || '',
       utg_description: record.utg_description || '',
       sheaf_ui_columns_base_foundation: record.sheaf_ui_columns_base_foundation ? JSON.stringify(record.sheaf_ui_columns_base_foundation) : '',
+      monolith_of_ui_columns: record.monolith_of_ui_columns || '',
       rel_xpage_id: record.rel_xpage_id,
       rel_xpage: record.rel_xpage || '',
       main_db_table: record.main_db_table || '',
@@ -380,6 +388,7 @@ export default function UiTableGridsTable() {
       utg_columns_definition_location: '',
       utg_description: '',
       sheaf_ui_columns_base_foundation: '',
+      monolith_of_ui_columns: '',
       rel_xpage_id: null,
       rel_xpage: '',
       main_db_table: '',
@@ -519,7 +528,7 @@ export default function UiTableGridsTable() {
 
   // Define column order
   const columnOrder = [
-    'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'sheaf_ui_columns_base_foundation', 'rel_xpage_id', 'rel_xpage',
+    'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'sheaf_ui_columns_base_foundation', 'monolith_of_ui_columns', 'rel_xpage_id', 'rel_xpage',
     'main_db_table', 'sql_view', 'associated_files', 'utg_class', 'created_at', 'updated_at',
     'is_active', 'sort_order', 'horomi_active', 'vertomi_active', 'header_rows_definition_fantasy',
     'filters_notes', 'pagination_notes', 'searchbox_notes', 'utg_columns_definition_file_link'
@@ -705,6 +714,27 @@ export default function UiTableGridsTable() {
                             Popup Editor
                           </button>
                         </div>
+                      ) : key === 'monolith_of_ui_columns' ? (
+                        // Special handling for monolith_of_ui_columns - Text popup editor
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${value ? 'bg-blue-500' : 'bg-gray-300'}`} 
+                                 title={value ? 'Has data' : 'Empty'}></div>
+                            <span className="text-xs text-gray-600">
+                              {value ? 'Text Data' : 'Empty'}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setTextEditorData({ recordId: row.utg_id, value: value || '', fieldName: 'monolith_of_ui_columns' });
+                              setTextEditValue(value || '');
+                              setIsTextEditorOpen(true);
+                            }}
+                            className="px-2 py-1 bg-orange-600 hover:bg-orange-700 text-white text-xs rounded"
+                          >
+                            Popup Editor
+                          </button>
+                        </div>
                       ) : key === 'rel_xpage_id' ? (
                         // Special dropdown for xpage relationship
                         <select
@@ -856,6 +886,16 @@ export default function UiTableGridsTable() {
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm"
                   rows={6}
                   placeholder='{"base_column_order": ["table.column1", "table.column2"], "wolf_exclusion_band": [], "column_groups": {}}'
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">monolith_of_ui_columns</label>
+                <textarea
+                  value={formData.monolith_of_ui_columns}
+                  onChange={(e) => setFormData({...formData, monolith_of_ui_columns: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm"
+                  rows={6}
+                  placeholder="addresspren.addresspren_id&#10;addresspren.fk_addressglub_id&#10;addresspren.address_label&#10;..."
                 />
               </div>
               <div>
@@ -1077,6 +1117,16 @@ export default function UiTableGridsTable() {
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm"
                   rows={6}
                   placeholder='{"base_column_order": ["table.column1", "table.column2"], "wolf_exclusion_band": [], "column_groups": {}}'
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">monolith_of_ui_columns</label>
+                <textarea
+                  value={formData.monolith_of_ui_columns}
+                  onChange={(e) => setFormData({...formData, monolith_of_ui_columns: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm"
+                  rows={6}
+                  placeholder="addresspren.addresspren_id&#10;addresspren.fk_addressglub_id&#10;addresspren.address_label&#10;..."
                 />
               </div>
               <div>
@@ -1432,6 +1482,112 @@ export default function UiTableGridsTable() {
                 className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
               >
                 Save JSON
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Text Editor Modal */}
+      {isTextEditorOpen && textEditorData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-[95vw] h-[95vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">
+                Text Editor: {textEditorData.fieldName} (Record: {textEditorData.recordId})
+              </h3>
+              <button
+                onClick={() => {
+                  setIsTextEditorOpen(false);
+                  setTextEditorData(null);
+                  setTextEditValue('');
+                }}
+                className="text-gray-400 hover:text-gray-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 flex flex-col p-4">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-sm text-gray-600">
+                  {textEditValue.split('\n').length} lines, {textEditValue.length} characters
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(textEditValue);
+                      alert('Text copied to clipboard!');
+                    }}
+                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded"
+                  >
+                    Copy Text
+                  </button>
+                  <button
+                    onClick={() => {
+                      setTextEditValue('');
+                    }}
+                    className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </div>
+              <textarea
+                value={textEditValue}
+                onChange={(e) => setTextEditValue(e.target.value)}
+                className="flex-1 w-full p-3 border border-gray-300 rounded-md font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
+                placeholder="Enter text data here..."
+              />
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 p-4 border-t">
+              <button
+                onClick={() => {
+                  setIsTextEditorOpen(false);
+                  setTextEditorData(null);
+                  setTextEditValue('');
+                }}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    if (textEditorData) {
+                      const { error } = await supabase
+                        .from('utgs')
+                        .update({ [textEditorData.fieldName]: textEditValue || null })
+                        .eq('utg_id', textEditorData.recordId);
+
+                      if (error) throw error;
+
+                      // Update local data
+                      setData(prevData =>
+                        prevData.map(item =>
+                          item.utg_id === textEditorData.recordId
+                            ? { ...item, [textEditorData.fieldName]: textEditValue || null }
+                            : item
+                        )
+                      );
+
+                      setIsTextEditorOpen(false);
+                      setTextEditorData(null);
+                      setTextEditValue('');
+                      alert('Text saved successfully!');
+                    }
+                  } catch (e) {
+                    console.error('Error saving text:', e);
+                    alert('Failed to save text data.');
+                  }
+                }}
+                className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700"
+              >
+                Save Text
               </button>
             </div>
           </div>
