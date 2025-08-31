@@ -79,12 +79,32 @@ the other instances of these columns that appear later (farther to the right) in
 ==========================================================
 
 
-please alter the main ui table grid on the page at /driggsman so that the <table> element is not taking up 100% the width of its parent
+please alter the main ui table grid on the page at 
+/addressjar
+
+so that the <table> element is not taking up 100% the width of its parent
 
 the table should only take up the width of its contents (columns)
 
 also please make sure each ui column is only taking up enough space to hold its contents (it may already be configured like this - I'm not sure)
 
+==========================================================
+============== SEPARATOR =================================
+==========================================================
+SPECIAL NARROW UI COLUMNS SUCH AS "ID" COLUMNS, ETC.
+
+for our ui table grid on:
+/addressjar
+
+I want to create a special rule that says:
+determine width of ui columns by using the necessary width show the contents of <td> elements
+
+any contents in <th> cells, however, should have portions of their text become invisible to the user if they are taking up horizontal space beyond this width (which is determined by contens of <td> cells)
+  
+i want there to be a rule that any such <th> content should line-break 1 time (with no hyphen - even in middle of text) and then not linebreak a second time but simply become invisible (as if the text "runs off the cell to the right" underneath the next ui column to the right (but cant be seen))
+
+
+please place the code for this rule in the shenfur css file in its own new section with css comments surrounding it
 
 ==========================================================
 ============== SEPARATOR =================================

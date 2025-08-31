@@ -23,5 +23,25 @@ for_db_field_addressglub_addressglub_id
 etc 
 */
 
+/* ============================================================================================== */
+/* TABLE COLUMN WIDTH AND HEADER TEXT OVERFLOW RULES                                             */
+/* This section handles header text overflow behavior only                                       */
+/* ============================================================================================== */
+
+/* TH content should break once then overflow invisibly - but maintain normal table layout */
+table.utg_addressjar th span {
+  display: inline-block;
+  line-height: 1.2;
+  max-height: 2.4em; /* Allow for 2 lines maximum */
+  overflow: hidden;
+  word-break: break-word;
+  hyphens: none;
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
+}
+
+/* END TABLE COLUMN WIDTH AND HEADER TEXT OVERFLOW RULES */
+/* ============================================================================================== */
+
 
 

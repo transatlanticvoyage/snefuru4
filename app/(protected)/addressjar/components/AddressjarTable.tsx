@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
+import { useOrgEntities } from '../hooks/useOrgEntities';
 import dynamic from 'next/dynamic';
 
 const NubraTablefaceKite = dynamic(
@@ -16,13 +17,6 @@ interface AddressData {
   user_id: string;
   address_label: string | null;
   fk_addressglub_id: number | null;
-  street_1_override: string | null;
-  street_2_override: string | null;
-  city_override: string | null;
-  state_code_override: string | null;
-  state_full_override: string | null;
-  zip_code_override: string | null;
-  country_override: string | null;
   internal_notes: string | null;
   address_purpose: string | null;
   is_primary: boolean | null;
@@ -33,6 +27,17 @@ interface AddressData {
   sharing_permissions: any;
   addresspren_created_at: string;
   addresspren_updated_at: string | null;
+  
+  // org entity fields
+  org_is_starred: boolean;
+  org_is_flagged: boolean;
+  org_is_circled: boolean;
+  org_is_squared: boolean;
+  org_is_triangled: boolean;
+  
+  // related sites fields
+  related_sites_internal: string | null;
+  related_sites_external: string | null;
   
   // addressglub fields (joined)
   addressglub_id: number | null;
@@ -100,17 +105,30 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
   
+  // Org entities hook
+  const { orgEntities, toggleEntity, hasEntity, loading: orgEntitiesLoading } = useOrgEntities();
+  
+  // Toggle org entity for all items in current pagination
+  const toggleEntityForAll = async (entityType: 'is_starred' | 'is_flagged' | 'is_circled' | 'is_squared' | 'is_triangled') => {
+    // Determine if we should turn all on or all off based on current state
+    // If any item doesn't have the entity, turn all on. If all have it, turn all off.
+    const currentStates = paginatedData.map(item => hasEntity(item.addresspren_id, entityType));
+    const allHaveEntity = currentStates.every(state => state);
+    const targetState = !allHaveEntity; // If all have it, turn off. Otherwise, turn on.
+    
+    // Toggle entity for each item in current pagination
+    for (const item of paginatedData) {
+      const currentState = hasEntity(item.addresspren_id, entityType);
+      if (currentState !== targetState) {
+        await toggleEntity(item.addresspren_id, entityType);
+      }
+    }
+  };
+  
   // Form data for creating
   const [formData, setFormData] = useState({
     address_label: '',
     fk_addressglub_id: null,
-    street_1_override: '',
-    street_2_override: '',
-    city_override: '',
-    state_code_override: '',
-    state_full_override: '',
-    zip_code_override: '',
-    country_override: '',
     internal_notes: '',
     address_purpose: '',
     is_primary: false,
@@ -120,19 +138,23 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
 
   const supabase = createClientComponentClient();
 
-  // Define columns - addresspren on left, addressglub on right
+  // Define columns - addresspren on left, org entities, then addressglub on right
   const columns = [
     // addresspren columns
     { key: 'addresspren_id' as keyof AddressData, label: 'addresspren_id', type: 'number', readOnly: true, width: '120px', group: 'addresspren' },
+    { key: 'fk_addressglub_id' as keyof AddressData, label: 'fk_addressglub_id', type: 'number', width: '140px', group: 'addresspren' },
     { key: 'address_label' as keyof AddressData, label: 'address_label', type: 'text', width: '150px', group: 'addresspren' },
-    { key: 'fk_addressglub_id' as keyof AddressData, label: 'fk_addressglub_id', type: 'number', width: '140px', group: 'addresspren', separator: 'right' },
-    { key: 'street_1_override' as keyof AddressData, label: 'street_1_override', type: 'text', width: '180px', group: 'addresspren' },
-    { key: 'street_2_override' as keyof AddressData, label: 'street_2_override', type: 'text', width: '180px', group: 'addresspren' },
-    { key: 'city_override' as keyof AddressData, label: 'city_override', type: 'text', width: '150px', group: 'addresspren' },
-    { key: 'state_code_override' as keyof AddressData, label: 'state_code_override', type: 'text', width: '150px', group: 'addresspren' },
-    { key: 'state_full_override' as keyof AddressData, label: 'state_full_override', type: 'text', width: '150px', group: 'addresspren' },
-    { key: 'zip_code_override' as keyof AddressData, label: 'zip_code_override', type: 'text', width: '150px', group: 'addresspren' },
-    { key: 'country_override' as keyof AddressData, label: 'country_override', type: 'text', width: '150px', group: 'addresspren' },
+    
+    // org entity columns
+    { key: 'separator_org' as any, label: '', type: 'separator', width: '3px', separator: 'vertical' },
+    { key: 'org_is_starred' as any, label: 'star', type: 'org_entity', width: '25px', group: 'org_entities' },
+    { key: 'org_is_flagged' as any, label: 'flag', type: 'org_entity', width: '25px', group: 'org_entities' },
+    { key: 'org_is_circled' as any, label: 'circle', type: 'org_entity', width: '25px', group: 'org_entities' },
+    { key: 'org_is_squared' as any, label: 'square', type: 'org_entity', width: '25px', group: 'org_entities' },
+    { key: 'org_is_triangled' as any, label: 'triangle', type: 'org_entity', width: '25px', group: 'org_entities' },
+    { key: 'related_sites_internal' as any, label: 'related sites (internal)', type: 'text', width: '120px', group: 'addresspren' },
+    { key: 'related_sites_external' as any, label: 'related sites (external)', type: 'text', width: '120px', group: 'addresspren' },
+    { key: 'full_address_input' as keyof AddressData, label: 'full_address_input', type: 'text', width: 'auto', minWidth: '350px', group: 'addressglub', separator: 'right' },
     { key: 'internal_notes' as keyof AddressData, label: 'internal_notes', type: 'text', width: '200px', group: 'addresspren' },
     { key: 'address_purpose' as keyof AddressData, label: 'address_purpose', type: 'text', width: '150px', group: 'addresspren' },
     { key: 'is_primary' as keyof AddressData, label: 'is_primary', type: 'boolean', width: '100px', group: 'addresspren' },
@@ -144,7 +166,6 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     
     // addressglub columns
     { key: 'addressglub_id' as keyof AddressData, label: 'addressglub_id', type: 'number', readOnly: true, width: '120px', group: 'addressglub' },
-    { key: 'full_address_input' as keyof AddressData, label: 'full_address_input', type: 'text', width: '300px', group: 'addressglub' },
     { key: 'street_1' as keyof AddressData, label: 'street_1', type: 'text', width: '200px', group: 'addressglub' },
     { key: 'street_2' as keyof AddressData, label: 'street_2', type: 'text', width: '200px', group: 'addressglub' },
     { key: 'city' as keyof AddressData, label: 'city', type: 'text', width: '150px', group: 'addressglub' },
@@ -181,8 +202,19 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
   // WolfExclusionBand - Sticky columns that are excluded from pagination
   const wolfExclusionBandColumns = [
     { key: 'addresspren_id' as keyof AddressData, label: 'addresspren_id', type: 'number', readOnly: true, width: '120px', group: 'addresspren' },
+    { key: 'fk_addressglub_id' as keyof AddressData, label: 'fk_addressglub_id', type: 'number', width: '140px', group: 'addresspren' },
     { key: 'address_label' as keyof AddressData, label: 'address_label', type: 'text', width: '150px', group: 'addresspren' },
-    { key: 'fk_addressglub_id' as keyof AddressData, label: 'fk_addressglub_id', type: 'number', width: '140px', group: 'addresspren', separator: 'right' }
+    
+    // org entity columns (sticky)
+    { key: 'separator_org' as any, label: '', type: 'separator', width: '3px', separator: 'vertical' },
+    { key: 'org_is_starred' as any, label: 'star', type: 'org_entity', width: '25px', group: 'org_entities' },
+    { key: 'org_is_flagged' as any, label: 'flag', type: 'org_entity', width: '25px', group: 'org_entities' },
+    { key: 'org_is_circled' as any, label: 'circle', type: 'org_entity', width: '25px', group: 'org_entities' },
+    { key: 'org_is_squared' as any, label: 'square', type: 'org_entity', width: '25px', group: 'org_entities' },
+    { key: 'org_is_triangled' as any, label: 'triangle', type: 'org_entity', width: '25px', group: 'org_entities' },
+    { key: 'related_sites_internal' as any, label: 'related sites (internal)', type: 'text', width: '120px', group: 'addresspren' },
+    { key: 'related_sites_external' as any, label: 'related sites (external)', type: 'text', width: '120px', group: 'addresspren' },
+    { key: 'full_address_input' as keyof AddressData, label: 'full_address_input', type: 'text', width: 'auto', minWidth: '450px', group: 'addressglub', separator: 'right' }
   ];
 
   // Paginated columns - exclude WolfExclusionBand columns
@@ -417,13 +449,6 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
         user_id: addr.user_id,
         address_label: addr.address_label,
         fk_addressglub_id: addr.fk_addressglub_id,
-        street_1_override: addr.street_1_override,
-        street_2_override: addr.street_2_override,
-        city_override: addr.city_override,
-        state_code_override: addr.state_code_override,
-        state_full_override: addr.state_full_override,
-        zip_code_override: addr.zip_code_override,
-        country_override: addr.country_override,
         internal_notes: addr.internal_notes,
         address_purpose: addr.address_purpose,
         is_primary: addr.is_primary,
@@ -434,6 +459,17 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
         sharing_permissions: addr.sharing_permissions,
         addresspren_created_at: addr.created_at,
         addresspren_updated_at: addr.updated_at,
+        
+        // org entity fields (populated by useOrgEntities hook)
+        org_is_starred: false,
+        org_is_flagged: false,
+        org_is_circled: false,
+        org_is_squared: false,
+        org_is_triangled: false,
+        
+        // related sites fields
+        related_sites_internal: null,
+        related_sites_external: null,
         
         // addressglub fields
         addressglub_id: addr.addressglub?.addressglub_id || null,
@@ -556,25 +592,81 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
       if (!currentItem) throw new Error('Item not found');
 
       if (column?.group === 'addressglub') {
-        if (!currentItem.addressglub_id) {
-          throw new Error('No addressglub record linked to this addresspren record. Cannot edit addressglub fields.');
-        }
+        let addressglubId = currentItem.addressglub_id;
         
-        // Update addressglub table
-        console.log('Updating addressglub table:', {
-          field: editingCell.field,
-          value: processedValue,
-          addressglub_id: currentItem.addressglub_id
-        });
-        
-        const { error } = await supabase
-          .from('addressglub')
-          .update({ [editingCell.field]: processedValue })
-          .eq('addressglub_id', currentItem.addressglub_id);
+        // If no addressglub record exists, create one
+        if (!addressglubId) {
+          console.log('Creating new addressglub record for addresspren:', editingCell.id);
+          
+          const { data: newAddressglub, error: createError } = await supabase
+            .from('addressglub')
+            .insert([{
+              street_1: 'New Address',
+              city: 'New City',
+              country_code: 'USA',
+              country: 'United States',
+              [editingCell.field]: processedValue
+            }])
+            .select()
+            .single();
+            
+          if (createError) {
+            console.error('Error creating addressglub:', createError);
+            throw createError;
+          }
+          
+          addressglubId = newAddressglub.addressglub_id;
+          
+          // Link the new addressglub to the current addresspren
+          const { error: linkError } = await supabase
+            .from('addresspren')
+            .update({ fk_addressglub_id: addressglubId })
+            .eq('addresspren_id', editingCell.id);
+            
+          if (linkError) {
+            console.error('Error linking addressglub:', linkError);
+            throw linkError;
+          }
+          
+          // Update local data with the new link
+          setData(data.map(item => 
+            item.addresspren_id === editingCell.id 
+              ? { 
+                  ...item, 
+                  fk_addressglub_id: addressglubId,
+                  addressglub_id: addressglubId,
+                  street_1: 'New Address',
+                  city: 'New City',
+                  country_code: 'USA',
+                  country: 'United States',
+                  [editingCell.field]: processedValue 
+                }
+              : item
+          ));
+        } else {
+          // Update existing addressglub table
+          console.log('Updating addressglub table:', {
+            field: editingCell.field,
+            value: processedValue,
+            addressglub_id: addressglubId
+          });
+          
+          const { error } = await supabase
+            .from('addressglub')
+            .update({ [editingCell.field]: processedValue })
+            .eq('addressglub_id', addressglubId);
 
-        if (error) {
-          console.error('Addressglub update error:', error);
-          throw error;
+          if (error) {
+            console.error('Addressglub update error:', error);
+            throw error;
+          }
+          
+          // Update local data
+          setData(data.map(item => 
+            item.addresspren_id === editingCell.id 
+              ? { ...item, [editingCell.field]: processedValue }
+              : item
+          ));
         }
       } else {
         // Update addresspren table
@@ -584,14 +676,14 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
           .eq('addresspren_id', editingCell.id);
 
         if (error) throw error;
+        
+        // Update local data for addresspren
+        setData(data.map(item => 
+          item.addresspren_id === editingCell.id 
+            ? { ...item, [editingCell.field]: processedValue }
+            : item
+        ));
       }
-
-      // Update local data
-      setData(data.map(item => 
-        item.addresspren_id === editingCell.id 
-          ? { ...item, [editingCell.field]: processedValue }
-          : item
-      ));
 
       setEditingCell(null);
       setEditingValue('');
@@ -694,13 +786,6 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
         user_id: user.id,
         address_label: 'New Address',
         fk_addressglub_id: addressglubData.addressglub_id,
-        street_1_override: '',
-        street_2_override: '',
-        city_override: '',
-        state_code_override: '',
-        state_full_override: '',
-        zip_code_override: '',
-        country_override: '',
         internal_notes: '',
         address_purpose: '',
         is_primary: false,
@@ -799,13 +884,13 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
         .from('addressglub')
         .insert([{
           full_address_input: null,
-          street_1: formData.street_1_override?.trim() || 'New Address',
-          street_2: formData.street_2_override?.trim() || null,
-          city: formData.city_override?.trim() || 'New City',
-          state_code: formData.state_code_override?.trim() || null,
-          state_full: formData.state_full_override?.trim() || null,
-          zip_code: formData.zip_code_override?.trim() || null,
-          country_code: formData.country_override?.trim() || 'USA',
+          street_1: 'New Address',
+          street_2: null,
+          city: 'New City',
+          state_code: null,
+          state_full: null,
+          zip_code: null,
+          country_code: 'USA',
           country: 'United States',
           street_1_clean: null,
           full_address_formatted: null,
@@ -839,13 +924,6 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
         user_id: user.id,
         address_label: formData.address_label?.trim() || null,
         fk_addressglub_id: addressglubData.addressglub_id,
-        street_1_override: formData.street_1_override?.trim() || null,
-        street_2_override: formData.street_2_override?.trim() || null,
-        city_override: formData.city_override?.trim() || null,
-        state_code_override: formData.state_code_override?.trim() || null,
-        state_full_override: formData.state_full_override?.trim() || null,
-        zip_code_override: formData.zip_code_override?.trim() || null,
-        country_override: formData.country_override?.trim() || null,
         internal_notes: formData.internal_notes?.trim() || null,
         address_purpose: formData.address_purpose?.trim() || null,
         is_primary: formData.is_primary,
@@ -878,13 +956,6 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     setFormData({
       address_label: '',
       fk_addressglub_id: null,
-      street_1_override: '',
-      street_2_override: '',
-      city_override: '',
-      state_code_override: '',
-      state_full_override: '',
-      zip_code_override: '',
-      country_override: '',
       internal_notes: '',
       address_purpose: '',
       is_primary: false,
@@ -898,6 +969,98 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
     const value = item[column.key];
     const isEditing = editingCell?.id === item.addresspren_id && editingCell?.field === column.key;
     const isReadOnly = column.readOnly;
+
+    // Handle separator columns
+    if (column.type === 'separator') {
+      return <div className="w-full h-full bg-gray-300"></div>;
+    }
+
+    // Handle org entity columns
+    if (column.type === 'org_entity') {
+      const entityType = column.key.replace('org_', '') as 'is_starred' | 'is_flagged' | 'is_circled' | 'is_squared' | 'is_triangled';
+      const isActive = hasEntity(item.addresspren_id, entityType);
+      
+      const getEntityShape = (entity: string, active: boolean) => {
+        const fillColor = active ? '#991B1B' : 'transparent'; // dark red when active, transparent when inactive
+        const strokeColor = '#9CA3AF'; // gray border always
+        
+        const shapes = {
+          'is_starred': (
+            <svg width="16" height="16" viewBox="0 0 24 24">
+              <path 
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                fill={fillColor}
+                stroke={strokeColor}
+                strokeWidth="1"
+              />
+            </svg>
+          ),
+          'is_flagged': (
+            <svg width="16" height="16" viewBox="0 0 24 24">
+              <path 
+                d="M4 4v16M4 4h12l-2 4 2 4H4"
+                fill={fillColor}
+                stroke={strokeColor}
+                strokeWidth="1"
+              />
+            </svg>
+          ),
+          'is_circled': (
+            <svg width="16" height="16" viewBox="0 0 24 24">
+              <circle 
+                cx="12" 
+                cy="12" 
+                r="10"
+                fill={fillColor}
+                stroke={strokeColor}
+                strokeWidth="1"
+              />
+            </svg>
+          ),
+          'is_squared': (
+            <svg width="16" height="16" viewBox="0 0 24 24">
+              <rect 
+                x="3" 
+                y="3" 
+                width="18" 
+                height="18"
+                fill={fillColor}
+                stroke={strokeColor}
+                strokeWidth="1"
+              />
+            </svg>
+          ),
+          'is_triangled': (
+            <svg width="16" height="16" viewBox="0 0 24 24">
+              <path 
+                d="M12 2 L22 20 L2 20 Z"
+                fill={fillColor}
+                stroke={strokeColor}
+                strokeWidth="1"
+              />
+            </svg>
+          )
+        };
+        
+        return shapes[entity as keyof typeof shapes] || shapes['is_circled'];
+      };
+      
+      return (
+        <button
+          onClick={() => toggleEntity(item.addresspren_id, entityType)}
+          className="w-full h-full flex items-center justify-center hover:opacity-75 transition-opacity"
+          style={{ 
+            minHeight: '30px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            padding: '4px'
+          }}
+          title={`Toggle ${entityType.replace('is_', '')}`}
+        >
+          {getEntityShape(entityType, isActive)}
+        </button>
+      );
+    }
 
     if (column.type === 'boolean' && !isReadOnly) {
       return (
@@ -950,6 +1113,77 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
           <button onClick={handleCellCancel} className="text-red-600 hover:text-red-800">
             ✗
           </button>
+        </div>
+      );
+    }
+
+    // Special handling for full_address_input column with B1-B4 buttons
+    if (column.key === 'full_address_input') {
+      return (
+        <div className="flex items-center justify-between w-full" style={{ minWidth: '350px' }}>
+          <div
+            onClick={() => !isReadOnly && handleCellClick(item.addresspren_id, column.key, value)}
+            className={`flex-1 px-2 py-1 ${!isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} whitespace-nowrap overflow-visible`}
+            title={value?.toString() || ''}
+          >
+            {column.type === 'datetime' && value ? 
+              new Date(value).toLocaleString() : 
+              value?.toString() || ''
+            }
+          </div>
+          <div className="flex items-center space-x-1 ml-2">
+            <a
+              href={`https://www.google.com/search?q=${encodeURIComponent(value?.toString() || '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.stopPropagation();
+                // Link will open in new tab
+              }}
+              className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium text-gray-700 bg-gray-100 border border-gray-300 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
+              title="Google Search for this address"
+            >
+              B1
+            </a>
+            <a
+              href={`https://www.google.com/maps/search/${encodeURIComponent(value?.toString() || '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.stopPropagation();
+                // Link will open in new tab
+              }}
+              className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium text-gray-700 bg-gray-100 border border-gray-300 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
+              title="Google Maps Search for this address"
+            >
+              B2
+            </a>
+            <a
+              href={`https://www.google.com/maps/place/${encodeURIComponent(value?.toString() || '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.stopPropagation();
+                // Link will open in new tab
+              }}
+              className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium text-gray-700 bg-gray-100 border border-gray-300 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
+              title="Google Maps Place for this address"
+            >
+              B3
+            </a>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Future functionality for B4
+              }}
+              className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium text-gray-700 bg-gray-100 border border-gray-300 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
+              title="B4 Action"
+            >
+              B4
+            </a>
+          </div>
         </div>
       );
     }
@@ -1128,7 +1362,7 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
       {/* Table */}
       <div className="bg-white overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-200 utg_addressjar" style={{ tableLayout: 'fixed' }}>
+          <table className="border-collapse border border-gray-200 utg_addressjar" style={{ tableLayout: 'auto', width: 'max-content' }}>
             <thead className="bg-gray-50">
               {/* Table source row */}
               <tr className="shenfur_db_table_name_tr">
@@ -1142,16 +1376,22 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                       column.separator === 'right' ? 'border-r-4 border-r-black' : ''
                     }`}
                     style={{
-                      ...(column.width ? { 
-                        width: column.width, 
-                        maxWidth: column.width, 
-                        minWidth: column.width 
-                      } : {}),
+                      ...(column.width && column.width !== 'auto' ? { 
+                        minWidth: column.width,
+                        width: 'max-content'
+                      } : column.minWidth ? {
+                        minWidth: column.minWidth,
+                        width: 'max-content'
+                      } : {
+                        width: 'max-content'
+                      }),
                       ...(column.separator === 'right' ? { borderRightWidth: '3px', borderRightColor: '#000' } : {})
                     }}
                   >
                     <span className="font-bold text-xs lowercase">
-                      {column.group === 'addresspren' ? 'addresspren' : 'addressglub'}
+                      {column.type === 'separator' ? '' : 
+                       column.group === 'org_entities' ? 'org' :
+                       column.group === 'addresspren' ? 'addresspren' : 'addressglub'}
                     </span>
                   </th>
                 ))}
@@ -1180,25 +1420,117 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                 {visibleColumns.map((column) => (
                   <th
                     key={column.key}
-                    className={`text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1 for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
+                    className={`text-left ${column.type === 'separator' || column.type === 'org_entity' ? 'cursor-default' : 'cursor-pointer hover:bg-gray-100'} border border-gray-200 px-2 py-1 for_db_field_${column.group}_${column.key} for_db_table_${column.group} ${
                       column.separator === 'right' ? 'border-r-4 border-r-black' : ''
                     }`}
                     style={{
-                      ...(column.width ? { 
-                        width: column.width, 
-                        maxWidth: column.width, 
-                        minWidth: column.width 
-                      } : {}),
+                      ...(column.width && column.width !== 'auto' ? { 
+                        minWidth: column.width,
+                        width: 'max-content'
+                      } : column.minWidth ? {
+                        minWidth: column.minWidth,
+                        width: 'max-content'
+                      } : {
+                        width: 'max-content'
+                      }),
                       ...(column.separator === 'right' ? { borderRightWidth: '3px', borderRightColor: '#000' } : {})
                     }}
-                    onClick={() => handleSort(column.key)}
+                    onClick={(e) => {
+                      // Only handle sort if not clicking on org entity button
+                      if (column.type !== 'separator' && column.type !== 'org_entity' && e.target === e.currentTarget) {
+                        handleSort(column.key);
+                      }
+                    }}
                   >
-                    <div className="flex items-center space-x-1">
-                      <span className="font-bold text-xs lowercase">{column.label}</span>
-                      {sortField === column.key && (
-                        <span className="text-xs">
-                          {sortOrder === 'asc' ? '↑' : '↓'}
-                        </span>
+                    <div className="flex items-center justify-center space-x-1">
+                      {column.type === 'org_entity' ? (
+                        <button
+                          className="flex items-center justify-center w-full h-full hover:bg-gray-200 transition-colors cursor-pointer"
+                          onClick={() => {
+                            const entityType = column.key.replace('org_', '') as 'is_starred' | 'is_flagged' | 'is_circled' | 'is_squared' | 'is_triangled';
+                            toggleEntityForAll(entityType);
+                          }}
+                          title={`Toggle ${column.label} for all items on this page`}
+                        >
+                          {(() => {
+                            // Determine the aggregate state for visual feedback
+                            const entityType = column.key.replace('org_', '') as 'is_starred' | 'is_flagged' | 'is_circled' | 'is_squared' | 'is_triangled';
+                            const currentStates = paginatedData.map(item => hasEntity(item.addresspren_id, entityType));
+                            const allHaveEntity = currentStates.every(state => state);
+                            const someHaveEntity = currentStates.some(state => state);
+                            
+                            // Determine fill based on state: all=dark red, some=light red, none=transparent
+                            const fillColor = allHaveEntity ? '#991B1B' : someHaveEntity ? '#FCA5A5' : 'transparent';
+                            
+                            const shapes = {
+                              'star': (
+                                <svg width="12" height="12" viewBox="0 0 24 24">
+                                  <path 
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    fill={fillColor}
+                                    stroke="#9CA3AF"
+                                    strokeWidth="1"
+                                  />
+                                </svg>
+                              ),
+                              'flag': (
+                                <svg width="12" height="12" viewBox="0 0 24 24">
+                                  <path 
+                                    d="M4 4v16M4 4h12l-2 4 2 4H4"
+                                    fill={fillColor}
+                                    stroke="#9CA3AF"
+                                    strokeWidth="1"
+                                  />
+                                </svg>
+                              ),
+                              'circle': (
+                                <svg width="12" height="12" viewBox="0 0 24 24">
+                                  <circle 
+                                    cx="12" 
+                                    cy="12" 
+                                    r="10"
+                                    fill={fillColor}
+                                    stroke="#9CA3AF"
+                                    strokeWidth="1"
+                                  />
+                                </svg>
+                              ),
+                              'square': (
+                                <svg width="12" height="12" viewBox="0 0 24 24">
+                                  <rect 
+                                    x="3" 
+                                    y="3" 
+                                    width="18" 
+                                    height="18"
+                                    fill={fillColor}
+                                    stroke="#9CA3AF"
+                                    strokeWidth="1"
+                                  />
+                                </svg>
+                              ),
+                              'triangle': (
+                                <svg width="12" height="12" viewBox="0 0 24 24">
+                                  <path 
+                                    d="M12 2 L22 20 L2 20 Z"
+                                    fill={fillColor}
+                                    stroke="#9CA3AF"
+                                    strokeWidth="1"
+                                  />
+                                </svg>
+                              )
+                            };
+                            return shapes[column.label as keyof typeof shapes] || shapes['circle'];
+                          })()} 
+                        </button>
+                      ) : (
+                        <>
+                          <span className="font-bold text-xs lowercase">{column.label}</span>
+                          {sortField === column.key && (
+                            <span className="text-xs">
+                              {sortOrder === 'asc' ? '↑' : '↓'}
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
                   </th>
@@ -1236,11 +1568,15 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                         column.separator === 'right' ? 'border-r-4 border-r-black' : ''
                       }`}
                       style={{
-                        ...(column.width ? { 
-                          width: column.width, 
-                          maxWidth: column.width, 
-                          minWidth: column.width 
-                        } : {}),
+                        ...(column.width && column.width !== 'auto' ? { 
+                          minWidth: column.width,
+                          width: 'max-content'
+                        } : column.minWidth ? {
+                          minWidth: column.minWidth,
+                          width: 'max-content'
+                        } : {
+                          width: 'max-content'
+                        }),
                         ...(column.separator === 'right' ? { borderRightWidth: '3px', borderRightColor: '#000' } : {})
                       }}
                     >
@@ -1293,46 +1629,6 @@ export default function AddressjarTable({ onColumnPaginationRender }: Addressjar
                   onChange={(e) => setFormData({ ...formData, fk_addressglub_id: e.target.value ? Number(e.target.value) : null })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="Optional global address reference"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Street 1 Override</label>
-                <input
-                  type="text"
-                  value={formData.street_1_override}
-                  onChange={(e) => setFormData({ ...formData, street_1_override: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Street 2 Override</label>
-                <input
-                  type="text"
-                  value={formData.street_2_override}
-                  onChange={(e) => setFormData({ ...formData, street_2_override: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City Override</label>
-                <input
-                  type="text"
-                  value={formData.city_override}
-                  onChange={(e) => setFormData({ ...formData, city_override: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State Code Override</label>
-                <input
-                  type="text"
-                  value={formData.state_code_override}
-                  onChange={(e) => setFormData({ ...formData, state_code_override: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
               
