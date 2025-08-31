@@ -25,6 +25,7 @@ interface Coltemp {
   icon_color: string | null;
   cached_rackui_count: number | null;
   cached_rackui_json: any | null;
+  nubra_lake_of_ui_columns: string | null;
 }
 
 export default function ColtempjarClient() {
@@ -61,11 +62,12 @@ export default function ColtempjarClient() {
           button_text: null,
           tooltip_text: null,
           default_header_row_color: null,
-          fk_user_id: user?.id, // Set to current user
+          fk_user_id: actualUserId, // Use actual user record ID, not auth ID
           coltemp_color: null,
           coltemp_icon: null, // deprecated
           icon_name: null,
-          icon_color: '#666666'
+          icon_color: '#666666',
+          nubra_lake_of_ui_columns: null
         })
         .select()
         .single();
@@ -118,6 +120,18 @@ export default function ColtempjarClient() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
   const [deleteSecondConfirm, setDeleteSecondConfirm] = useState(false);
   
+  // Nubra Lake popup modal state
+  const [nubraLakePopup, setNubraLakePopup] = useState<{
+    isOpen: boolean;
+    record: Coltemp | null;
+    mode: 'view' | 'edit';
+  }>({
+    isOpen: false,
+    record: null,
+    mode: 'view'
+  });
+  const [nubraLakeEditValue, setNubraLakeEditValue] = useState<string>('');
+  
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
@@ -136,7 +150,8 @@ export default function ColtempjarClient() {
     coltemp_color: '',
     coltemp_icon: '', // deprecated
     icon_name: '',
-    icon_color: '#666666'
+    icon_color: '#666666',
+    nubra_lake_of_ui_columns: ''
   });
   
   const [formData, setFormData] = useState<any>(getEmptyFormData());
@@ -481,13 +496,85 @@ export default function ColtempjarClient() {
     setEditingCell(null);
     setEditingValue('');
   };
+  
+  // Nubra Lake popup handlers
+  const openNubraLakePopup = (record: Coltemp, mode: 'view' | 'edit' = 'view') => {
+    setNubraLakePopup({
+      isOpen: true,
+      record,
+      mode
+    });
+    setNubraLakeEditValue(record.nubra_lake_of_ui_columns || '');
+  };
+  
+  const closeNubraLakePopup = () => {
+    setNubraLakePopup({
+      isOpen: false,
+      record: null,
+      mode: 'view'
+    });
+    setNubraLakeEditValue('');
+  };
+  
+  const saveNubraLakeValue = async () => {
+    if (!nubraLakePopup.record) return;
+    
+    try {
+      const { error } = await supabase
+        .from('coltemps')
+        .update({ nubra_lake_of_ui_columns: nubraLakeEditValue || null })
+        .eq('coltemp_id', nubraLakePopup.record.coltemp_id);
+        
+      if (error) throw error;
+      
+      // Update local data
+      setData(prevData =>
+        prevData.map(item =>
+          item.coltemp_id === nubraLakePopup.record!.coltemp_id
+            ? { ...item, nubra_lake_of_ui_columns: nubraLakeEditValue || null }
+            : item
+        )
+      );
+      
+      closeNubraLakePopup();
+    } catch (err) {
+      console.error('Error updating nubra_lake_of_ui_columns:', err);
+      alert('Failed to update field');
+    }
+  };
 
   // Define which fields can be inline edited
   const inlineEditableFields = [
     'rel_utg_id', 'coltemp_name', 'coltemp_category', 'coltemp_display_name',
     'button_text', 'tooltip_text', 'default_header_row_color', 'fk_user_id',
     'coltemp_color', 'coltemp_icon', 'icon_name', 'icon_color'
+    // nubra_lake_of_ui_columns handled via popup
   ];
+  
+  // Get ordered column keys (placing nubra_lake_of_ui_columns near the left)
+  const getOrderedColumns = (record: Coltemp | null) => {
+    if (!record) return [];
+    
+    const allKeys = Object.keys(record).filter(
+      key => key !== 'cached_rackui_count' && key !== 'cached_rackui_json'
+    );
+    
+    // Define desired column order (nubra_lake_of_ui_columns in position 4)
+    const priorityOrder = [
+      'coltemp_id',
+      'rel_utg_id',
+      'coltemp_name',
+      'nubra_lake_of_ui_columns',
+      'coltemp_category',
+      'coltemp_display_name'
+    ];
+    
+    // Get remaining columns not in priority order
+    const remainingKeys = allKeys.filter(key => !priorityOrder.includes(key));
+    
+    // Combine priority columns with remaining columns
+    return [...priorityOrder.filter(key => allKeys.includes(key)), ...remainingKeys];
+  };
 
   // Render form fields
   const renderFormFields = () => {
@@ -615,6 +702,16 @@ export default function ColtempjarClient() {
             onChange={(e) => setFormData({...formData, icon_color: e.target.value})}
             className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
             placeholder="e.g. #FF5733"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">nubra_lake_of_ui_columns</label>
+          <textarea
+            value={formData.nubra_lake_of_ui_columns}
+            onChange={(e) => setFormData({...formData, nubra_lake_of_ui_columns: e.target.value})}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+            placeholder="UI columns configuration"
+            rows={3}
           />
         </div>
       </div>
@@ -806,7 +903,7 @@ export default function ColtempjarClient() {
                   <th className="px-1 py-1 text-left text-xs text-gray-400 italic" style={{ border: '1px solid #d1d5db' }}>
                     -
                   </th>
-                  {Object.keys(data[0] || {}).filter(key => key !== 'cached_rackui_count' && key !== 'cached_rackui_json').map(key => (
+                  {getOrderedColumns(data[0] || null).map(key => (
                     <th
                       key={`table-${key}`}
                       className="px-1 py-1 text-left text-xs text-gray-400 italic"
@@ -826,7 +923,7 @@ export default function ColtempjarClient() {
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
                     Actions
                   </th>
-                  {Object.keys(data[0] || {}).filter(key => key !== 'cached_rackui_count' && key !== 'cached_rackui_json').map(key => (
+                  {getOrderedColumns(data[0] || null).map(key => (
                     <th
                       key={key}
                       className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider cursor-pointer hover:bg-gray-100"
@@ -890,9 +987,35 @@ export default function ColtempjarClient() {
                         )}
                       </div>
                     </td>
-                    {Object.entries(row).filter(([key]) => key !== 'cached_rackui_count' && key !== 'cached_rackui_json').map(([key, value]) => {
+                    {getOrderedColumns(row).map((key) => {
+                      const value = (row as any)[key];
                       const isEditing = editingCell?.id === row.coltemp_id && editingCell?.field === key;
                       const isEditable = inlineEditableFields.includes(key);
+                      
+                      // Special handling for nubra_lake_of_ui_columns
+                      if (key === 'nubra_lake_of_ui_columns') {
+                        return (
+                          <td key={key} className="px-3 py-2 text-sm text-gray-900" style={{ border: '1px solid #d1d5db' }}>
+                            <div className="flex items-center gap-2">
+                              {value ? (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                  Has Data
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                                  Empty
+                                </span>
+                              )}
+                              <button
+                                onClick={() => openNubraLakePopup(row, 'view')}
+                                className="px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                              >
+                                Open Popup
+                              </button>
+                            </div>
+                          </td>
+                        );
+                      }
                       
                       return (
                         <td key={key} className="px-3 py-2 text-sm text-gray-900" style={{ border: '1px solid #d1d5db' }}>
@@ -1049,6 +1172,85 @@ export default function ColtempjarClient() {
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
                   Update
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Nubra Lake Popup Modal */}
+        {nubraLakePopup.isOpen && nubraLakePopup.record && (
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[80vh] flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold">
+                  Nubra Lake UI Columns - {nubraLakePopup.record.coltemp_name || `ID: ${nubraLakePopup.record.coltemp_id}`}
+                </h2>
+                <div className="flex items-center gap-2">
+                  {nubraLakePopup.mode === 'view' ? (
+                    <button
+                      onClick={() => setNubraLakePopup(prev => ({ ...prev, mode: 'edit' }))}
+                      className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                    >
+                      Edit
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setNubraLakePopup(prev => ({ ...prev, mode: 'view' }))}
+                        className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
+                      >
+                        Cancel Edit
+                      </button>
+                      <button
+                        onClick={saveNubraLakeValue}
+                        className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+                      >
+                        Save Changes
+                      </button>
+                    </>
+                  )}
+                  <button
+                    onClick={() => {
+                      if (nubraLakeEditValue) {
+                        navigator.clipboard.writeText(nubraLakeEditValue);
+                        alert('Copied to clipboard!');
+                      }
+                    }}
+                    className="px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex-1 overflow-auto">
+                {nubraLakePopup.mode === 'view' ? (
+                  <div className="bg-gray-50 p-4 rounded border border-gray-200">
+                    <pre className="whitespace-pre-wrap font-mono text-sm">
+                      {nubraLakeEditValue || '(No data)'}
+                    </pre>
+                  </div>
+                ) : (
+                  <textarea
+                    value={nubraLakeEditValue}
+                    onChange={(e) => setNubraLakeEditValue(e.target.value)}
+                    className="w-full h-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none"
+                    placeholder="Enter UI columns configuration here..."
+                    style={{ minHeight: '400px' }}
+                  />
+                )}
+              </div>
+              
+              <div className="mt-4 flex justify-between items-center">
+                <div className="text-sm text-gray-500">
+                  {nubraLakeEditValue ? `${nubraLakeEditValue.length} characters` : 'Empty'}
+                </div>
+                <button
+                  onClick={closeNubraLakePopup}
+                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Close
                 </button>
               </div>
             </div>

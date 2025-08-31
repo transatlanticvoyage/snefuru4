@@ -40,6 +40,7 @@ export default function AddressjarClient() {
   const [coltempsData, setColtempsData] = useState<any[]>([]);
   const [coltempsLoading, setColtempsLoading] = useState(false);
   const [coltempsError, setColtempsError] = useState<string | null>(null);
+  const [actualUserId, setActualUserId] = useState<string | null>(null);
 
   // Function to ensure addressjar UTG exists and fetch sheaf data
   const fetchSheafData = async () => {
@@ -270,7 +271,7 @@ export default function AddressjarClient() {
 
   // Function to fetch coltemps data
   const fetchColtempsData = async () => {
-    if (!user?.id) return;
+    if (!actualUserId) return;
     
     setColtempsLoading(true);
     setColtempsError(null);
@@ -280,7 +281,7 @@ export default function AddressjarClient() {
         .from('coltemps')
         .select('*')
         .eq('rel_utg_id', 'utg_addressjar')
-        .or(`fk_user_id.eq.${user.id},coltemp_category.eq.adminpublic`)
+        .or(`fk_user_id.eq.${actualUserId},coltemp_category.eq.adminpublic`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -299,7 +300,38 @@ export default function AddressjarClient() {
       router.push('/login');
       return;
     }
+    
+    // Fetch the actual user ID from the users table
+    const fetchActualUserId = async () => {
+      try {
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+        
+        if (error) {
+          console.error('Error fetching user record:', error);
+          return;
+        }
+        
+        if (userData) {
+          setActualUserId(userData.id);
+        }
+      } catch (err) {
+        console.error('Error fetching actual user ID:', err);
+      }
+    };
+    
+    fetchActualUserId();
   }, [user, router]);
+  
+  // Auto-fetch coltemps data when actualUserId is set and modal is open
+  useEffect(() => {
+    if (actualUserId && isPillarShiftModalOpen) {
+      fetchColtempsData();
+    }
+  }, [actualUserId, isPillarShiftModalOpen]);
 
   if (!user) {
     return (
