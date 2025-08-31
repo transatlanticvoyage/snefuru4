@@ -10,6 +10,11 @@ const DrenjariButtonBarDriggsmanLinks = dynamic(
   { ssr: false }
 );
 
+const AddressjarTable = dynamic(
+  () => import('./components/AddressjarTable'),
+  { ssr: false }
+);
+
 
 export default function AddressjarClient() {
   const { user } = useAuth();
@@ -47,8 +52,8 @@ export default function AddressjarClient() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
-        <div className="text-gray-500">Table components cleared - ready for rebuild</div>
+      <div className="flex-1 overflow-hidden">
+        <AddressjarTable />
       </div>
     </div>
   );
