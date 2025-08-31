@@ -8,29 +8,16 @@ export interface NavItem {
 
 export const system1Navigation: NavItem[] = [
   {
-    name: 'Home',
-    path: '/home'
+    name: 'Voyager Site Table',
+    path: '/sitejar'
   },
   {
-    name: 'Profile',
-    path: '/profile'
+    name: 'Andromeda Editor',
+    path: '/driggsman'
   },
   {
-    name: 'MyHub',
-    path: '/myhub'
-  },
-  {
-    name: 'Tools',
-    children: [
-      {
-        name: 'Download Plugin',
-        path: '/downloadplugin'
-      },
-      {
-        name: 'API Keys',
-        path: '/ruplin-api-keys-p1'
-      }
-    ]
+    name: 'Other Links',
+    children: []
   }
 ];
 

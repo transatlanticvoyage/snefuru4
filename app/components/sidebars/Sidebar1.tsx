@@ -233,9 +233,10 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
     return navItems;
   };
 
-  if (!shouldShow) {
-    return null;
-  }
+  // Always show sidebar when using layout system provider
+  // if (!shouldShow) {
+  //   return null;
+  // }
 
   return (
     <>

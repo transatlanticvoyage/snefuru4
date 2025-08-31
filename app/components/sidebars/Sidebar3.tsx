@@ -265,9 +265,10 @@ export default function Sidebar3({ isOpen, onToggle, showToggleButton = true }: 
     return items;
   };
 
-  if (!shouldShow) {
-    return null;
-  }
+  // Always show sidebar when using layout system provider
+  // if (!shouldShow) {
+  //   return null;
+  // }
 
   return (
     <>

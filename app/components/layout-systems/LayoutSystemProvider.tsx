@@ -129,8 +129,10 @@ export function LayoutSystemProvider({ children }: LayoutSystemProviderProps) {
 
   // Get current header and sidebar components
   const currentConfig = LAYOUT_SYSTEMS[currentSystem];
+  console.log('Current system:', currentSystem, 'Config:', currentConfig);
   const HeaderComponent = HEADER_COMPONENTS[currentConfig?.header as keyof typeof HEADER_COMPONENTS] || HEADER_COMPONENTS.Header1;
   const SidebarComponent = SIDEBAR_COMPONENTS[currentConfig?.sidebar as keyof typeof SIDEBAR_COMPONENTS] || SIDEBAR_COMPONENTS.Sidebar1;
+  console.log('Using components:', currentConfig?.header, currentConfig?.sidebar);
 
   const contextValue: LayoutSystemContextType = {
     currentSystem,
