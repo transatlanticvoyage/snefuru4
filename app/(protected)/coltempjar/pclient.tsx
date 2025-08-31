@@ -28,6 +28,8 @@ interface Coltemp {
 }
 
 export default function ColtempjarClient() {
+  console.log('🚀 ColtempjarClient component loaded!');
+  
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
@@ -38,6 +40,7 @@ export default function ColtempjarClient() {
   const [error, setError] = useState<string | null>(null);
   const [liveCounts, setLiveCounts] = useState<Record<number, number>>({});
   const [isAdmin, setIsAdmin] = useState(false);
+  const [actualUserId, setActualUserId] = useState<string | null>(null);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
 
   // Create new inline entry
@@ -147,17 +150,28 @@ export default function ColtempjarClient() {
   const checkUserAdminStatus = async () => {
     try {
       setCheckingAdmin(true);
+      console.log('Checking admin status for user ID:', user?.id);
+      
       const { data: userData, error } = await supabase
         .from('users')
-        .select('is_admin')
-        .eq('id', user?.id)
+        .select('id, is_admin')
+        .eq('auth_id', user?.id)
         .single();
 
-      if (error) throw error;
-      setIsAdmin(userData?.is_admin || false);
+      if (error) {
+        console.error('Admin check error:', error);
+        throw error;
+      }
+      
+      const adminStatus = userData?.is_admin || false;
+      console.log('Admin status result:', adminStatus);
+      
+      // Store the actual user record ID for data filtering
+      setActualUserId(userData?.id);
+      setIsAdmin(adminStatus);
       
       // After checking admin status, fetch data
-      await fetchData(userData?.is_admin || false);
+      await fetchData(adminStatus);
     } catch (err) {
       console.error('Error checking admin status:', err);
       setIsAdmin(false);
@@ -171,14 +185,19 @@ export default function ColtempjarClient() {
     try {
       setLoading(true);
       
+      console.log(`Fetching data with admin status: ${userIsAdmin}`);
+      
       let query = supabase
         .from('coltemps')
         .select('*');
       
       // ONLY filter if user is NOT admin
-      if (!userIsAdmin && user?.id) {
+      if (!userIsAdmin && actualUserId) {
+        console.log('Applying regular user filters');
         // Regular users see only their own records + adminpublic records
-        query = query.or(`fk_user_id.eq.${user.id},coltemp_category.eq.adminpublic`);
+        query = query.or(`fk_user_id.eq.${actualUserId},coltemp_category.eq.adminpublic`);
+      } else if (userIsAdmin) {
+        console.log('Admin user - no filters applied, fetching ALL records');
       }
       // If userIsAdmin is TRUE, no filtering applied - get ALL records
       
@@ -187,12 +206,15 @@ export default function ColtempjarClient() {
       if (error) throw error;
       setData(coltemps || []);
       
-      console.log(`Fetched ${coltemps?.length || 0} coltemp records (isAdmin: ${userIsAdmin})`);
+      console.log(`✅ Successfully fetched ${coltemps?.length || 0} coltemp records (isAdmin: ${userIsAdmin})`);
+      if (coltemps && coltemps.length > 0) {
+        console.log('First few records:', coltemps.slice(0, 3).map(r => ({ id: r.coltemp_id, name: r.coltemp_name, category: r.coltemp_category })));
+      }
       
       // Fetch live counts for all coltemps
       await fetchLiveCounts(coltemps || []);
     } catch (err) {
-      console.error('Error fetching data:', err);
+      console.error('❌ Error fetching data:', err);
       setError('Failed to load column templates');
     } finally {
       setLoading(false);
@@ -778,16 +800,37 @@ export default function ColtempjarClient() {
         {/* Table */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200" style={{ borderCollapse: 'collapse' }}>
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-1 py-1 text-left text-xs text-gray-400 italic" style={{ border: '1px solid #d1d5db' }}>
+                    -
+                  </th>
+                  {Object.keys(data[0] || {}).filter(key => key !== 'cached_rackui_count' && key !== 'cached_rackui_json').map(key => (
+                    <th
+                      key={`table-${key}`}
+                      className="px-1 py-1 text-left text-xs text-gray-400 italic"
+                      style={{ border: '1px solid #d1d5db' }}
+                    >
+                      coltemps
+                    </th>
+                  ))}
+                  <th className="px-1 py-1 text-left text-xs text-gray-400 italic" style={{ border: '1px solid #d1d5db' }}>
+                    coltemps
+                  </th>
+                  <th className="px-1 py-1 text-left text-xs text-gray-400 italic" style={{ border: '1px solid #d1d5db' }}>
+                    coltemps
+                  </th>
+                </tr>
+                <tr>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ border: '1px solid #d1d5db' }}>
                     Actions
                   </th>
                   {Object.keys(data[0] || {}).filter(key => key !== 'cached_rackui_count' && key !== 'cached_rackui_json').map(key => (
                     <th
                       key={key}
                       className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider cursor-pointer hover:bg-gray-100"
+                      style={{ border: '1px solid #d1d5db' }}
                       onClick={() => handleSort(key as keyof Coltemp)}
                     >
                       <div className="flex items-center gap-1">
@@ -800,10 +843,10 @@ export default function ColtempjarClient() {
                       </div>
                     </th>
                   ))}
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider" style={{ border: '1px solid #d1d5db' }}>
                     <span style={{ fontWeight: 'bold' }}>cached_rackui_count (json)</span>
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider" style={{ border: '1px solid #d1d5db' }}>
                     <span style={{ fontWeight: 'bold' }}>live_rackui_count (db)</span>
                   </th>
                 </tr>
@@ -811,7 +854,7 @@ export default function ColtempjarClient() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedData.map((row) => (
                   <tr key={row.coltemp_id} className="hover:bg-gray-50">
-                    <td className="px-3 py-2 whitespace-nowrap text-sm">
+                    <td className="px-3 py-2 whitespace-nowrap text-sm" style={{ border: '1px solid #d1d5db' }}>
                       <div className="flex gap-2">
                         <button
                           onClick={() => startEdit(row)}
@@ -852,7 +895,7 @@ export default function ColtempjarClient() {
                       const isEditable = inlineEditableFields.includes(key);
                       
                       return (
-                        <td key={key} className="px-3 py-2 text-sm text-gray-900">
+                        <td key={key} className="px-3 py-2 text-sm text-gray-900" style={{ border: '1px solid #d1d5db' }}>
                           {isEditable ? (
                             isEditing ? (
                               <input
@@ -881,7 +924,7 @@ export default function ColtempjarClient() {
                         </td>
                       );
                     })}
-                    <td className="px-3 py-2 text-sm text-gray-900">
+                    <td className="px-3 py-2 text-sm text-gray-900" style={{ border: '1px solid #d1d5db' }}>
                       {(() => {
                         try {
                           const jsonData = typeof row.cached_rackui_json === 'string' 
@@ -893,7 +936,7 @@ export default function ColtempjarClient() {
                         }
                       })()}
                     </td>
-                    <td className="px-3 py-2 text-sm text-gray-900">
+                    <td className="px-3 py-2 text-sm text-gray-900" style={{ border: '1px solid #d1d5db' }}>
                       {liveCounts[row.coltemp_id] || 0}
                     </td>
                   </tr>
