@@ -1,0 +1,108 @@
+where is the mapping code contained at? pleae show me what line range and
+  what the code looks like by displaying it here in the chat for me. im tyring
+   to understand how we will scale this column mapping and template system to
+  other pages in the app. please just answer and do not change any of our code
+   right now. we are still in planning phase.
+
+⏺ The mapping code is contained in two main locations:
+
+  1. AddressjarTable.tsx (Lines 149-275)
+
+  File: /app/(protected)/addressjar/components/AddressjarTable.tsx
+
+  // Column Name Mapper - Maps user-friendly names to actual column keys
+  const columnNameMapper = useMemo(() => ({
+	// AddressGlub columns (addressglub.*)
+	'addressglub.is_po_box': 'is_po_box',
+	'addressglub.is_apartment': 'is_apartment',
+	'addressglub.is_suite': 'is_suite',
+	'addressglub.data_source': 'data_source',
+	'addressglub.addressglub_id': 'addressglub_id',
+	'addressglub.full_address_input': 'full_address_input',
+	// ... continues for ~125 more mappings
+
+	// AddressPren columns (addresspren.*)
+	'addresspren.addresspren_id': 'addresspren_id',
+	'addresspren.user_id': 'user_id',
+	'addresspren.address_label': 'address_label',
+	// ... continues
+
+	// Org Entity columns (org.*)
+	'org.starred': 'org_is_starred',
+	'org.flagged': 'org_is_flagged',
+	// ... continues
+
+	// Direct mappings (allow exact column names too)
+	'is_po_box': 'is_po_box',
+	'is_apartment': 'is_apartment',
+	// ... continues for all columns
+  }), []);
+
+  2. Column Resolution Logic (Lines 364-401)
+
+  File: /app/(protected)/addressjar/components/AddressjarTable.tsx
+
+  // Calculate visible columns based on mode
+  const visibleColumns = useMemo(() => {
+	if (useColumnFiltering && filteredColumns.length > 0) {
+	  // Column filtering mode - use wolf exclusion band + mapped filtered
+  columns
+	  console.log('Filtering columns with user input:', filteredColumns);
+
+	  const filteredColumnObjects = filteredColumns
+		.map(userColumnName => {
+		  // Map user-friendly name to actual column key
+		  const actualColumnKey = columnNameMapper[userColumnName.trim()] ||
+   userColumnName.trim();
+		  console.log(`Mapping: "${userColumnName}" ->
+  "${actualColumnKey}"`);
+
+		  // Find the actual column definition
+		  const foundColumn = columns.find(col => col.key ===
+  actualColumnKey);
+
+		  if (!foundColumn) {
+			console.warn(`Column not found for key: "${actualColumnKey}"
+  (original: "${userColumnName}")`);
+		  }
+
+		  return foundColumn;
+		})
+		.filter(Boolean); // Remove undefined entries
+
+	  return [...actualWolfExclusionBandColumns, ...filteredColumnObjects];
+	}
+	// ... pagination mode logic
+  }, [useColumnFiltering, filteredColumns, actualWolfExclusionBandColumns,
+  columns, currentColumnPage, columnsPerPage, columnNameMapper]);
+
+  Scaling Challenges for Other Pages:
+
+  Current Issues:
+
+  1. Hard-coded in AddressjarTable - Each table component would need its own
+   massive mapping object
+  2. Duplicated effort - Would need to recreate 150+ mappings for each page
+  3. Maintenance nightmare - Adding a new column means updating multiple
+  mapping tables
+  4. No centralization - Each page operates independently
+
+  Better Scaling Approaches:
+
+  1. Centralized Mapping Service
+  // /utils/columnMapper.js
+  export const createColumnMapper = (tableType) => {
+	// Returns appropriate mapper for 'addressjar', 'sitejar', etc.
+  }
+  2. Database-Stored Mappings
+	- Store column mappings in a column_mappings table
+	- Dynamic lookup based on page/table type
+  3. Convention-Based Mapping
+	- Standardize column naming across all tables
+	- Use pattern matching instead of explicit mappings
+  4. Schema-Driven Approach
+	- Generate mappings automatically from table schemas
+	- Reduce manual mapping maintenance
+
+  The current approach works for AddressjarTable but doesn't scale well to
+  multiple pages without significant refactoring.

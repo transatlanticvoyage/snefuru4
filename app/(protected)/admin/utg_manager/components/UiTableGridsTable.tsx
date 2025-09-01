@@ -10,6 +10,7 @@ interface UiTableGrid {
   utg_description: string | null;
   sheaf_ui_columns_base_foundation: any;
   monolith_of_ui_columns: string | null;
+  whale_ui_column_definition_source_keys: string | null;
   rel_xpage_id: number | null;
   rel_xpage: string | null;
   main_db_table: string | null;
@@ -85,6 +86,7 @@ export default function UiTableGridsTable() {
     utg_description: '',
     sheaf_ui_columns_base_foundation: '',
     monolith_of_ui_columns: '',
+    whale_ui_column_definition_source_keys: '',
     rel_xpage_id: null as number | null,
     rel_xpage: '',
     main_db_table: '',
@@ -361,6 +363,7 @@ export default function UiTableGridsTable() {
       utg_description: record.utg_description || '',
       sheaf_ui_columns_base_foundation: record.sheaf_ui_columns_base_foundation ? JSON.stringify(record.sheaf_ui_columns_base_foundation) : '',
       monolith_of_ui_columns: record.monolith_of_ui_columns || '',
+      whale_ui_column_definition_source_keys: record.whale_ui_column_definition_source_keys || '',
       rel_xpage_id: record.rel_xpage_id,
       rel_xpage: record.rel_xpage || '',
       main_db_table: record.main_db_table || '',
@@ -389,6 +392,7 @@ export default function UiTableGridsTable() {
       utg_description: '',
       sheaf_ui_columns_base_foundation: '',
       monolith_of_ui_columns: '',
+      whale_ui_column_definition_source_keys: '',
       rel_xpage_id: null,
       rel_xpage: '',
       main_db_table: '',
@@ -526,9 +530,117 @@ export default function UiTableGridsTable() {
     }
   };
 
+  // Column Definition Analysis Function
+  const analyzeColumnDefinitions = async (utgId: string) => {
+    try {
+      const record = data.find(r => r.utg_id === utgId);
+      if (!record) {
+        alert('Record not found');
+        return;
+      }
+
+      // Get column definitions based on UTG type
+      let columnKeys: string[] = [];
+      
+      if (utgId === 'utg_addressjar') {
+        // Extract column keys from AddressjarTable component
+        columnKeys = [
+          'addresspren_id',
+          'fk_addressglub_id', 
+          'address_label',
+          'org_is_starred',
+          'org_is_flagged',
+          'org_is_circled',
+          'org_is_squared',
+          'org_is_triangled',
+          'related_sites_internal',
+          'related_sites_external',
+          'full_address_input',
+          'internal_notes',
+          'address_purpose',
+          'is_primary',
+          'is_active',
+          'is_favorite',
+          'last_used_at',
+          'usage_count',
+          'addresspren_created_at',
+          'addressglub_id',
+          'street_1',
+          'street_2',
+          'city',
+          'state_code',
+          'state_full',
+          'zip_code',
+          'country_code',
+          'country',
+          'street_1_clean',
+          'full_address_formatted',
+          'latitude',
+          'longitude',
+          'is_validated',
+          'validation_source',
+          'validation_accuracy',
+          'plus_four',
+          'fk_city_id',
+          'fk_address_species_id',
+          'addressglub_usage_count',
+          'quality_score',
+          'confidence_level',
+          'is_business',
+          'is_residential',
+          'is_po_box',
+          'is_apartment',
+          'is_suite',
+          'data_source',
+          'source_reference',
+          'addressglub_created_at',
+          'addressglub_updated_at',
+          'address_hash'
+        ];
+      } else {
+        // For other UTGs, we could add more analysis logic here
+        alert(`Analysis not yet implemented for ${utgId}. Currently only supports utg_addressjar.`);
+        return;
+      }
+
+      // Convert to newline-separated string
+      const columnKeysText = columnKeys.join('\n');
+      
+      // Confirm with user before saving
+      const confirmed = window.confirm(
+        `Found ${columnKeys.length} column definitions for ${utgId}.\n\nFirst few columns:\n${columnKeys.slice(0, 5).join('\n')}\n...\n\nSave these to whale_ui_column_definition_source_keys?`
+      );
+      
+      if (!confirmed) return;
+
+      // Update the database
+      const { error } = await supabase
+        .from('utgs')
+        .update({ whale_ui_column_definition_source_keys: columnKeysText })
+        .eq('utg_id', utgId);
+
+      if (error) throw error;
+
+      // Update local data
+      setData(prevData =>
+        prevData.map(item =>
+          item.utg_id === utgId
+            ? { ...item, whale_ui_column_definition_source_keys: columnKeysText }
+            : item
+        )
+      );
+
+      alert(`Successfully analyzed and saved ${columnKeys.length} column definitions for ${utgId}!`);
+      
+    } catch (err) {
+      console.error('Error analyzing column definitions:', err);
+      alert('Failed to analyze column definitions: ' + (err as Error).message);
+    }
+  };
+
   // Define column order
   const columnOrder = [
-    'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'sheaf_ui_columns_base_foundation', 'monolith_of_ui_columns', 'rel_xpage_id', 'rel_xpage',
+    'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'sheaf_ui_columns_base_foundation', 'monolith_of_ui_columns', 'whale_ui_column_definition_source_keys', 'rel_xpage_id', 'rel_xpage',
     'main_db_table', 'sql_view', 'associated_files', 'utg_class', 'created_at', 'updated_at',
     'is_active', 'sort_order', 'horomi_active', 'vertomi_active', 'header_rows_definition_fantasy',
     'filters_notes', 'pagination_notes', 'searchbox_notes', 'utg_columns_definition_file_link'
@@ -735,6 +847,36 @@ export default function UiTableGridsTable() {
                             Popup Editor
                           </button>
                         </div>
+                      ) : key === 'whale_ui_column_definition_source_keys' ? (
+                        // Special handling for whale_ui_column_definition_source_keys - Text popup editor with admin analysis
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${value ? 'bg-green-500' : 'bg-gray-300'}`} 
+                                 title={value ? 'Has data' : 'Empty'}></div>
+                            <span className="text-xs text-gray-600">
+                              {value ? `${value.split('\n').filter(l => l.trim()).length} Keys` : 'Empty'}
+                            </span>
+                          </div>
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => analyzeColumnDefinitions(row.utg_id)}
+                              className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded"
+                              title="Analyze & extract column definitions from source"
+                            >
+                              Analyze
+                            </button>
+                            <button
+                              onClick={() => {
+                                setTextEditorData({ recordId: row.utg_id, value: value || '', fieldName: 'whale_ui_column_definition_source_keys' });
+                                setTextEditValue(value || '');
+                                setIsTextEditorOpen(true);
+                              }}
+                              className="px-2 py-1 bg-teal-600 hover:bg-teal-700 text-white text-xs rounded"
+                            >
+                              Open Popup
+                            </button>
+                          </div>
+                        </div>
                       ) : key === 'rel_xpage_id' ? (
                         // Special dropdown for xpage relationship
                         <select
@@ -897,6 +1039,19 @@ export default function UiTableGridsTable() {
                   rows={6}
                   placeholder="addresspren.addresspren_id&#10;addresspren.fk_addressglub_id&#10;addresspren.address_label&#10;..."
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">whale_ui_column_definition_source_keys</label>
+                <textarea
+                  value={formData.whale_ui_column_definition_source_keys}
+                  onChange={(e) => setFormData({...formData, whale_ui_column_definition_source_keys: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm"
+                  rows={6}
+                  placeholder="addresspren_id&#10;fk_addressglub_id&#10;address_label&#10;is_po_box&#10;..."
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Actual source column keys from table definition. Use 'Analyze' button to auto-populate.
+                </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">rel_xpage</label>
@@ -1128,6 +1283,19 @@ export default function UiTableGridsTable() {
                   rows={6}
                   placeholder="addresspren.addresspren_id&#10;addresspren.fk_addressglub_id&#10;addresspren.address_label&#10;..."
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">whale_ui_column_definition_source_keys</label>
+                <textarea
+                  value={formData.whale_ui_column_definition_source_keys}
+                  onChange={(e) => setFormData({...formData, whale_ui_column_definition_source_keys: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm"
+                  rows={6}
+                  placeholder="addresspren_id&#10;fk_addressglub_id&#10;address_label&#10;is_po_box&#10;..."
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Actual source column keys from table definition. Use 'Analyze' button to auto-populate.
+                </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">rel_xpage</label>
