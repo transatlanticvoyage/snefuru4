@@ -17,7 +17,16 @@ export const system1Navigation: NavItem[] = [
   },
   {
     name: 'Other Links',
-    children: []
+    children: [
+      {
+        name: 'Host Entity Manager',
+        path: '/haccjar2'
+      },
+      {
+        name: 'CDN Manager',
+        path: '/cdnjar'
+      }
+    ]
   }
 ];
 
