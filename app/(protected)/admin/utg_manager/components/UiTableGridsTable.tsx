@@ -638,6 +638,222 @@ export default function UiTableGridsTable() {
     }
   };
 
+  const consolidateUtgRows = async () => {
+    try {
+      const addressjarRow = data.find(r => r.utg_id === 'addressjar');
+      const utgAddressjarRow = data.find(r => r.utg_id === 'utg_addressjar');
+      
+      if (!addressjarRow || !utgAddressjarRow) {
+        alert('Could not find both UTG rows for consolidation');
+        return;
+      }
+
+      // Check what data needs to be transferred
+      const transferData: string[] = [];
+      const updateFields: any = {};
+      
+      if (addressjarRow.whale_ui_column_definition_source_keys && !utgAddressjarRow.whale_ui_column_definition_source_keys) {
+        transferData.push('whale_ui_column_definition_source_keys');
+        updateFields.whale_ui_column_definition_source_keys = addressjarRow.whale_ui_column_definition_source_keys;
+      }
+      if (addressjarRow.monolith_of_ui_columns && !utgAddressjarRow.monolith_of_ui_columns) {
+        transferData.push('monolith_of_ui_columns');
+        updateFields.monolith_of_ui_columns = addressjarRow.monolith_of_ui_columns;
+      }
+      if (addressjarRow.sheaf_ui_columns_base_foundation && !utgAddressjarRow.sheaf_ui_columns_base_foundation) {
+        transferData.push('sheaf_ui_columns_base_foundation');
+        updateFields.sheaf_ui_columns_base_foundation = addressjarRow.sheaf_ui_columns_base_foundation;
+      }
+      
+      if (transferData.length === 0) {
+        const shouldDelete = window.confirm(
+          'No data needs to be transferred from "addressjar" to "utg_addressjar".\n\nProceed with deleting the "addressjar" row?'
+        );
+        if (!shouldDelete) return;
+      } else {
+        const shouldTransfer = window.confirm(
+          `Transfer the following data from "addressjar" to "utg_addressjar":\n\n${transferData.join('\n')}\n\nThen delete the "addressjar" row?`
+        );
+        if (!shouldTransfer) return;
+        
+        // Perform the transfer
+        const { error: updateError } = await supabase
+          .from('utgs')
+          .update(updateFields)
+          .eq('utg_id', 'utg_addressjar');
+          
+        if (updateError) throw updateError;
+      }
+
+      // Delete the addressjar row
+      const { error: deleteError } = await supabase
+        .from('utgs')
+        .delete()
+        .eq('utg_id', 'addressjar');
+        
+      if (deleteError) throw deleteError;
+
+      // Update local data
+      setData(prevData => {
+        return prevData
+          .map(item =>
+            item.utg_id === 'utg_addressjar' && transferData.length > 0
+              ? { ...item, ...updateFields }
+              : item
+          )
+          .filter(item => item.utg_id !== 'addressjar');
+      });
+
+      alert('Successfully consolidated UTG rows! Transferred data to "utg_addressjar" and deleted "addressjar" row.');
+      
+    } catch (err) {
+      console.error('Error consolidating UTG rows:', err);
+      alert('Failed to consolidate UTG rows: ' + (err as Error).message);
+    }
+  };
+
+  const generateSheafAndMonolithData = async (utgId: string) => {
+    try {
+      if (utgId !== 'utg_addressjar') {
+        alert('Sheaf generation currently only supports utg_addressjar');
+        return;
+      }
+
+      const confirmed = window.confirm(
+        'Generate sheaf_ui_columns_base_foundation and monolith_of_ui_columns data for utg_addressjar?\n\nThis will create the standard addressjar column structure.'
+      );
+      if (!confirmed) return;
+
+      // Real column structure based on AddressjarTable component analysis
+      const realSheafData = {
+        columns: [
+          // addresspren columns
+          { id: 'addresspren_id', name: 'addresspren_id', type: 'number', readOnly: true, width: '120px', group: 'addresspren', visible: true, order: 1 },
+          { id: 'fk_addressglub_id', name: 'fk_addressglub_id', type: 'number', width: '140px', group: 'addresspren', visible: true, order: 2 },
+          { id: 'address_label', name: 'address_label', type: 'text', width: '150px', group: 'addresspren', visible: true, order: 3 },
+          
+          // org entity columns
+          { id: 'separator_org', name: '', type: 'separator', width: '3px', separator: 'vertical', visible: true, order: 4 },
+          { id: 'org_is_starred', name: 'star', type: 'org_entity', width: '25px', group: 'org_entities', visible: true, order: 5 },
+          { id: 'org_is_flagged', name: 'flag', type: 'org_entity', width: '25px', group: 'org_entities', visible: true, order: 6 },
+          { id: 'org_is_circled', name: 'circle', type: 'org_entity', width: '25px', group: 'org_entities', visible: true, order: 7 },
+          { id: 'org_is_squared', name: 'square', type: 'org_entity', width: '25px', group: 'org_entities', visible: true, order: 8 },
+          { id: 'org_is_triangled', name: 'triangle', type: 'org_entity', width: '25px', group: 'org_entities', visible: true, order: 9 },
+          { id: 'related_sites_internal', name: 'related sites (internal)', type: 'text', width: '120px', group: 'addresspren', visible: true, order: 10 },
+          { id: 'related_sites_external', name: 'related sites (external)', type: 'text', width: '120px', group: 'addresspren', visible: true, order: 11 },
+          { id: 'full_address_input', name: 'full_address_input', type: 'text', width: 'auto', minWidth: '350px', group: 'addressglub', separator: 'right', visible: true, order: 12 },
+          { id: 'internal_notes', name: 'internal_notes', type: 'text', width: '200px', group: 'addresspren', visible: true, order: 13 },
+          { id: 'address_purpose', name: 'address_purpose', type: 'text', width: '150px', group: 'addresspren', visible: true, order: 14 },
+          { id: 'is_primary', name: 'is_primary', type: 'boolean', width: '100px', group: 'addresspren', visible: true, order: 15 },
+          { id: 'is_active', name: 'is_active', type: 'boolean', width: '100px', group: 'addresspren', visible: true, order: 16 },
+          { id: 'is_favorite', name: 'is_favorite', type: 'boolean', width: '100px', group: 'addresspren', visible: true, order: 17 },
+          { id: 'last_used_at', name: 'last_used_at', type: 'datetime', readOnly: true, width: '160px', group: 'addresspren', visible: true, order: 18 },
+          { id: 'usage_count', name: 'usage_count', type: 'number', width: '120px', group: 'addresspren', visible: true, order: 19 },
+          { id: 'addresspren_created_at', name: 'created_at', type: 'datetime', readOnly: true, width: '160px', group: 'addresspren', separator: 'right', visible: true, order: 20 },
+          
+          // addressglub columns
+          { id: 'addressglub_id', name: 'addressglub_id', type: 'number', readOnly: true, width: '120px', group: 'addressglub', visible: true, order: 21 },
+          { id: 'street_1', name: 'street_1', type: 'text', width: '200px', group: 'addressglub', visible: true, order: 22 },
+          { id: 'street_2', name: 'street_2', type: 'text', width: '200px', group: 'addressglub', visible: true, order: 23 },
+          { id: 'city', name: 'city', type: 'text', width: '150px', group: 'addressglub', visible: true, order: 24 },
+          { id: 'state_code', name: 'state_code', type: 'text', width: '100px', group: 'addressglub', visible: true, order: 25 },
+          { id: 'state_full', name: 'state_full', type: 'text', width: '150px', group: 'addressglub', visible: true, order: 26 },
+          { id: 'zip_code', name: 'zip_code', type: 'text', width: '100px', group: 'addressglub', visible: true, order: 27 },
+          { id: 'country_code', name: 'country_code', type: 'text', width: '100px', group: 'addressglub', visible: true, order: 28 },
+          { id: 'country', name: 'country', type: 'text', width: '150px', group: 'addressglub', visible: true, order: 29 },
+          { id: 'street_1_clean', name: 'street_1_clean', type: 'text', readOnly: true, width: '200px', group: 'addressglub', visible: true, order: 30 },
+          { id: 'full_address_formatted', name: 'full_address_formatted', type: 'text', readOnly: true, width: '300px', group: 'addressglub', visible: true, order: 31 },
+          { id: 'latitude', name: 'latitude', type: 'number', readOnly: true, width: '120px', group: 'addressglub', visible: true, order: 32 },
+          { id: 'longitude', name: 'longitude', type: 'number', readOnly: true, width: '120px', group: 'addressglub', visible: true, order: 33 },
+          { id: 'is_validated', name: 'is_validated', type: 'boolean', readOnly: true, width: '100px', group: 'addressglub', visible: true, order: 34 },
+          { id: 'validation_source', name: 'validation_source', type: 'text', readOnly: true, width: '150px', group: 'addressglub', visible: true, order: 35 },
+          { id: 'validation_accuracy', name: 'validation_accuracy', type: 'text', readOnly: true, width: '150px', group: 'addressglub', visible: true, order: 36 },
+          { id: 'plus_four', name: 'plus_four', type: 'text', width: '100px', group: 'addressglub', visible: true, order: 37 },
+          { id: 'fk_city_id', name: 'fk_city_id', type: 'number', readOnly: true, width: '100px', group: 'addressglub', visible: true, order: 38 },
+          { id: 'fk_address_species_id', name: 'fk_address_species_id', type: 'number', readOnly: true, width: '180px', group: 'addressglub', visible: true, order: 39 },
+          { id: 'addressglub_usage_count', name: 'usage_count', type: 'number', readOnly: true, width: '120px', group: 'addressglub', visible: true, order: 40 },
+          { id: 'quality_score', name: 'quality_score', type: 'number', readOnly: true, width: '120px', group: 'addressglub', visible: true, order: 41 },
+          { id: 'confidence_level', name: 'confidence_level', type: 'number', readOnly: true, width: '140px', group: 'addressglub', visible: true, order: 42 },
+          { id: 'is_business', name: 'is_business', type: 'boolean', readOnly: true, width: '100px', group: 'addressglub', visible: true, order: 43 },
+          { id: 'is_residential', name: 'is_residential', type: 'boolean', readOnly: true, width: '120px', group: 'addressglub', visible: true, order: 44 },
+          { id: 'is_po_box', name: 'is_po_box', type: 'boolean', readOnly: true, width: '100px', group: 'addressglub', visible: true, order: 45 },
+          { id: 'is_apartment', name: 'is_apartment', type: 'boolean', readOnly: true, width: '120px', group: 'addressglub', visible: true, order: 46 },
+          { id: 'is_suite', name: 'is_suite', type: 'boolean', readOnly: true, width: '100px', group: 'addressglub', visible: true, order: 47 },
+          { id: 'data_source', name: 'data_source', type: 'text', width: '120px', group: 'addressglub', visible: true, order: 48 },
+          { id: 'source_reference', name: 'source_reference', type: 'text', width: '180px', group: 'addressglub', visible: true, order: 49 },
+          { id: 'addressglub_created_at', name: 'created_at', type: 'datetime', readOnly: true, width: '160px', group: 'addressglub', visible: true, order: 50 },
+          { id: 'addressglub_updated_at', name: 'updated_at', type: 'datetime', readOnly: true, width: '160px', group: 'addressglub', visible: true, order: 51 },
+          { id: 'address_hash', name: 'address_hash', type: 'text', readOnly: true, width: '200px', group: 'addressglub', visible: true, order: 52 }
+        ],
+        metadata: {
+          table_name: 'addresspren + addressglub (joined)',
+          description: 'Address Constellation System - User addresses joined with global address database',
+          main_db_table: 'addresspren',
+          joined_tables: ['addressglub'],
+          created_date: new Date().toISOString(),
+          column_groups: {
+            'addresspren': 'User-specific address records and preferences',
+            'addressglub': 'Global address database with validation and standardization',
+            'org_entities': 'Organization entity flags (star, flag, circle, square, triangle)'
+          }
+        }
+      };
+
+      // Generate monolith text format from sheaf data
+      const columns = realSheafData.columns;
+      const sortedColumns = [...columns].sort((a, b) => (a.order || 0) - (b.order || 0));
+      
+      const monolithText = sortedColumns.map(column => {
+        if (column.type === 'separator') {
+          return `SEPARATOR|${column.separator}|${column.width}`;
+        }
+        
+        const parts = [
+          column.id,
+          column.name || column.id,
+          column.type || 'text',
+          column.width || 'auto',
+          column.readOnly ? 'readonly' : 'editable',
+          column.visible ? 'visible' : 'hidden',
+          column.group || '',
+          column.separator || ''
+        ];
+        
+        return parts.join('|');
+      }).join('\n');
+
+      // Update the database
+      const { error } = await supabase
+        .from('utgs')
+        .update({ 
+          sheaf_ui_columns_base_foundation: realSheafData,
+          monolith_of_ui_columns: monolithText
+        })
+        .eq('utg_id', utgId);
+
+      if (error) throw error;
+
+      // Update local data
+      setData(prevData =>
+        prevData.map(item =>
+          item.utg_id === utgId
+            ? { 
+                ...item, 
+                sheaf_ui_columns_base_foundation: realSheafData,
+                monolith_of_ui_columns: monolithText
+              }
+            : item
+        )
+      );
+
+      alert(`Successfully generated sheaf and monolith data for ${utgId}!`);
+      
+    } catch (err) {
+      console.error('Error generating sheaf and monolith data:', err);
+      alert('Failed to generate data: ' + (err as Error).message);
+    }
+  };
+
   // Define column order
   const columnOrder = [
     'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'sheaf_ui_columns_base_foundation', 'monolith_of_ui_columns', 'whale_ui_column_definition_source_keys', 'rel_xpage_id', 'rel_xpage',
@@ -696,6 +912,20 @@ export default function UiTableGridsTable() {
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Create New Entry
+          </button>
+          <button
+            onClick={consolidateUtgRows}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            title="Transfer data from 'addressjar' to 'utg_addressjar' and delete duplicate"
+          >
+            Consolidate UTG Rows
+          </button>
+          <button
+            onClick={() => generateSheafAndMonolithData('utg_addressjar')}
+            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+            title="Generate sheaf and monolith data for utg_addressjar"
+          >
+            Generate UTG Data
           </button>
         </div>
       </div>
@@ -824,6 +1054,13 @@ export default function UiTableGridsTable() {
                             className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded"
                           >
                             Popup Editor
+                          </button>
+                          <button
+                            onClick={() => generateSheafAndMonolithData(row.utg_id)}
+                            className="px-2 py-1 bg-teal-600 hover:bg-teal-700 text-white text-xs rounded"
+                            title="Auto-fetch standard sheaf data for this UTG"
+                          >
+                            Fetch Sheaf
                           </button>
                         </div>
                       ) : key === 'monolith_of_ui_columns' ? (
