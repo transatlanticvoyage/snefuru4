@@ -323,6 +323,9 @@ export default function Sidebar2({ isOpen, onToggle, showToggleButton = true, on
           </button>
         </div>
 
+        {/* Layout System Switcher */}
+        <LayoutSystemSwitcher />
+
         {/* Header Visibility Toggle */}
         <HeaderVisibilityToggle onToggle={onHeaderVisibilityChange} />
 
@@ -427,8 +430,6 @@ export default function Sidebar2({ isOpen, onToggle, showToggleButton = true, on
           </nav>
         </div>
 
-        {/* Layout System Switcher */}
-        <LayoutSystemSwitcher />
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-700">

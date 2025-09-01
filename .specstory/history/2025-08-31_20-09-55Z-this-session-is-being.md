@@ -4804,3 +4804,1282 @@ Perfect! The build is working successfully. Let me create a brief summary of wha
 
 The bezel button now appears below the hamburger icon in all three layout systems. When clicked, it opens an 800×800px popup showing "Bezel Chamber" with a placeholder message. The system is ready for you to add page-specific visibility controls and toggle switches as needed.
 
+---
+
+_**User**_
+
+pleaes find the existing area in the sidebar that allows user to select header1/sidebar1, header2/sidebar2, etc. . please move this dropdown menu area, etc. to now be located above the user profile pic area in the sidebar 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll move the LayoutSystemSwitcher to be above the user profile picture area in all three sidebars.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar1
+- [ ] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar2
+- [ ] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar3
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me first find where the LayoutSystemSwitcher is currently located in the sidebars:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/components/sidebars/Sidebar1.tsx`
+
+Result:
+
+```
+12:import LayoutSystemSwitcher from '@/app/components/layout-systems/LayoutSystemSwitcher';
+399:        <LayoutSystemSwitcher />
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me see the context around line 399 to understand where it's currently positioned:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/components/sidebars/Sidebar1.tsx`
+
+Result:
+
+```
+395→          </nav>
+   396→        </div>
+   397→
+   398→        {/* Layout System Switcher */}
+   399→        <LayoutSystemSwitcher />
+   400→
+   401→        {/* Footer */}
+   402→        <div className="p-4 border-t border-gray-700">
+   403→          <div className="flex items-center text-xs text-gray-400">
+   404→            <svg 
+   405→              className="w-3 h-3 mr-1 text-yellow-400" 
+   406→              fill="currentColor" 
+   407→              viewBox="0 0 20 20"
+   408→            >
+   409→              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to find where the user profile section starts to move the switcher above it:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/components/sidebars/Sidebar1.tsx`
+
+Result:
+
+```
+294:        {/* Header Visibility Toggle */}
+297:        {/* User Profile Section */}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! Now I'll move the LayoutSystemSwitcher from its current location (line 399) to above the Header Visibility Toggle (before line 294). Let me do this for Sidebar1:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/sidebars/Sidebar1.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   394→            {getAllNavItems().map(item => renderNavItem(item))}
+   395→          </nav>
+   396→        </div>
+   397→
+   398→
+   399→        {/* Footer */}
+   400→        <div className="p-4 border-t border-gray-700">
+   401→          <div className="flex items-center text-xs text-gray-400">
+   402→            <svg
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me add it above the Header Visibility Toggle:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/sidebars/Sidebar1.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   290→            </svg>
+   291→          </button>
+   292→        </div>
+   293→
+   294→        {/* Layout System Switcher */}
+   295→        <LayoutSystemSwitcher />
+   296→
+   297→        {/* Header Visibility Toggle */}
+   298→        <HeaderVisibilityToggle onToggle={onHeaderVisibilityChange} />
+   299→
+   300→        {/* User Profile Section */}
+   301→        <div className="p-4 border-b border-gray-700">
+   302→          <div className="relative" ref={userMenuRef}>
+   303→            <button
+   304→              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Great! Now let me do the same for Sidebar2:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar1
+- [⚡] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar2
+- [ ] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar3
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/components/sidebars/Sidebar2.tsx`
+
+Result:
+
+```
+12:import LayoutSystemSwitcher from '@/app/components/layout-systems/LayoutSystemSwitcher';
+431:        <LayoutSystemSwitcher />
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/sidebars/Sidebar2.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   426→            {getAllNavItems().map(item => renderNavItem(item))}
+   427→          </nav>
+   428→        </div>
+   429→
+   430→
+   431→        {/* Footer */}
+   432→        <div className="p-4 border-t border-gray-700">
+   433→          <div className="flex items-center text-xs text-gray-400">
+   434→            <svg
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/sidebars/Sidebar2.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   322→            </svg>
+   323→          </button>
+   324→        </div>
+   325→
+   326→        {/* Layout System Switcher */}
+   327→        <LayoutSystemSwitcher />
+   328→
+   329→        {/* Header Visibility Toggle */}
+   330→        <HeaderVisibilityToggle onToggle={onHeaderVisibilityChange} />
+   331→
+   332→        {/* User Profile Section */}
+   333→        <div className="p-4 border-b border-gray-700">
+   334→          <div className="relative" ref={userMenuRef}>
+   335→            <button
+   336→              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me do the same for Sidebar3:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar1
+- [X] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar2
+- [⚡] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar3
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/components/sidebars/Sidebar3.tsx`
+
+Result:
+
+```
+12:import LayoutSystemSwitcher from '@/app/components/layout-systems/LayoutSystemSwitcher';
+431:        <LayoutSystemSwitcher />
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/sidebars/Sidebar3.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   426→            {getAllNavItems().map(item => renderNavItem(item))}
+   427→          </nav>
+   428→        </div>
+   429→
+   430→
+   431→        {/* Footer */}
+   432→        <div className="p-4 border-t border-gray-700">
+   433→          <div className="flex items-center text-xs text-gray-400">
+   434→            <svg
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/sidebars/Sidebar3.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   322→            </svg>
+   323→          </button>
+   324→        </div>
+   325→
+   326→        {/* Layout System Switcher */}
+   327→        <LayoutSystemSwitcher />
+   328→
+   329→        {/* Header Visibility Toggle */}
+   330→        <HeaderVisibilityToggle onToggle={onHeaderVisibilityChange} />
+   331→
+   332→        {/* User Profile Section */}
+   333→        <div className="p-4 border-b border-gray-700">
+   334→          <div className="relative" ref={userMenuRef}>
+   335→            <button
+   336→              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar1
+- [X] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar2
+- [X] 🌡️ Move LayoutSystemSwitcher above user profile in Sidebar3
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me check if the build is working correctly:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **BashOutput**
+
+Result:
+
+```
+<status>running</status>
+
+<stdout>
+ GET /coltempjar 200 in 153ms
+ GET /coltempjar 200 in 78ms
+ ✓ Compiled in 1903ms (547 modules)
+ GET /sitejar 200 in 105ms
+ GET /myhub 200 in 118ms
+ GET /coltempjar 200 in 109ms
+ GET /coltempjar 200 in 27ms
+ ✓ Compiled in 1797ms (547 modules)
+ GET /myhub 200 in 121ms
+ GET /sitejar 200 in 124ms
+ GET /coltempjar 200 in 130ms
+ GET /coltempjar 200 in 45ms
+ ✓ Compiled in 2.6s (1255 modules)
+ GET /myhub 200 in 128ms
+ GET /coltempjar 200 in 140ms
+ GET /sitejar 200 in 142ms
+ GET /coltempjar 200 in 48ms
+ ○ Compiling /sitejar4 ...
+ ✓ Compiled /sitejar4 in 1309ms (1259 modules)
+ GET /sitejar4?is_external=show 200 in 1636ms
+ ○ Compiling /api/get_sitespren_data ...
+ ✓ Compiled /api/get_sitespren_data in 596ms (1356 modules)
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+ GET /sitejar4?is_external=show 200 in 161ms
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 7833ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id'
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 516ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id'
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 532ms
+ ✓ Compiled /api/sitespren_tags in 302ms (891 modules)
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 554ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 127ms
+ ✓ Compiled /assignwiz in 370ms (1439 modules)
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 719ms
+ ✓ Compiled /addressjar in 483ms (1447 modules)
+ GET /addressjar 200 in 763ms
+ GET /coltempjar 200 in 75ms
+ GET /coltempjar?page=1 200 in 55ms
+ GET /coltempjar?page=1 200 in 50ms
+ GET /addressjar 200 in 56ms
+ GET /coltempjar?page=1&rel_utg_id=utg_addressjar 200 in 47ms
+ ✓ Compiled in 2.7s (1258 modules)
+ GET /sitejar 200 in 222ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 225ms
+ GET /addressjar 200 in 230ms
+ GET /coltempjar 200 in 236ms
+ GET /myhub 200 in 241ms
+ GET /coltempjar?page=1&rel_utg_id=utg_addressjar 200 in 257ms
+ GET /coltempjar 200 in 103ms
+ ✓ Compiled in 2.8s (1258 modules)
+ GET /coltempjar 200 in 138ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 232ms
+ GET /addressjar 200 in 241ms
+ GET /sitejar 200 in 242ms
+ GET /myhub 200 in 248ms
+ GET /coltempjar?page=1&rel_utg_id=utg_addressjar 200 in 258ms
+ GET /coltempjar 200 in 225ms
+ ○ Compiling /driggsman ...
+ ✓ Compiled /driggsman in 861ms (715 modules)
+ GET /driggsman 200 in 961ms
+ ✓ Compiled /api/sitespren_tags in 171ms (905 modules)
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 547ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 128ms
+ ✓ Compiled in 3.1s (1275 modules)
+ GET /myhub 200 in 281ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 454ms
+ GET /coltempjar 200 in 478ms
+ GET /sitejar 200 in 479ms
+ GET /addressjar 200 in 536ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 665ms
+ GET /coltempjar 200 in 85ms
+ ✓ Compiled in 2.1s (1275 modules)
+ GET /myhub 200 in 209ms
+ GET /coltempjar 200 in 220ms
+ GET /sitejar 200 in 220ms
+ GET /addressjar 200 in 230ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 235ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 237ms
+ GET /coltempjar 200 in 104ms
+ ✓ Compiled in 2.4s (1275 modules)
+ GET /sitejar 200 in 330ms
+ GET /addressjar 200 in 532ms
+ GET /myhub 200 in 533ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 541ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 564ms
+ GET /coltempjar 200 in 593ms
+ GET /coltempjar 200 in 467ms
+ ✓ Compiled in 2.2s (1275 modules)
+ GET /myhub 200 in 226ms
+ GET /coltempjar 200 in 244ms
+ GET /addressjar 200 in 246ms
+ GET /sitejar 200 in 249ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 255ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 257ms
+ GET /coltempjar 200 in 89ms
+ ✓ Compiled in 1878ms (1275 modules)
+ GET /sitejar 200 in 201ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 175ms
+ GET /addressjar 200 in 180ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 184ms
+ GET /myhub 200 in 209ms
+ GET /coltempjar 200 in 182ms
+ GET /coltempjar 200 in 108ms
+ ✓ Compiled in 2.3s (1275 modules)
+ GET /myhub 200 in 188ms
+ GET /sitejar 200 in 193ms
+ GET /addressjar 200 in 192ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 192ms
+ GET /coltempjar 200 in 193ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 194ms
+ GET /coltempjar 200 in 91ms
+ ✓ Compiled in 2.2s (1275 modules)
+ GET /sitejar 200 in 194ms
+ GET /coltempjar 200 in 200ms
+ GET /addressjar 200 in 205ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 220ms
+ GET /myhub 200 in 222ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 222ms
+ GET /coltempjar 200 in 110ms
+ ✓ Compiled in 2.4s (1275 modules)
+ GET /coltempjar 200 in 214ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 237ms
+ GET /myhub 200 in 243ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 245ms
+ GET /addressjar 200 in 257ms
+ GET /sitejar 200 in 257ms
+ GET /coltempjar 200 in 119ms
+ ✓ Compiled in 2.4s (1275 modules)
+ GET /coltempjar 200 in 190ms
+ GET /myhub 200 in 288ms
+ GET /addressjar 200 in 297ms
+ GET /sitejar 200 in 297ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 307ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 296ms
+ GET /coltempjar 200 in 215ms
+ GET /addressjar 200 in 176ms
+ GET /addressjar 200 in 60ms
+ GET /addressjar 200 in 41ms
+ GET /coltempjar 200 in 68ms
+ GET /coltempjar?rel_utg_id=utg_torna3&page=1 200 in 26ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 41ms
+ ✓ Compiled in 1576ms (560 modules)
+ GET /myhub 200 in 140ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 148ms
+ GET /addressjar 200 in 148ms
+ GET /coltempjar 200 in 146ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 159ms
+ GET /sitejar 200 in 159ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 146ms
+ GET /addressjar 200 in 182ms
+ GET /coltempjar 200 in 190ms
+ GET /addressjar 200 in 83ms
+ ✓ Compiled in 2.6s (1275 modules)
+ GET /addressjar 200 in 274ms
+ GET /coltempjar 200 in 279ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 223ms
+ GET /myhub 200 in 284ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 243ms
+ GET /sitejar 200 in 316ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 537ms
+ GET /addressjar 200 in 527ms
+ GET /coltempjar 200 in 486ms
+ GET /addressjar 200 in 88ms
+ ✓ Compiled in 2.3s (1275 modules)
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 190ms
+ GET /myhub 200 in 221ms
+ GET /sitejar 200 in 230ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 230ms
+ GET /coltempjar 200 in 283ms
+ GET /addressjar 200 in 271ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 127ms
+ GET /coltempjar 200 in 123ms
+ GET /addressjar 200 in 138ms
+ GET /addressjar 200 in 131ms
+ ○ Compiling /_error ...
+ GET /addressjar 500 in 6160ms
+ GET /myhub 500 in 6163ms
+ GET /coltempjar 500 in 6164ms
+ GET /sitejar 500 in 6163ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 500 in 6163ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 500 in 6161ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 500 in 125ms
+ GET /addressjar 500 in 116ms
+ GET /coltempjar 500 in 162ms
+ GET /myhub 500 in 163ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 500 in 163ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 500 in 163ms
+ GET /sitejar 500 in 166ms
+ GET /coltempjar 500 in 123ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 500 in 135ms
+ GET /addressjar 500 in 153ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 500 in 153ms
+ GET /myhub 500 in 143ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 500 in 127ms
+ GET /sitejar 500 in 108ms
+ GET /addressjar 500 in 98ms
+ GET /coltempjar 500 in 98ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 500 in 117ms
+ GET /myhub 500 in 121ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 500 in 169ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 500 in 149ms
+ GET /sitejar 500 in 138ms
+ GET /coltempjar 500 in 125ms
+ GET /addressjar 500 in 120ms
+ GET /coltempjar 500 in 75ms
+ GET /addressjar 500 in 91ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 500 in 58ms
+ GET /coltempjar 500 in 54ms
+ GET /addressjar 500 in 61ms
+ GET /addressjar 500 in 60ms
+ GET /_next/static/webpack/a217ea6494a38862.webpack.hot-update.json 500 in 846ms
+ GET /addressjar 500 in 871ms
+ GET /addressjar 500 in 825ms
+ GET /addressjar 500 in 62ms
+ GET /coltempjar 500 in 109ms
+ GET /addressjar 500 in 81ms
+ ✓ Compiled /_not-found in 2.5s (1593 modules)
+ GET /_next/static/webpack/a9756375526c6d58.webpack.hot-update.json 500 in 2974ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 978ms
+ GET /addressjar 200 in 1073ms
+ GET /_next/static/webpack/a9756375526c6d58.webpack.hot-update.json 404 in 279ms
+ GET /myhub 200 in 512ms
+ GET /coltempjar 200 in 109ms
+ GET /_next/static/webpack/a9756375526c6d58.webpack.hot-update.json 404 in 58ms
+ GET /_next/static/webpack/a9756375526c6d58.webpack.hot-update.json 404 in 79ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 96ms
+ GET /_next/static/webpack/a9756375526c6d58.webpack.hot-update.json 404 in 71ms
+ GET /addressjar 200 in 126ms
+ GET /_next/static/webpack/a9756375526c6d58.webpack.hot-update.json 404 in 65ms
+ GET /addressjar 200 in 115ms
+ GET /_next/static/webpack/a9756375526c6d58.webpack.hot-update.json 404 in 68ms
+ GET /coltempjar 200 in 117ms
+ GET /_next/static/webpack/a9756375526c6d58.webpack.hot-update.json 404 in 110ms
+ GET /sitejar 200 in 127ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 73ms
+ ✓ Compiled in 2.9s (1607 modules)
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 314ms
+ GET /coltempjar 200 in 304ms
+ GET /addressjar 200 in 324ms
+ GET /myhub 200 in 327ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 328ms
+ GET /sitejar 200 in 332ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 159ms
+ GET /coltempjar 200 in 179ms
+ GET /addressjar 200 in 123ms
+ GET /addressjar 200 in 48ms
+ ○ Compiling /api/sitespren_tags ...
+ ✓ Compiled /api/sitespren_tags in 839ms (993 modules)
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 1555ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 130ms
+ ✓ Compiled in 1839ms (804 modules)
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 170ms
+ GET /sitejar 200 in 174ms
+ GET /myhub 200 in 176ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 178ms
+ GET /coltempjar 200 in 178ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 197ms
+ GET /addressjar 200 in 136ms
+ GET /coltempjar 200 in 121ms
+ GET /addressjar 200 in 145ms
+ GET /addressjar 200 in 57ms
+ ✓ Compiled in 2.5s (1606 modules)
+ GET /coltempjar 200 in 307ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 312ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 320ms
+ GET /myhub 200 in 327ms
+ GET /sitejar 200 in 328ms
+ GET /addressjar 200 in 350ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 181ms
+ GET /coltempjar 200 in 162ms
+ GET /addressjar 200 in 154ms
+ GET /addressjar 200 in 127ms
+ ✓ Compiled in 2.2s (1606 modules)
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 192ms
+ GET /coltempjar 200 in 191ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 207ms
+ GET /myhub 200 in 210ms
+ GET /addressjar 200 in 207ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 216ms
+ GET /sitejar 200 in 115ms
+ GET /coltempjar 200 in 99ms
+ GET /addressjar 200 in 103ms
+ GET /addressjar 200 in 121ms
+ ✓ Compiled in 1940ms (1606 modules)
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 181ms
+ GET /coltempjar 200 in 216ms
+ GET /myhub 200 in 226ms
+ GET /sitejar 200 in 230ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 233ms
+ GET /addressjar 200 in 240ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 157ms
+ GET /addressjar 200 in 125ms
+ GET /coltempjar 200 in 155ms
+ GET /addressjar 200 in 77ms
+ ✓ Compiled in 2.2s (1606 modules)
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 132ms
+ GET /myhub 200 in 249ms
+ GET /sitejar 200 in 250ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 253ms
+ GET /coltempjar 200 in 258ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 267ms
+ GET /addressjar 200 in 150ms
+ GET /coltempjar 200 in 137ms
+ GET /addressjar 200 in 119ms
+ GET /addressjar 200 in 73ms
+ GET /addressjar 200 in 145ms
+ GET /addressjar 200 in 72ms
+ ✓ Compiled in 2.5s (1606 modules)
+ GET /coltempjar 200 in 205ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 257ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 261ms
+ GET /sitejar 200 in 261ms
+ GET /myhub 200 in 263ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 264ms
+ GET /addressjar 200 in 131ms
+ GET /coltempjar 200 in 116ms
+ GET /addressjar 200 in 73ms
+ GET /addressjar 200 in 44ms
+ GET /addressjar 200 in 99ms
+ ✓ Compiled in 1895ms (1606 modules)
+ GET /myhub 200 in 195ms
+ GET /sitejar 200 in 224ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 225ms
+ GET /coltempjar 200 in 231ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 237ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 242ms
+ GET /addressjar 200 in 154ms
+ GET /coltempjar 200 in 138ms
+ GET /addressjar 200 in 97ms
+ GET /addressjar 200 in 54ms
+ ✓ Compiled in 2.3s (1606 modules)
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 178ms
+ GET /coltempjar 200 in 178ms
+ GET /sitejar 200 in 225ms
+ GET /myhub 200 in 226ms
+ GET /addressjar 200 in 233ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 235ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 209ms
+ GET /coltempjar 200 in 225ms
+ GET /addressjar 200 in 172ms
+ GET /addressjar 200 in 56ms
+ ✓ Compiled in 1979ms (1606 modules)
+ GET /myhub 200 in 180ms
+ GET /sitejar 200 in 199ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 213ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 194ms
+ GET /coltempjar 200 in 222ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 208ms
+ GET /addressjar 200 in 151ms
+ GET /coltempjar 200 in 137ms
+ GET /addressjar 200 in 89ms
+ GET /addressjar 200 in 51ms
+ ✓ Compiled in 1971ms (1606 modules)
+ GET /myhub 200 in 199ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 210ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 198ms
+ GET /sitejar 200 in 212ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 212ms
+ GET /coltempjar 200 in 213ms
+ GET /addressjar 200 in 139ms
+ GET /coltempjar 200 in 138ms
+ GET /addressjar 200 in 120ms
+ GET /addressjar 200 in 110ms
+ ✓ Compiled in 2.3s (1606 modules)
+ GET /myhub 200 in 175ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 228ms
+ GET /sitejar 200 in 228ms
+ GET /coltempjar 200 in 232ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 235ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 264ms
+ GET /addressjar 200 in 108ms
+ GET /coltempjar 200 in 108ms
+ GET /addressjar 200 in 69ms
+ GET /addressjar 200 in 64ms
+ GET /driggsman 200 in 153ms
+ ○ Compiling /api/sitespren_tags ...
+ ✓ Compiled /api/sitespren_tags in 1237ms (992 modules)
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 1547ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 119ms
+ ✓ Compiled in 2.5s (1796 modules)
+ GET /coltempjar 200 in 114ms
+ GET /myhub 200 in 198ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 201ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 200ms
+ GET /sitejar 200 in 205ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 205ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 206ms
+ GET /addressjar 200 in 180ms
+ GET /coltempjar 200 in 190ms
+ GET /addressjar 200 in 148ms
+ GET /addressjar 200 in 54ms
+ ✓ Compiled in 2s (1796 modules)
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 263ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 186ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 193ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 186ms
+ GET /coltempjar 200 in 198ms
+ GET /myhub 200 in 194ms
+ GET /sitejar 200 in 178ms
+ GET /coltempjar 200 in 143ms
+ GET /addressjar 200 in 146ms
+ GET /addressjar 200 in 205ms
+ GET /addressjar 200 in 81ms
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 69ms
+ ✓ Compiled in 2.3s (1796 modules)
+ GET /myhub 200 in 193ms
+ GET /sitejar 200 in 220ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 248ms
+ GET /coltempjar 200 in 261ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 254ms
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 270ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 234ms
+ GET /coltempjar 200 in 117ms
+ GET /addressjar 200 in 134ms
+ GET /addressjar 200 in 53ms
+ GET /addressjar 200 in 49ms
+ ○ Compiling /indusjar ...
+ ✓ Compiled /indusjar in 1038ms (1602 modules)
+ GET /indusjar 200 in 1450ms
+ ✓ Compiled in 3.3s (1609 modules)
+ GET /myhub 200 in 243ms
+ GET /sitejar 200 in 247ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 253ms
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 258ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 263ms
+ GET /coltempjar 200 in 278ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 77ms
+ GET /coltempjar 200 in 83ms
+ GET /addressjar 200 in 116ms
+ GET /addressjar 200 in 80ms
+ GET /addressjar 200 in 99ms
+ ✓ Compiled in 2.1s (1609 modules)
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 111ms
+ GET /sitejar 200 in 217ms
+ GET /coltempjar 200 in 221ms
+ GET /myhub 200 in 229ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 292ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 311ms
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 319ms
+ GET /addressjar 200 in 149ms
+ GET /coltempjar 200 in 159ms
+ GET /addressjar 200 in 97ms
+ GET /addressjar 200 in 52ms
+ ✓ Compiled in 2.3s (1609 modules)
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 182ms
+ GET /myhub 200 in 192ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 197ms
+ GET /coltempjar 200 in 199ms
+ GET /sitejar 200 in 203ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 220ms
+ GET /addressjar 200 in 197ms
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 175ms
+ GET /coltempjar 200 in 176ms
+ GET /addressjar 200 in 170ms
+ GET /addressjar 200 in 70ms
+ ✓ Compiled in 1970ms (1609 modules)
+ GET /coltempjar 200 in 196ms
+ GET /sitejar 200 in 206ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 208ms
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 199ms
+ GET /myhub 200 in 209ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 210ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 160ms
+ GET /coltempjar 200 in 226ms
+ GET /addressjar 200 in 234ms
+ GET /addressjar 200 in 104ms
+ GET /addressjar 200 in 52ms
+ ✓ Compiled in 3.2s (807 modules)
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 1687ms
+ ✓ Compiled in 1812ms (807 modules)
+ GET /coltempjar 200 in 1823ms
+ GET /sitejar 200 in 1823ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 1823ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 1824ms
+ GET /myhub 200 in 1824ms
+ GET /addressjar 200 in 121ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 117ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 119ms
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 120ms
+ GET /coltempjar 200 in 120ms
+ GET /myhub 200 in 143ms
+ GET /sitejar 200 in 165ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 153ms
+ GET /coltempjar 200 in 125ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 136ms
+ GET /addressjar 200 in 140ms
+ GET /coltempjar 200 in 316ms
+ GET /addressjar 200 in 330ms
+ GET /addressjar 200 in 115ms
+ GET /addressjar 200 in 42ms
+ GET /addressjar 200 in 32ms
+ ✓ Compiled in 1854ms (807 modules)
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 127ms
+ GET /coltempjar 200 in 131ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 139ms
+ GET /myhub 200 in 143ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 153ms
+ GET /sitejar 200 in 164ms
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 207ms
+ GET /coltempjar 200 in 176ms
+ GET /addressjar 200 in 234ms
+ GET /addressjar 200 in 149ms
+ GET /addressjar 200 in 53ms
+ ✓ Compiled in 1586ms (807 modules)
+ GET /myhub 200 in 114ms
+ GET /sitejar 200 in 121ms
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 124ms
+ GET /assignwiz?type=cncglub&site=augustaplumbingco.com&user=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 120ms
+ GET /coltempjar 200 in 131ms
+ GET /driggsman?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 131ms
+ GET /driggsman?showtundrachamber=no&sitesperview=1&speccolumnpage=1&activefilterchamber=daylight&sitesentered=flintpestcontrol.net 200 in 120ms
+ GET /coltempjar 200 in 115ms
+ GET /addressjar 200 in 116ms
+ GET /addressjar 200 in 99ms
+ GET /addressjar 200 in 77ms
+ ✓ Compiled in 1722ms (807 modules)
+ GET /coltempjar?rel_utg_id=utg_addressjar&page=1 200 in 128ms
+ GET /driggsman?ac
+
+... [12634 lines truncated] ...
+</stdout>
+
+<stderr>
+Error fetching sitespren: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '    at node:internal/deps/undici/undici:13392:13\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async GET (webpack-internal:///(rsc)/./app/api/get_sitespren_data/route.ts:26:44)\n' +
+    '    at async AppRouteRouteModule.do (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34112)\n' +
+    '    at async AppRouteRouteModule.handle (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41338)\n' +
+    '    at async doRender (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/base-server.js:1513:42)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/base-server.js:1915:28)\n' +
+    '    at async DevServer.renderPageComponent (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/base-server.js:2403:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/base-server.js:2440:32)\n' +
+    '    at async DevServer.pipeImpl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/base-server.js:1007:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/next-server.js:305:17)\n' +
+    '    at async DevServer.handleRequestImpl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/base-server.js:899:17)\n' +
+    '    at async /Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/dev/next-dev-server.js:371:20\n' +
+    '    at async Span.traceAsyncFn (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/trace/trace.js:157:20)\n' +
+    '    at async DevServer.handleRequest (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/dev/next-dev-server.js:368:24)\n' +
+    '    at async invokeRender (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/lib/router-server.js:237:21)\n' +
+    '    at async handleRequest (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/lib/router-server.js:428:24)\n' +
+    '    at async requestHandlerImpl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/lib/router-server.js:452:13)\n' +
+    '    at async Server.requestListener (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/next/dist/server/lib/start-server.js:158:13)',
+  hint: '',
+  code: ''
+}
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ ⨯ ./app/(protected)/addressjar/pclient.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/addressjar/pclient.tsx[0m:390:1]
+ [2m387[0m |   }
+ [2m388[0m | 
+ [2m389[0m |   return (
+ [2m390[0m |     <div className="min-h-screen bg-gray-50 flex flex-col">
+     : [35;1m     ^^^[0m
+ [2m391[0m |       {/* Header */}
+ [2m392[0m |       <div className="bg-white border-b px-6 py-4">
+ [2m393[0m |         <div className="flex items-center justify-between">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/addressjar/pclient.tsx
+./app/(protected)/addressjar/page.tsx
+ ⨯ ./app/(protected)/addressjar/pclient.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/addressjar/pclient.tsx[0m:390:1]
+ [2m387[0m |   }
+ [2m388[0m | 
+ [2m389[0m |   return (
+ [2m390[0m |     <div className="min-h-screen bg-gray-50 flex flex-col">
+     : [35;1m     ^^^[0m
+ [2m391[0m |       {/* Header */}
+ [2m392[0m |       <div className="bg-white border-b px-6 py-4">
+ [2m393[0m |         <div className="flex items-center justify-between">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/addressjar/pclient.tsx
+./app/(protected)/addressjar/page.tsx
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⨯ ./app/(protected)/addressjar/pclient.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/addressjar/pclient.tsx[0m:390:1]
+ [2m387[0m |   }
+ [2m388[0m | 
+ [2m389[0m |   return (
+ [2m390[0m |     <div className="min-h-screen bg-gray-50 flex flex-col">
+     : [35;1m     ^^^[0m
+ [2m391[0m |       {/* Header */}
+ [2m392[0m |       <div className="bg-white border-b px-6 py-4">
+ [2m393[0m |         <div className="flex items-center justify-between">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/addressjar/pclient.tsx
+./app/(protected)/addressjar/page.tsx
+ ⨯ ./app/(protected)/addressjar/pclient.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/addressjar/pclient.tsx[0m:390:1]
+ [2m387[0m |   }
+ [2m388[0m | 
+ [2m389[0m |   return (
+ [2m390[0m |     <div className="min-h-screen bg-gray-50 flex flex-col">
+     : [35;1m     ^^^[0m
+ [2m391[0m |       {/* Header */}
+ [2m392[0m |       <div className="bg-white border-b px-6 py-4">
+ [2m393[0m |         <div className="flex items-center justify-between">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/addressjar/pclient.tsx
+./app/(protected)/addressjar/page.tsx
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ ⨯ ./app/(protected)/addressjar/components/AddressjarTable.tsx
+Module parse failed: Identifier 'wolfExclusionBandColumns' has already been declared (466:10)
+|     ];
+|     // WolfExclusionBand - Sticky columns that are excluded from pagination
+>     const wolfExclusionBandColumns = [
+|         {
+|             key: 'addresspren_id',
+
+Import trace for requested module:
+./app/(protected)/addressjar/components/AddressjarTable.tsx
+./app/(protected)/addressjar/pclient.tsx
+ ⨯ ./app/(protected)/addressjar/components/AddressjarTable.tsx
+Error:   [31mx[0m Expected ',', got ';'
+     ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/addressjar/components/AddressjarTable.tsx[0m:208:1]
+ [2m205[0m |     { key: 'addressglub_created_at' as keyof AddressData, label: 'created_at', type: 'datetime', readOnly: true, width: '160px', group: 'addressglub' },
+ [2m206[0m |     { key: 'addressglub_updated_at' as keyof AddressData, label: 'updated_at', type: 'datetime', readOnly: true, width: '160px', group: 'addressglub' },
+ [2m207[0m |     { key: 'address_hash' as keyof AddressData, label: 'address_hash', type: 'text', readOnly: true, width: '200px', group: 'addressglub' }
+ [2m208[0m |   ];
+     : [35;1m   ^[0m
+ [2m209[0m | 
+ [2m210[0m |   // WolfExclusionBand - Sticky columns that are excluded from pagination (use prop or default)
+ [2m211[0m |   const defaultWolfExclusionBandColumns = [
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/addressjar/components/AddressjarTable.tsx
+./app/(protected)/addressjar/pclient.tsx
+ ⨯ ./app/(protected)/addressjar/components/AddressjarTable.tsx
+Error:   [31mx[0m Expected ',', got ';'
+     ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/addressjar/components/AddressjarTable.tsx[0m:226:1]
+ [2m223[0m |     { key: 'related_sites_internal' as any, label: 'related sites (internal)', type: 'text', width: '120px', group: 'addresspren' },
+ [2m224[0m |     { key: 'related_sites_external' as any, label: 'related sites (external)', type: 'text', width: '120px', group: 'addresspren' },
+ [2m225[0m |     { key: 'full_address_input' as keyof AddressData, label: 'full_address_input', type: 'text', width: 'auto', minWidth: '450px', group: 'addressglub', separator: 'right' }
+ [2m226[0m |   ];
+     : [35;1m   ^[0m
+ [2m227[0m | 
+ [2m228[0m |   // Get wolf exclusion band columns - either from props or use default (memoized)
+ [2m229[0m |   const actualWolfExclusionBandColumns = useMemo(() => {
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/addressjar/components/AddressjarTable.tsx
+./app/(protected)/addressjar/pclient.tsx
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+Error fetching host companies with accounts (V2): {
+  code: 'PGRST200',
+  details: "Searched for a foreign key relationship between 'host_account' and 'host_plan' using the hint 'fk_host_account_id' in the schema 'public', but no matches were found.",
+  hint: "Perhaps you meant 'host_company' instead of 'host_plan'.",
+  message: "Could not find a relationship between 'host_account' and 'host_plan' in the schema cache"
+}
+Error fetching host companies with accounts (V2): {
+  code: 'PGRST200',
+  details: "Searched for a foreign key relationship between 'host_account' and 'host_plan' using the hint 'fk_host_account_id' in the schema 'public', but no matches were found.",
+  hint: "Perhaps you meant 'host_company' instead of 'host_plan'.",
+  message: "Could not find a relationship between 'host_account' and 'host_plan' in the schema cache"
+}
+Error fetching host companies with accounts (V2): {
+  code: 'PGRST200',
+  details: "Searched for a foreign key relationship between 'host_account' and 'host_plan' using the hint 'fk_host_account_id' in the schema 'public', but no matches were found.",
+  hint: "Perhaps you meant 'host_company' instead of 'host_plan'.",
+  message: "Could not find a relationship between 'host_account' and 'host_plan' in the schema cache"
+}
+Error fetching host companies with accounts (V2): {
+  code: 'PGRST200',
+  details: "Searched for a foreign key relationship between 'host_account' and 'host_plan' using the hint 'fk_host_account_id' in the schema 'public', but no matches were found.",
+  hint: "Perhaps you meant 'host_company' instead of 'host_plan'.",
+  message: "Could not find a relationship between 'host_account' and 'host_plan' in the schema cache"
+}
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_domain_registrar_info" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_domain_registrar_info" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_domain_registrar_info" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/update_domain_registrar" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/update_domain_registrar" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/update_domain_registrar" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/update_domain_registrar" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/update_domain_registrar" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+Playwright screenshot error: Error [TimeoutError]: page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "https://sitetrain.net/", waiting until "networkidle"[22m
+
+    at captureWebsiteScreenshot (app/api/capture-screenshot/route.ts:209:15)
+    at async POST (app/api/capture-screenshot/route.ts:106:29)
+  207 |
+  208 |     // Navigate with timeout and wait for network idle
+> 209 |     await page.goto(url, { 
+      |               ^
+  210 |       waitUntil: 'networkidle',
+  211 |       timeout: 30000 
+  212 |     });
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+</stderr>
+
+<timestamp>2025-09-01T13:44:53.583Z</timestamp>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Good, the build is working (there are some unrelated errors in addressjar but the main app is compiling). 
+
+## Summary
+
+✅ **Layout System Switcher Successfully Moved!**
+
+The Layout System Switcher dropdown has been relocated from the footer area to above the user profile picture section in all three sidebars. 
+
+### **New Order in Sidebars (from top to bottom):**
+1. **Logo and close button** (top of sidebar)
+2. **Layout System Switcher** (dropdown to switch between Default/Admin/Advanced Admin Systems) ← **MOVED HERE**
+3. **Header Visibility Toggle** (Show/Hide Header button)
+4. **User Profile Section** (avatar and user menu)
+5. **Navigation Items** (menu links)
+6. **Footer** (system info)
+
+### **Changes Made:**
+- **Sidebar1.tsx**: Moved LayoutSystemSwitcher from line 399 to line 295 (above Header Visibility Toggle)
+- **Sidebar2.tsx**: Moved LayoutSystemSwitcher from line 431 to line 327 (above Header Visibility Toggle)
+- **Sidebar3.tsx**: Moved LayoutSystemSwitcher from line 431 to line 327 (above Header Visibility Toggle)
+
+The Layout System Switcher is now prominently positioned at the top of the sidebar, making it easier for users to switch between different header/sidebar systems without scrolling to the bottom.
+

@@ -291,6 +291,9 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true,
           </button>
         </div>
 
+        {/* Layout System Switcher */}
+        <LayoutSystemSwitcher />
+
         {/* Header Visibility Toggle */}
         <HeaderVisibilityToggle onToggle={onHeaderVisibilityChange} />
 
@@ -395,8 +398,6 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true,
           </nav>
         </div>
 
-        {/* Layout System Switcher */}
-        <LayoutSystemSwitcher />
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-700">
