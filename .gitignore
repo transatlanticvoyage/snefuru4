@@ -76,3 +76,4 @@ next-env.d.ts
 *.wpress
 wordpress-sites/*/wp-content/ai1wm-backups/
 wordpress-sites/*/wp-content/backups/
+wordpress-sites/*/wp-content/plugins/snefuruplin*/
