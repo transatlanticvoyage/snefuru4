@@ -1,13 +1,16 @@
-  {
-	  "folders": [
-		  {
-			  "path": "."
-		  },
-		  {
-			  "path": "./snefuruplin"
-		  },
-		  {
-			  "path": "./shenzi-wordpress-plugins/grove"
-		  }
-	  ]
-  }
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "./snefuruplin"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/grove"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/beacon"
+		}
+	]
+}

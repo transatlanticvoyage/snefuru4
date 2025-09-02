@@ -25,6 +25,10 @@ export const system1Navigation: NavItem[] = [
       {
         name: 'CDN Manager',
         path: '/cdnjar'
+      },
+      {
+        name: 'Call Platform Manager',
+        path: '/callplatzar'
       }
     ]
   },
