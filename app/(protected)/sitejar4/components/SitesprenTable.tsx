@@ -151,7 +151,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   const [updatingPlugin, setUpdatingPlugin] = useState<Set<string>>(new Set());
   const [barkroPushing, setBarkroPushing] = useState<Set<string>>(new Set());
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const [gadgetFeedback, setGadgetFeedback] = useState<{action: string, message: string, type: 'success' | 'error' | 'info', timestamp: string} | null>(null);
   const [registrarPopupOpen, setRegistrarPopupOpen] = useState<string | null>(null);
   const [allHostAccounts, setAllHostAccounts] = useState<any[]>([]);
   const [editPopupOpen, setEditPopupOpen] = useState<string | null>(null);
@@ -173,7 +172,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   const [tagsFeedback, setTagsFeedback] = useState<{type: 'success' | 'error' | 'info', message: string} | null>(null);
   const [showCopyOverlay, setShowCopyOverlay] = useState(false);
   const [overlayOpacity, setOverlayOpacity] = useState(0);
-  const [chepnoVisible, setChepnoVisible] = useState(false);
   
   const supabase = createClientComponentClient();
   
@@ -292,15 +290,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     localStorage.setItem('sitejar4_stickycol', stickyCol);
   };
 
-  const handleColumnTemplateChange = (option: string) => {
-    setSelectedColumnTemplate(option);
-    updateUrlAndStorage(option, selectedStickyColumns, filterTag);
-  };
-
-  const handleStickyColumnsChange = (option: string) => {
-    setSelectedStickyColumns(option);
-    updateUrlAndStorage(selectedColumnTemplate, option, filterTag);
-  };
 
   const handleTagFilterChange = (tagId: string) => {
     setFilterTag(tagId);
@@ -1648,79 +1637,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     }
   };
 
-  // Single site action handler for the gadgets section
-  const handleSingleSiteAction = async (action: string, method?: string) => {
-    const selectedSiteId = Array.from(selectedSites)[0];
-    if (!selectedSiteId) return;
-
-    const timestamp = new Date().toISOString();
-    setGadgetFeedback({
-      action: `${action}${method ? ` (${method})` : ''}`,
-      message: 'Processing...',
-      type: 'info',
-      timestamp
-    });
-
-    try {
-      let result;
-      switch (action) {
-        case 'wpsv2_sync':
-          result = await handleWpsv2Sync(selectedSiteId, (method as 'plugin_api' | 'rest_api') || 'plugin_api');
-          break;
-        case 'test_plugin':
-          result = await handleWpsv2TestPlugin(selectedSiteId);
-          break;
-        case 'check_plugin_version':
-          result = await handleCheckPluginVersion(selectedSiteId);
-          break;
-        case 'update_plugin':
-          result = await handleUpdatePlugin(selectedSiteId);
-          break;
-        case 'barkro_push':
-          result = await handleBarkroPush(selectedSiteId);
-          break;
-        default:
-          throw new Error(`Unknown action: ${action}`);
-      }
-
-      // The individual handlers now set the gadget feedback directly,
-      // so we don't need to do anything else here
-    } catch (error) {
-      setGadgetFeedback({
-        action: `${action}${method ? ` (${method})` : ''}`,
-        message: error instanceof Error ? error.message : 'Unknown error occurred',
-        type: 'error',
-        timestamp
-      });
-    }
-  };
-
-  // Copy feedback message to clipboard
-  const copyFeedbackMessage = async () => {
-    if (!gadgetFeedback) return;
-    
-    const message = `Action: ${gadgetFeedback.action}\nMessage: ${gadgetFeedback.message}\nTime: ${new Date(gadgetFeedback.timestamp).toLocaleString()}`;
-    
-    try {
-      await navigator.clipboard.writeText(message);
-      // Briefly show success
-      const originalMessage = gadgetFeedback.message;
-      setGadgetFeedback({
-        ...gadgetFeedback,
-        message: 'Message copied to clipboard!'
-      });
-      setTimeout(() => {
-        setGadgetFeedback(prev => prev ? { ...prev, message: originalMessage } : null);
-      }, 2000);
-    } catch (error) {
-      console.error('Failed to copy:', error);
-    }
-  };
-
-  // Clear feedback message
-  const clearFeedbackMessage = () => {
-    setGadgetFeedback(null);
-  };
 
   // Update domain registrar for a site
   const updateDomainRegistrar = async (siteId: string, newHostAccountId: string | null) => {
@@ -2309,75 +2225,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
 
   return (
     <div className="space-y-4">
-      {/* Column Template and View Control System */}
-      <div className="flex items-start space-x-4">
-        {/* SQL View Info */}
-        <div className="bg-gray-100 p-3 rounded-lg border" style={{width: '130px'}}>
-          <div className="text-xs font-semibold text-gray-700 mb-1">SQL View Info</div>
-          <div className="text-xs text-gray-600">
-            <div>view name: sitespren_large_view_1</div>
-            <div># columns: {allColumns.length}</div>
-          </div>
-        </div>
-
-        {/* Column Template Button Bar */}
-        <div className="bg-white p-3 rounded-lg border shadow-sm" style={{width: '600px'}}>
-          <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
-          <div className="flex space-x-1">
-            {[
-              { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-22' },
-              { id: 'option2', label: 'OPTION 2', subtitle: 'col temp a', range: 'columns 1-8' },
-              { id: 'option3', label: 'OPTION 3', subtitle: 'col temp b', range: 'columns 9-15' },
-              { id: 'option4', label: 'OPTION 4', subtitle: 'col temp c', range: 'columns 16-22' },
-              { id: 'option5', label: 'OPTION 5', subtitle: 'col temp d', range: 'empty' }
-            ].map(option => (
-              <button
-                key={option.id}
-                onClick={() => handleColumnTemplateChange(option.id)}
-                className={`text-xs leading-tight py-1 px-0.5 rounded border text-center ${
-                  selectedColumnTemplate === option.id
-                    ? 'bg-blue-900 text-white border-blue-900'
-                    : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
-                }`}
-                style={{width: '115px', fontSize: '10px'}}
-              >
-                <div className="font-semibold" style={{fontSize: '10px'}}>{option.label}</div>
-                <div style={{fontSize: '9px'}}>{option.subtitle}</div>
-                <div style={{fontSize: '9px'}}>{option.range}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Sticky Columns Section */}
-        <div className="bg-white p-3 rounded-lg border shadow-sm">
-          <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns At Left Side Of UI Grid Table</div>
-          <div className="flex space-x-1">
-            {[
-              { id: 'option1', label: 'OPTION 1', subtitle: '1 left-most', range: 'column' },
-              { id: 'option2', label: 'OPTION 2', subtitle: '2 left-most', range: 'columns' },
-              { id: 'option3', label: 'OPTION 3', subtitle: '3 left-most', range: 'columns' },
-              { id: 'option4', label: 'OPTION 4', subtitle: '4 left-most', range: 'columns' },
-              { id: 'option5', label: 'OPTION 5', subtitle: '5 left-most', range: 'columns' }
-            ].map(option => (
-              <button
-                key={option.id}
-                onClick={() => handleStickyColumnsChange(option.id)}
-                className={`text-xs leading-tight py-1 px-0.5 rounded border text-center ${
-                  selectedStickyColumns === option.id
-                    ? 'bg-blue-900 text-white border-blue-900'
-                    : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
-                }`}
-                style={{width: '75px', fontSize: '10px'}}
-              >
-                <div className="font-semibold" style={{fontSize: '10px'}}>{option.label}</div>
-                <div style={{fontSize: '9px'}}>{option.subtitle}</div>
-                <div style={{fontSize: '9px'}}>{option.range}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
       
       {/* Search and Filters */}
       <div className="bg-white p-4 rounded-lg shadow">
@@ -2611,243 +2458,9 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         </div>
       </div>
 
-      {/* Chepzur Toggle Button */}
-      <div className="flex justify-center">
-        <button
-          onClick={() => setChepnoVisible(!chepnoVisible)}
-          className={`px-4 py-2 text-sm font-medium rounded-md border transition-colors ${
-            chepnoVisible 
-              ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          chepzur
-        </button>
-      </div>
 
-      {/* Site Gadgets Section - Chepno Chamber - Upper Instance */}
-      {chepnoVisible && (
-        <div className="bg-white p-4 rounded-lg shadow border-black border-4">
-          <div className="text-lg font-bold">site_gadgets_chepno_original</div>
-          <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-            <button className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('plugin_api')} disabled={selectedSites.size !== 1} title="Call Plugin API">
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">chep11<br />xplugin<br />Plugin API</div>
-            </button>
-            <button className="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('rest_api')} disabled={selectedSites.size !== 1} title="Call REST API">
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">chep21<br />xrest<br />REST API</div>
-            </button>
-          </div>
-        </div>
-      )}
 
-      {/* Site Gadgets Section - Chepno Chamber 
-      TEMPORARILY COMMENTED OUT FOR DEBUGGING
-      {chepnoVisible && (
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
-        
-        {/* Sync Actions Buttons */}
-        <div className="mb-4">
-          <div className="flex flex-wrap gap-2">
-            <button
-              className="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-              onClick={() => handleSingleSiteAction('wpsv2_sync', 'plugin_api')}
-              disabled={selectedSites.size !== 1}
-              title="Sync site using Plugin API"
-            >
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">
-                chep11<br />
-                articles<br />
-                wp → nwpi<br />
-                xplugin<br />
-                Plugin API
-              </div>
-            </button>
-            
-            <button
-              className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-              onClick={() => handleSingleSiteAction('wpsv2_sync', 'rest_api')}
-              disabled={selectedSites.size !== 1}
-              title="Sync site using REST API"
-            >
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">
-                chep21<br />
-                articles<br />
-                wp → nwpi<br />
-                xrest<br />
-                REST API
-              </div>
-            </button>
-            
-            <button
-              className="px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-              onClick={() => handleSingleSiteAction('test_plugin')}
-              disabled={selectedSites.size !== 1}
-              title="Test plugin connection"
-            >
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">
-                chep31<br />
-                Test Plugin
-              </div>
-            </button>
-            
-            <button
-              className="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-              onClick={() => handleSingleSiteAction('check_plugin_version')}
-              disabled={selectedSites.size !== 1}
-              title="Check plugin version"
-            >
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">
-                chep41<br />
-                Check Version
-              </div>
-            </button>
-            
-            <button
-              className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-              onClick={() => handleSingleSiteAction('update_plugin')}
-              disabled={selectedSites.size !== 1}
-              title="Update plugin"
-            >
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">
-                chep51<br />
-                xrest<br />
-                Update Plugin
-              </div>
-            </button>
-            
-            <button
-              className="px-3 py-2 text-sm font-medium text-white bg-yellow-600 rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-              onClick={() => handleSingleSiteAction('barkro_push')}
-              disabled={selectedSites.size !== 1}
-              title="Push Barkro update"
-            >
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">
-                chep61<br />
-                xplugin<br />
-                Barkro Push
-              </div>
-            </button>
-          </div>
-          
-          {selectedSites.size === 0 && (
-            <p className="text-sm text-gray-500 mt-2">Please select exactly 1 site to use these actions</p>
-          )}
-          {selectedSites.size > 1 && (
-            <p className="text-sm text-orange-600 mt-2">Please select only 1 site (currently {selectedSites.size} selected)</p>
-          )}
-        </div>
-        
-        <hr className="border-gray-200 mb-4" />
-        
-        {/* Feedback Message Area */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium text-gray-700">Action Feedback</h4>
-            <div className="flex gap-2">
-              <button
-                onClick={() => copyFeedbackMessage()}
-                disabled={!gadgetFeedback}
-                className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 rounded border disabled:cursor-not-allowed"
-              >
-                Copy Message
-              </button>
-              <button
-                onClick={() => clearFeedbackMessage()}
-                disabled={!gadgetFeedback}
-                className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 disabled:bg-gray-50 disabled:text-gray-400 text-red-700 rounded border disabled:cursor-not-allowed"
-              >
-                Clear Message
-              </button>
-            </div>
-          </div>
-          
-          <div className="min-h-[80px] p-3 bg-gray-50 border rounded-md">
-            {gadgetFeedback ? (
-              <div className={`text-sm ${
-                gadgetFeedback.type === 'success' ? 'text-green-700' : 
-                gadgetFeedback.type === 'error' ? 'text-red-700' : 'text-gray-700'
-              }`}>
-                <div className="font-medium">{gadgetFeedback.action}</div>
-                <div className="mt-1">{gadgetFeedback.message}</div>
-                {gadgetFeedback.timestamp && (
-                  <div className="text-xs text-gray-500 mt-2">
-                    {new Date(gadgetFeedback.timestamp).toLocaleString()}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-sm text-gray-400 italic">
-                No feedback messages yet. Select a site and click an action button.
-              </div>
-            )}
-          </div>
-        </div>
 
-      {/* Site Gadgets Section - Chepno Chamber */}
-      {chepnoVisible && (
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-            <button className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('plugin_api')} disabled={selectedSites.size !== 1} title="Call Plugin API">
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">chep11<br />xplugin<br />Plugin API</div>
-            </button>
-            <button className="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('rest_api')} disabled={selectedSites.size !== 1} title="Call REST API">
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">chep21<br />xrest<br />REST API</div>
-            </button>
-            <button className="px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('test_plugin')} disabled={selectedSites.size !== 1} title="Test Plugin">
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">chep31<br />xrest<br />Test Plugin</div>
-            </button>
-            <button className="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('check_version')} disabled={selectedSites.size !== 1} title="Check Plugin Version">
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">chep41<br />xrest<br />Check Version</div>
-            </button>
-            <button className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('update_plugin')} disabled={selectedSites.size !== 1} title="Update Plugin">
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">chep51<br />xrest<br />Update Plugin</div>
-            </button>
-            <button className="px-3 py-2 text-sm font-medium text-white bg-yellow-600 rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('barkro_push')} disabled={selectedSites.size !== 1} title="Push Barkro update">
-              <span className="info-icon group">ℹ</span>
-              <div className="text-center leading-tight">chep61<br />xplugin<br />Barkro Push</div>
-            </button>
-          </div>
-          {selectedSites.size === 0 && (<p className="text-sm text-gray-500 mt-2">Please select exactly 1 site to use these actions</p>)}
-          {selectedSites.size > 1 && (<p className="text-sm text-orange-600 mt-2">Please select only 1 site (currently {selectedSites.size} selected)</p>)}
-          <hr className="border-gray-200 mb-4" />
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium text-gray-700">Action Feedback</h4>
-              <div className="flex gap-2">
-                <button onClick={() => copyFeedbackMessage()} disabled={!gadgetFeedback} className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 rounded border disabled:cursor-not-allowed">Copy Message</button>
-                <button onClick={() => clearFeedbackMessage()} disabled={!gadgetFeedback} className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 disabled:bg-gray-50 disabled:text-gray-400 text-red-700 rounded border disabled:cursor-not-allowed">Clear Message</button>
-              </div>
-            </div>
-            <div className="min-h-[80px] p-3 bg-gray-50 border rounded-md">
-              {gadgetFeedback ? (
-                <div className={`text-sm ${gadgetFeedback.type === 'success' ? 'text-green-700' : gadgetFeedback.type === 'error' ? 'text-red-700' : 'text-gray-700'}`}>
-                  <div className="font-medium">{gadgetFeedback.action}</div>
-                  <div className="mt-1">{gadgetFeedback.message}</div>
-                  {gadgetFeedback.timestamp && (<div className="text-xs text-gray-500 mt-2">{new Date(gadgetFeedback.timestamp).toLocaleString()}</div>)}
-                </div>
-              ) : (
-                <div className="text-sm text-gray-400 italic">No feedback messages yet. Select a site and click an action button.</div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">

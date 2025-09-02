@@ -287,6 +287,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 3000);
   }
 
+  // Environment toggle functionality
+  let currentEnvironment = 'localhost'; // Default to localhost
+  
+  const localhostBtn = document.getElementById('localhostBtn');
+  const cloudBtn = document.getElementById('cloudBtn');
+  
+  function updateEnvironment(env) {
+    currentEnvironment = env;
+    
+    // Update button states
+    if (env === 'localhost') {
+      localhostBtn.classList.add('env-btn-active');
+      cloudBtn.classList.remove('env-btn-active');
+    } else {
+      cloudBtn.classList.add('env-btn-active');
+      localhostBtn.classList.remove('env-btn-active');
+    }
+  }
+  
+  localhostBtn.addEventListener('click', () => updateEnvironment('localhost'));
+  cloudBtn.addEventListener('click', () => updateEnvironment('cloud'));
+  
   // Dromdori functionality
   async function getCurrentDomain() {
     try {
@@ -301,12 +323,17 @@ document.addEventListener('DOMContentLoaded', function() {
       return null;
     }
   }
+  
+  function getAppBaseUrl() {
+    return currentEnvironment === 'cloud' ? 'https://snef.me' : 'http://localhost:3000';
+  }
 
   // Direct button handlers
   document.getElementById('dromdoriDromBtn').addEventListener('click', async function() {
     const domain = await getCurrentDomain();
     if (domain) {
-      const dromUrl = `https://snef.me/drom?sitesentered=${encodeURIComponent(domain)}&activefilterchamber=daylight&showmainchamberboxes=no&showtundrachamber=yes&sitesperview=1&speccolumnpage=1`;
+      const baseUrl = getAppBaseUrl();
+      const dromUrl = `${baseUrl}/drom?sitesentered=${encodeURIComponent(domain)}&activefilterchamber=daylight&showmainchamberboxes=no&showtundrachamber=yes&sitesperview=1&speccolumnpage=1`;
       chrome.tabs.create({ url: dromUrl });
     }
   });

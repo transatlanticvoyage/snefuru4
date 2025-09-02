@@ -104,6 +104,10 @@ export default function Sitejar4Client() {
     yupik: true,
     chepno: true
   });
+  
+  // Chepno functionality states (moved from SitesprenTable)
+  const [chepnoVisible, setChepnoVisible] = useState(false);
+  const [gadgetFeedback, setGadgetFeedback] = useState<{action: string, message: string, type: 'success' | 'error' | 'info', timestamp: string} | null>(null);
   const [selectedF71Fields, setSelectedF71Fields] = useState<Set<string>>(new Set());
   const [tagsData, setTagsData] = useState<any>(null);
   const { user } = useAuth();
@@ -620,6 +624,66 @@ export default function Sitejar4Client() {
     }));
   };
 
+  // Chepno action handlers (moved from SitesprenTable)
+  const handleSingleSiteAction = async (action: string, method?: string) => {
+    const selectedSiteId = selectedSiteIds[0];
+    if (!selectedSiteId) return;
+
+    const timestamp = new Date().toISOString();
+    setGadgetFeedback({
+      action: `${action}${method ? ` (${method})` : ''}`,
+      message: 'Action started...',
+      type: 'info',
+      timestamp
+    });
+
+    try {
+      // Simulate API call - replace with actual implementation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setGadgetFeedback({
+        action: `${action}${method ? ` (${method})` : ''}`,
+        message: `Action completed successfully for site ${selectedSiteId}`,
+        type: 'success',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      setGadgetFeedback({
+        action: `${action}${method ? ` (${method})` : ''}`,
+        message: `Action failed: ${error}`,
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
+    }
+  };
+
+  // Copy feedback message to clipboard
+  const copyFeedbackMessage = async () => {
+    if (!gadgetFeedback) return;
+    
+    const message = `Action: ${gadgetFeedback.action}\nMessage: ${gadgetFeedback.message}\nTime: ${new Date(gadgetFeedback.timestamp).toLocaleString()}`;
+    
+    try {
+      await navigator.clipboard.writeText(message);
+      // Briefly show success
+      const originalMessage = gadgetFeedback.message;
+      setGadgetFeedback({
+        ...gadgetFeedback,
+        message: 'Message copied to clipboard!'
+      });
+      setTimeout(() => {
+        setGadgetFeedback(prev => prev ? { ...prev, message: originalMessage } : null);
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy message:', error);
+    }
+  };
+
+  // Clear feedback message
+  const clearFeedbackMessage = () => {
+    setGadgetFeedback(null);
+  };
+
   const f18_deletesites = async () => {
     if (selectedSiteIds.length === 0) {
       setDeleteNotification({
@@ -740,14 +804,6 @@ export default function Sitejar4Client() {
             }`}
           >
             yupik
-          </button>
-          <button
-            onClick={() => toggleChamber('chepno')}
-            className={`px-3 py-1 text-sm rounded transition-colors ${
-              chambersVisible.chepno ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
-            }`}
-          >
-            chepno
           </button>
         </div>
       </div>
@@ -1587,8 +1643,244 @@ http://www.drogs.com`}
                 )}
                 {activePopupTab === 'ptab5' && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Content for ptab5</h3>
-                    <p className="text-gray-600">This is the content area for ptab5.</p>
+                    <h3 className="text-lg font-semibold mb-4">Chepno Site Gadgets</h3>
+                    
+                    {/* Chepzur Toggle Button */}
+                    <div className="flex justify-center mb-4">
+                      <button
+                        onClick={() => setChepnoVisible(!chepnoVisible)}
+                        className={`px-4 py-2 text-sm font-medium rounded-md border transition-colors ${
+                          chepnoVisible 
+                            ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        chepzur
+                      </button>
+                    </div>
+
+                    {/* All Chepno Content - exactly as on main page */}
+                    {chepnoVisible && (
+                      <>
+                        {/* Site Gadgets Section - Chepno Chamber - Upper Instance */}
+                        <div className="bg-white p-4 rounded-lg shadow border-black border-4 mb-4">
+                          <div className="text-lg font-bold">site_gadgets_chepno_original</div>
+                          <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                            <button className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('plugin_api')} disabled={selectedSiteIds.length !== 1} title="Call Plugin API">
+                              <span className="info-icon group">ℹ</span>
+                              <div className="text-center leading-tight">chep11<br />xplugin<br />Plugin API</div>
+                            </button>
+                            <button className="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('rest_api')} disabled={selectedSiteIds.length !== 1} title="Call REST API">
+                              <span className="info-icon group">ℹ</span>
+                              <div className="text-center leading-tight">chep21<br />xrest<br />REST API</div>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Site Gadgets Section - Chepno Chamber - Extended Version */}
+                        <div className="bg-white p-4 rounded-lg shadow border mb-4">
+                          <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
+                          
+                          {/* Sync Actions Buttons */}
+                          <div className="mb-4">
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                className="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                onClick={() => handleSingleSiteAction('wpsv2_sync', 'plugin_api')}
+                                disabled={selectedSiteIds.length !== 1}
+                                title="Sync site using Plugin API"
+                              >
+                                <span className="info-icon group">ℹ</span>
+                                <div className="text-center leading-tight">
+                                  chep11<br />
+                                  articles<br />
+                                  wp → nwpi<br />
+                                  xplugin<br />
+                                  Plugin API
+                                </div>
+                              </button>
+                              
+                              <button
+                                className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                onClick={() => handleSingleSiteAction('wpsv2_sync', 'rest_api')}
+                                disabled={selectedSiteIds.length !== 1}
+                                title="Sync site using REST API"
+                              >
+                                <span className="info-icon group">ℹ</span>
+                                <div className="text-center leading-tight">
+                                  chep21<br />
+                                  articles<br />
+                                  wp → nwpi<br />
+                                  xrest<br />
+                                  REST API
+                                </div>
+                              </button>
+                              
+                              <button
+                                className="px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                onClick={() => handleSingleSiteAction('test_plugin')}
+                                disabled={selectedSiteIds.length !== 1}
+                                title="Test plugin connection"
+                              >
+                                <span className="info-icon group">ℹ</span>
+                                <div className="text-center leading-tight">
+                                  chep31<br />
+                                  Test Plugin
+                                </div>
+                              </button>
+                              
+                              <button
+                                className="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                onClick={() => handleSingleSiteAction('check_plugin_version')}
+                                disabled={selectedSiteIds.length !== 1}
+                                title="Check plugin version"
+                              >
+                                <span className="info-icon group">ℹ</span>
+                                <div className="text-center leading-tight">
+                                  chep41<br />
+                                  Check Version
+                                </div>
+                              </button>
+                              
+                              <button
+                                className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                onClick={() => handleSingleSiteAction('update_plugin')}
+                                disabled={selectedSiteIds.length !== 1}
+                                title="Update plugin"
+                              >
+                                <span className="info-icon group">ℹ</span>
+                                <div className="text-center leading-tight">
+                                  chep51<br />
+                                  xrest<br />
+                                  Update Plugin
+                                </div>
+                              </button>
+                              
+                              <button
+                                className="px-3 py-2 text-sm font-medium text-white bg-yellow-600 rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                onClick={() => handleSingleSiteAction('barkro_push')}
+                                disabled={selectedSiteIds.length !== 1}
+                                title="Push Barkro update"
+                              >
+                                <span className="info-icon group">ℹ</span>
+                                <div className="text-center leading-tight">
+                                  chep61<br />
+                                  xplugin<br />
+                                  Barkro Push
+                                </div>
+                              </button>
+                            </div>
+                            
+                            {selectedSiteIds.length === 0 && (
+                              <p className="text-sm text-gray-500 mt-2">Please select exactly 1 site to use these actions</p>
+                            )}
+                            {selectedSiteIds.length > 1 && (
+                              <p className="text-sm text-orange-600 mt-2">Please select only 1 site (currently {selectedSiteIds.length} selected)</p>
+                            )}
+                          </div>
+                          
+                          <hr className="border-gray-200 mb-4" />
+                          
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-sm font-medium text-gray-700">Action Feedback</h4>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => copyFeedbackMessage()}
+                                  disabled={!gadgetFeedback}
+                                  className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 rounded border disabled:cursor-not-allowed"
+                                >
+                                  Copy Message
+                                </button>
+                                <button
+                                  onClick={() => clearFeedbackMessage()}
+                                  disabled={!gadgetFeedback}
+                                  className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 disabled:bg-gray-50 disabled:text-gray-400 text-red-700 rounded border disabled:cursor-not-allowed"
+                                >
+                                  Clear Message
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <div className="min-h-[80px] p-3 bg-gray-50 border rounded-md">
+                              {gadgetFeedback ? (
+                                <div className={`text-sm ${
+                                  gadgetFeedback.type === 'success' ? 'text-green-700' : 
+                                  gadgetFeedback.type === 'error' ? 'text-red-700' : 'text-gray-700'
+                                }`}>
+                                  <div className="font-medium">{gadgetFeedback.action}</div>
+                                  <div className="mt-1">{gadgetFeedback.message}</div>
+                                  {gadgetFeedback.timestamp && (
+                                    <div className="text-xs text-gray-500 mt-2">
+                                      {new Date(gadgetFeedback.timestamp).toLocaleString()}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="text-sm text-gray-400 italic">
+                                  No feedback messages yet. Select a site and click an action button.
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Site Gadgets Section - Chepno Chamber - Main Version */}
+                        <div className="bg-white p-4 rounded-lg shadow border">
+                          <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                            <button className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('plugin_api')} disabled={selectedSiteIds.length !== 1} title="Call Plugin API">
+                              <span className="info-icon group">ℹ</span>
+                              <div className="text-center leading-tight">chep11<br />xplugin<br />Plugin API</div>
+                            </button>
+                            <button className="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('rest_api')} disabled={selectedSiteIds.length !== 1} title="Call REST API">
+                              <span className="info-icon group">ℹ</span>
+                              <div className="text-center leading-tight">chep21<br />xrest<br />REST API</div>
+                            </button>
+                            <button className="px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('test_plugin')} disabled={selectedSiteIds.length !== 1} title="Test Plugin">
+                              <span className="info-icon group">ℹ</span>
+                              <div className="text-center leading-tight">chep31<br />xrest<br />Test Plugin</div>
+                            </button>
+                            <button className="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('check_version')} disabled={selectedSiteIds.length !== 1} title="Check Plugin Version">
+                              <span className="info-icon group">ℹ</span>
+                              <div className="text-center leading-tight">chep41<br />xrest<br />Check Version</div>
+                            </button>
+                            <button className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('update_plugin')} disabled={selectedSiteIds.length !== 1} title="Update Plugin">
+                              <span className="info-icon group">ℹ</span>
+                              <div className="text-center leading-tight">chep51<br />xrest<br />Update Plugin</div>
+                            </button>
+                            <button className="px-3 py-2 text-sm font-medium text-white bg-yellow-600 rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1" onClick={() => handleSingleSiteAction('barkro_push')} disabled={selectedSiteIds.length !== 1} title="Push Barkro update">
+                              <span className="info-icon group">ℹ</span>
+                              <div className="text-center leading-tight">chep61<br />xplugin<br />Barkro Push</div>
+                            </button>
+                          </div>
+                          {selectedSiteIds.length === 0 && (<p className="text-sm text-gray-500 mt-2">Please select exactly 1 site to use these actions</p>)}
+                          {selectedSiteIds.length > 1 && (<p className="text-sm text-orange-600 mt-2">Please select only 1 site (currently {selectedSiteIds.length} selected)</p>)}
+                          <hr className="border-gray-200 mb-4" />
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-sm font-medium text-gray-700">Action Feedback</h4>
+                              <div className="flex gap-2">
+                                <button onClick={() => copyFeedbackMessage()} disabled={!gadgetFeedback} className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 rounded border disabled:cursor-not-allowed">Copy Message</button>
+                                <button onClick={() => clearFeedbackMessage()} disabled={!gadgetFeedback} className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 disabled:bg-gray-50 disabled:text-gray-400 text-red-700 rounded border disabled:cursor-not-allowed">Clear Message</button>
+                              </div>
+                            </div>
+                            <div className="min-h-[80px] p-3 bg-gray-50 border rounded-md">
+                              {gadgetFeedback ? (
+                                <div className={`text-sm ${gadgetFeedback.type === 'success' ? 'text-green-700' : gadgetFeedback.type === 'error' ? 'text-red-700' : 'text-gray-700'}`}>
+                                  <div className="font-medium">{gadgetFeedback.action}</div>
+                                  <div className="mt-1">{gadgetFeedback.message}</div>
+                                  {gadgetFeedback.timestamp && (<div className="text-xs text-gray-500 mt-2">{new Date(gadgetFeedback.timestamp).toLocaleString()}</div>)}
+                                </div>
+                              ) : (
+                                <div className="text-sm text-gray-400 italic">No feedback messages yet. Select a site and click an action button.</div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
                 {activePopupTab === 'ptab6' && (

@@ -4545,14 +4545,14 @@ export default function DriggsmanTable({
                                   DG
                                 </a>
                                 
-                                {/* IN - Sitejar4 individual view */}
+                                {/* /sitejar4 - Sitejar4 individual view */}
                                 <a
                                   href={`/sitejar4?sitesentered=${encodeURIComponent(domain)}`}
                                   onClick={(e) => e.stopPropagation()}
                                   style={{...baseButtonStyle, backgroundColor: '#3b82f6'}}
                                   title="View only this site"
                                 >
-                                  IN
+                                  /sitejar4
                                 </a>
                                 
                                 {/* Dromdori component - compact mode for reindeer box */}
