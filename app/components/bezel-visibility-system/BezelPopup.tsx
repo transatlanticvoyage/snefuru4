@@ -39,7 +39,8 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     if (pathname === '/sitejar4') {
       const savedVisibility = localStorage.getItem('sitejar4_copperChamberVisible');
       if (savedVisibility !== null) {
-        setCopperChamberVisible(JSON.parse(savedVisibility));
+        const parsed = JSON.parse(savedVisibility);
+        setCopperChamberVisible(parsed);
       } else {
         // If no saved state, set default to true and save it
         setCopperChamberVisible(true);

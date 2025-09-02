@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -141,7 +141,8 @@ export default function Sitejar4Client() {
   useEffect(() => {
     const savedVisibility = localStorage.getItem('sitejar4_copperChamberVisible');
     if (savedVisibility !== null) {
-      setCopperChamberVisible(JSON.parse(savedVisibility));
+      const parsed = JSON.parse(savedVisibility);
+      setCopperChamberVisible(parsed);
     } else {
       // If no saved state, set default to true and save it
       setCopperChamberVisible(true);
@@ -747,15 +748,15 @@ export default function Sitejar4Client() {
     setGadgetFeedback(null);
   };
 
-  // Handle pagination from SitesprenTable (both row and column)
-  const handleColumnPaginationRender = (controls: {
+  // Handle pagination from SitesprenTable (both row and column) - use useCallback to prevent infinite loop
+  const handleColumnPaginationRender = useCallback((controls: {
     RowPaginationBar1: () => JSX.Element | null;
     RowPaginationBar2: () => JSX.Element | null;
     ColumnPaginationBar1: () => JSX.Element | null;
     ColumnPaginationBar2: () => JSX.Element | null;
   }) => {
     setPaginationBars(controls);
-  };
+  }, []);
 
   const f18_deletesites = async () => {
     if (selectedSiteIds.length === 0) {
