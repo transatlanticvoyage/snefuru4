@@ -30,6 +30,8 @@ export default function DFSAutofetchSettingsClient() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [pendingChanges, setPendingChanges] = useState<Map<number, boolean>>(new Map());
 
   // Load settings on component mount
   useEffect(() => {
@@ -61,39 +63,70 @@ export default function DFSAutofetchSettingsClient() {
     }
   };
 
-  const toggleSetting = async (settingId: number, currentValue: boolean) => {
+  const toggleSetting = (settingId: number, currentValue: boolean) => {
+    // Update local state immediately
+    setSettings(prev => prev.map(setting => 
+      setting.id === settingId 
+        ? { ...setting, is_enabled: !currentValue }
+        : setting
+    ));
+    
+    // Track the change
+    setPendingChanges(prev => {
+      const newChanges = new Map(prev);
+      newChanges.set(settingId, !currentValue);
+      return newChanges;
+    });
+    
+    setHasUnsavedChanges(true);
+  };
+
+  const saveChanges = async () => {
+    if (!hasUnsavedChanges || pendingChanges.size === 0) {
+      setNotification({
+        type: 'success',
+        message: 'No changes to save'
+      });
+      setTimeout(() => setNotification(null), 3000);
+      return;
+    }
+
     try {
       setSaving(true);
       
-      const { error } = await supabase
-        .from('dfs_autofetch_settings')
-        .update({ is_enabled: !currentValue })
-        .eq('id', settingId);
+      // Save all pending changes
+      const promises = Array.from(pendingChanges.entries()).map(([settingId, newValue]) => 
+        supabase
+          .from('dfs_autofetch_settings')
+          .update({ is_enabled: newValue })
+          .eq('id', settingId)
+      );
 
-      if (error) {
-        throw error;
+      const results = await Promise.all(promises);
+      
+      // Check for any errors
+      const errors = results.filter(result => result.error);
+      if (errors.length > 0) {
+        throw new Error(`Failed to save ${errors.length} setting(s)`);
       }
-
-      // Update local state
-      setSettings(prev => prev.map(setting => 
-        setting.id === settingId 
-          ? { ...setting, is_enabled: !currentValue }
-          : setting
-      ));
 
       setNotification({
         type: 'success',
-        message: `Setting ${!currentValue ? 'enabled' : 'disabled'} successfully`
+        message: `Successfully saved ${pendingChanges.size} setting(s)`
       });
+
+      // Clear pending changes
+      setPendingChanges(new Map());
+      setHasUnsavedChanges(false);
 
       // Clear notification after 3 seconds
       setTimeout(() => setNotification(null), 3000);
 
     } catch (err) {
-      console.error('Error updating setting:', err);
+      console.error('Error saving settings:', err);
       setNotification({
         type: 'error',
-        message: err instanceof Error ? err.message : 'Failed to update setting'
+        message: err instanceof Error ? err.message : 'Failed to save settings'
       });
       setTimeout(() => setNotification(null), 5000);
     } finally {
@@ -101,43 +134,33 @@ export default function DFSAutofetchSettingsClient() {
     }
   };
 
-  const bulkToggleCategory = async (category: string, enable: boolean) => {
-    try {
-      setSaving(true);
-      
-      const { error } = await supabase
-        .from('dfs_autofetch_settings')
-        .update({ is_enabled: enable })
-        .eq('category', category);
-
-      if (error) {
-        throw error;
-      }
-
-      // Update local state
-      setSettings(prev => prev.map(setting => 
-        setting.category === category 
-          ? { ...setting, is_enabled: enable }
-          : setting
-      ));
-
-      setNotification({
-        type: 'success',
-        message: `All ${category} fields ${enable ? 'enabled' : 'disabled'} successfully`
+  const bulkToggleCategory = (category: string, enable: boolean) => {
+    // Update local state for all settings in category
+    const categorySettings = settings.filter(s => s.category === category);
+    
+    setSettings(prev => prev.map(setting => 
+      setting.category === category 
+        ? { ...setting, is_enabled: enable }
+        : setting
+    ));
+    
+    // Track all changes
+    setPendingChanges(prev => {
+      const newChanges = new Map(prev);
+      categorySettings.forEach(setting => {
+        newChanges.set(setting.id, enable);
       });
-
-      setTimeout(() => setNotification(null), 3000);
-
-    } catch (err) {
-      console.error('Error bulk updating category:', err);
-      setNotification({
-        type: 'error',
-        message: err instanceof Error ? err.message : 'Failed to bulk update category'
-      });
-      setTimeout(() => setNotification(null), 5000);
-    } finally {
-      setSaving(false);
-    }
+      return newChanges;
+    });
+    
+    setHasUnsavedChanges(true);
+    
+    setNotification({
+      type: 'success',
+      message: `${categorySettings.length} ${category} fields ${enable ? 'enabled' : 'disabled'} - Click Save to confirm`
+    });
+    
+    setTimeout(() => setNotification(null), 5000);
   };
 
   // Group settings by category
@@ -208,8 +231,26 @@ export default function DFSAutofetchSettingsClient() {
           <p className="text-gray-600 mt-1">
             Configure which fields are automatically fetched when new sites are added to the system.
           </p>
-          <div className="mt-2 text-sm text-gray-500">
-            {enabledSettings} of {totalSettings} fields enabled
+          <div className="mt-2 flex items-center justify-between">
+            <div className="text-sm text-gray-500">
+              {enabledSettings} of {totalSettings} fields enabled
+              {hasUnsavedChanges && (
+                <span className="ml-2 text-orange-600 font-medium">
+                  • {pendingChanges.size} unsaved change(s)
+                </span>
+              )}
+            </div>
+            <button
+              onClick={saveChanges}
+              disabled={saving || !hasUnsavedChanges}
+              className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                hasUnsavedChanges && !saving
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
           </div>
         </div>
       </div>
@@ -242,6 +283,17 @@ export default function DFSAutofetchSettingsClient() {
                     </p>
                   </div>
                   <div className="flex space-x-2">
+                    <button
+                      onClick={saveChanges}
+                      disabled={saving || !hasUnsavedChanges}
+                      className={`px-3 py-1 text-xs rounded font-medium ${
+                        hasUnsavedChanges && !saving
+                          ? 'bg-blue-600 text-white hover:bg-blue-700'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {saving ? 'Saving...' : 'Save'}
+                    </button>
                     <button
                       onClick={() => bulkToggleCategory(group.category, true)}
                       disabled={saving}
@@ -321,10 +373,12 @@ export default function DFSAutofetchSettingsClient() {
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h4 className="text-sm font-semibold text-blue-900 mb-2">How It Works</h4>
           <ul className="text-sm text-blue-800 space-y-1">
+            <li>• Toggle checkboxes to select which fields to fetch from DataForSEO API</li>
+            <li>• Click "Save Changes" button to confirm your settings</li>
             <li>• When users add new sites via f71_createsite, the system automatically creates sitesdfs records</li>
             <li>• Only enabled fields above will be fetched from the DataForSEO API</li>
             <li>• This saves API costs by only fetching the data you actually need</li>
-            <li>• Changes take effect immediately for new sites added</li>
+            <li>• Changes take effect immediately for new sites added after saving</li>
             <li>• Raw API responses are always stored for future data extraction</li>
           </ul>
         </div>
