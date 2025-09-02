@@ -89,6 +89,12 @@ interface SitesprenTableProps {
     yupik: boolean;
     chepno: boolean;
   };
+  onColumnPaginationRender?: (controls: {
+    RowPaginationBar1: () => JSX.Element | null;
+    RowPaginationBar2: () => JSX.Element | null;
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  }) => void;
 }
 
 type SortField = keyof SitesprenRecord;
@@ -132,7 +138,7 @@ const allColumns = [
   'is_flylocal'        // 35
 ];
 
-export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, isExternalFilter, onIsExternalFilterChange, onTagsUpdate, chambersVisible }: SitesprenTableProps) {
+export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, isExternalFilter, onIsExternalFilterChange, onTagsUpdate, chambersVisible, onColumnPaginationRender }: SitesprenTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -173,21 +179,17 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   const [showCopyOverlay, setShowCopyOverlay] = useState(false);
   const [overlayOpacity, setOverlayOpacity] = useState(0);
   
+  // Column pagination state (like addressjar)
+  const [columnsPerPage, setColumnsPerPage] = useState(12);
+  const [currentColumnPage, setCurrentColumnPage] = useState(1);
+  
   const supabase = createClientComponentClient();
   
-  // Column template and sticky state
-  const [selectedColumnTemplate, setSelectedColumnTemplate] = useState('option1');
-  const [selectedStickyColumns, setSelectedStickyColumns] = useState('option1');
-
-  // Load state from URL parameters and localStorage on component mount
+  // Load state from URL parameters on component mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const colTempParam = urlParams.get('coltemp') || localStorage.getItem('sitejar4_coltemp') || 'option1';
-    const stickyColParam = urlParams.get('stickycol') || localStorage.getItem('sitejar4_stickycol') || 'option1';
     const stagParam = urlParams.get('stag') || '';
     
-    setSelectedColumnTemplate(colTempParam);
-    setSelectedStickyColumns(stickyColParam);
     setFilterTag(stagParam);
   }, []);
 
@@ -204,96 +206,21 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     });
   };
 
-  // Utility functions
-  const getStickyColumnCount = () => {
-    switch (selectedStickyColumns) {
-      case 'option1': return 1;
-      case 'option2': return 2;
-      case 'option3': return 3;
-      case 'option4': return 4;
-      case 'option5': return 5;
-      default: return 1;
-    }
-  };
 
-  const getVisibleColumns = () => {
-    const stickyColumnCount = getStickyColumnCount();
-    const stickyColumns = allColumns.slice(0, stickyColumnCount);
-    
-    switch (selectedColumnTemplate) {
-      case 'option1': 
-        return allColumns; // All columns (1-22)
-      case 'option2': {
-        const templateColumns = allColumns.slice(0, 8); // Columns 1-8
-        const combinedColumns = [...stickyColumns];
-        templateColumns.forEach(col => {
-          if (!stickyColumns.includes(col)) {
-            combinedColumns.push(col);
-          }
-        });
-        return combinedColumns;
-      }
-      case 'option3': {
-        const templateColumns = allColumns.slice(8, 15); // Columns 9-15
-        const combinedColumns = [...stickyColumns];
-        templateColumns.forEach(col => {
-          if (!stickyColumns.includes(col)) {
-            combinedColumns.push(col);
-          }
-        });
-        return combinedColumns;
-      }
-      case 'option4': {
-        const templateColumns = allColumns.slice(15, 22); // Columns 16-22
-        const combinedColumns = [...stickyColumns];
-        templateColumns.forEach(col => {
-          if (!stickyColumns.includes(col)) {
-            combinedColumns.push(col);
-          }
-        });
-        return combinedColumns;
-      }
-      case 'option5': {
-        // Empty option for future expansion
-        return stickyColumns;
-      }
-      default: 
-        return allColumns;
-    }
-  };
 
-  const getColumnSeparators = (col: string) => {
-    // No specific left separators needed for sitespren table
-    const hasLeftSeparator = false;
-    // No specific right separators needed for sitespren table  
-    const hasRightSeparator = false;
-    
-    return { hasLeftSeparator, hasRightSeparator };
-  };
-
-  const updateUrlAndStorage = (colTemp: string, stickyCol: string, stagFilter?: string) => {
-    // Update URL
-    const url = new URL(window.location.href);
-    url.searchParams.set('coltemp', colTemp);
-    url.searchParams.set('stickycol', stickyCol);
-    
-    if (stagFilter && stagFilter.trim()) {
-      url.searchParams.set('stag', stagFilter);
-    } else {
-      url.searchParams.delete('stag');
-    }
-    
-    window.history.replaceState({}, '', url.toString());
-    
-    // Update localStorage
-    localStorage.setItem('sitejar4_coltemp', colTemp);
-    localStorage.setItem('sitejar4_stickycol', stickyCol);
-  };
 
 
   const handleTagFilterChange = (tagId: string) => {
     setFilterTag(tagId);
-    updateUrlAndStorage(selectedColumnTemplate, selectedStickyColumns, tagId);
+    // Update URL
+    const url = new URL(window.location.href);
+    if (tagId && tagId.trim()) {
+      url.searchParams.set('stag', tagId);
+    } else {
+      url.searchParams.delete('stag');
+    }
+    window.history.replaceState({}, '', url.toString());
+    
     setCurrentPage(1); // Reset to first page when filter changes
   };
 
@@ -329,8 +256,37 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     }
   }, [filterTag, userInternalId]);
 
-  const visibleColumns = getVisibleColumns();
-  const stickyColumnCount = getStickyColumnCount();
+  // WolfExclusionBand - Sticky columns that are excluded from pagination (memoized)
+  const wolfExclusionBandColumns = useMemo(() => [
+    'checkbox',           // Selection control
+    'tool_buttons',       // Site actions  
+    'id',                // Unique identifier
+    'sitespren_base',    // Domain name
+    'is_starred1'        // Quick status
+  ], []);
+
+  // Paginated columns - exclude WolfExclusionBand columns (memoized)
+  const paginatedColumns = useMemo(() => allColumns.filter(column => 
+    !wolfExclusionBandColumns.includes(column)
+  ), [wolfExclusionBandColumns]);
+
+  // Column pagination logic (memoized)
+  const totalColumnPages = useMemo(() => Math.ceil(paginatedColumns.length / columnsPerPage), [paginatedColumns, columnsPerPage]);
+
+  // Calculate visible columns based on pagination (memoized)
+  const visibleColumns = useMemo(() => {
+    const startColumnIndex = (currentColumnPage - 1) * columnsPerPage;
+    const visiblePaginatedColumns = paginatedColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+    
+    return [...wolfExclusionBandColumns, ...visiblePaginatedColumns];
+  }, [wolfExclusionBandColumns, paginatedColumns, currentColumnPage, columnsPerPage]);
+
+  const stickyColumnCount = wolfExclusionBandColumns.length;
+
+  // Column separators (simplified version)
+  const getColumnSeparators = (col: string) => {
+    return { hasLeftSeparator: false, hasRightSeparator: false };
+  };
 
   // Filter logic (only for WordPress site filter, search is handled by parent)
   const filteredData = useMemo(() => {
@@ -2223,6 +2179,319 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     );
   };
 
+  // Row Pagination Components (moved from Essex area)
+  // Bar 1: Items per page selector
+  const RowPaginationBar1 = () => {
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Rows/page:</span>
+          <div className="inline-flex rounded-md shadow-sm" role="group">
+            {[10, 25, 50, 100, 200, 'All'].map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => {
+                  if (value === 'All') {
+                    setItemsPerPage(sortedData.length || 1000);
+                  } else {
+                    setItemsPerPage(value as number);
+                  }
+                  setCurrentPage(1);
+                }}
+                className={`
+                  px-4 py-2 text-sm font-medium border
+                  ${value === 10 ? 'rounded-l-lg' : ''}
+                  ${value === 'All' ? 'rounded-r-lg' : ''}
+                  ${(value === 'All' && itemsPerPage >= sortedData.length) || itemsPerPage === value
+                    ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 focus:bg-blue-700 focus:text-white'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }
+                  focus:z-10 focus:ring-2 focus:ring-blue-500
+                `}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Bar 2: Page navigation
+  const RowPaginationBar2 = () => {
+    // Always show page navigation if there's data, even for single page
+    if (sortedData.length === 0) return null;
+    
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Row page:</span>
+          <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+            {/* Previous button */}
+            <button
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className={`
+                relative inline-flex items-center rounded-l-md px-3 py-2 text-gray-400 ring-1 ring-inset ring-gray-300
+                ${currentPage === 1 
+                  ? 'cursor-not-allowed bg-gray-50' 
+                  : 'hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                }
+              `}
+            >
+              <span className="text-lg">«</span>
+            </button>
+            
+            {/* Page numbers */}
+            {(() => {
+              const pageNumbers = [];
+              const maxVisiblePages = 5;
+              let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+              let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+              
+              if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+              }
+              
+              for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i)}
+                    className={`
+                      relative inline-flex items-center px-4 py-2 text-sm font-semibold
+                      ${currentPage === i
+                        ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+                        : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                      }
+                    `}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              
+              return pageNumbers;
+            })()}
+            
+            {/* Next button */}
+            <button
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className={`
+                relative inline-flex items-center rounded-r-md px-3 py-2 text-gray-400 ring-1 ring-inset ring-gray-300
+                ${currentPage === totalPages 
+                  ? 'cursor-not-allowed bg-gray-50' 
+                  : 'hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                }
+              `}
+            >
+              <span className="text-lg">»</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+    );
+  };
+
+  // Column Pagination Components (adapted from addressjar)
+  // Bar 1: Columns per page quantity selector
+  const ColumnPaginationBar1 = () => {
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Cols/page:</span>
+          <button
+            onClick={() => {
+              setColumnsPerPage(6);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${
+              columnsPerPage === 6 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 6 ? '#f8f782' : undefined
+            }}
+          >
+            6
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(8);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 8 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 8 ? '#f8f782' : undefined
+            }}
+          >
+            8
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(10);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 10 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 10 ? '#f8f782' : undefined
+            }}
+          >
+            10
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(12);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 12 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 12 ? '#f8f782' : undefined
+            }}
+          >
+            12
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(15);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 15 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 15 ? '#f8f782' : undefined
+            }}
+          >
+            15
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(allColumns.length);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${
+              columnsPerPage === allColumns.length ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === allColumns.length ? '#f8f782' : undefined
+            }}
+          >
+            ALL
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Bar 2: Current column page selector
+  const ColumnPaginationBar2 = () => {
+    if (totalColumnPages <= 1) return null;
+    
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Col page:</span>
+          <button
+            onClick={() => setCurrentColumnPage(1)}
+            disabled={currentColumnPage === 1}
+            className="px-2 py-2.5 text-sm border rounded-l -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            ≪
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(currentColumnPage - 1)}
+            disabled={currentColumnPage === 1}
+            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            ‹
+          </button>
+          
+          {Array.from({ length: Math.min(5, totalColumnPages) }, (_, i) => {
+            const pageNum = Math.max(1, Math.min(totalColumnPages - 4, currentColumnPage - 2)) + i;
+            if (pageNum > totalColumnPages) return null;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentColumnPage(pageNum)}
+                className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+                  currentColumnPage === pageNum 
+                    ? 'text-black border-black' 
+                    : 'bg-white hover:bg-gray-200'
+                }`}
+                style={{ 
+                  fontSize: '14px', 
+                  paddingTop: '10px', 
+                  paddingBottom: '10px',
+                  backgroundColor: currentColumnPage === pageNum ? '#f8f782' : undefined
+                }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          
+          <button
+            onClick={() => setCurrentColumnPage(currentColumnPage + 1)}
+            disabled={currentColumnPage === totalColumnPages}
+            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            ›
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(totalColumnPages)}
+            disabled={currentColumnPage === totalColumnPages}
+            className="px-2 py-2.5 text-sm border rounded-r disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            ≫
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Pass pagination components to parent
+  useEffect(() => {
+    if (onColumnPaginationRender) {
+      onColumnPaginationRender({
+        RowPaginationBar1,
+        RowPaginationBar2,
+        ColumnPaginationBar1,
+        ColumnPaginationBar2
+      });
+    }
+  }, [onColumnPaginationRender, currentColumnPage, totalColumnPages, columnsPerPage, currentPage, totalPages, itemsPerPage]);
+
   return (
     <div className="space-y-4">
       
@@ -2346,117 +2615,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         </div>
       </div>
 
-      {/* Flex container for Essex and Chepno */}
-      <div className="flex gap-4 items-start">
-        {/* Pagination Controls Essex */}
-        <div className="bg-white rounded-lg shadow p-4 w-fit">
-        <h3 className="text-sm font-bold text-gray-800 mb-3">pagination_controls_essex</h3>
-        
-        {/* Results info */}
-        <div className="mb-4 text-sm text-gray-600">
-          Showing {Math.min(itemsPerPage, sortedData.length)} of {sortedData.length} results
-        </div>
-        
-        {/* Results per page button group */}
-        <div className="mb-4">
-          <div className="inline-flex rounded-md shadow-sm" role="group">
-            {[10, 25, 50, 100, 200, 'All'].map((value) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => {
-                  if (value === 'All') {
-                    setItemsPerPage(sortedData.length || 1000);
-                  } else {
-                    setItemsPerPage(value as number);
-                  }
-                  setCurrentPage(1);
-                }}
-                className={`
-                  px-4 py-2 text-sm font-medium border
-                  ${value === 10 ? 'rounded-l-lg' : ''}
-                  ${value === 'All' ? 'rounded-r-lg' : ''}
-                  ${(value === 'All' && itemsPerPage >= sortedData.length) || itemsPerPage === value
-                    ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 focus:bg-blue-700 focus:text-white'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }
-                  focus:z-10 focus:ring-2 focus:ring-blue-500
-                `}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        {/* Page navigation */}
-        <div className="flex items-center justify-start">
-          <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-            {/* Previous button */}
-            <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              className={`
-                relative inline-flex items-center rounded-l-md px-3 py-2 text-gray-400 ring-1 ring-inset ring-gray-300
-                ${currentPage === 1 
-                  ? 'cursor-not-allowed bg-gray-50' 
-                  : 'hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                }
-              `}
-            >
-              <span className="text-lg">«</span>
-            </button>
-            
-            {/* Page numbers */}
-            {(() => {
-              const pageNumbers = [];
-              const maxVisiblePages = 5;
-              let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-              let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-              
-              if (endPage - startPage < maxVisiblePages - 1) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
-              }
-              
-              for (let i = startPage; i <= endPage; i++) {
-                pageNumbers.push(
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i)}
-                    className={`
-                      relative inline-flex items-center px-4 py-2 text-sm font-semibold
-                      ${currentPage === i
-                        ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
-                        : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                      }
-                    `}
-                  >
-                    {i}
-                  </button>
-                );
-              }
-              
-              return pageNumbers;
-            })()}
-            
-            {/* Next button */}
-            <button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-              className={`
-                relative inline-flex items-center rounded-r-md px-3 py-2 text-gray-400 ring-1 ring-inset ring-gray-300
-                ${currentPage === totalPages 
-                  ? 'cursor-not-allowed bg-gray-50' 
-                  : 'hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                }
-              `}
-            >
-              <span className="text-lg">»</span>
-            </button>
-          </nav>
-        </div>
-        </div>
-      </div>
 
 
 

@@ -104,16 +104,53 @@ export default function Sitejar4Client() {
     yupik: true,
     chepno: true
   });
+
+  // Bloffer chamber visibility state (default to false/off)
+  const [blofferChamberVisible, setBlofferChamberVisible] = useState(false);
   
   // Chepno functionality states (moved from SitesprenTable)
   const [chepnoVisible, setChepnoVisible] = useState(false);
   const [gadgetFeedback, setGadgetFeedback] = useState<{action: string, message: string, type: 'success' | 'error' | 'info', timestamp: string} | null>(null);
   const [selectedF71Fields, setSelectedF71Fields] = useState<Set<string>>(new Set());
   const [tagsData, setTagsData] = useState<any>(null);
+  
+  // Pagination state (both row and column)
+  const [paginationBars, setPaginationBars] = useState<{
+    RowPaginationBar1: () => JSX.Element | null;
+    RowPaginationBar2: () => JSX.Element | null;
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  } | null>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Initialize bloffer chamber visibility from localStorage
+  useEffect(() => {
+    const savedVisibility = localStorage.getItem('sitejar4_blofferChamberVisible');
+    if (savedVisibility !== null) {
+      setBlofferChamberVisible(JSON.parse(savedVisibility));
+    }
+  }, []);
+
+  // Save bloffer chamber visibility to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('sitejar4_blofferChamberVisible', JSON.stringify(blofferChamberVisible));
+  }, [blofferChamberVisible]);
+
+  // Listen for bezel system visibility changes
+  useEffect(() => {
+    const handleBezelVisibilityChange = (event: CustomEvent) => {
+      setBlofferChamberVisible(event.detail.visible);
+    };
+
+    window.addEventListener('blofferChamberVisibilityChange', handleBezelVisibilityChange as EventListener);
+
+    return () => {
+      window.removeEventListener('blofferChamberVisibilityChange', handleBezelVisibilityChange as EventListener);
+    };
+  }, []);
 
   useEffect(() => {
     // Handle URL parameters for popup and tab state
@@ -684,6 +721,16 @@ export default function Sitejar4Client() {
     setGadgetFeedback(null);
   };
 
+  // Handle pagination from SitesprenTable (both row and column)
+  const handleColumnPaginationRender = (controls: {
+    RowPaginationBar1: () => JSX.Element | null;
+    RowPaginationBar2: () => JSX.Element | null;
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  }) => {
+    setPaginationBars(controls);
+  };
+
   const f18_deletesites = async () => {
     if (selectedSiteIds.length === 0) {
       setDeleteNotification({
@@ -783,30 +830,39 @@ export default function Sitejar4Client() {
   return (
     <div className="pr-4">
 
-      {/* Sitedori Navigation Links */}
-      <div className="mb-4">
-        <SitedoriButtonBar />
-      </div>
+      {/* Navigation and Chamber Controls */}
+      {blofferChamberVisible && (
+        <div className="bloffer_chamber_div chamber_div mb-4 p-4 border border-black bg-white" style={{ borderWidth: '1px' }}>
+          <div className="font-bold text-black mb-4" style={{ fontSize: '16px' }}>
+            div.bloffer_chamber_div chamber_div
+          </div>
+          
+          {/* Sitedori Navigation Links */}
+          <div className="mb-4">
+            <SitedoriButtonBar />
+          </div>
 
-      {/* Drenjari Navigation Links */}
-      <div className="mb-4">
-        <DrenjariButtonBarDriggsmanLinks />
-      </div>
+          {/* Drenjari Navigation Links */}
+          <div className="mb-4">
+            <DrenjariButtonBarDriggsmanLinks />
+          </div>
 
-      {/* Chamber Controlyar Buttons */}
-      <div className="mb-4 flex items-center">
-        <span className="font-bold text-black mr-6" style={{ fontSize: '16px' }}>chamber controlyar buttons</span>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => toggleChamber('yupik')}
-            className={`px-3 py-1 text-sm rounded transition-colors ${
-              chambersVisible.yupik ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
-            }`}
-          >
-            yupik
-          </button>
+          {/* Chamber Controlyar Buttons */}
+          <div className="mb-4 flex items-center">
+            <span className="font-bold text-black mr-6" style={{ fontSize: '16px' }}>chamber controlyar buttons</span>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => toggleChamber('yupik')}
+                className={`px-3 py-1 text-sm rounded transition-colors ${
+                  chambersVisible.yupik ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+                }`}
+              >
+                yupik
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Functions popup button */}
       <div className="mb-4">
@@ -1885,8 +1941,40 @@ http://www.drogs.com`}
                 )}
                 {activePopupTab === 'ptab6' && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Content for ptab6</h3>
-                    <p className="text-gray-600">This is the content area for ptab6.</p>
+                    <h3 className="text-lg font-semibold mb-4">Bloffer Chamber Settings</h3>
+                    
+                    {/* Bloffer Chamber Visibility Toggle */}
+                    <div className="bg-white p-4 rounded-lg shadow border">
+                      <div className="flex items-center space-x-4">
+                        {/* Toggle Switch */}
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={blofferChamberVisible}
+                            onChange={(e) => {
+                              setBlofferChamberVisible(e.target.checked);
+                              // Dispatch event to sync with bezel system
+                              window.dispatchEvent(new CustomEvent('blofferChamberVisibilityChange', { 
+                                detail: { visible: e.target.checked } 
+                              }));
+                            }}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                        
+                        {/* Label Text */}
+                        <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                          div.bloffer_chamber_div
+                        </div>
+                      </div>
+                      
+                      <div className="mt-3 text-sm text-gray-600">
+                        <p>Toggle visibility of the bloffer chamber div on the main page.</p>
+                        <p>Current state: <strong>{blofferChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                        <p className="text-xs text-gray-500 mt-1">Settings are automatically saved to localStorage</p>
+                      </div>
+                    </div>
                   </div>
                 )}
                 {activePopupTab === 'ptab7' && (
@@ -1895,6 +1983,26 @@ http://www.drogs.com`}
                     <p className="text-gray-600">This is the content area for ptab7.</p>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pagination Controls (Row first, then Column) */}
+      {paginationBars && (
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-8">
+              {/* Row pagination first (left side) */}
+              <div className="flex items-center space-x-4">
+                {paginationBars.RowPaginationBar1()}
+                {paginationBars.RowPaginationBar2()}
+              </div>
+              {/* Column pagination second */}
+              <div className="flex items-center space-x-4">
+                {paginationBars.ColumnPaginationBar1()}
+                {paginationBars.ColumnPaginationBar2()}
               </div>
             </div>
           </div>
@@ -1915,6 +2023,7 @@ http://www.drogs.com`}
         isExternalFilter={isExternalFilter}
         onIsExternalFilterChange={handleIsExternalFilterChange}
         chambersVisible={chambersVisible}
+        onColumnPaginationRender={handleColumnPaginationRender}
       />
     </div>
   );
