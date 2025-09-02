@@ -13,7 +13,7 @@ export const system1Navigation: NavItem[] = [
   },
   {
     name: 'Andromeda Editor',
-    path: '/driggsman'
+    path: '/drom'
   },
   {
     name: 'Other Links',

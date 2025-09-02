@@ -3347,7 +3347,7 @@ export default function DriggsmanTable({
                           </td>
                           <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
                             <a
-                              href={`/driggsman?sitesentered=${encodeURIComponent(entry.sitesEntered.join(','))}&activefilterchamber=daylight`}
+                              href={`/drom?sitesentered=${encodeURIComponent(entry.sitesEntered.join(','))}&activefilterchamber=daylight`}
                               className="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200"
                             >
                               Open Configuration Link
@@ -3355,7 +3355,7 @@ export default function DriggsmanTable({
                           </td>
                           <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
                             <a
-                              href={`/driggsman?sitesentered=${encodeURIComponent(entry.sitesEntered.join(','))}&activefilterchamber=daylight&showmainchamberboxes=yes`}
+                              href={`/drom?sitesentered=${encodeURIComponent(entry.sitesEntered.join(','))}&activefilterchamber=daylight&showmainchamberboxes=yes`}
                               className="inline-flex items-center px-3 py-1 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded hover:bg-green-100 hover:text-green-700 transition-colors duration-200"
                             >
                               Open w/ Yes
@@ -3363,7 +3363,7 @@ export default function DriggsmanTable({
                           </td>
                           <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
                             <a
-                              href={`/driggsman?sitesentered=${encodeURIComponent(entry.sitesEntered.join(','))}&activefilterchamber=daylight&showmainchamberboxes=no`}
+                              href={`/drom?sitesentered=${encodeURIComponent(entry.sitesEntered.join(','))}&activefilterchamber=daylight&showmainchamberboxes=no`}
                               className="inline-flex items-center px-3 py-1 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded hover:bg-red-100 hover:text-red-700 transition-colors duration-200"
                             >
                               Open w/ No
@@ -4536,7 +4536,7 @@ export default function DriggsmanTable({
                                 
                                 {/* DG - Driggsman link */}
                                 <a
-                                  href={`/driggsman?sitesentered=${encodeURIComponent(domain)}&activefilterchamber=daylight&showmainchamberboxes=no&showtundrachamber=yes`}
+                                  href={`/drom?sitesentered=${encodeURIComponent(domain)}&activefilterchamber=daylight&showmainchamberboxes=no&showtundrachamber=yes`}
                                   onClick={(e) => e.stopPropagation()}
                                   style={{...baseButtonStyle, backgroundColor: '#8b5cf6'}}
                                   title="Open Driggsman"
