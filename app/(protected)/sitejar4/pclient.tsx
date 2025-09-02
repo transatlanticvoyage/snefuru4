@@ -108,6 +108,9 @@ export default function Sitejar4Client() {
   // Bloffer chamber visibility state (default to false/off)
   const [blofferChamberVisible, setBlofferChamberVisible] = useState(false);
   
+  // Copper chamber visibility state (default to true/show)
+  const [copperChamberVisible, setCopperChamberVisible] = useState(true);
+  
   // Chepno functionality states (moved from SitesprenTable)
   const [chepnoVisible, setChepnoVisible] = useState(false);
   const [gadgetFeedback, setGadgetFeedback] = useState<{action: string, message: string, type: 'success' | 'error' | 'info', timestamp: string} | null>(null);
@@ -134,10 +137,27 @@ export default function Sitejar4Client() {
     }
   }, []);
 
+  // Initialize copper chamber visibility from localStorage (default to true)
+  useEffect(() => {
+    const savedVisibility = localStorage.getItem('sitejar4_copperChamberVisible');
+    if (savedVisibility !== null) {
+      setCopperChamberVisible(JSON.parse(savedVisibility));
+    } else {
+      // If no saved state, set default to true and save it
+      setCopperChamberVisible(true);
+      localStorage.setItem('sitejar4_copperChamberVisible', JSON.stringify(true));
+    }
+  }, []);
+
   // Save bloffer chamber visibility to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('sitejar4_blofferChamberVisible', JSON.stringify(blofferChamberVisible));
   }, [blofferChamberVisible]);
+
+  // Save copper chamber visibility to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('sitejar4_copperChamberVisible', JSON.stringify(copperChamberVisible));
+  }, [copperChamberVisible]);
 
   // Listen for bezel system visibility changes
   useEffect(() => {
@@ -145,10 +165,16 @@ export default function Sitejar4Client() {
       setBlofferChamberVisible(event.detail.visible);
     };
 
+    const handleCopperChamberVisibilityChange = (event: CustomEvent) => {
+      setCopperChamberVisible(event.detail.visible);
+    };
+
     window.addEventListener('blofferChamberVisibilityChange', handleBezelVisibilityChange as EventListener);
+    window.addEventListener('copperChamberVisibilityChange', handleCopperChamberVisibilityChange as EventListener);
 
     return () => {
       window.removeEventListener('blofferChamberVisibilityChange', handleBezelVisibilityChange as EventListener);
+      window.removeEventListener('copperChamberVisibilityChange', handleCopperChamberVisibilityChange as EventListener);
     };
   }, []);
 
@@ -1975,6 +2001,36 @@ http://www.drogs.com`}
                         <p className="text-xs text-gray-500 mt-1">Settings are automatically saved to localStorage</p>
                       </div>
                     </div>
+                    
+                    {/* Copper Chamber Visibility Toggle */}
+                    <div className="bg-white p-4 rounded-lg shadow border mt-4">
+                      <div className="flex items-center space-x-4">
+                        {/* Toggle Switch */}
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={copperChamberVisible}
+                            onChange={(e) => {
+                              setCopperChamberVisible(e.target.checked);
+                            }}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                        
+                        {/* Label Text */}
+                        <div className="flex flex-col">
+                          <span className="text-lg font-bold text-gray-900">copper_chamber_div</span>
+                          <span className="text-sm text-gray-500">Toggle search and filter controls</span>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-3 text-sm text-gray-600">
+                        <p>Toggle visibility of the copper chamber div (search and filter controls).</p>
+                        <p>Current state: <strong>{copperChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                        <p className="text-xs text-gray-500 mt-1">Settings are automatically saved to localStorage</p>
+                      </div>
+                    </div>
                   </div>
                 )}
                 {activePopupTab === 'ptab7' && (
@@ -1989,25 +2045,6 @@ http://www.drogs.com`}
         </div>
       )}
 
-      {/* Pagination Controls (Row first, then Column) */}
-      {paginationBars && (
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
-              {/* Row pagination first (left side) */}
-              <div className="flex items-center space-x-4">
-                {paginationBars.RowPaginationBar1()}
-                {paginationBars.RowPaginationBar2()}
-              </div>
-              {/* Column pagination second */}
-              <div className="flex items-center space-x-4">
-                {paginationBars.ColumnPaginationBar1()}
-                {paginationBars.ColumnPaginationBar2()}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Sitespren Table */}
       <SitesprenTable 
@@ -2023,6 +2060,7 @@ http://www.drogs.com`}
         isExternalFilter={isExternalFilter}
         onIsExternalFilterChange={handleIsExternalFilterChange}
         chambersVisible={chambersVisible}
+        copperChamberVisible={copperChamberVisible}
         onColumnPaginationRender={handleColumnPaginationRender}
       />
     </div>

@@ -89,6 +89,7 @@ interface SitesprenTableProps {
     yupik: boolean;
     chepno: boolean;
   };
+  copperChamberVisible?: boolean;
   onColumnPaginationRender?: (controls: {
     RowPaginationBar1: () => JSX.Element | null;
     RowPaginationBar2: () => JSX.Element | null;
@@ -138,7 +139,7 @@ const allColumns = [
   'is_flylocal'        // 35
 ];
 
-export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, isExternalFilter, onIsExternalFilterChange, onTagsUpdate, chambersVisible, onColumnPaginationRender }: SitesprenTableProps) {
+export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, isExternalFilter, onIsExternalFilterChange, onTagsUpdate, chambersVisible, copperChamberVisible = true, onColumnPaginationRender }: SitesprenTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -2496,7 +2497,21 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     <div className="space-y-4">
       
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg shadow">
+      {copperChamberVisible && (
+        <div className="bg-white p-4 rounded-lg shadow copper_chamber_div" style={{ 
+          border: '1px solid black', 
+          position: 'relative' 
+        }}>
+        <div style={{ 
+          position: 'absolute', 
+          top: '4px', 
+          left: '4px', 
+          fontSize: '16px', 
+          fontWeight: 'bold',
+          color: 'black'
+        }}>
+          copper_chamber
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="md:col-span-2">
             <label htmlFor="site-search-table" className="block text-sm font-medium text-gray-700 mb-2">
@@ -2599,6 +2614,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
           </div>
         </div>
       </div>
+      )}
 
 
       {/* Selection controls and results count */}
@@ -2615,13 +2631,47 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         </div>
       </div>
 
-
-
-
-
-
+      {/* Rocket Chamber Div - Contains the 4 pagination button bars */}
+      <div className="rocket_chamber_div" style={{ 
+        border: '1px solid black', 
+        padding: 0,
+        margin: 0,
+        position: 'relative'
+      }}>
+        <div style={{ 
+          position: 'absolute', 
+          top: '4px', 
+          left: '4px', 
+          fontSize: '16px', 
+          fontWeight: 'bold' 
+        }}>
+          rocket_chamber
+        </div>
+        <div style={{ marginTop: '24px', paddingTop: '4px', paddingBottom: 0, paddingLeft: '8px', paddingRight: '8px' }}>
+          <div className="flex items-end justify-between">
+            <div className="flex items-end space-x-8">
+              {/* Row pagination first (left side) */}
+              <div className="flex items-end space-x-4">
+                {RowPaginationBar1()}
+                {RowPaginationBar2()}
+              </div>
+              {/* Column pagination second */}
+              <div className="flex items-end space-x-4">
+                {ColumnPaginationBar1()}
+                {ColumnPaginationBar2()}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white shadow overflow-hidden" style={{ 
+        borderBottomLeftRadius: '0.5rem',
+        borderBottomRightRadius: '0.5rem',
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
+        marginTop: 0
+      }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
             <thead>
@@ -2631,7 +2681,18 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
                   const isSticky = index < stickyColumnCount;
                   const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                  const leftPosition = isSticky ? `${index * 150}px` : 'auto';
+                  // Fixed: Calculate proper left position based on actual column widths
+                  const getStickyLeftPosition = (idx: number) => {
+                    if (idx === 0) return 0;
+                    const widths = { checkbox: 60, tool_buttons: 180, id: 80, sitespren_base: 200, is_starred1: 80 };
+                    let totalWidth = 0;
+                    for (let i = 0; i < idx; i++) {
+                      const col = visibleColumns[i];
+                      totalWidth += widths[col as keyof typeof widths] || 150;
+                    }
+                    return totalWidth;
+                  };
+                  const leftPosition = isSticky ? `${getStickyLeftPosition(index)}px` : 'auto';
                   const isLastSticky = index === stickyColumnCount - 1;
 
                   // Determine database table name for this column
@@ -2647,20 +2708,21 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   return (
                     <th
                       key={`table-name-${col}`}
-                      className={`${col === 'checkbox' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} for_db_table_sitespren`}
+                      className={`${col === 'checkbox' || col === 'tool_buttons' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} for_db_table_sitespren`}
                       style={{
                         ...(isSticky ? { left: leftPosition } : {}),
-                        backgroundColor: col === 'checkbox' || col === 'tool_buttons' 
-                          ? '#e5e7eb' // gray-200 for action columns
-                          : col === 'domain_registrar_info'
-                          ? '#fbbf24' // amber-400 for domain registrar info column
-                          : '#dbeafe', // blue-100 for sitespren table columns
+                        // Let CSS handle backgroundColor for database table name row - shenfur CSS will set the colors
                         textTransform: 'none',
                         ...(col === 'checkbox' ? {
                           paddingTop: '6px',
                           paddingBottom: '6px',
                           paddingLeft: '10px',
                           paddingRight: '10px'
+                        } : col === 'tool_buttons' ? {
+                          paddingTop: '12px',
+                          paddingBottom: '12px',
+                          paddingLeft: '8px',
+                          paddingRight: '8px'
                         } : {})
                       }}
                     >
@@ -2686,13 +2748,24 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
                   const isSticky = index < stickyColumnCount;
                   const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                  const leftPosition = isSticky ? `${index * 150}px` : 'auto';
+                  // Fixed: Calculate proper left position based on actual column widths
+                  const getStickyLeftPosition = (idx: number) => {
+                    if (idx === 0) return 0;
+                    const widths = { checkbox: 60, tool_buttons: 180, id: 80, sitespren_base: 200, is_starred1: 80 };
+                    let totalWidth = 0;
+                    for (let i = 0; i < idx; i++) {
+                      const col = visibleColumns[i];
+                      totalWidth += widths[col as keyof typeof widths] || 150;
+                    }
+                    return totalWidth;
+                  };
+                  const leftPosition = isSticky ? `${getStickyLeftPosition(index)}px` : 'auto';
                   const isLastSticky = index === stickyColumnCount - 1;
 
                   return (
                     <th
                       key={col}
-                      className={`${col === 'checkbox' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} ${
+                      className={`${col === 'checkbox' || col === 'tool_buttons' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} ${
                         ['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) 
                           ? 'cursor-pointer hover:brightness-95' 
                           : ''
@@ -2710,6 +2783,11 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                           paddingBottom: '6px',
                           paddingLeft: '10px',
                           paddingRight: '10px'
+                        } : col === 'tool_buttons' ? {
+                          paddingTop: '12px',
+                          paddingBottom: '12px',
+                          paddingLeft: '8px',
+                          paddingRight: '8px'
                         } : {})
                       }}
                       onClick={col === 'checkbox' ? (isAllSelected ? handleClearAll : handleSelectAll) : 
@@ -2753,7 +2831,18 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                     const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
                     const isSticky = colIndex < stickyColumnCount;
                     const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                    const leftPosition = isSticky ? `${colIndex * 150}px` : 'auto';
+                    // Fixed: Calculate proper left position based on actual column widths
+                    const getStickyLeftPosition = (idx: number) => {
+                      if (idx === 0) return 0;
+                      const widths = { checkbox: 60, tool_buttons: 180, id: 80, sitespren_base: 200, is_starred1: 80 };
+                      let totalWidth = 0;
+                      for (let i = 0; i < idx; i++) {
+                        const col = visibleColumns[i];
+                        totalWidth += widths[col as keyof typeof widths] || 150;
+                      }
+                      return totalWidth;
+                    };
+                    const leftPosition = isSticky ? `${getStickyLeftPosition(colIndex)}px` : 'auto';
                     const bgClass = 'bg-inherit';
                     const isLastSticky = colIndex === stickyColumnCount - 1;
 

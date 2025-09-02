@@ -14,6 +14,9 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   
   // Bloffer chamber visibility state for /sitejar4
   const [blofferChamberVisible, setBlofferChamberVisible] = useState(false);
+  
+  // Copper chamber visibility state for /sitejar4 (default to true/show)
+  const [copperChamberVisible, setCopperChamberVisible] = useState(true);
 
   useEffect(() => {
     // Check if current page has bezel configuration
@@ -31,6 +34,20 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     }
   }, [pathname]);
 
+  // Initialize copper chamber visibility from localStorage for /sitejar4
+  useEffect(() => {
+    if (pathname === '/sitejar4') {
+      const savedVisibility = localStorage.getItem('sitejar4_copperChamberVisible');
+      if (savedVisibility !== null) {
+        setCopperChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // If no saved state, set default to true and save it
+        setCopperChamberVisible(true);
+        localStorage.setItem('sitejar4_copperChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
   // Handle toggle change and save to localStorage
   const handleBlofferChamberToggle = (checked: boolean) => {
     setBlofferChamberVisible(checked);
@@ -38,6 +55,17 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     
     // Dispatch custom event to notify other components
     window.dispatchEvent(new CustomEvent('blofferChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Handle copper chamber toggle
+  const handleCopperChamberToggle = (checked: boolean) => {
+    setCopperChamberVisible(checked);
+    localStorage.setItem('sitejar4_copperChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('copperChamberVisibilityChange', { 
       detail: { visible: checked } 
     }));
   };
@@ -99,6 +127,32 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
                       <p>Toggle visibility of the bloffer chamber div on the main page.</p>
                       <p>This controls the navigation links section (Sitedori, Drenjari) and chamber control buttons.</p>
                       <p>Current state: <strong>{blofferChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Copper Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={copperChamberVisible}
+                          onChange={(e) => handleCopperChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      {/* Label Text */}
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        copper_chamber_div
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the copper chamber div on the main page.</p>
+                      <p>This controls the search and filter controls section.</p>
+                      <p>Current state: <strong>{copperChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
                       <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
                     </div>
                   </div>
