@@ -2625,6 +2625,62 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         <div className="overflow-x-auto">
           <table className="w-full text-sm" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
             <thead>
+              {/* Database table name row */}
+              <tr className="shenfur_db_table_name_tr">
+                {visibleColumns.map((col, index) => {
+                  const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
+                  const isSticky = index < stickyColumnCount;
+                  const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
+                  const leftPosition = isSticky ? `${index * 150}px` : 'auto';
+                  const isLastSticky = index === stickyColumnCount - 1;
+
+                  // Determine database table name for this column
+                  let dbTableName = "-";
+                  if (col === 'checkbox' || col === 'tool_buttons') {
+                    dbTableName = "-";
+                  } else if (col === 'domain_registrar_info') {
+                    dbTableName = "-"; // This doesn't correspond to a specific db column
+                  } else {
+                    dbTableName = "sitespren"; // Most columns correspond to the sitespren table
+                  }
+
+                  return (
+                    <th
+                      key={`table-name-${col}`}
+                      className={`${col === 'checkbox' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} for_db_table_sitespren`}
+                      style={{
+                        ...(isSticky ? { left: leftPosition } : {}),
+                        backgroundColor: col === 'checkbox' || col === 'tool_buttons' 
+                          ? '#e5e7eb' // gray-200 for action columns
+                          : col === 'domain_registrar_info'
+                          ? '#fbbf24' // amber-400 for domain registrar info column
+                          : '#dbeafe', // blue-100 for sitespren table columns
+                        textTransform: 'none',
+                        ...(col === 'checkbox' ? {
+                          paddingTop: '6px',
+                          paddingBottom: '6px',
+                          paddingLeft: '10px',
+                          paddingRight: '10px'
+                        } : {})
+                      }}
+                    >
+                      {hasLeftSeparator && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
+                      )}
+                      <span className="text-xs lowercase">
+                        {dbTableName}
+                      </span>
+                      {hasRightSeparator && (
+                        <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                      )}
+                      {isLastSticky && (
+                        <div className="absolute right-0 top-0 bottom-0 bg-black" style={{width: '4px'}}></div>
+                      )}
+                    </th>
+                  );
+                })}
+              </tr>
+              {/* Column names row */}
               <tr>
                 {visibleColumns.map((col, index) => {
                   const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
