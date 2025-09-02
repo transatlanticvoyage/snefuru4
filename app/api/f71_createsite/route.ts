@@ -76,6 +76,71 @@ async function getOrCreateSitesglub(supabase: any, domain: string): Promise<{ si
   }
 }
 
+// Helper function to get or create sitesdfs record
+async function getOrCreateSitesdfs(supabase: any, domain: string): Promise<{ sitesdfs_id: number } | null> {
+  try {
+    // First, check if sitesdfs record already exists
+    const { data: existingSitesdfs, error: selectError } = await supabase
+      .from('sitesdfs')
+      .select('sitesdfs_id')
+      .eq('sitesdfs_base', domain)
+      .single();
+
+    if (selectError && selectError.code !== 'PGRST116') { // PGRST116 = no rows found
+      console.error('Error checking existing sitesdfs:', selectError);
+      return null;
+    }
+
+    // If exists, return the existing record
+    if (existingSitesdfs) {
+      console.log(`Using existing sitesdfs record for domain: ${domain}, ID: ${existingSitesdfs.sitesdfs_id}`);
+      return existingSitesdfs;
+    }
+
+    // Create new sitesdfs record
+    console.log(`Creating new sitesdfs record for domain: ${domain}`);
+    const { data: newSitesdfs, error: insertError } = await supabase
+      .from('sitesdfs')
+      .insert({
+        sitesdfs_base: domain,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select('sitesdfs_id')
+      .single();
+
+    if (insertError) {
+      console.error('Error creating sitesdfs record:', insertError);
+      return null;
+    }
+
+    console.log(`Created new sitesdfs record for domain: ${domain}, ID: ${newSitesdfs.sitesdfs_id}`);
+    
+    // Trigger the AutomaticFetchOfDFSMetricsOnSiteAdd background process
+    try {
+      console.log(`Triggering AutomaticFetchOfDFSMetricsOnSiteAdd for domain: ${domain}`);
+      fetch('/api/autofetch-dfs-metrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          domain: domain,
+          sitesdfs_id: newSitesdfs.sitesdfs_id
+        })
+      }).catch(err => {
+        console.error('Error triggering DFS autofetch (non-blocking):', err);
+      });
+    } catch (triggerError) {
+      console.error('Error triggering DFS autofetch (non-blocking):', triggerError);
+    }
+    
+    return newSitesdfs;
+
+  } catch (error) {
+    console.error('Error in getOrCreateSitesdfs:', error);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     console.log('f71_createsite API route called');
@@ -136,9 +201,10 @@ export async function POST(request: NextRequest) {
       console.log(`Limited to 300 URLs, processing ${urlsToProcess.length} out of ${validUrls.length}`);
     }
     
-    // Process each URL to get/create sitesglub records and prepare sitespren records
+    // Process each URL to get/create sitesglub and sitesdfs records and prepare sitespren records
     const sitesToInsert = [];
     const sitesglubProcessed = [];
+    const sitesdfsProcessed = [];
     const errors = [];
 
     for (const url of urlsToProcess) {
@@ -147,6 +213,30 @@ export async function POST(request: NextRequest) {
         const sitesglubRecord = await getOrCreateSitesglub(supabase, url);
         
         if (sitesglubRecord) {
+          // Get or create sitesdfs record for this domain
+          const sitesdfsRecord = await getOrCreateSitesdfs(supabase, url);
+          
+          if (sitesdfsRecord) {
+            // Link sitesglub to sitesdfs if not already linked
+            const { error: linkError } = await supabase
+              .from('sitesglub')
+              .update({ fk_sitesdfs_id: sitesdfsRecord.sitesdfs_id })
+              .eq('sitesglub_id', sitesglubRecord.sitesglub_id)
+              .is('fk_sitesdfs_id', null);
+            
+            if (linkError) {
+              console.error('Error linking sitesglub to sitesdfs:', linkError);
+            } else {
+              console.log(`Linked sitesglub ${sitesglubRecord.sitesglub_id} to sitesdfs ${sitesdfsRecord.sitesdfs_id}`);
+            }
+            
+            sitesdfsProcessed.push({
+              domain: url,
+              sitesdfs_id: sitesdfsRecord.sitesdfs_id,
+              action: 'processed'
+            });
+          }
+          
           // Prepare sitespren record with foreign key to sitesglub
           sitesToInsert.push({
             sitespren_base: url,
@@ -225,8 +315,9 @@ export async function POST(request: NextRequest) {
     const invalidCount = cleanedUrls.length - validUrls.length;
     const limitedCount = validUrls.length - urlsToProcess.length;
     const sitesglubCreated = sitesglubProcessed.length;
+    const sitesdfsCreated = sitesdfsProcessed.length;
 
-    let message = `Successfully created ${sitesCreated} site(s) with ${sitesglubCreated} sitesglub record(s) processed`;
+    let message = `Successfully created ${sitesCreated} site(s) with ${sitesglubCreated} sitesglub and ${sitesdfsCreated} sitesdfs record(s) processed`;
     if (limitedCount > 0) {
       message += ` (${limitedCount} sites were skipped due to 300 limit)`;
     }
@@ -245,6 +336,7 @@ export async function POST(request: NextRequest) {
         invalidUrls: invalidCount,
         limitedUrls: limitedCount,
         sitesglubProcessed: sitesglubCreated,
+        sitesdfsProcessed: sitesdfsCreated,
         errors: errors.length > 0 ? errors : undefined,
         message
       }
