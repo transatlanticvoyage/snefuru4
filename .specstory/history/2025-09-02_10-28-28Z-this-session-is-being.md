@@ -5550,3 +5550,2191 @@ Grove Hub (Parent Menu)
 
 The Grove plugin now provides complete backup functionality - if Snefuruplin is deleted, Grove can fully manage the zen database tables with professional interfaces that mirror the original functionality.
 
+---
+
+_**User**_
+
+please explain to me how the shortcode registration (and any other important systems related to shortcodes) is currently configured in the snefuruplin wp plugin. please just answer and do not change any of our code right now. we are still in planning phase.
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me analyze how shortcode registration and related systems work in the Snefuruplin plugin.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `snefuruplin`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php:31:        add_shortcode('zen_services', array($this, 'render_services'));
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php:32:        add_shortcode('zen_service', array($this, 'render_single_service'));
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php:33:        add_shortcode('zen_service_image', array($this, 'render_service_image'));
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php:36:        add_shortcode('zen_locations', array($this, 'render_locations'));
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php:37:        add_shortcode('zen_location', array($this, 'render_single_location'));
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php:38:        add_shortcode('zen_location_image', array($this, 'render_location_image'));
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php:41:        add_shortcode('zen_pinned_services', array($this, 'render_pinned_services'));
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php:42:        add_shortcode('zen_pinned_locations', array($this, 'render_pinned_locations'));
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php:45:        add_shortcode('sitespren', array($this, 'render_sitespren'));
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-zen-shortcodes.php`
+
+Result:
+
+```
+1→<?php
+     2→
+     3→/**
+     4→ * Zen Shortcodes Class
+     5→ * Handles WordPress shortcodes for zen_services and zen_locations data
+     6→ */
+     7→class Zen_Shortcodes {
+     8→    
+     9→    public function __construct() {
+    10→        $this->init_shortcodes();
+    11→        add_action('wp_enqueue_scripts', array($this, 'enqueue_styles'));
+    12→    }
+    13→    
+    14→    /**
+    15→     * Enqueue shortcodes CSS
+    16→     */
+    17→    public function enqueue_styles() {
+    18→        wp_enqueue_style(
+    19→            'zen-shortcodes',
+    20→            SNEFURU_PLUGIN_URL . 'assets/zen-shortcodes.css',
+    21→            array(),
+    22→            SNEFURU_PLUGIN_VERSION
+    23→        );
+    24→    }
+    25→    
+    26→    /**
+    27→     * Initialize and register all shortcodes
+    28→     */
+    29→    private function init_shortcodes() {
+    30→        // Services shortcodes
+    31→        add_shortcode('zen_services', array($this, 'render_services'));
+    32→        add_shortcode('zen_service', array($this, 'render_single_service'));
+    33→        add_shortcode('zen_service_image', array($this, 'render_service_image'));
+    34→        
+    35→        // Locations shortcodes
+    36→        add_shortcode('zen_locations', array($this, 'render_locations'));
+    37→        add_shortcode('zen_location', array($this, 'render_single_location'));
+    38→        add_shortcode('zen_location_image', array($this, 'render_location_image'));
+    39→        
+    40→        // Utility shortcodes
+    41→        add_shortcode('zen_pinned_services', array($this, 'render_pinned_services'));
+    42→        add_shortcode('zen_pinned_locations', array($this, 'render_pinned_locations'));
+    43→        
+    44→        // Sitespren shortcode
+    45→        add_shortcode('sitespren', array($this, 'render_sitespren'));
+    46→    }
+    47→    
+    48→    /**
+    49→     * Render services list
+    50→     * Usage: [zen_services limit="5" template="grid" show_images="true" pinned_first="true"]
+    51→     */
+    52→    public function render_services($atts) {
+    53→        $atts = shortcode_atts(array(
+    54→            'limit' => -1,
+    55→            'template' => 'list', // list, grid, cards
+    56→            'show_images' => 'false',
+    57→            'pinned_first' => 'true',
+    58→            'order' => 'ASC',
+    59→            'orderby' => 'position_in_custom_order',
+    60→            'class' => '',
+    61→            'image_size' => 'thumbnail'
+    62→        ), $atts, 'zen_services');
+    63→        
+    64→        $services = Ruplin_WP_Database_Horse_Class::get_services(array(
+    65→            'orderby' => $atts['orderby'],
+    66→            'order' => $atts['order'],
+    67→            'pinned_first' => $atts['pinned_first'] === 'true'
+    68→        ));
+    69→        
+    70→        if (empty($services)) {
+    71→            return '<p>No services found.</p>';
+    72→        }
+    73→        
+    74→        // Apply limit if specified
+    75→        if ($atts['limit'] > 0) {
+    76→            $services = array_slice($services, 0, $atts['limit']);
+    77→        }
+    78→        
+    79→        $output = '<div class="zen-services-wrapper ' . esc_attr($atts['class']) . ' zen-template-' . esc_attr($atts['template']) . '">';
+    80→        
+    81→        foreach ($services as $service) {
+    82→            $output .= $this->render_service_item($service, $atts);
+    83→        }
+    84→        
+    85→        $output .= '</div>';
+    86→        
+    87→        return $output;
+    88→    }
+    89→    
+    90→    /**
+    91→     * Render single service
+    92→     * Usage: [zen_service id="1" field="service_name"] or [zen_service id="1" template="card"]
+    93→     */
+    94→    public function render_single_service($atts) {
+    95→        $atts = shortcode_atts(array(
+    96→            'id' => '',
+    97→            'field' => '', // specific field to display
+    98→            'template' => 'full',
+    99→            'show_image' => 'true',
+   100→            'image_size' => 'medium',
+   101→            'class' => ''
+   102→        ), $atts, 'zen_service');
+   103→        
+   104→        if (empty($atts['id'])) {
+   105→            return '<p>Service ID is required.</p>';
+   106→        }
+   107→        
+   108→        $service = Ruplin_WP_Database_Horse_Class::get_service($atts['id']);
+   109→        
+   110→        if (!$service) {
+   111→            return '<p>Service not found.</p>';
+   112→        }
+   113→        
+   114→        // If specific field requested, return just that field
+   115→        if (!empty($atts['field'])) {
+   116→            return isset($service->{$atts['field']}) ? esc_html($service->{$atts['field']}) : '';
+   117→        }
+   118→        
+   119→        return $this->render_service_item($service, $atts);
+   120→    }
+   121→    
+   122→    /**
+   123→     * Render service image
+   124→     * Usage: [zen_service_image id="1" size="medium" alt="Custom alt text"]
+   125→     */
+   126→    public function render_service_image($atts) {
+   127→        $atts = shortcode_atts(array(
+   128→            'id' => '',
+   129→            'size' => 'medium',
+   130→            'alt' => '',
+   131→            'class' => 'zen-service-image',
+   132→            'link' => 'false' // Link to full size image
+   133→        ), $atts, 'zen_service_image');
+   134→        
+   135→        if (empty($atts['id'])) {
+   136→            return '';
+   137→        }
+   138→        
+   139→        $service = Ruplin_WP_Database_Horse_Class::get_service($atts['id']);
+   140→        
+   141→        if (!$service || !$service->rel_image1_id) {
+   142→            return '';
+   143→        }
+   144→        
+   145→        $image_html = wp_get_attachment_image(
+   146→            $service->rel_image1_id, 
+   147→            $atts['size'], 
+   148→            false, 
+   149→            array(
+   150→                'class' => $atts['class'],
+   151→                'alt' => !empty($atts['alt']) ? $atts['alt'] : $service->service_name
+   152→            )
+   153→        );
+   154→        
+   155→        if ($atts['link'] === 'true') {
+   156→            $image_url = wp_get_attachment_image_url($service->rel_image1_id, 'full');
+   157→            $image_html = '<a href="' . esc_url($image_url) . '" target="_blank">' . $image_html . '</a>';
+   158→        }
+   159→        
+   160→        return $image_html;
+   161→    }
+   162→    
+   163→    /**
+   164→     * Render locations list
+   165→     * Usage: [zen_locations limit="3" template="grid" show_images="true"]
+   166→     */
+   167→    public function render_locations($atts) {
+   168→        $atts = shortcode_atts(array(
+   169→            'limit' => -1,
+   170→            'template' => 'list',
+   171→            'show_images' => 'false',
+   172→            'pinned_first' => 'true',
+   173→            'order' => 'ASC',
+   174→            'orderby' => 'position_in_custom_order',
+   175→            'class' => '',
+   176→            'image_size' => 'thumbnail'
+   177→        ), $atts, 'zen_locations');
+   178→        
+   179→        $locations = Ruplin_WP_Database_Horse_Class::get_locations(array(
+   180→            'orderby' => $atts['orderby'],
+   181→            'order' => $atts['order'],
+   182→            'pinned_first' => $atts['pinned_first'] === 'true'
+   183→        ));
+   184→        
+   185→        if (empty($locations)) {
+   186→            return '<p>No locations found.</p>';
+   187→        }
+   188→        
+   189→        if ($atts['limit'] > 0) {
+   190→            $locations = array_slice($locations, 0, $atts['limit']);
+   191→        }
+   192→        
+   193→        $output = '<div class="zen-locations-wrapper ' . esc_attr($atts['class']) . ' zen-template-' . esc_attr($atts['template']) . '">';
+   194→        
+   195→        foreach ($locations as $location) {
+   196→            $output .= $this->render_location_item($location, $atts);
+   197→        }
+   198→        
+   199→        $output .= '</div>';
+   200→        
+   201→        return $output;
+   202→    }
+   203→    
+   204→    /**
+   205→     * Render single location
+   206→     * Usage: [zen_location id="1" field="location_name"] or [zen_location id="1" template="card"]
+   207→     */
+   208→    public function render_single_location($atts) {
+   209→        $atts = shortcode_atts(array(
+   210→            'id' => '',
+   211→            'field' => '',
+   212→            'template' => 'full',
+   213→            'show_image' => 'true',
+   214→            'image_size' => 'medium',
+   215→            'class' => ''
+   216→        ), $atts, 'zen_location');
+   217→        
+   218→        if (empty($atts['id'])) {
+   219→            return '<p>Location ID is required.</p>';
+   220→        }
+   221→        
+   222→        $location = Ruplin_WP_Database_Horse_Class::get_location($atts['id']);
+   223→        
+   224→        if (!$location) {
+   225→            return '<p>Location not found.</p>';
+   226→        }
+   227→        
+   228→        if (!empty($atts['field'])) {
+   229→            return isset($location->{$atts['field']}) ? esc_html($location->{$atts['field']}) : '';
+   230→        }
+   231→        
+   232→        return $this->render_location_item($location, $atts);
+   233→    }
+   234→    
+   235→    /**
+   236→     * Render location image
+   237→     * Usage: [zen_location_image id="1" size="large"]
+   238→     */
+   239→    public function render_location_image($atts) {
+   240→        $atts = shortcode_atts(array(
+   241→            'id' => '',
+   242→            'size' => 'medium',
+   243→            'alt' => '',
+   244→            'class' => 'zen-location-image',
+   245→            'link' => 'false'
+   246→        ), $atts, 'zen_location_image');
+   247→        
+   248→        if (empty($atts['id'])) {
+   249→            return '';
+   250→        }
+   251→        
+   252→        $location = Ruplin_WP_Database_Horse_Class::get_location($atts['id']);
+   253→        
+   254→        if (!$location || !$location->rel_image1_id) {
+   255→            return '';
+   256→        }
+   257→        
+   258→        $image_html = wp_get_attachment_image(
+   259→            $location->rel_image1_id, 
+   260→            $atts['size'], 
+   261→            false, 
+   262→            array(
+   263→                'class' => $atts['class'],
+   264→                'alt' => !empty($atts['alt']) ? $atts['alt'] : $location->location_name
+   265→            )
+   266→        );
+   267→        
+   268→        if ($atts['link'] === 'true') {
+   269→            $image_url = wp_get_attachment_image_url($location->rel_image1_id, 'full');
+   270→            $image_html = '<a href="' . esc_url($image_url) . '" target="_blank">' . $image_html . '</a>';
+   271→        }
+   272→        
+   273→        return $image_html;
+   274→    }
+   275→    
+   276→    /**
+   277→     * Render only pinned services
+   278→     * Usage: [zen_pinned_services template="cards" limit="3"]
+   279→     */
+   280→    public function render_pinned_services($atts) {
+   281→        $atts = shortcode_atts(array(
+   282→            'limit' => -1,
+   283→            'template' => 'list',
+   284→            'show_images' => 'true',
+   285→            'class' => 'zen-pinned-services'
+   286→        ), $atts, 'zen_pinned_services');
+   287→        
+   288→        global $wpdb;
+   289→        $table = $wpdb->prefix . 'zen_services';
+   290→        $services = $wpdb->get_results(
+   291→            "SELECT * FROM $table WHERE is_pinned_service = 1 ORDER BY position_in_custom_order ASC"
+   292→        );
+   293→        
+   294→        if (empty($services)) {
+   295→            return '<p>No pinned services found.</p>';
+   296→        }
+   297→        
+   298→        if ($atts['limit'] > 0) {
+   299→            $services = array_slice($services, 0, $atts['limit']);
+   300→        }
+   301→        
+   302→        $output = '<div class="zen-services-wrapper ' . esc_attr($atts['class']) . ' zen-template-' . esc_attr($atts['template']) . '">';
+   303→        
+   304→        foreach ($services as $service) {
+   305→            $output .= $this->render_service_item($service, $atts);
+   306→        }
+   307→        
+   308→        $output .= '</div>';
+   309→        
+   310→        return $output;
+   311→    }
+   312→    
+   313→    /**
+   314→     * Render only pinned locations
+   315→     * Usage: [zen_pinned_locations template="grid"]
+   316→     */
+   317→    public function render_pinned_locations($atts) {
+   318→        $atts = shortcode_atts(array(
+   319→            'limit' => -1,
+   320→            'template' => 'list',
+   321→            'show_images' => 'true',
+   322→            'class' => 'zen-pinned-locations'
+   323→        ), $atts, 'zen_pinned_locations');
+   324→        
+   325→        global $wpdb;
+   326→        $table = $wpdb->prefix . 'zen_locations';
+   327→        $locations = $wpdb->get_results(
+   328→            "SELECT * FROM $table WHERE is_pinned_location = 1 ORDER BY position_in_custom_order ASC"
+   329→        );
+   330→        
+   331→        if (empty($locations)) {
+   332→            return '<p>No pinned locations found.</p>';
+   333→        }
+   334→        
+   335→        if ($atts['limit'] > 0) {
+   336→            $locations = array_slice($locations, 0, $atts['limit']);
+   337→        }
+   338→        
+   339→        $output = '<div class="zen-locations-wrapper ' . esc_attr($atts['class']) . ' zen-template-' . esc_attr($atts['template']) . '">';
+   340→        
+   341→        foreach ($locations as $location) {
+   342→            $output .= $this->render_location_item($location, $atts);
+   343→        }
+   344→        
+   345→        $output .= '</div>';
+   346→        
+   347→        return $output;
+   348→    }
+   349→    
+   350→    /**
+   351→     * Render individual service item based on template
+   352→     */
+   353→    private function render_service_item($service, $atts) {
+   354→        $template = $atts['template'];
+   355→        $show_images = $atts['show_images'] === 'true';
+   356→        $image_size = $atts['image_size'];
+   357→        
+   358→        $output = '<div class="zen-service-item">';
+   359→        
+   360→        // Add pinned indicator
+   361→        if ($service->is_pinned_service) {
+   362→            $output .= '<span class="zen-pinned-badge">📌 Pinned</span>';
+   363→        }
+   364→        
+   365→        switch ($template) {
+   366→            case 'grid':
+   367→            case 'cards':
+   368→                $output .= '<div class="zen-service-card">';
+   369→                if ($show_images && $service->rel_image1_id) {
+   370→                    $output .= '<div class="zen-service-image-wrapper">';
+   371→                    $output .= wp_get_attachment_image($service->rel_image1_id, $image_size, false, array('class' => 'zen-service-image'));
+   372→                    $output .= '</div>';
+   373→                }
+   374→                $output .= '<div class="zen-service-content">';
+   375→                $output .= '<h3 class="zen-service-name">' . esc_html($service->service_name) . '</h3>';
+   376→                if ($service->service_placard) {
+   377→                    $output .= '<div class="zen-service-placard">' . esc_html($service->service_placard) . '</div>';
+   378→                }
+   379→                if ($service->description1_short) {
+   380→                    $output .= '<div class="zen-service-description">' . esc_html($service->description1_short) . '</div>';
+   381→                }
+   382→                $output .= '</div></div>';
+   383→                break;
+   384→                
+   385→            case 'list':
+   386→            default:
+   387→                if ($show_images && $service->rel_image1_id) {
+   388→                    $output .= '<div class="zen-service-image-wrapper">';
+   389→                    $output .= wp_get_attachment_image($service->rel_image1_id, $image_size, false, array('class' => 'zen-service-image'));
+   390→                    $output .= '</div>';
+   391→                }
+   392→                $output .= '<div class="zen-service-content">';
+   393→                $output .= '<h3 class="zen-service-name">' . esc_html($service->service_name) . '</h3>';
+   394→                if ($service->service_placard) {
+   395→                    $output .= '<div class="zen-service-placard">' . esc_html($service->service_placard) . '</div>';
+   396→                }
+   397→                if ($service->service_moniker) {
+   398→                    $output .= '<div class="zen-service-moniker">' . esc_html($service->service_moniker) . '</div>';
+   399→                }
+   400→                if ($service->description1_short) {
+   401→                    $output .= '<div class="zen-service-description-short">' . esc_html($service->description1_short) . '</div>';
+   402→                }
+   403→                if ($service->description1_long && $template === 'full') {
+   404→                    $output .= '<div class="zen-service-description-long">' . esc_html($service->description1_long) . '</div>';
+   405→                }
+   406→                $output .= '</div>';
+   407→                break;
+   408→        }
+   409→        
+   410→        $output .= '</div>';
+   411→        
+   412→        return $output;
+   413→    }
+   414→    
+   415→    /**
+   416→     * Render individual location item based on template
+   417→     */
+   418→    private function render_location_item($location, $atts) {
+   419→        $template = $atts['template'];
+   420→        $show_images = $atts['show_images'] === 'true';
+   421→        $image_size = $atts['image_size'];
+   422→        
+   423→        $output = '<div class="zen-location-item">';
+   424→        
+   425→        if ($location->is_pinned_location) {
+   426→            $output .= '<span class="zen-pinned-badge">📌 Pinned</span>';
+   427→        }
+   428→        
+   429→        switch ($template) {
+   430→            case 'grid':
+   431→            case 'cards':
+   432→                $output .= '<div class="zen-location-card">';
+   433→                if ($show_images && $location->rel_image1_id) {
+   434→                    $output .= '<div class="zen-location-image-wrapper">';
+   435→                    $output .= wp_get_attachment_image($location->rel_image1_id, $image_size, false, array('class' => 'zen-location-image'));
+   436→                    $output .= '</div>';
+   437→                }
+   438→                $output .= '<div class="zen-location-content">';
+   439→                $output .= '<h3 class="zen-location-name">' . esc_html($location->location_name) . '</h3>';
+   440→                if ($location->location_placard) {
+   441→                    $output .= '<div class="zen-location-placard">' . esc_html($location->location_placard) . '</div>';
+   442→                }
+   443→                $address = $this->format_address($location);
+   444→                if ($address) {
+   445→                    $output .= '<div class="zen-location-address">' . $address . '</div>';
+   446→                }
+   447→                $output .= '</div></div>';
+   448→                break;
+   449→                
+   450→            case 'list':
+   451→            default:
+   452→                if ($show_images && $location->rel_image1_id) {
+   453→                    $output .= '<div class="zen-location-image-wrapper">';
+   454→                    $output .= wp_get_attachment_image($location->rel_image1_id, $image_size, false, array('class' => 'zen-location-image'));
+   455→                    $output .= '</div>';
+   456→                }
+   457→                $output .= '<div class="zen-location-content">';
+   458→                $output .= '<h3 class="zen-location-name">' . esc_html($location->location_name) . '</h3>';
+   459→                if ($location->location_placard) {
+   460→                    $output .= '<div class="zen-location-placard">' . esc_html($location->location_placard) . '</div>';
+   461→                }
+   462→                if ($location->location_moniker) {
+   463→                    $output .= '<div class="zen-location-moniker">' . esc_html($location->location_moniker) . '</div>';
+   464→                }
+   465→                $address = $this->format_address($location);
+   466→                if ($address) {
+   467→                    $output .= '<div class="zen-location-address">' . $address . '</div>';
+   468→                }
+   469→                $output .= '</div>';
+   470→                break;
+   471→        }
+   472→        
+   473→        $output .= '</div>';
+   474→        
+   475→        return $output;
+   476→    }
+   477→    
+   478→    /**
+   479→     * Format location address
+   480→     */
+   481→    private function format_address($location) {
+   482→        $address_parts = array();
+   483→        
+   484→        if ($location->street) $address_parts[] = $location->street;
+   485→        if ($location->city) $address_parts[] = $location->city;
+   486→        if ($location->state_code) $address_parts[] = $location->state_code;
+   487→        if ($location->zip_code) $address_parts[] = $location->zip_code;
+   488→        if ($location->country && $location->country !== 'US') $address_parts[] = $location->country;
+   489→        
+   490→        return implode(', ', $address_parts);
+   491→    }
+   492→    
+   493→    /**
+   494→     * Render sitespren data
+   495→     * Usage: [sitespren wppma_id="1" field="driggs_phone_1"]
+   496→     */
+   497→    public function render_sitespren($atts) {
+   498→        global $wpdb;
+   499→        
+   500→        $atts = shortcode_atts(array(
+   501→            'wppma_id' => '',
+   502→            'field' => '',
+   503→            'default' => '', // Default value if field is empty
+   504→            'format' => '', // Optional formatting (e.g., 'phone', 'currency', 'date')
+   505→            'class' => ''
+   506→        ), $atts, 'sitespren');
+   507→        
+   508→        // Validate required parameters
+   509→        if (empty($atts['wppma_id'])) {
+   510→            return '<span class="sitespren-error">Sitespren wppma_id is required.</span>';
+   511→        }
+   512→        
+   513→        if (empty($atts['field'])) {
+   514→            return '<span class="sitespren-error">Sitespren field is required.</span>';
+   515→        }
+   516→        
+   517→        // Get the sitespren record
+   518→        $table_name = $wpdb->prefix . 'zen_sitespren';
+   519→        $sitespren = $wpdb->get_row($wpdb->prepare(
+   520→            "SELECT * FROM $table_name WHERE wppma_id = %d",
+   521→            intval($atts['wppma_id'])
+   522→        ));
+   523→        
+   524→        if (!$sitespren) {
+   525→            return !empty($atts['default']) ? esc_html($atts['default']) : '<span class="sitespren-not-found">Sitespren record not found.</span>';
+   526→        }
+   527→        
+   528→        // Check if field exists
+   529→        if (!property_exists($sitespren, $atts['field'])) {
+   530→            return !empty($atts['default']) ? esc_html($atts['default']) : '<span class="sitespren-no-field">Field not found.</span>';
+   531→        }
+   532→        
+   533→        // Get the field value
+   534→        $value = $sitespren->{$atts['field']};
+   535→        
+   536→        // Return default if value is empty
+   537→        if (empty($value) && !empty($atts['default'])) {
+   538→            $value = $atts['default'];
+   539→        }
+   540→        
+   541→        // Apply formatting if specified
+   542→        if (!empty($atts['format'])) {
+   543→            $value = $this->format_sitespren_value($value, $atts['format']);
+   544→        }
+   545→        
+   546→        // Return the formatted value
+   547→        $class = !empty($atts['class']) ? ' class="' . esc_attr($atts['class']) . '"' : '';
+   548→        return '<span' . $class . '>' . esc_html($value) . '</span>';
+   549→    }
+   550→    
+   551→    /**
+   552→     * Format sitespren value based on type
+   553→     */
+   554→    private function format_sitespren_value($value, $format) {
+   555→        switch ($format) {
+   556→            case 'phone':
+   557→                // Format phone number (assuming US format)
+   558→                $cleaned = preg_replace('/[^0-9]/', '', $value);
+   559→                if (strlen($cleaned) === 10) {
+   560→                    return sprintf('(%s) %s-%s', 
+   561→                        substr($cleaned, 0, 3),
+   562→                        substr($cleaned, 3, 3),
+   563→                        substr($cleaned, 6, 4)
+   564→                    );
+   565→                }
+   566→                break;
+   567→                
+   568→            case 'currency':
+   569→                // Format as currency
+   570→                if (is_numeric($value)) {
+   571→                    return '$' . number_format((float)$value, 2);
+   572→                }
+   573→                break;
+   574→                
+   575→            case 'date':
+   576→                // Format date
+   577→                $timestamp = strtotime($value);
+   578→                if ($timestamp !== false) {
+   579→                    return date('F j, Y', $timestamp);
+   580→                }
+   581→                break;
+   582→                
+   583→            case 'url':
+   584→                // Ensure URL has protocol
+   585→                if (!preg_match('/^https?:\/\//', $value)) {
+   586→                    return 'https://' . $value;
+   587→                }
+   588→                break;
+   589→        }
+   590→        
+   591→        return $value;
+   592→    }
+   593→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `snefuruplin`
+
+Result:
+
+```
+No matches found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `snefuruplin`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/snefuruplin.php:84:        new Zen_Shortcodes();
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php:7:class Zen_Shortcodes {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `snefuruplin`
+
+Result:
+
+```
+Found 9 files
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/uninstall.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/snefuruplin.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/pages/debug-status-page.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-version-checker.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-elementor-dynamic-tags.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-ruplin-wppma-database.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-zen-shortcodes.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-elementor-media-workaround.php
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Based on my analysis of the Snefuruplin plugin, here's how the shortcode registration and related systems are currently configured:
+
+## **Shortcode Registration System in Snefuruplin:**
+
+### **1. Main Shortcode Class:**
+- **File**: `includes/class-zen-shortcodes.php`
+- **Instantiated**: In `snefuruplin.php:84` via `new Zen_Shortcodes();`
+- **CSS**: Enqueues `assets/zen-shortcodes.css` on frontend
+
+### **2. Registered Shortcodes:**
+
+**Services Shortcodes:**
+- `[zen_services]` - List/grid of services with templates, limits, ordering
+- `[zen_service]` - Single service by ID or specific field
+- `[zen_service_image]` - Service image with sizing options
+
+**Locations Shortcodes:**
+- `[zen_locations]` - List/grid of locations with templates
+- `[zen_location]` - Single location by ID or specific field  
+- `[zen_location_image]` - Location image with sizing
+
+**Utility Shortcodes:**
+- `[zen_pinned_services]` - Only pinned services
+- `[zen_pinned_locations]` - Only pinned locations
+- `[sitespren]` - Dynamic field display from zen_sitespren table
+
+### **3. Key Dependencies:**
+
+**Database Layer:**
+- Uses `Ruplin_WP_Database_Horse_Class` methods:
+  - `get_services()`, `get_service()`
+  - `get_locations()`, `get_location()`
+- Direct SQL queries for pinned items
+- Relies on `wp_zen_services`, `wp_zen_locations`, `wp_zen_sitespren` tables
+
+**The Critical `[sitespren]` Shortcode:**
+- **Usage**: `[sitespren wppma_id="1" field="driggs_phone_1"]`
+- **Purpose**: Dynamically displays any field from zen_sitespren table
+- **Features**: Default values, formatting (phone, currency, date, URL)
+- **This is the shortcode the R button copies in rup_driggs_mar**
+
+### **4. Template System:**
+- **Templates**: `list`, `grid`, `cards`, `full`
+- **Attributes**: `limit`, `show_images`, `pinned_first`, `order`, `orderby`, `class`, `image_size`
+- **Images**: Uses WordPress attachment system via `rel_image1_id`
+
+### **5. Key Architectural Points:**
+
+**Initialization**: 
+- Shortcodes registered in constructor via `init_shortcodes()`
+- Plugin loads this class automatically on init
+
+**Data Access**:
+- Shortcodes access database tables directly
+- No dependency on admin interface - pure frontend functionality
+
+**Independence**: 
+- Shortcode system is completely separate from admin pages
+- Could function independently if main plugin removed
+- Only requires database tables to exist
+
+**Critical for Grove**: The shortcode system is the **user-facing functionality** that websites depend on. If Snefuruplin is removed, these shortcodes break, which is exactly why Grove needs to provide **identical shortcode registration** to maintain website functionality.
+
+---
+
+_**User**_
+
+please list out specifically all of the pieces of code in the existing snefuruplin wp plugin shortcode system. then please show me the chain of custody / sequence of events / etc. that would arise and how the grove wp plugin would actually "take over" control of this and if that would require any file changes on an ongoing basis or can we just configure the plugin to assume control automatically, etc.? please just answer and do not change any of our code right now. we are still in planning phase.
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Looking at the shortcode system in Snefuruplin, here are all the specific pieces of code involved:
+
+## **All Code Pieces in Snefuruplin Shortcode System:**
+
+### **1. Main Shortcode Registration:**
+- **File**: `snefuruplin/includes/class-zen-shortcodes.php` (593 lines)
+- **Loaded**: `snefuruplin/snefuruplin.php:84` - `new Zen_Shortcodes();`
+- **CSS**: `snefuruplin/assets/zen-shortcodes.css` (enqueued on frontend)
+
+### **2. Database Dependency:**
+- **File**: `snefuruplin/includes/class-ruplin-wppma-database.php`
+- **Methods Used**:
+  - `Ruplin_WP_Database_Horse_Class::get_services()`
+  - `Ruplin_WP_Database_Horse_Class::get_service()`
+  - `Ruplin_WP_Database_Horse_Class::get_locations()`
+  - `Ruplin_WP_Database_Horse_Class::get_location()`
+
+### **3. Database Tables:**
+- `wp_zen_services` (accessed via class methods)
+- `wp_zen_locations` (accessed via class methods)
+- `wp_zen_sitespren` (accessed directly via SQL in `render_sitespren()`)
+
+### **4. All Registered Shortcodes:**
+```php
+// Services (lines 31-33)
+add_shortcode('zen_services', array($this, 'render_services'));
+add_shortcode('zen_service', array($this, 'render_single_service'));
+add_shortcode('zen_service_image', array($this, 'render_service_image'));
+
+// Locations (lines 36-38)
+add_shortcode('zen_locations', array($this, 'render_locations'));
+add_shortcode('zen_location', array($this, 'render_single_location'));
+add_shortcode('zen_location_image', array($this, 'render_location_image'));
+
+// Utility (lines 41-42)
+add_shortcode('zen_pinned_services', array($this, 'render_pinned_services'));
+add_shortcode('zen_pinned_locations', array($this, 'render_pinned_locations'));
+
+// Sitespren (line 45)
+add_shortcode('sitespren', array($this, 'render_sitespren'));
+```
+
+---
+
+## **Chain of Custody / Sequence of Events:**
+
+### **Current State (Snefuruplin Active):**
+1. **WordPress loads** → `snefuruplin/snefuruplin.php`
+2. **Plugin init** → `new Zen_Shortcodes()` (line 84)
+3. **Shortcodes registered** → All 9 shortcodes active
+4. **Frontend renders** → Shortcodes work, CSS loaded
+5. **Database queries** → Via `Ruplin_WP_Database_Horse_Class`
+
+### **Transition Scenarios:**
+
+#### **Scenario A: Both Plugins Active (Conflict)**
+```
+WordPress Priority: Last registered shortcode wins
+1. Snefuruplin loads → Registers shortcodes
+2. Grove loads → Overwrites same shortcodes  
+Result: Grove shortcodes active, Snefuruplin ignored
+```
+
+#### **Scenario B: Snefuruplin Removed, Grove Active**
+```
+1. Snefuruplin deleted → Shortcodes unregistered
+2. Grove active → Registers identical shortcodes
+3. Frontend still works → No broken shortcodes
+Result: Seamless takeover
+```
+
+---
+
+## **Grove "Takeover" Implementation Options:**
+
+### **Option 1: Automatic Conditional Takeover (Recommended)**
+**No ongoing file changes required**
+
+```php
+// In Grove constructor
+public function __construct() {
+    // Always try to register shortcodes
+    add_action('init', array($this, 'maybe_register_shortcodes'), 15); // Later priority
+}
+
+public function maybe_register_shortcodes() {
+    // Only register if Snefuruplin is NOT active
+    if (!is_plugin_active('snefuruplin/snefuruplin.php')) {
+        $this->register_zen_shortcodes();
+    }
+}
+```
+
+**Benefits:**
+- ✅ Automatic detection
+- ✅ No conflicts when both active
+- ✅ Seamless takeover when Snefuruplin removed
+- ✅ Zero ongoing maintenance
+
+### **Option 2: Force Override Mode**
+**Admin setting to force takeover even with Snefuruplin active**
+
+```php
+// Always register if user enables "Force Shortcode Control"
+if (get_option('grove_force_shortcode_control') || !is_plugin_active('snefuruplin/snefuruplin.php')) {
+    $this->register_zen_shortcodes();
+}
+```
+
+### **Option 3: Smart Detection**
+**Check if shortcodes actually exist**
+
+```php
+public function maybe_register_shortcodes() {
+    // Register any missing shortcodes
+    $zen_shortcodes = ['zen_services', 'zen_locations', 'sitespren', /*...*/];
+    
+    foreach ($zen_shortcodes as $shortcode) {
+        if (!shortcode_exists($shortcode)) {
+            // Register this specific shortcode
+        }
+    }
+}
+```
+
+---
+
+## **Required Grove Implementation:**
+
+### **1. Copy Shortcode System:**
+- **File**: `grove/includes/class-grove-zen-shortcodes.php`
+- **Content**: Identical copy of `class-zen-shortcodes.php`
+- **Dependencies**: Either copy database methods OR query tables directly
+
+### **2. Database Access Strategy:**
+
+#### **Option A: Copy Database Methods**
+```php
+// Copy required methods from Ruplin_WP_Database_Horse_Class
+class Grove_Database {
+    public static function get_services($args = []) {
+        // Identical implementation
+    }
+    // etc...
+}
+```
+
+#### **Option B: Direct SQL (Simpler)**
+```php
+// Query tables directly like sitespren shortcode does
+global $wpdb;
+$services = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}zen_services ORDER BY...");
+```
+
+### **3. Asset Handling:**
+- **Copy**: `assets/zen-shortcodes.css` to Grove
+- **Enqueue**: Only when Grove shortcodes active
+
+---
+
+## **Answers to Key Questions:**
+
+### **Would takeover require ongoing file changes?**
+**No** - with Option 1 (Conditional Registration), it's completely automatic:
+- Grove monitors Snefuruplin status
+- Automatically activates when Snefuruplin removed
+- No user intervention needed
+
+### **Can we configure automatic control?**
+**Yes** - using `is_plugin_active()` detection:
+```php
+// This runs every page load automatically
+if (!is_plugin_active('snefuruplin/snefuruplin.php')) {
+    // Register shortcodes
+}
+```
+
+### **What happens during transition?**
+**Seamless** - WordPress shortcode system handles it:
+1. Snefuruplin deactivated → Shortcodes unregistered
+2. Next page load → Grove detects absence, registers shortcodes
+3. User sees no difference → Website continues working
+
+### **Dependencies needed:**
+- ✅ Database tables (already preserved by updated `uninstall.php`)
+- ✅ Identical shortcode functionality (copy existing code)
+- ✅ Plugin detection logic (built-in WordPress function)
+
+**Bottom line**: Grove can provide **completely automatic failover** with zero ongoing maintenance once implemented.
+
+---
+
+_**User**_
+
+what if i deactivate snefuruplin and then have to install grove after i already deactivated/deleted snefuruplin (of course db schema and values never gets deleted - or this is the funcitonality i want in snefuruplin) ? we need it to work this way too, or maybe have a new page called
+=shortcodecommander
+
+on this page in the grove plugin, we could have settings that activate it to take over the shortcode registration (so frontend pages can use the shortcodes) . or is this unnecessary? please just answer and do not change any of our code right now. we are still in planning phase.
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+You raise excellent points about the edge case scenarios. Let me analyze both approaches:
+
+## **Current Grove Implementation (Automatic Detection)**
+
+**Your Scenario: Snefuruplin deleted → Grove installed later**
+
+✅ **This actually works perfectly** with the conditional detection:
+
+```php
+// Every time Grove loads, it checks
+if (!is_plugin_active('snefuruplin/snefuruplin.php')) {
+    // Snefuruplin is gone, so Grove registers shortcodes
+    $this->register_zen_shortcodes();
+}
+```
+
+**Timeline:**
+1. Snefuruplin active → Shortcodes work
+2. Snefuruplin deleted → Shortcodes broken ❌
+3. Grove installed → Grove detects Snefuruplin missing → Grove registers shortcodes ✅
+4. Website works again immediately
+
+## **Manual Control via `shortcodecommander` Page**
+
+### **Pros of Manual Control:**
+- ✅ **User certainty** - explicit control over shortcode behavior
+- ✅ **Override capability** - can force Grove to take control even if Snefuruplin present
+- ✅ **Troubleshooting** - clear status display of which plugin controls shortcodes
+- ✅ **Safety** - prevents accidental conflicts during testing/development
+- ✅ **Audit trail** - logs who activated shortcode control when
+
+### **Cons of Manual Control:**
+- ❌ **User error** - they might forget to activate it
+- ❌ **Extra step** - not automatic failover
+- ❌ **Complexity** - more code to maintain
+
+## **Hybrid Approach (Best of Both Worlds)**
+
+```php
+class Grove_Shortcode_Commander {
+    
+    public function maybe_register_shortcodes() {
+        $mode = get_option('grove_shortcode_mode', 'automatic');
+        
+        switch ($mode) {
+            case 'automatic':
+                // Default: Only if Snefuruplin not active
+                if (!is_plugin_active('snefuruplin/snefuruplin.php')) {
+                    $this->register_shortcodes();
+                }
+                break;
+                
+            case 'force_active':
+                // Always register (override Snefuruplin)
+                $this->register_shortcodes();
+                break;
+                
+            case 'disabled':
+                // Never register
+                break;
+        }
+    }
+}
+```
+
+## **Shortcode Commander Page Features:**
+
+### **Status Display:**
+```
+🟢 Shortcode Status: ACTIVE (Grove controlling)
+📊 Registered Shortcodes: 9 found
+🔍 Snefuruplin Status: Not detected
+📈 Database Tables: ✅ zen_services (15 records), ✅ zen_locations (8 records)
+```
+
+### **Control Options:**
+```
+○ Automatic (Default) - Take control only when Snefuruplin missing
+○ Force Active - Always control shortcodes (overrides Snefuruplin) 
+○ Disabled - Never register shortcodes
+```
+
+### **Troubleshooting Tools:**
+- **Test Shortcode** button - renders `[zen_services limit="1"]` to verify
+- **Conflict Detection** - warns if both plugins registering same shortcodes
+- **Database Health** - verifies zen tables exist and have data
+
+## **Recommendation: Hybrid Approach**
+
+**Default behavior**: Automatic detection (works in your scenario)
+**Plus**: Manual override via `shortcodecommander` page
+
+**Why this is best:**
+1. ✅ **Your scenario works** - automatic detection handles Snefuruplin deleted → Grove installed
+2. ✅ **Power user control** - manual override for testing/development
+3. ✅ **Enterprise ready** - clear status/control for complex setups
+4. ✅ **Troubleshooting** - when shortcodes break, admins have diagnostic tools
+5. ✅ **Future proof** - handles edge cases we haven't thought of
+
+## **Is Manual Control Necessary?**
+
+**For basic functionality**: No, automatic detection handles all normal scenarios including yours.
+
+**For professional/enterprise use**: Yes, because:
+- **Client sites** need clear diagnostics when things break
+- **Developers** need override capability during plugin development
+- **Support teams** need to see exactly what's controlling shortcodes
+- **Complex setups** (staging/production) may need different behaviors
+
+**The `shortcodecommander` page transforms Grove from "backup plugin" to "professional shortcode management system".**
+
+---
+
+_**User**_
+
+lets use the hybrid approach. and please make any updates to snefuruplin and grove that we need to accomodate this approach. but dont go updating or changing or analyzing random other features or pages that are not discussed here in our latest prompts exchanges in chat. please only implement specifically the things we are talking about here 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Create shortcode system for Grove plugin
+- [ ] 🌡️ Add shortcodecommander page to Grove admin
+- [ ] 🌡️ Implement hybrid shortcode control logic
+- [ ] 🌡️ Copy zen-shortcodes functionality to Grove
+- [ ] 🌡️ Add shortcode CSS assets to Grove
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll implement the hybrid approach. First, let me create the Grove shortcode system by copying and adapting the zen-shortcodes functionality:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```php
+<?php
+
+/**
+ * Grove Zen Shortcodes Class
+ * Handles WordPress shortcodes for zen_services and zen_locations data
+ */
+class Grove_Zen_Shortcodes {
+    
+    public function __construct() {
+        // Don't auto-register shortcodes - let the commander control it
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_styles'));
+        add_action('init', array($this, 'maybe_register_shortcodes'), 15); // Later priority
+    }
+    
+    /**
+     * Maybe register shortcodes based on Grove settings
+     */
+    public function maybe_register_shortcodes() {
+        $mode = get_option('grove_shortcode_mode', 'automatic');
+        
+        switch ($mode) {
+            case 'automatic':
+                // Default: Only if Snefuruplin not active
+                if (!is_plugin_active('snefuruplin/snefuruplin.php')) {
+                    $this->register_shortcodes();
+                }
+                break;
+                
+            case 'force_active':
+                // Always register (override Snefuruplin)
+                $this->register_shortcodes();
+                break;
+                
+            case 'disabled':
+                // Never register
+                break;
+        }
+    }
+    
+    /**
+     * Register all shortcodes
+     */
+    public function register_shortcodes() {
+        // Services shortcodes
+        add_shortcode('zen_services', array($this, 'render_services'));
+        add_shortcode('zen_service', array($this, 'render_single_service'));
+        add_shortcode('zen_service_image', array($this, 'render_service_image'));
+        
+        // Locations shortcodes
+        add_shortcode('zen_locations', array($this, 'render_locations'));
+        add_shortcode('zen_location', array($this, 'render_single_location'));
+        add_shortcode('zen_location_image', array($this, 'render_location_image'));
+        
+        // Utility shortcodes
+        add_shortcode('zen_pinned_services', array($this, 'render_pinned_services'));
+        add_shortcode('zen_pinned_locations', array($this, 'render_pinned_locations'));
+        
+        // Sitespren shortcode
+        add_shortcode('sitespren', array($this, 'render_sitespren'));
+    }
+    
+    /**
+     * Check if Grove is controlling shortcodes
+     */
+    public function is_grove_controlling_shortcodes() {
+        $mode = get_option('grove_shortcode_mode', 'automatic');
+        
+        if ($mode === 'force_active') {
+            return true;
+        } elseif ($mode === 'automatic') {
+            return !is_plugin_active('snefuruplin/snefuruplin.php');
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Enqueue shortcodes CSS only when Grove is controlling
+     */
+    public function enqueue_styles() {
+        if ($this->is_grove_controlling_shortcodes()) {
+            wp_enqueue_style(
+                'grove-zen-shortcodes',
+                GROVE_PLUGIN_URL . 'assets/zen-shortcodes.css',
+                array(),
+                GROVE_PLUGIN_VERSION
+            );
+        }
+    }
+    
+    /**
+     * Render services list
+     * Usage: [zen_services limit="5" template="grid" show_images="true" pinned_first="true"]
+     */
+    public function render_services($atts) {
+        $atts = shortcode_atts(array(
+            'limit' => -1,
+            'template' => 'list', // list, grid, cards
+            'show_images' => 'false',
+            'pinned_first' => 'true',
+            'order' => 'ASC',
+            'orderby' => 'position_in_custom_order',
+            'class' => '',
+            'image_size' => 'thumbnail'
+        ), $atts, 'zen_services');
+        
+        $services = $this->get_services(array(
+            'orderby' => $atts['orderby'],
+            'order' => $atts['order'],
+            'pinned_first' => $atts['pinned_first'] === 'true'
+        ));
+        
+        if (empty($services)) {
+            return '<p>No services found.</p>';
+        }
+        
+        // Apply limit if specified
+        if ($atts['limit'] > 0) {
+            $services = array_slice($services, 0, $atts['limit']);
+        }
+        
+        $output = '<div class="zen-services-wrapper ' . esc_attr($atts['class']) . ' zen-template-' . esc_attr($atts['template']) . '">';
+        
+        foreach ($services as $service) {
+            $output .= $this->render_service_item($service, $atts);
+        }
+        
+        $output .= '</div>';
+        
+        return $output;
+    }
+    
+    /**
+     * Render single service
+     * Usage: [zen_service id="1" field="service_name"] or [zen_service id="1" template="card"]
+     */
+    public function render_single_service($atts) {
+        $atts = shortcode_atts(array(
+            'id' => '',
+            'field' => '', // specific field to display
+            'template' => 'full',
+            'show_image' => 'true',
+            'image_size' => 'medium',
+            'class' => ''
+        ), $atts, 'zen_service');
+        
+        if (empty($atts['id'])) {
+            return '<p>Service ID is required.</p>';
+        }
+        
+        $service = $this->get_service($atts['id']);
+        
+        if (!$service) {
+            return '<p>Service not found.</p>';
+        }
+        
+        // If specific field requested, return just that field
+        if (!empty($atts['field'])) {
+            return isset($service->{$atts['field']}) ? esc_html($service->{$atts['field']}) : '';
+        }
+        
+        return $this->render_service_item($service, $atts);
+    }
+    
+    /**
+     * Render service image
+     * Usage: [zen_service_image id="1" size="medium" alt="Custom alt text"]
+     */
+    public function render_service_image($atts) {
+        $atts = shortcode_atts(array(
+            'id' => '',
+            'size' => 'medium',
+            'alt' => '',
+            'class' => 'zen-service-image',
+            'link' => 'false'
+        ), $atts, 'zen_service_image');
+        
+        if (empty($atts['id'])) {
+            return '';
+        }
+        
+        $service = $this->get_service($atts['id']);
+        
+        if (!$service || !$service->rel_image1_id) {
+            return '';
+        }
+        
+        $image_html = wp_get_attachment_image(
+            $service->rel_image1_id, 
+            $atts['size'], 
+            false, 
+            array(
+                'class' => $atts['class'],
+                'alt' => !empty($atts['alt']) ? $atts['alt'] : $service->service_name
+            )
+        );
+        
+        if ($atts['link'] === 'true') {
+            $image_url = wp_get_attachment_image_url($service->rel_image1_id, 'full');
+            $image_html = '<a href="' . esc_url($image_url) . '" target="_blank">' . $image_html . '</a>';
+        }
+        
+        return $image_html;
+    }
+    
+    /**
+     * Render locations list
+     * Usage: [zen_locations limit="3" template="grid" show_images="true"]
+     */
+    public function render_locations($atts) {
+        $atts = shortcode_atts(array(
+            'limit' => -1,
+            'template' => 'list',
+            'show_images' => 'false',
+            'pinned_first' => 'true',
+            'order' => 'ASC',
+            'orderby' => 'position_in_custom_order',
+            'class' => '',
+            'image_size' => 'thumbnail'
+        ), $atts, 'zen_locations');
+        
+        $locations = $this->get_locations(array(
+            'orderby' => $atts['orderby'],
+            'order' => $atts['order'],
+            'pinned_first' => $atts['pinned_first'] === 'true'
+        ));
+        
+        if (empty($locations)) {
+            return '<p>No locations found.</p>';
+        }
+        
+        if ($atts['limit'] > 0) {
+            $locations = array_slice($locations, 0, $atts['limit']);
+        }
+        
+        $output = '<div class="zen-locations-wrapper ' . esc_attr($atts['class']) . ' zen-template-' . esc_attr($atts['template']) . '">';
+        
+        foreach ($locations as $location) {
+            $output .= $this->render_location_item($location, $atts);
+        }
+        
+        $output .= '</div>';
+        
+        return $output;
+    }
+    
+    /**
+     * Render single location
+     * Usage: [zen_location id="1" field="location_name"] or [zen_location id="1" template="card"]
+     */
+    public function render_single_location($atts) {
+        $atts = shortcode_atts(array(
+            'id' => '',
+            'field' => '',
+            'template' => 'full',
+            'show_image' => 'true',
+            'image_size' => 'medium',
+            'class' => ''
+        ), $atts, 'zen_location');
+        
+        if (empty($atts['id'])) {
+            return '<p>Location ID is required.</p>';
+        }
+        
+        $location = $this->get_location($atts['id']);
+        
+        if (!$location) {
+            return '<p>Location not found.</p>';
+        }
+        
+        if (!empty($atts['field'])) {
+            return isset($location->{$atts['field']}) ? esc_html($location->{$atts['field']}) : '';
+        }
+        
+        return $this->render_location_item($location, $atts);
+    }
+    
+    /**
+     * Render location image
+     * Usage: [zen_location_image id="1" size="large"]
+     */
+    public function render_location_image($atts) {
+        $atts = shortcode_atts(array(
+            'id' => '',
+            'size' => 'medium',
+            'alt' => '',
+            'class' => 'zen-location-image',
+            'link' => 'false'
+        ), $atts, 'zen_location_image');
+        
+        if (empty($atts['id'])) {
+            return '';
+        }
+        
+        $location = $this->get_location($atts['id']);
+        
+        if (!$location || !$location->rel_image1_id) {
+            return '';
+        }
+        
+        $image_html = wp_get_attachment_image(
+            $location->rel_image1_id, 
+            $atts['size'], 
+            false, 
+            array(
+                'class' => $atts['class'],
+                'alt' => !empty($atts['alt']) ? $atts['alt'] : $location->location_name
+            )
+        );
+        
+        if ($atts['link'] === 'true') {
+            $image_url = wp_get_attachment_image_url($location->rel_image1_id, 'full');
+            $image_html = '<a href="' . esc_url($image_url) . '" target="_blank">' . $image_html . '</a>';
+        }
+        
+        return $image_html;
+    }
+    
+    /**
+     * Render only pinned services
+     * Usage: [zen_pinned_services template="cards" limit="3"]
+     */
+    public function render_pinned_services($atts) {
+        $atts = shortcode_atts(array(
+            'limit' => -1,
+            'template' => 'list',
+            'show_images' => 'true',
+            'class' => 'zen-pinned-services'
+        ), $atts, 'zen_pinned_services');
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'zen_services';
+        $services = $wpdb->get_results(
+            "SELECT * FROM $table WHERE is_pinned_service = 1 ORDER BY position_in_custom_order ASC"
+        );
+        
+        if (empty($services)) {
+            return '<p>No pinned services found.</p>';
+        }
+        
+        if ($atts['limit'] > 0) {
+            $services = array_slice($services, 0, $atts['limit']);
+        }
+        
+        $output = '<div class="zen-services-wrapper ' . esc_attr($atts['class']) . ' zen-template-' . esc_attr($atts['template']) . '">';
+        
+        foreach ($services as $service) {
+            $output .= $this->render_service_item($service, $atts);
+        }
+        
+        $output .= '</div>';
+        
+        return $output;
+    }
+    
+    /**
+     * Render only pinned locations
+     * Usage: [zen_pinned_locations template="grid"]
+     */
+    public function render_pinned_locations($atts) {
+        $atts = shortcode_atts(array(
+            'limit' => -1,
+            'template' => 'list',
+            'show_images' => 'true',
+            'class' => 'zen-pinned-locations'
+        ), $atts, 'zen_pinned_locations');
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'zen_locations';
+        $locations = $wpdb->get_results(
+            "SELECT * FROM $table WHERE is_pinned_location = 1 ORDER BY position_in_custom_order ASC"
+        );
+        
+        if (empty($locations)) {
+            return '<p>No pinned locations found.</p>';
+        }
+        
+        if ($atts['limit'] > 0) {
+            $locations = array_slice($locations, 0, $atts['limit']);
+        }
+        
+        $output = '<div class="zen-locations-wrapper ' . esc_attr($atts['class']) . ' zen-template-' . esc_attr($atts['template']) . '">';
+        
+        foreach ($locations as $location) {
+            $output .= $this->render_location_item($location, $atts);
+        }
+        
+        $output .= '</div>';
+        
+        return $output;
+    }
+    
+    /**
+     * Render sitespren data
+     * Usage: [sitespren wppma_id="1" field="driggs_phone_1"]
+     */
+    public function render_sitespren($atts) {
+        global $wpdb;
+        
+        $atts = shortcode_atts(array(
+            'wppma_id' => '',
+            'field' => '',
+            'default' => '',
+            'format' => '',
+            'class' => ''
+        ), $atts, 'sitespren');
+        
+        // Validate required parameters
+        if (empty($atts['wppma_id'])) {
+            return '<span class="sitespren-error">Sitespren wppma_id is required.</span>';
+        }
+        
+        if (empty($atts['field'])) {
+            return '<span class="sitespren-error">Sitespren field is required.</span>';
+        }
+        
+        // Get the sitespren record
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        $sitespren = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE wppma_id = %d",
+            intval($atts['wppma_id'])
+        ));
+        
+        if (!$sitespren) {
+            return !empty($atts['default']) ? esc_html($atts['default']) : '<span class="sitespren-not-found">Sitespren record not found.</span>';
+        }
+        
+        // Check if field exists
+        if (!property_exists($sitespren, $atts['field'])) {
+            return !empty($atts['default']) ? esc_html($atts['default']) : '<span class="sitespren-no-field">Field not found.</span>';
+        }
+        
+        // Get the field value
+        $value = $sitespren->{$atts['field']};
+        
+        // Return default if value is empty
+        if (empty($value) && !empty($atts['default'])) {
+            $value = $atts['default'];
+        }
+        
+        // Apply formatting if specified
+        if (!empty($atts['format'])) {
+            $value = $this->format_sitespren_value($value, $atts['format']);
+        }
+        
+        // Return the formatted value
+        $class = !empty($atts['class']) ? ' class="' . esc_attr($atts['class']) . '"' : '';
+        return '<span' . $class . '>' . esc_html($value) . '</span>';
+    }
+    
+    /**
+     * Database helper methods - Direct SQL queries
+     */
+    private function get_services($args = array()) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'zen_services';
+        
+        $defaults = array(
+            'orderby' => 'position_in_custom_order',
+            'order' => 'ASC',
+            'pinned_first' => true
+        );
+        
+        $args = wp_parse_args($args, $defaults);
+        
+        $order_clause = '';
+        if ($args['pinned_first']) {
+            $order_clause = "ORDER BY is_pinned_service DESC, {$args['orderby']} {$args['order']}";
+        } else {
+            $order_clause = "ORDER BY {$args['orderby']} {$args['order']}";
+        }
+        
+        return $wpdb->get_results("SELECT * FROM $table $order_clause");
+    }
+    
+    private function get_service($id) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'zen_services';
+        return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE service_id = %d", $id));
+    }
+    
+    private function get_locations($args = array()) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'zen_locations';
+        
+        $defaults = array(
+            'orderby' => 'position_in_custom_order',
+            'order' => 'ASC',
+            'pinned_first' => true
+        );
+        
+        $args = wp_parse_args($args, $defaults);
+        
+        $order_clause = '';
+        if ($args['pinned_first']) {
+            $order_clause = "ORDER BY is_pinned_location DESC, {$args['orderby']} {$args['order']}";
+        } else {
+            $order_clause = "ORDER BY {$args['orderby']} {$args['order']}";
+        }
+        
+        return $wpdb->get_results("SELECT * FROM $table $order_clause");
+    }
+    
+    private function get_location($id) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'zen_locations';
+        return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE location_id = %d", $id));
+    }
+    
+    /**
+     * Render individual service item based on template
+     */
+    private function render_service_item($service, $atts) {
+        $template = $atts['template'];
+        $show_images = $atts['show_images'] === 'true';
+        $image_size = $atts['image_size'];
+        
+        $output = '<div class="zen-service-item">';
+        
+        // Add pinned indicator
+        if ($service->is_pinned_service) {
+            $output .= '<span class="zen-pinned-badge">📌 Pinned</span>';
+        }
+        
+        switch ($template) {
+            case 'grid':
+            case 'cards':
+                $output .= '<div class="zen-service-card">';
+                if ($show_images && $service->rel_image1_id) {
+                    $output .= '<div class="zen-service-image-wrapper">';
+                    $output .= wp_get_attachment_image($service->rel_image1_id, $image_size, false, array('class' => 'zen-service-image'));
+                    $output .= '</div>';
+                }
+                $output .= '<div class="zen-service-content">';
+                $output .= '<h3 class="zen-service-name">' . esc_html($service->service_name) . '</h3>';
+                if ($service->service_placard) {
+                    $output .= '<div class="zen-service-placard">' . esc_html($service->service_placard) . '</div>';
+                }
+                if ($service->description1_short) {
+                    $output .= '<div class="zen-service-description">' . esc_html($service->description1_short) . '</div>';
+                }
+                $output .= '</div></div>';
+                break;
+                
+            case 'list':
+            default:
+                if ($show_images && $service->rel_image1_id) {
+                    $output .= '<div class="zen-service-image-wrapper">';
+                    $output .= wp_get_attachment_image($service->rel_image1_id, $image_size, false, array('class' => 'zen-service-image'));
+                    $output .= '</div>';
+                }
+                $output .= '<div class="zen-service-content">';
+                $output .= '<h3 class="zen-service-name">' . esc_html($service->service_name) . '</h3>';
+                if ($service->service_placard) {
+                    $output .= '<div class="zen-service-placard">' . esc_html($service->service_placard) . '</div>';
+                }
+                if ($service->service_moniker) {
+                    $output .= '<div class="zen-service-moniker">' . esc_html($service->service_moniker) . '</div>';
+                }
+                if ($service->description1_short) {
+                    $output .= '<div class="zen-service-description-short">' . esc_html($service->description1_short) . '</div>';
+                }
+                if ($service->description1_long && $template === 'full') {
+                    $output .= '<div class="zen-service-description-long">' . esc_html($service->description1_long) . '</div>';
+                }
+                $output .= '</div>';
+                break;
+        }
+        
+        $output .= '</div>';
+        
+        return $output;
+    }
+    
+    /**
+     * Render individual location item based on template
+     */
+    private function render_location_item($location, $atts) {
+        $template = $atts['template'];
+        $show_images = $atts['show_images'] === 'true';
+        $image_size = $atts['image_size'];
+        
+        $output = '<div class="zen-location-item">';
+        
+        if ($location->is_pinned_location) {
+            $output .= '<span class="zen-pinned-badge">📌 Pinned</span>';
+        }
+        
+        switch ($template) {
+            case 'grid':
+            case 'cards':
+                $output .= '<div class="zen-location-card">';
+                if ($show_images && $location->rel_image1_id) {
+                    $output .= '<div class="zen-location-image-wrapper">';
+                    $output .= wp_get_attachment_image($location->rel_image1_id, $image_size, false, array('class' => 'zen-location-image'));
+                    $output .= '</div>';
+                }
+                $output .= '<div class="zen-location-content">';
+                $output .= '<h3 class="zen-location-name">' . esc_html($location->location_name) . '</h3>';
+                if ($location->location_placard) {
+                    $output .= '<div class="zen-location-placard">' . esc_html($location->location_placard) . '</div>';
+                }
+                $address = $this->format_address($location);
+                if ($address) {
+                    $output .= '<div class="zen-location-address">' . $address . '</div>';
+                }
+                $output .= '</div></div>';
+                break;
+                
+            case 'list':
+            default:
+                if ($show_images && $location->rel_image1_id) {
+                    $output .= '<div class="zen-location-image-wrapper">';
+                    $output .= wp_get_attachment_image($location->rel_image1_id, $image_size, false, array('class' => 'zen-location-image'));
+                    $output .= '</div>';
+                }
+                $output .= '<div class="zen-location-content">';
+                $output .= '<h3 class="zen-location-name">' . esc_html($location->location_name) . '</h3>';
+                if ($location->location_placard) {
+                    $output .= '<div class="zen-location-placard">' . esc_html($location->location_placard) . '</div>';
+                }
+                if ($location->location_moniker) {
+                    $output .= '<div class="zen-location-moniker">' . esc_html($location->location_moniker) . '</div>';
+                }
+                $address = $this->format_address($location);
+                if ($address) {
+                    $output .= '<div class="zen-location-address">' . $address . '</div>';
+                }
+                $output .= '</div>';
+                break;
+        }
+        
+        $output .= '</div>';
+        
+        return $output;
+    }
+    
+    /**
+     * Format location address
+     */
+    private function format_address($location) {
+        $address_parts = array();
+        
+        if ($location->street) $address_parts[] = $location->street;
+        if ($location->city) $address_parts[] = $location->city;
+        if ($location->state_code) $address_parts[] = $location->state_code;
+        if ($location->zip_code) $address_parts[] = $location->zip_code;
+        if ($location->country && $location->country !== 'US') $address_parts[] = $location->country;
+        
+        return implode(', ', $address_parts);
+    }
+    
+    /**
+     * Format sitespren value based on type
+     */
+    private function format_sitespren_value($value, $format) {
+        switch ($format) {
+            case 'phone':
+                $cleaned = preg_replace('/[^0-9]/', '', $value);
+                if (strlen($cleaned) === 10) {
+                    return sprintf('(%s) %s-%s', 
+                        substr($cleaned, 0, 3),
+                        substr($cleaned, 3, 3),
+                        substr($cleaned, 6, 4)
+                    );
+                }
+                break;
+                
+            case 'currency':
+                if (is_numeric($value)) {
+                    return '$' . number_format((float)$value, 2);
+                }
+                break;
+                
+            case 'date':
+                $timestamp = strtotime($value);
+                if ($timestamp !== false) {
+                    return date('F j, Y', $timestamp);
+                }
+                break;
+                
+            case 'url':
+                if (!preg_match('/^https?:\/\//', $value)) {
+                    return 'https://' . $value;
+                }
+                break;
+        }
+        
+        return $value;
+    }
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/shenzi-wordpress-plugins/grove/includes/class-grove-zen-shortcodes.php
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the Grove main admin class to include the shortcodecommander page:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/shenzi-wordpress-plugins/grove/includes/class-grove-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    60→            'grove_locations_mar',
+    61→            array($this, 'grove_locations_mar_page')
+    62→        );
+    63→        
+    64→        add_submenu_page(
+    65→            'grovehub',
+    66→            'Grove Services Manager',
+    67→            'grove_services_mar', 
+    68→            'manage_options',
+    69→            'grove_services_mar',
+    70→            array($this, 'grove_services_mar_page')
+    71→        );
+    72→        
+    73→        add_submenu_page(
+    74→            'grovehub',
+    75→            'Shortcode Commander',
+    76→            'shortcodecommander',
+    77→            'manage_options',
+    78→            'shortcodecommander',
+    79→            array($this, 'shortcodecommander_page')
+    80→        );
+    81→    }
+    82→    
+    83→    public function grove_driggs_mar_page() {
+    84→        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add the AJAX handler for the shortcode commander and add the shortcodecommander page method:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/shenzi-wordpress-plugins/grove/includes/class-grove-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    13→        add_action('wp_ajax_grove_locations_update_field', array($this, 'grove_locations_update_field'));
+    14→        add_action('wp_ajax_grove_locations_delete', array($this, 'grove_locations_delete'));
+    15→        add_action('wp_ajax_grove_locations_create', array($this, 'grove_locations_create'));
+    16→        add_action('wp_ajax_grove_services_get_data', array($this, 'grove_services_get_data'));
+    17→        add_action('wp_ajax_grove_services_update_field', array($this, 'grove_services_update_field'));
+    18→        add_action('wp_ajax_grove_services_delete', array($this, 'grove_services_delete'));
+    19→        add_action('wp_ajax_grove_services_create', array($this, 'grove_services_create'));
+    20→        add_action('wp_ajax_grove_shortcode_update_mode', array($this, 'grove_shortcode_update_mode'));
+    21→        add_action('wp_ajax_grove_shortcode_test', array($this, 'grove_shortcode_test'));
+    22→    }
+    23→    
+    24→    public function add_admin_menu() {
+    25→        // Main menu page (parent only - no actual page)
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add the shortcodecommander page method at the end of the class, right before the AJAX methods:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/shenzi-wordpress-plugins/grove/includes/class-grove-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1467→        </script>
+  1468→        <?php
+  1469→    }
+  1470→    
+  1471→    /**
+  1472→     * Shortcode Commander Page
+  1473→     */
+  1474→    public function shortcodecommander_page() {
+  1475→        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+  1476→        $this->suppress_all_admin_notices();
+  1477→        
+  1478→        $current_mode = get_option('grove_shortcode_mode', 'automatic');
+  1479→        $snefuruplin_active = is_plugin_active('snefuruplin/snefuruplin.php');
+  1480→        
+  1481→        // Get shortcode status
+  1482→        $grove_shortcodes = new Grove_Zen_Shortcodes();
+  1483→        $grove_controlling = $grove_shortcodes->is_grove_controlling_shortcodes();
+  1484→        
+  1485→        // Get database stats
+  1486→        global $wpdb;
+  1487→        $services_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}zen_services");
+  1488→        $locations_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}zen_locations");
+  1489→        $sitespren_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}zen_sitespren");
+  1490→        
+  1491→        // Check which shortcodes are registered
+  1492→        $shortcodes_to_check = ['zen_services', 'zen_locations', 'zen_service', 'zen_location', 'sitespren', 'zen_pinned_services', 'zen_pinned_locations', 'zen_service_image', 'zen_location_image'];
+  1493→        $registered_shortcodes = 0;
+  1494→        foreach ($shortcodes_to_check as $shortcode) {
+  1495→            if (shortcode_exists($shortcode)) {
+  1496→                $registered_shortcodes++;
+  1497→            }
+  1498→        }
+  1499→        
+  1500→        ?>
+  1501→        <div class="wrap" style="margin: 0; padding: 0;">
+  1502→            <!-- Allow space for WordPress notices -->
+  1503→            <div style="height: 20px;"></div>
+  1504→            
+  1505→            <div style="padding: 20px;">
+  1506→                <h1 style="margin-bottom: 20px;">🌳📡 Shortcode Commander</h1>
+  1507→                
+  1508→                <!-- Status Dashboard -->
+  1509→                <div style="background: white; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+  1510→                    <h2 style="margin-top: 0;">System Status</h2>
+  1511→                    
+  1512→                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+  1513→                        <div>
+  1514→                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+  1515→                                <?php if ($grove_controlling): ?>
+  1516→                                    <span style="color: #46b450; font-size: 18px; margin-right: 10px;">🟢</span>
+  1517→                                    <strong>Shortcode Status: ACTIVE</strong>
+  1518→                                    <span style="background: #46b450; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 10px;">GROVE CONTROLLING</span>
+  1519→                                <?php else: ?>
+  1520→                                    <span style="color: #dc3232; font-size: 18px; margin-right: 10px;">🔴</span>
+  1521→                                    <strong>Shortcode Status: INACTIVE</strong>
+  1522→                                    <?php if ($snefuruplin_active): ?>
+  1523→                                        <span style="background: #0073aa; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 10px;">SNEFURUPLIN ACTIVE</span>
+  1524→                                    <?php else: ?>
+  1525→                                        <span style="background: #dc3232; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 10px;">DISABLED</span>
+  1526→                                    <?php endif; ?>
+  1527→                                <?php endif; ?>
+  1528→                            </div>
+  1529→                            
+  1530→                            <div style="margin-bottom: 10px;">
+  1531→                                <strong>Registered Shortcodes:</strong> <?php echo $registered_shortcodes; ?>/<?php echo count($shortcodes_to_check); ?> found
+  1532→                            </div>
+  1533→                            
+  1534→                            <div style="margin-bottom: 10px;">
+  1535→                                <strong>Current Mode:</strong> <?php echo ucwords(str_replace('_', ' ', $current_mode)); ?>
+  1536→                            </div>
+  1537→                        </div>
+  1538→                        
+  1539→                        <div>
+  1540→                            <div style="margin-bottom: 10px;">
+  1541→                                <strong>Snefuruplin Status:</strong> <?php echo $snefuruplin_active ? '<span style="color: #46b450;">✅ Active</span>' : '<span style="color: #666;">❌ Not detected</span>'; ?>
+  1542→                            </div>
+  1543→                            
+  1544→                            <div style="margin-bottom: 10px;">
+  1545→                                <strong>Database Tables:</strong><br>
+  1546→                                <small>
+  1547→                                    • zen_services: <?php echo $services_count ? '<span style="color: #46b450;">✅ ' . $services_count . ' records</span>' : '<span style="color: #dc3232;">❌ No data</span>'; ?><br>
+  1548→                                    • zen_locations: <?php echo $locations_count ? '<span style="color: #46b450;">✅ ' . $locations_count . ' records</span>' : '<span style="color: #dc3232;">❌ No data</span>'; ?><br>
+  1549→                                    • zen_sitespren: <?php echo $sitespren_count ? '<span style="color: #46b450;">✅ ' . $sitespren_count . ' records</span>' : '<span style="color: #dc3232;">❌ No data</span>'; ?>
+  1550→                                </small>
+  1551→                            </div>
+  1552→                        </div>
+  1553→                    </div>
+  1554→                </div>
+  1555→                
+  1556→                <!-- Control Panel -->
+  1557→                <div style="background: white; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+  1558→                    <h2 style="margin-top: 0;">Shortcode Control</h2>
+  1559→                    
+  1560→                    <form id="shortcode-mode-form">
+  1561→                        <div style="margin-bottom: 20px;">
+  1562→                            <label style="display: block; font-weight: bold; margin-bottom: 10px;">Control Mode:</label>
+  1563→                            
+  1564→                            <div style="margin-bottom: 10px;">
+  1565→                                <label style="display: flex; align-items: center; cursor: pointer;">
+  1566→                                    <input type="radio" name="grove_shortcode_mode" value="automatic" <?php checked($current_mode, 'automatic'); ?> style="margin-right: 10px;">
+  1567→                                    <div>
+  1568→                                        <strong>Automatic (Recommended)</strong><br>
+  1569→                                        <small style="color: #666;">Take control only when Snefuruplin is missing. Seamless failover protection.</small>
+  1570→                                    </div>
+  1571→                                </label>
+  1572→                            </div>
+  1573→                            
+  1574→                            <div style="margin-bottom: 10px;">
+  1575→                                <label style="display: flex; align-items: center; cursor: pointer;">
+  1576→                                    <input type="radio" name="grove_shortcode_mode" value="force_active" <?php checked($current_mode, 'force_active'); ?> style="margin-right: 10px;">
+  1577→                                    <div>
+  1578→                                        <strong>Force Active</strong><br>
+  1579→                                        <small style="color: #666;">Always control shortcodes, even if Snefuruplin is active. Override mode.</small>
+  1580→                                    </div>
+  1581→                                </label>
+  1582→                            </div>
+  1583→                            
+  1584→                            <div style="margin-bottom: 10px;">
+  1585→                                <label style="display: flex; align-items: center; cursor: pointer;">
+  1586→                                    <input type="radio" name="grove_shortcode_mode" value="disabled" <?php checked($current_mode, 'disabled'); ?> style="margin-right: 10px;">
+  1587→                                    <div>
+  1588→                                        <strong>Disabled</strong><br>
+  1589→                                        <small style="color: #666;">Never register shortcodes. Completely disable Grove shortcode system.</small>
+  1590→                                    </div>
+  1591→                                </label>
+  1592→                            </div>
+  1593→                        </div>
+  1594→                        
+  1595→                        <button type="submit" class="button button-primary">Save Settings</button>
+  1596→                        <button type="button" id="test-shortcode-btn" class="button button-secondary" style="margin-left: 10px;">Test Shortcodes</button>
+  1597→                    </form>
+  1598→                </div>
+  1599→                
+  1600→                <!-- Test Results -->
+  1601→                <div id="test-results" style="display: none; background: white; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+  1602→                    <h2 style="margin-top: 0;">Shortcode Test Results</h2>
+  1603→                    <div id="test-output"></div>
+  1604→                </div>
+  1605→                
+  1606→                <!-- Information Panel -->
+  1607→                <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 20px; border-radius: 5px;">
+  1608→                    <h3 style="margin-top: 0;">How It Works</h3>
+  1609→                    <ul>
+  1610→                        <li><strong>Automatic Mode:</strong> Grove monitors for Snefuruplin and only takes control when it's not present. This provides seamless backup protection without conflicts.</li>
+  1611→                        <li><strong>Force Active Mode:</strong> Grove always controls shortcodes, overriding Snefuruplin. Use for testing or when you want Grove to be the primary shortcode provider.</li>
+  1612→                        <li><strong>Disabled Mode:</strong> Grove never registers shortcodes. Use when you want Snefuruplin to handle all shortcodes exclusively.</li>
+  1613→                    </ul>
+  1614→                    
+  1615→                    <h3>Available Shortcodes</h3>
+  1616→                    <p><small>When Grove is controlling shortcodes, these are available:</small></p>
+  1617→                    <code style="background: white; padding: 10px; display: block; margin: 10px 0;">
+  1618→                        [zen_services], [zen_service], [zen_service_image]<br>
+  1619→                        [zen_locations], [zen_location], [zen_location_image]<br>
+  1620→                        [zen_pinned_services], [zen_pinned_locations]<br>
+  1621→                        [sitespren wppma_id="1" field="field_name"]
+  1622→                    </code>
+  1623→                </div>
+  1624→            </div>
+  1625→        </div>
+  1626→        
+  1627→        <script type="text/javascript">
+  1628→        jQuery(document).ready(function($) {
+  1629→            $('#shortcode-mode-form').on('submit', function(e) {
+  1630→                e.preventDefault();
+  1631→                
+  1632→                var mode = $('input[name="grove_shortcode_mode"]:checked').val();
+  1633→                
+  1634→                $.ajax({
+  1635→                    url: ajaxurl,
+  1636→                    type: 'POST',
+  1637→                    data: {
+  1638→                        action: 'grove_shortcode_update_mode',
+  1639→                        nonce: '<?php echo wp_create_nonce('grove_shortcode_nonce'); ?>',
+  1640→                        mode: mode
+  1641→                    },
+  1642→                    success: function(response) {
+  1643→                        if (response.success) {
+  1644→                            alert('Settings saved successfully! Please refresh the page to see status updates.');
+  1645→                            location.reload();
+  1646→                        } else {
+  1647→                            alert('Error saving settings: ' + response.data);
+  1648→                        }
+  1649→                    },
+  1650→                    error: function() {
+  1651→                        alert('Error saving settings');
+  1652→                    }
+  1653→                });
+  1654→            });
+  1655→            
+  1656→            $('#test-shortcode-btn').on('click', function() {
+  1657→                $.ajax({
+  1658→                    url: ajaxurl,
+  1659→                    type: 'POST',
+  1660→                    data: {
+  1661→                        action: 'grove_shortcode_test',
+  1662→                        nonce: '<?php echo wp_create_nonce('grove_shortcode_nonce'); ?>'
+  1663→                    },
+  1664→                    success: function(response) {
+  1665→                        if (response.success) {
+  1666→                            $('#test-output').html(response.data);
+  1667→                            $('#test-results').show();
+  1668→                        } else {
+  1669→                            $('#test-output').html('<div style="color: #dc3232;">Test failed: ' + response.data + '</div>');
+  1670→                            $('#test-results').show();
+  1671→                        }
+  1672→                    },
+  1673→                    error: function() {
+  1674→                        $('#test-output').html('<div style="color: #dc3232;">Test request failed</div>');
+  1675→                        $('#test-results').show();
+  1676→                    }
+  1677→                });
+  1678→            });
+  1679→        });
+  1680→        </script>
+  1681→        <?php
+  1682→    }
+  1683→    
+  1684→    /**
+  1685→     * AJAX: Get locations data
+  1686→     */
+  1687→    public function grove_locations_get_data() {
+  1688→        check_ajax_referer('grove_locations_nonce', 'nonce');
+  1689→        
+  1690→        if (!current_user_can('manage_options')) {
+  1691→            wp_die('Unauthorized');
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add the AJAX handler methods at the end of the class:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/shenzi-wordpress-plugins/grove/includes/class-grove-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1965→            wp_send_json_error('Error deleting service: ' . $e->getMessage());
+  1966→        }
+  1967→    }
+  1968→    
+  1969→    /**
+  1970→     * AJAX: Update shortcode mode
+  1971→     */
+  1972→    public function grove_shortcode_update_mode() {
+  1973→        check_ajax_referer('grove_shortcode_nonce', 'nonce');
+  1974→        
+  1975→        if (!current_user_can('manage_options')) {
+  1976→            wp_die('Unauthorized');
+  1977→        }
+  1978→        
+  1979→        $mode = sanitize_text_field($_POST['mode']);
+  1980→        $allowed_modes = ['automatic', 'force_active', 'disabled'];
+  1981→        
+  1982→        if (!in_array($mode, $allowed_modes)) {
+  1983→            wp_send_json_error('Invalid mode');
+  1984→            return;
+  1985→        }
+  1986→        
+  1987→        update_option('grove_shortcode_mode', $mode);
+  1988→        wp_send_json_success('Mode updated to: ' . $mode);
+  1989→    }
+  1990→    
+  1991→    /**
+  1992→     * AJAX: Test shortcode functionality
+  1993→     */
+  1994→    public function grove_shortcode_test() {
+  1995→        check_ajax_referer('grove_shortcode_nonce', 'nonce');
+  1996→        
+  1997→        if (!current_user_can('manage_options')) {
+  1998→            wp_die('Unauthorized');
+  1999→        }
+  2000→        
+  2001→        $output = '<h4>Shortcode Test Results</h4>';
+  2002→        
+  2003→        // Test each shortcode
+  2004→        $shortcodes_to_test = [
+  2005→            'zen_services' => '[zen_services limit="1"]',
+  2006→            'zen_locations' => '[zen_locations limit="1"]',
+  2007→            'sitespren' => '[sitespren wppma_id="1" field="driggs_brand_name"]'
+  2008→        ];
+  2009→        
+  2010→        foreach ($shortcodes_to_test as $name => $shortcode) {
+  2011→            $exists = shortcode_exists($name);
+  2012→            $result = '';
+  2013→            
+  2014→            if ($exists) {
+  2015→                $result = do_shortcode($shortcode);
+  2016→                $status = '<span style="color: #46b450;">✅ Active</span>';
+  2017→                if (empty(trim($result))) {
+  2018→                    $status .= ' <small>(No data returned)</small>';
+  2019→                }
+  2020→            } else {
+  2021→                $status = '<span style="color: #dc3232;">❌ Not registered</span>';
+  2022→            }
+  2023→            
+  2024→            $output .= '<div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 3px;">';
+  2025→            $output .= '<strong>' . $shortcode . '</strong> ' . $status;
+  2026→            
+  2027→            if ($exists && !empty(trim($result))) {
+  2028→                $output .= '<div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 3px; font-size: 12px;">'; 
+  2029→                $output .= '<strong>Output:</strong><br>' . wp_kses_post($result);
+  2030→                $output .= '</div>';
+  2031→            }
+  2032→            $output .= '</div>';
+  2033→        }
+  2034→        
+  2035→        wp_send_json_success($output);
+  2036→    }
+  2037→    
+  2038→    /**
+  2039→     * Suppress admin notices on our pages
+  2040→     */
+  2041→    private function suppress_all_admin_notices() {
+  2042→        // Remove all admin notices for clean interface
+  2043→        remove_all_actions('admin_notices');
+  2044→        remove_all_actions('all_admin_notices');
+  2045→    }
+  2046→}
+```
+
