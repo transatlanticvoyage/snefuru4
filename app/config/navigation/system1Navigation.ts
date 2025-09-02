@@ -27,6 +27,27 @@ export const system1Navigation: NavItem[] = [
         path: '/cdnjar'
       }
     ]
+  },
+  {
+    name: 'Market Research',
+    children: [
+      {
+        name: 'City Jar',
+        path: '/cityjar'
+      },
+      {
+        name: 'Industry Jar',
+        path: '/indusjar'
+      },
+      {
+        name: 'City-Niche-Combo Jar',
+        path: '/cnjar1'
+      },
+      {
+        name: 'Keyword Jar',
+        path: '/kwjar'
+      }
+    ]
   }
 ];
 
