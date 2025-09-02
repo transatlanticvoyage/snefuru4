@@ -286,4 +286,128 @@ document.addEventListener('DOMContentLoaded', function() {
       statusDiv.classList.remove('show');
     }, 3000);
   }
+
+  // Dromdori functionality
+  async function getCurrentDomain() {
+    try {
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!activeTab || !activeTab.url) {
+        return null;
+      }
+      const url = new URL(activeTab.url);
+      return url.hostname;
+    } catch (error) {
+      console.error('Error getting current domain:', error);
+      return null;
+    }
+  }
+
+  // Direct button handlers
+  document.getElementById('dromdoriDromBtn').addEventListener('click', async function() {
+    const domain = await getCurrentDomain();
+    if (domain) {
+      const dromUrl = `https://snef.me/drom?sitesentered=${encodeURIComponent(domain)}&activefilterchamber=daylight&showmainchamberboxes=no&showtundrachamber=yes&sitesperview=1&speccolumnpage=1`;
+      chrome.tabs.create({ url: dromUrl });
+    }
+  });
+
+  document.getElementById('dromdoriRupBtn').addEventListener('click', async function() {
+    const domain = await getCurrentDomain();
+    if (domain) {
+      const rupUrl = `http://${domain}/wp-admin/admin.php?page=rup_driggs_mar`;
+      chrome.tabs.create({ url: rupUrl });
+    }
+  });
+
+  document.getElementById('dromdoriGroveBtn').addEventListener('click', async function() {
+    const domain = await getCurrentDomain();
+    if (domain) {
+      const groveUrl = `http://${domain}/wp-admin/admin.php?page=grove_driggs_mar`;
+      chrome.tabs.create({ url: groveUrl });
+    }
+  });
+
+  document.getElementById('dromdoriBeaconBtn').addEventListener('click', async function() {
+    const domain = await getCurrentDomain();
+    if (domain) {
+      const beaconUrl = `http://${domain}/wp-admin/admin.php?page=beacon_driggs_mar`;
+      chrome.tabs.create({ url: beaconUrl });
+    }
+  });
+
+  // Dropdown functionality
+  const klocDropdownBtn = document.getElementById('klocDropdownBtn');
+  const klocDropdownMenu = document.getElementById('klocDropdownMenu');
+  const kservDropdownBtn = document.getElementById('kservDropdownBtn');
+  const kservDropdownMenu = document.getElementById('kservDropdownMenu');
+
+  klocDropdownBtn.addEventListener('click', function() {
+    klocDropdownMenu.classList.toggle('show');
+    kservDropdownMenu.classList.remove('show'); // Close other dropdown
+  });
+
+  kservDropdownBtn.addEventListener('click', function() {
+    kservDropdownMenu.classList.toggle('show');
+    klocDropdownMenu.classList.remove('show'); // Close other dropdown
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', function(event) {
+    if (!klocDropdownBtn.contains(event.target) && !klocDropdownMenu.contains(event.target)) {
+      klocDropdownMenu.classList.remove('show');
+    }
+    if (!kservDropdownBtn.contains(event.target) && !kservDropdownMenu.contains(event.target)) {
+      kservDropdownMenu.classList.remove('show');
+    }
+  });
+
+  // Kloc dropdown items
+  document.getElementById('klocRupBtn').addEventListener('click', async function() {
+    const domain = await getCurrentDomain();
+    if (domain) {
+      const url = `http://${domain}/wp-admin/admin.php?page=rup_locations_mar`;
+      chrome.tabs.create({ url: url });
+    }
+  });
+
+  document.getElementById('klocGroveBtn').addEventListener('click', async function() {
+    const domain = await getCurrentDomain();
+    if (domain) {
+      const url = `http://${domain}/wp-admin/admin.php?page=grove_locations_mar`;
+      chrome.tabs.create({ url: url });
+    }
+  });
+
+  document.getElementById('klocBeaconBtn').addEventListener('click', async function() {
+    const domain = await getCurrentDomain();
+    if (domain) {
+      const url = `http://${domain}/wp-admin/admin.php?page=beacon_locations_mar`;
+      chrome.tabs.create({ url: url });
+    }
+  });
+
+  // Kserv dropdown items
+  document.getElementById('kservRupBtn').addEventListener('click', async function() {
+    const domain = await getCurrentDomain();
+    if (domain) {
+      const url = `http://${domain}/wp-admin/admin.php?page=rup_services_mar`;
+      chrome.tabs.create({ url: url });
+    }
+  });
+
+  document.getElementById('kservGroveBtn').addEventListener('click', async function() {
+    const domain = await getCurrentDomain();
+    if (domain) {
+      const url = `http://${domain}/wp-admin/admin.php?page=grove_services_mar`;
+      chrome.tabs.create({ url: url });
+    }
+  });
+
+  document.getElementById('kservBeaconBtn').addEventListener('click', async function() {
+    const domain = await getCurrentDomain();
+    if (domain) {
+      const url = `http://${domain}/wp-admin/admin.php?page=beacon_services_mar`;
+      chrome.tabs.create({ url: url });
+    }
+  });
 });

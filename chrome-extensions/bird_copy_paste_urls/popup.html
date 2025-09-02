@@ -88,8 +88,54 @@
         </button>
       </div>
 
-      <!-- Column 3: Future content -->
-      <div class="column column-3"></div>
+      <!-- Column 3: Dromdori Tools -->
+      <div class="column column-3">
+        <h3>Dromdori Tools</h3>
+        <p class="timestamp">(updated sep 2, 2025, 12:43 PM EST)</p>
+        
+        <div class="dromdori-container">
+          <!-- Direct links row -->
+          <div class="dromdori-row">
+            <button class="dromdori-btn dromdori-drom" id="dromdoriDromBtn" title="Open in Drom">
+              /drom
+            </button>
+            <button class="dromdori-btn dromdori-rup" id="dromdoriRupBtn" title="Rup Driggs Manager">
+              =rupdm
+            </button>
+            <button class="dromdori-btn dromdori-grove" id="dromdoriGroveBtn" title="Grove Driggs Manager">
+              =grovedm
+            </button>
+            <button class="dromdori-btn dromdori-beacon" id="dromdoriBeaconBtn" title="Beacon Driggs Manager">
+              =beacondm
+            </button>
+          </div>
+          
+          <!-- Dropdown links row -->
+          <div class="dromdori-row">
+            <div class="dromdori-dropdown">
+              <button class="dromdori-btn dromdori-kloc" id="klocDropdownBtn" title="Location Managers">
+                kloc ▼
+              </button>
+              <div class="dromdori-dropdown-menu" id="klocDropdownMenu">
+                <a href="#" class="dromdori-dropdown-item dromdori-rup" id="klocRupBtn">=ruploc</a>
+                <a href="#" class="dromdori-dropdown-item dromdori-grove" id="klocGroveBtn">=groveloc</a>
+                <a href="#" class="dromdori-dropdown-item dromdori-beacon" id="klocBeaconBtn">=beaconloc</a>
+              </div>
+            </div>
+            
+            <div class="dromdori-dropdown">
+              <button class="dromdori-btn dromdori-kserv" id="kservDropdownBtn" title="Service Managers">
+                kserv ▼
+              </button>
+              <div class="dromdori-dropdown-menu" id="kservDropdownMenu">
+                <a href="#" class="dromdori-dropdown-item dromdori-rup" id="kservRupBtn">=rupserv</a>
+                <a href="#" class="dromdori-dropdown-item dromdori-grove" id="kservGroveBtn">=groveserv</a>
+                <a href="#" class="dromdori-dropdown-item dromdori-beacon" id="kservBeaconBtn">=beaconserv</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   

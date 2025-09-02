@@ -13,6 +13,7 @@ import Chatdori from '@/app/components/Chatdori';
 import DriggsActionsFeedback from '@/app/components/DriggsActionsFeedback';
 import { SitesglubFetcher } from './SitesglubFetchingFunctions';
 import ScreenshotPreview from './ScreenshotPreview';
+import Dromdori from '@/app/components/Dromdori';
 
 const DrenjariButtonBarDriggsmanLinks = dynamic(
   () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
@@ -4553,6 +4554,11 @@ export default function DriggsmanTable({
                                 >
                                   IN
                                 </a>
+                                
+                                {/* Dromdori component - compact mode for reindeer box */}
+                                <div style={{ display: 'inline-flex', marginLeft: '2px' }}>
+                                  <Dromdori sitesprenBase={domain} compact={true} />
+                                </div>
                               </>
                             );
                           })()}
