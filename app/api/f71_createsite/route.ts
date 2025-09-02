@@ -29,9 +29,56 @@ function isValidCleanedUrl(url: string): boolean {
   return true;
 }
 
+// Helper function to get or create sitesglub record
+async function getOrCreateSitesglub(supabase: any, domain: string): Promise<{ sitesglub_id: number } | null> {
+  try {
+    // First, check if sitesglub record already exists
+    const { data: existingSitesglub, error: selectError } = await supabase
+      .from('sitesglub')
+      .select('sitesglub_id')
+      .eq('sitesglub_base', domain)
+      .single();
+
+    if (selectError && selectError.code !== 'PGRST116') { // PGRST116 = no rows found
+      console.error('Error checking existing sitesglub:', selectError);
+      return null;
+    }
+
+    // If exists, return the existing record
+    if (existingSitesglub) {
+      console.log(`Using existing sitesglub record for domain: ${domain}, ID: ${existingSitesglub.sitesglub_id}`);
+      return existingSitesglub;
+    }
+
+    // Create new sitesglub record
+    console.log(`Creating new sitesglub record for domain: ${domain}`);
+    const { data: newSitesglub, error: insertError } = await supabase
+      .from('sitesglub')
+      .insert({
+        sitesglub_base: domain,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select('sitesglub_id')
+      .single();
+
+    if (insertError) {
+      console.error('Error creating sitesglub record:', insertError);
+      return null;
+    }
+
+    console.log(`Created new sitesglub record for domain: ${domain}, ID: ${newSitesglub.sitesglub_id}`);
+    return newSitesglub;
+
+  } catch (error) {
+    console.error('Error in getOrCreateSitesglub:', error);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    console.log('API route called');
+    console.log('f71_createsite API route called');
     
     // Get the request body
     const { user_internal_id, sites_list, additional_fields } = await request.json();
@@ -89,23 +136,62 @@ export async function POST(request: NextRequest) {
       console.log(`Limited to 300 URLs, processing ${urlsToProcess.length} out of ${validUrls.length}`);
     }
     
-    // Prepare records for insertion
-    const sitesToInsert = urlsToProcess.map(url => ({
-      sitespren_base: url,
-      fk_users_id: user_internal_id,
-      ...additional_fields // Spread the additional fields
-    }));
+    // Process each URL to get/create sitesglub records and prepare sitespren records
+    const sitesToInsert = [];
+    const sitesglubProcessed = [];
+    const errors = [];
 
-    console.log(`Attempting to insert ${sitesToInsert.length} sites:`, sitesToInsert);
+    for (const url of urlsToProcess) {
+      try {
+        // Get or create sitesglub record for this domain
+        const sitesglubRecord = await getOrCreateSitesglub(supabase, url);
+        
+        if (sitesglubRecord) {
+          // Prepare sitespren record with foreign key to sitesglub
+          sitesToInsert.push({
+            sitespren_base: url,
+            fk_users_id: user_internal_id,
+            fk_sitesglub_id: sitesglubRecord.sitesglub_id, // Link to sitesglub
+            ...additional_fields // Spread the additional fields
+          });
+          
+          sitesglubProcessed.push({
+            domain: url,
+            sitesglub_id: sitesglubRecord.sitesglub_id,
+            action: 'processed'
+          });
+        } else {
+          errors.push(`Failed to create/get sitesglub record for domain: ${url}`);
+          console.error(`Failed to create/get sitesglub record for domain: ${url}`);
+        }
+      } catch (error) {
+        errors.push(`Error processing domain ${url}: ${error}`);
+        console.error(`Error processing domain ${url}:`, error);
+      }
+    }
 
-    // Insert all sites
+    console.log(`Attempting to insert ${sitesToInsert.length} sitespren records:`, sitesToInsert);
+    console.log(`Sitesglub records processed:`, sitesglubProcessed);
+
+    if (sitesToInsert.length === 0) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'No sites could be processed successfully',
+          details: errors.length > 0 ? errors.join('; ') : 'Unknown error'
+        },
+        { status: 500 }
+      );
+    }
+
+    // Insert all sitespren records
     const { data: insertedSites, error: insertError } = await supabase
       .from('sitespren')
       .insert(sitesToInsert)
       .select();
 
     if (insertError) {
-      console.error('Error inserting sites:', insertError);
+      console.error('Error inserting sitespren records:', insertError);
       console.error('Error details:', {
         message: insertError.message,
         code: insertError.code,
@@ -138,13 +224,17 @@ export async function POST(request: NextRequest) {
     const sitesCreated = insertedSites?.length || 0;
     const invalidCount = cleanedUrls.length - validUrls.length;
     const limitedCount = validUrls.length - urlsToProcess.length;
+    const sitesglubCreated = sitesglubProcessed.length;
 
-    let message = `Successfully created ${sitesCreated} site(s)`;
+    let message = `Successfully created ${sitesCreated} site(s) with ${sitesglubCreated} sitesglub record(s) processed`;
     if (limitedCount > 0) {
       message += ` (${limitedCount} sites were skipped due to 300 limit)`;
     }
     if (invalidCount > 0) {
       message += ` (${invalidCount} invalid URLs were skipped)`;
+    }
+    if (errors.length > 0) {
+      message += ` (${errors.length} errors occurred)`;
     }
 
     return NextResponse.json({
@@ -154,6 +244,8 @@ export async function POST(request: NextRequest) {
         sitesRequested: cleanedUrls.length,
         invalidUrls: invalidCount,
         limitedUrls: limitedCount,
+        sitesglubProcessed: sitesglubCreated,
+        errors: errors.length > 0 ? errors : undefined,
         message
       }
     });
