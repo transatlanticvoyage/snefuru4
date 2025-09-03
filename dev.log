@@ -2702,3 +2702,8 @@ Sample is_external values: [
 [Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
  GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 827ms
+ ✓ Compiled in 2.7s (797 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 262ms
+ GET /addressjar 200 in 278ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 18ms
