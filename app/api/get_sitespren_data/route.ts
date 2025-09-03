@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
 
     console.log('Fetching sitespren data for user:', userInternalId);
 
-    // Fetch sitespren data from the base table to ensure we get is_external/is_internal columns
+    // Fetch sitespren data from the unified view to get all columns from joined tables
     const { data: sitespren, error } = await supabase
-      .from('sitespren')
+      .from('sitespren_unified_view')
       .select('*')
       .eq('fk_users_id', userInternalId)
       .order('created_at', { ascending: false });

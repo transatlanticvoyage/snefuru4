@@ -6,6 +6,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { formatDateForCreatedAt } from '@/app/utils/dateUtils';
 
 interface SitesprenRecord {
+  // Existing sitespren fields
   id: string; // Changed from number to string for UUID
   created_at: string;
   sitespren_base: string | null;
@@ -36,11 +37,88 @@ interface SitesprenRecord {
   is_aff: boolean | null;
   is_other1: boolean | null;
   is_other2: boolean | null;
-  // New joined columns from sitespren_large_view_1
+  is_flylocal: boolean | null;
+  // Joined columns from sitespren_large_view_1
   registrar_username: string | null;
   registrar_company_id: string | null;
   registrar_company_name: string | null;
   registrar_portal_url: string | null;
+  
+  // sitesglub fields (in original table order)
+  sitesglub_id?: number | null;
+  glub_sitesglub_base?: string | null;
+  glub_ns_full?: string | null;
+  glub_ip_address?: string | null;
+  mj_tf?: number | null;
+  mj_cf?: number | null;
+  mj_rd?: number | null;
+  mj_refips?: number | null;
+  mj_refsubnets?: number | null;
+  mj_bl?: number | null;
+  fk_sitesdfs_id?: number | null;
+  glub_created_at?: string | null;
+  glub_updated_at?: string | null;
+  
+  // sitesdfs fields (in original table order)
+  sitesdfs_id?: number | null;
+  dfs_sitesdfs_base?: string | null;
+  dfs_domain?: string | null;
+  dfs_created_datetime?: string | null;
+  dfs_changed_datetime?: string | null;
+  dfs_expiration_datetime?: string | null;
+  dfs_updated_datetime?: string | null;
+  dfs_first_seen?: string | null;
+  dfs_tld?: string | null;
+  dfs_registered?: boolean | null;
+  dfs_registrar?: string | null;
+  dfs_epp_status_codes?: any | null;
+  dfs_raw_status_codes?: any | null;
+  organic_pos_1?: number | null;
+  organic_pos_2_3?: number | null;
+  organic_pos_4_10?: number | null;
+  organic_pos_11_20?: number | null;
+  organic_pos_21_30?: number | null;
+  organic_pos_31_40?: number | null;
+  organic_pos_41_50?: number | null;
+  organic_pos_51_60?: number | null;
+  organic_pos_61_70?: number | null;
+  organic_pos_71_80?: number | null;
+  organic_pos_81_90?: number | null;
+  organic_pos_91_100?: number | null;
+  organic_etv?: number | null;
+  organic_estimated_paid_traffic_cost?: number | null;
+  paid_pos_1?: number | null;
+  paid_pos_2_3?: number | null;
+  paid_pos_4_10?: number | null;
+  paid_pos_11_20?: number | null;
+  paid_pos_21_30?: number | null;
+  paid_pos_31_40?: number | null;
+  paid_pos_41_50?: number | null;
+  paid_pos_51_60?: number | null;
+  paid_pos_61_70?: number | null;
+  paid_pos_71_80?: number | null;
+  paid_pos_81_90?: number | null;
+  paid_pos_91_100?: number | null;
+  paid_etv?: number | null;
+  paid_estimated_paid_traffic_cost?: number | null;
+  referring_domains?: number | null;
+  referring_main_domains?: number | null;
+  referring_pages?: number | null;
+  backlinks?: number | null;
+  backlinks_spam_score?: number | null;
+  broken_backlinks?: number | null;
+  broken_pages?: number | null;
+  referring_domains_nofollow?: number | null;
+  referring_main_domains_nofollow?: number | null;
+  referring_ips?: number | null;
+  referring_subnets?: number | null;
+  referring_pages_nofollow?: number | null;
+  dfs_metrics_time_update?: string | null;
+  dfs_se_type?: string | null;
+  dfs_location_code?: number | null;
+  dfs_language_code?: string | null;
+  dfs_created_at?: string | null;
+  dfs_updated_at?: string | null;
 }
 
 interface SitesprenTableProps {
@@ -101,8 +179,70 @@ interface SitesprenTableProps {
 type SortField = keyof SitesprenRecord;
 type SortOrder = 'asc' | 'desc';
 
+// Helper function to get display names for columns
+const getColumnDisplayName = (col: string): string => {
+  const displayNames: { [key: string]: string } = {
+    'glub_sitesglub_base': 'sitesglub_base',
+    'glub_ns_full': 'ns_full',
+    'glub_ip_address': 'ip_address',
+    'glub_created_at': 'created_at',
+    'glub_updated_at': 'updated_at',
+    'dfs_sitesdfs_base': 'sitesdfs_base',
+    'dfs_domain': 'domain',
+    'dfs_created_datetime': 'created_datetime',
+    'dfs_changed_datetime': 'changed_datetime',
+    'dfs_expiration_datetime': 'expiration_datetime',
+    'dfs_updated_datetime': 'updated_datetime',
+    'dfs_first_seen': 'first_seen',
+    'dfs_tld': 'tld',
+    'dfs_registered': 'registered',
+    'dfs_registrar': 'registrar',
+    'dfs_epp_status_codes': 'epp_status_codes',
+    'dfs_raw_status_codes': 'raw_status_codes',
+    'dfs_metrics_time_update': 'metrics_time_update',
+    'dfs_se_type': 'se_type',
+    'dfs_location_code': 'location_code',
+    'dfs_language_code': 'language_code',
+    'dfs_created_at': 'created_at',
+    'dfs_updated_at': 'updated_at'
+  };
+  
+  return displayNames[col] || col;
+};
+
+// Helper function to determine database table and CSS class for a column
+const getColumnTableInfo = (col: string) => {
+  if (col === 'checkbox' || col === 'tool_buttons' || col === 'ph1') {
+    return { dbTableName: '-', dbTableClass: '' };
+  } else if (col === 'domain_registrar_info') {
+    return { dbTableName: '-', dbTableClass: '' };
+  } else if (
+    col.startsWith('glub_') || 
+    col.startsWith('mj_') || 
+    col === 'sitesglub_id' || 
+    col === 'fk_sitesdfs_id'
+  ) {
+    return { dbTableName: 'sitesglub', dbTableClass: 'for_db_table_sitesglub' };
+  } else if (
+    col.startsWith('dfs_') || 
+    col.startsWith('organic_') || 
+    col.startsWith('paid_') || 
+    col.startsWith('referring_') || 
+    col === 'sitesdfs_id' || 
+    col === 'backlinks' || 
+    col === 'backlinks_spam_score' || 
+    col === 'broken_backlinks' || 
+    col === 'broken_pages'
+  ) {
+    return { dbTableName: 'sitesdfs', dbTableClass: 'for_db_table_sitesdfs' };
+  } else {
+    return { dbTableName: 'sitespren', dbTableClass: 'for_db_table_sitespren' };
+  }
+};
+
 // Define all columns in order (including action columns)
 const allColumns = [
+  // Existing columns (unchanged order)
   'checkbox',           // 1
   'tool_buttons',       // 2
   'ph1',               // 2.5 - placeholder column to prevent overlap
@@ -137,7 +277,83 @@ const allColumns = [
   'is_aff',            // 32
   'is_other1',         // 33
   'is_other2',         // 34
-  'is_flylocal'        // 35
+  'is_flylocal',       // 35
+  
+  // sitesglub columns (in original DB table order)
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  
+  // sitesdfs columns (in original DB table order)
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  'dfs_tld',
+  'dfs_registered',
+  'dfs_registrar',
+  'dfs_epp_status_codes',
+  'dfs_raw_status_codes',
+  'organic_pos_1',
+  'organic_pos_2_3',
+  'organic_pos_4_10',
+  'organic_pos_11_20',
+  'organic_pos_21_30',
+  'organic_pos_31_40',
+  'organic_pos_41_50',
+  'organic_pos_51_60',
+  'organic_pos_61_70',
+  'organic_pos_71_80',
+  'organic_pos_81_90',
+  'organic_pos_91_100',
+  'organic_etv',
+  'organic_estimated_paid_traffic_cost',
+  'paid_pos_1',
+  'paid_pos_2_3',
+  'paid_pos_4_10',
+  'paid_pos_11_20',
+  'paid_pos_21_30',
+  'paid_pos_31_40',
+  'paid_pos_41_50',
+  'paid_pos_51_60',
+  'paid_pos_61_70',
+  'paid_pos_71_80',
+  'paid_pos_81_90',
+  'paid_pos_91_100',
+  'paid_etv',
+  'paid_estimated_paid_traffic_cost',
+  'referring_domains',
+  'referring_main_domains',
+  'referring_pages',
+  'backlinks',
+  'backlinks_spam_score',
+  'broken_backlinks',
+  'broken_pages',
+  'referring_domains_nofollow',
+  'referring_main_domains_nofollow',
+  'referring_ips',
+  'referring_subnets',
+  'referring_pages_nofollow',
+  'dfs_metrics_time_update',
+  'dfs_se_type',
+  'dfs_location_code',
+  'dfs_language_code',
+  'dfs_created_at',
+  'dfs_updated_at'
 ];
 
 export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, isExternalFilter, onIsExternalFilterChange, onTagsUpdate, chambersVisible, copperChamberVisible = true, onColumnPaginationRender }: SitesprenTableProps) {
@@ -184,6 +400,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   // Column pagination state (like addressjar)
   const [columnsPerPage, setColumnsPerPage] = useState(12);
   const [currentColumnPage, setCurrentColumnPage] = useState(1);
+  const [sitesprenBaseSearch, setSitesprenBaseSearch] = useState('');
   
   const supabase = createClientComponentClient();
   
@@ -258,7 +475,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     }
   }, [filterTag, userInternalId]);
 
-  // WolfExclusionBand - Sticky columns that are excluded from pagination (memoized)
+  // WolfExclusionBand - Sticky columns that are excluded from the column pagination system (memoized)
   const wolfExclusionBandColumns = useMemo(() => [
     'checkbox',           // Selection control
     'tool_buttons',       // Site actions
@@ -308,9 +525,14 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         (filterBulldozer === 'true' && item.is_bulldozer === true) ||
         (filterBulldozer === 'false' && (item.is_bulldozer === false || item.is_bulldozer === null));
 
-      return matchesWpFilter && matchesTagFilter && matchesBulldozerFilter;
+      // Sitespren base search filter
+      const matchesSitesprenBaseSearch = sitesprenBaseSearch === '' ||
+        item.sitespren_base?.toLowerCase().includes(sitesprenBaseSearch.toLowerCase()) ||
+        false;
+
+      return matchesWpFilter && matchesTagFilter && matchesBulldozerFilter && matchesSitesprenBaseSearch;
     });
-  }, [data, filterWpSite, filterTag, tagFilteredSiteIds, filterBulldozer]);
+  }, [data, filterWpSite, filterTag, tagFilteredSiteIds, filterBulldozer, sitesprenBaseSearch]);
 
   // Sort logic
   const sortedData = useMemo(() => {
@@ -2657,6 +2879,17 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                 {RowPaginationBar1()}
                 {RowPaginationBar2()}
               </div>
+              {/* Sitespren Base Search Box */}
+              <div className="flex items-end">
+                <input
+                  type="text"
+                  value={sitesprenBaseSearch}
+                  onChange={(e) => setSitesprenBaseSearch(e.target.value)}
+                  placeholder="Search sitespren_base..."
+                  className="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  style={{ width: '200px', marginBottom: '3px' }}
+                />
+              </div>
               {/* Column pagination second */}
               <div className="flex items-end space-x-4">
                 {ColumnPaginationBar1()}
@@ -2698,19 +2931,12 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   const isLastSticky = index === stickyColumnCount - 1;
 
                   // Determine database table name for this column
-                  let dbTableName = "-";
-                  if (col === 'checkbox' || col === 'tool_buttons' || col === 'ph1') {
-                    dbTableName = "-";
-                  } else if (col === 'domain_registrar_info') {
-                    dbTableName = "-"; // This doesn't correspond to a specific db column
-                  } else {
-                    dbTableName = "sitespren"; // Most columns correspond to the sitespren table
-                  }
+                  const { dbTableName, dbTableClass } = getColumnTableInfo(col);
 
                   return (
                     <th
                       key={`table-name-${col}`}
-                      className={`${col === 'checkbox' || col === 'tool_buttons' || col === 'ph1' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} for_db_table_sitespren`}
+                      className={`${col === 'checkbox' || col === 'tool_buttons' || col === 'ph1' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} ${dbTableClass}`}
                       style={{
                         ...(isSticky ? { left: leftPosition } : {}),
                         // Let CSS handle backgroundColor for database table name row - shenfur CSS will set the colors
@@ -2823,7 +3049,20 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         'ph1b'
                       ) : (
                         <>
-                          {col === 'is_starred1' ? '•str1' : col === 'is_bulldozer' ? 'is_bulldozer' : col === 'is_competitor' ? 'is_competitor' : col === 'is_external' ? 'is_external' : col === 'is_internal' ? 'is_internal' : col === 'is_ppx' ? 'is_ppx' : col === 'is_ms' ? 'is_ms' : col === 'is_wayback_rebuild' ? 'wayback_rebuild' : col === 'is_naked_wp_build' ? 'naked_wp_build' : col === 'is_rnr' ? 'is_rnr' : col === 'is_aff' ? 'is_aff' : col === 'is_other1' ? 'is_other1' : col === 'is_other2' ? 'is_other2' : col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
+                          {col === 'is_starred1' ? '•str1' : 
+                           col === 'is_bulldozer' ? 'is_bulldozer' : 
+                           col === 'is_competitor' ? 'is_competitor' : 
+                           col === 'is_external' ? 'is_external' : 
+                           col === 'is_internal' ? 'is_internal' : 
+                           col === 'is_ppx' ? 'is_ppx' : 
+                           col === 'is_ms' ? 'is_ms' : 
+                           col === 'is_wayback_rebuild' ? 'wayback_rebuild' : 
+                           col === 'is_naked_wp_build' ? 'naked_wp_build' : 
+                           col === 'is_rnr' ? 'is_rnr' : 
+                           col === 'is_aff' ? 'is_aff' : 
+                           col === 'is_other1' ? 'is_other1' : 
+                           col === 'is_other2' ? 'is_other2' : 
+                           getColumnDisplayName(col)} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
                         </>
                       )}
                       {hasRightSeparator && (
@@ -3540,6 +3779,48 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                               </button>
                             )}
                           </div>
+                        ) : col === 'sitesglub_id' || col === 'fk_sitesdfs_id' || col === 'sitesdfs_id' ? (
+                          renderCopyableContent(
+                            item[col as keyof SitesprenRecord] ? `${(item[col as keyof SitesprenRecord] as number).toString().substring(0, 3)}..` : null, 
+                            col, 
+                            '-', 
+                            item[col as keyof SitesprenRecord]?.toString()
+                          )
+                        ) : col === 'mj_tf' || col === 'mj_cf' || col === 'mj_rd' || col === 'mj_refips' || 
+                             col === 'mj_refsubnets' || col === 'mj_bl' || col.startsWith('organic_') || 
+                             col.startsWith('paid_') || col.startsWith('referring_') || col === 'backlinks' || 
+                             col === 'backlinks_spam_score' || col === 'broken_backlinks' || col === 'broken_pages' ||
+                             col === 'dfs_location_code' ? (
+                          renderCopyableContent(
+                            item[col as keyof SitesprenRecord] !== null && item[col as keyof SitesprenRecord] !== undefined 
+                              ? (item[col as keyof SitesprenRecord] as number).toLocaleString() 
+                              : null, 
+                            col
+                          )
+                        ) : col === 'organic_etv' || col === 'organic_estimated_paid_traffic_cost' || 
+                             col === 'paid_etv' || col === 'paid_estimated_paid_traffic_cost' ? (
+                          renderCopyableContent(
+                            item[col as keyof SitesprenRecord] !== null && item[col as keyof SitesprenRecord] !== undefined 
+                              ? `$${(item[col as keyof SitesprenRecord] as number).toLocaleString()}` 
+                              : null, 
+                            col
+                          )
+                        ) : col === 'dfs_registered' ? (
+                          renderCopyableContent(formatBoolean(item[col as keyof SitesprenRecord] as boolean | null), col)
+                        ) : col.includes('created_at') || col.includes('updated_at') || 
+                             col.includes('datetime') || col === 'dfs_first_seen' || col === 'dfs_metrics_time_update' ? (
+                          renderCopyableContent(formatDate(item[col as keyof SitesprenRecord] as string), col)
+                        ) : col === 'dfs_epp_status_codes' || col === 'dfs_raw_status_codes' ? (
+                          renderCopyableContent(
+                            item[col as keyof SitesprenRecord] 
+                              ? JSON.stringify(item[col as keyof SitesprenRecord]).substring(0, 30) + '...' 
+                              : null, 
+                            col,
+                            '-',
+                            item[col as keyof SitesprenRecord] 
+                              ? JSON.stringify(item[col as keyof SitesprenRecord]) 
+                              : null
+                          )
                         ) : (
                           renderCopyableContent(item[col as keyof SitesprenRecord] as string, col)
                         )}

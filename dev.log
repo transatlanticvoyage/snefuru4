@@ -2,3701 +2,1596 @@
 > nextjs@0.1.0 dev
 > next dev
 
+ ⚠ Port 3000 is in use, using available port 3001 instead.
    ▲ Next.js 15.3.2
-   - Local:        http://localhost:3000
-   - Network:      http://192.168.50.23:3000
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.50.23:3001
    - Environments: .env.local
 
  ✓ Starting...
- ✓ Ready in 1387ms
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 1312ms (998 modules)
- GET /(protected2)/bren1 404 in 1516ms
- ✓ Compiled /torna3 in 435ms (1070 modules)
- GET /torna3 200 in 577ms
- ✓ Compiled /favicon.ico in 69ms (599 modules)
- GET /favicon.ico 200 in 170ms
- GET /favicon.ico 200 in 11ms
- GET /favicon.ico 200 in 11ms
- ✓ Compiled /api/navigation in 102ms (1079 modules)
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 148ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 19ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 18ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 20ms
- ✓ Compiled /bren1 in 203ms (1088 modules)
- GET /bren1 200 in 287ms
+ ✓ Ready in 1704ms
  ○ Compiling /sitejar4 ...
- ✓ Compiled /sitejar4 in 900ms (1211 modules)
- GET /sitejar4 200 in 1052ms
- GET /favicon.ico 200 in 206ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 717ms
+ ✓ Compiled /sitejar4 in 6.3s (1193 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 7167ms
+ ✓ Compiled /icon.png in 263ms (686 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 383ms
  ○ Compiling /api/get_sitespren_data ...
- ✓ Compiled /api/get_sitespren_data in 979ms (1292 modules)
- GET /favicon.ico 200 in 1466ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
+ ✓ Compiled /api/get_sitespren_data in 1777ms (1292 modules)
 Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
- GET /favicon.ico 200 in 56ms
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 133ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 19ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 14ms
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
 ]
- GET /api/navigation 200 in 930ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
 ]
- GET /api/navigation 200 in 17ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 45ms
-Found sitespren records: 151
- GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 1694ms
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 2466ms
 Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
-Found sitespren records: 151
- GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 75ms
- ○ Compiling /api/sitespren_tags ...
- ✓ Compiled /api/sitespren_tags in 629ms (1387 modules)
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 581ms
+ ○ Compiling /api/get_sites_by_tag ...
+ ✓ Compiled /api/get_sites_by_tag in 622ms (1375 modules)
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
- GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 820ms
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 957ms
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
- GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 183ms
- ✓ Compiled /torna2 in 187ms (1396 modules)
- GET /torna2 200 in 290ms
- GET /torna3 200 in 36ms
- GET /torna2 200 in 35ms
- ✓ Compiled in 401ms (528 modules)
- GET /torna3 200 in 58ms
- GET /sitejar4 200 in 58ms
- GET /favicon.ico 200 in 20ms
- GET /favicon.ico 200 in 9ms
- ✓ Compiled in 542ms (1212 modules)
- GET /torna3 200 in 124ms
- GET /sitejar4 200 in 124ms
- GET /favicon.ico 200 in 15ms
- GET /favicon.ico 200 in 9ms
- GET /favicon.ico 200 in 11ms
- ✓ Compiled in 139ms (528 modules)
- GET /torna3 200 in 34ms
- GET /sitejar4 200 in 29ms
- GET /favicon.ico 200 in 10ms
- GET /favicon.ico 200 in 18ms
- ✓ Compiled in 140ms (527 modules)
- GET /torna3 200 in 27ms
- GET /sitejar4 200 in 25ms
- GET /favicon.ico 200 in 10ms
- GET /favicon.ico 200 in 19ms
- ✓ Compiled in 160ms (527 modules)
- GET /torna3 200 in 137ms
- ✓ Compiled /_not-found in 328ms (1201 modules)
- GET /sitejar4 404 in 389ms
- GET /favicon.ico 200 in 56ms
- GET /favicon.ico 200 in 11ms
- GET /torna3 200 in 113ms
- GET /favicon.ico 200 in 30ms
- GET /favicon.ico 200 in 10ms
- GET /favicon.ico 200 in 10ms
- ✓ Compiled /api/navigation in 173ms (690 modules)
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 236ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 18ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 17ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 16ms
- GET /torna3 200 in 155ms
- GET /favicon.ico 200 in 42ms
- GET /favicon.ico 200 in 13ms
- GET /favicon.ico 200 in 10ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 22ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 17ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 23ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 18ms
- ✓ Compiled /torna2 in 216ms (695 modules)
- GET /torna2 200 in 324ms
- GET /favicon.ico 200 in 49ms
- GET /favicon.ico 200 in 9ms
- GET /favicon.ico 200 in 9ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 44ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 16ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 17ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 18ms
- GET /torna2 200 in 51ms
- GET /favicon.ico 200 in 32ms
- GET /favicon.ico 200 in 11ms
- GET /favicon.ico 200 in 10ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 40ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 24ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 21ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 20ms
- GET /torna3 200 in 50ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 43ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 19ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 19ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 16ms
- ✓ Compiled in 617ms (1200 modules)
- GET /torna3 200 in 87ms
- GET /torna3 200 in 19ms
- ✓ Compiled /favicon.ico in 80ms (689 modules)
- GET /favicon.ico 200 in 145ms
- GET /favicon.ico 200 in 12ms
- ✓ Compiled in 305ms (1216 modules)
- GET /torna3 200 in 63ms
- GET /torna3 200 in 28ms
- GET /favicon.ico 200 in 18ms
- GET /favicon.ico 200 in 11ms
- GET /favicon.ico 200 in 9ms
- ✓ Compiled in 287ms (1216 modules)
- GET /torna3 200 in 49ms
- GET /torna3 200 in 16ms
- GET /favicon.ico 200 in 17ms
- GET /favicon.ico 200 in 15ms
- ✓ Compiled in 326ms (1216 modules)
- GET /torna3 200 in 63ms
- GET /torna3 200 in 16ms
- GET /favicon.ico 200 in 25ms
- GET /favicon.ico 200 in 11ms
- ✓ Compiled in 232ms (1216 modules)
- GET /torna3 200 in 57ms
- GET /torna3 200 in 16ms
- GET /favicon.ico 200 in 28ms
- GET /favicon.ico 200 in 10ms
- GET /torna3 200 in 96ms
- GET /favicon.ico 200 in 43ms
- GET /favicon.ico 200 in 13ms
- GET /favicon.ico 200 in 9ms
- ✓ Compiled /api/navigation in 304ms (695 modules)
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 362ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 19ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 17ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 16ms
- GET /torna3 200 in 109ms
- GET /favicon.ico 200 in 21ms
- GET /favicon.ico 200 in 9ms
- GET /favicon.ico 200 in 9ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 16ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 20ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 16ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 16ms
- GET /sitejar4 200 in 67ms
- GET /favicon.ico 200 in 52ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
- GET /favicon.ico 200 in 16ms
- GET /favicon.ico 200 in 10ms
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 51ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 17ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 17ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
-]
- GET /api/navigation 200 in 17ms
- ✓ Compiled /api/get_sitespren_data in 226ms (776 modules)
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 235ms
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 1269ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 188ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 26ms
 Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
-Found sitespren records: 151
- GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 455ms
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 1037ms
 Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
-Found sitespren records: 151
- GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 74ms
- ✓ Compiled /api/sitespren_tags in 243ms (871 modules)
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
- GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 433ms
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 260ms
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 410ms
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
- GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 79ms
- ✓ Compiled in 568ms (1200 modules)
- GET /torna3 200 in 124ms
- GET /sitejar4 200 in 125ms
- GET /torna3 200 in 39ms
- ✓ Compiled /favicon.ico in 74ms (689 modules)
- GET /favicon.ico 200 in 141ms
- GET /favicon.ico 200 in 16ms
- GET /favicon.ico 200 in 9ms
- GET /favicon.ico 200 in 9ms
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- ✓ Compiled in 866ms (1200 modules)
- ✓ Compiled in 0ms (673 modules)
- ✓ Compiled in 0ms (673 modules)
- ✓ Compiled in 1ms (673 modules)
- GET /torna3 200 in 703ms
- ✓ Compiled in 0ms (673 modules)
- GET /sitejar4 200 in 469ms
- GET /torna3 200 in 255ms
- ✓ Compiled /favicon.ico in 190ms (689 modules)
- GET /favicon.ico 200 in 345ms
- GET /favicon.ico 200 in 10ms
- GET /favicon.ico 200 in 12ms
- GET /favicon.ico 200 in 9ms
- GET /favicon.ico 200 in 8ms
- GET /favicon.ico 200 in 9ms
- ✓ Compiled in 241ms (1216 modules)
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- GET /sitejar4 200 in 131ms
- GET /torna3 200 in 132ms
- GET /torna3 200 in 72ms
- GET /favicon.ico 200 in 115ms
- GET /favicon.ico 200 in 22ms
- GET /favicon.ico 200 in 14ms
- ✓ Compiled /api/navigation in 170ms (695 modules)
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
- GET /favicon.ico 200 in 272ms
- GET /favicon.ico 200 in 13ms
- GET /favicon.ico 200 in 14ms
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 406ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 171ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 53ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 21ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
 ]
- GET /api/navigation 200 in 319ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
 ]
- GET /api/navigation 200 in 18ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 465ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
 ]
- GET /api/navigation 200 in 16ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
 ]
- GET /api/navigation 200 in 19ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 297ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 230ms
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 123ms
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 387ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 73ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 35ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
 ]
- GET /api/navigation 200 in 18ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
 ]
- GET /api/navigation 200 in 18ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 1001ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 264ms
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
 ]
- GET /api/navigation 200 in 17ms
-API: Starting navigation request...
-API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
-API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
-API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
-API: Calling getNavigation...
-API: Navigation items received: [
-  { name: '[', children: [ [Object], [Object] ] },
-  { name: 'azulpsql', path: '/admin/azulpsql' },
-  { name: 'B', children: [ [Object], [Object], [Object] ] },
-  { name: 'c', children: [ [Object] ] },
-  {
-    name: 'C',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'D',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ]
-  },
-  {
-    name: 'F',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'gconjar1', path: '/gconjar1' },
-  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'J', children: [ [Object], [Object] ] },
-  { name: 'K', children: [ [Object], [Object], [Object] ] },
-  { name: 'M', children: [ [Object], [Object] ] },
-  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'navgroup6',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  { name: 'obi', path: '/admin/obi' },
-  { name: 'P', children: [ [Object], [Object], [Object] ] },
-  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
-  {
-    name: 'S',
-    children: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object]
-    ]
-  },
-  {
-    name: 'T',
-    children: [ [Object], [Object], [Object], [Object], [Object] ]
-  },
-  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
-  { name: 'valan', path: '/valan' },
-  { name: 'W', children: [ [Object], [Object] ] },
-  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
-  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
 ]
- GET /api/navigation 200 in 16ms
- ✓ Compiled in 554ms (1200 modules)
- ✓ Compiled in 261ms (1200 modules)
- ✓ Compiled in 300ms (1200 modules)
- ✓ Compiled in 380ms (1200 modules)
- ✓ Compiled in 220ms (1200 modules)
- GET /torna3 200 in 161ms
- ✓ Compiled /_not-found in 402ms (1190 modules)
- GET /_next/static/css/app/(protected2)/torna3/page.css?v=1752415417361 404 in 584ms
- GET /_next/static/css/app/layout.css?v=1752415417361 404 in 593ms
- GET /_next/static/chunks/app-pages-internals.js 404 in 583ms
- GET /_next/static/chunks/app/(protected2)/layout.js 404 in 572ms
- GET /_next/static/chunks/main-app.js?v=1752415417361 404 in 585ms
- ✓ Compiled /favicon.ico in 164ms (690 modules)
- GET /favicon.ico 200 in 228ms
- GET /torna3 200 in 98ms
- GET /_next/static/css/app/layout.css?v=1752415423136 404 in 65ms
- GET /_next/static/css/app/(protected2)/torna3/page.css?v=1752415423136 404 in 69ms
- GET /_next/static/chunks/app-pages-internals.js 404 in 49ms
- GET /_next/static/chunks/main-app.js?v=1752415423136 404 in 49ms
- GET /_next/static/chunks/app/(protected2)/layout.js 404 in 16ms
- GET /favicon.ico 200 in 13ms
- GET /torna3 200 in 48ms
- GET /_next/static/css/app/layout.css?v=1752415426816 404 in 69ms
- GET /_next/static/css/app/(protected2)/torna3/page.css?v=1752415426816 404 in 71ms
- GET /_next/static/chunks/app-pages-internals.js 404 in 49ms
- GET /_next/static/chunks/main-app.js?v=1752415426816 404 in 49ms
- GET /_next/static/chunks/app/(protected2)/layout.js 404 in 16ms
- GET /favicon.ico 200 in 14ms
- GET /torna3 200 in 42ms
- GET /_next/static/css/app/(protected2)/torna3/page.css?v=1752415436224 404 in 40ms
- GET /_next/static/css/app/layout.css?v=1752415436224 404 in 57ms
- GET /_next/static/chunks/app-pages-internals.js 404 in 44ms
- GET /_next/static/chunks/main-app.js?v=1752415436224 404 in 46ms
- GET /_next/static/chunks/app/(protected2)/layout.js 404 in 19ms
- GET /torna2 200 in 50ms
- GET /_next/static/css/app/layout.css?v=1752415437994 404 in 19ms
- GET /_next/static/css/app/(protected2)/torna2/page.css?v=1752415437994 404 in 33ms
- GET /_next/static/chunks/app-pages-internals.js 404 in 46ms
- GET /_next/static/chunks/main-app.js?v=1752415437994 404 in 47ms
- GET /_next/static/chunks/app/(protected2)/layout.js 404 in 45ms
- GET /torna3 200 in 27ms
- GET /_next/static/css/app/layout.css?v=1752415443837 404 in 64ms
- GET /_next/static/css/app/(protected2)/torna3/page.css?v=1752415443837 404 in 61ms
- GET /_next/static/chunks/app-pages-internals.js 404 in 60ms
- GET /_next/static/chunks/main-app.js?v=1752415443837 404 in 61ms
- GET /_next/static/chunks/app/(protected2)/layout.js 404 in 18ms
- GET /favicon.ico 200 in 13ms
- GET /torna2 200 in 40ms
- GET /_next/static/css/app/layout.css?v=1752415445111 404 in 78ms
- GET /_next/static/css/app/(protected2)/torna2/page.css?v=1752415445111 404 in 78ms
- GET /_next/static/chunks/main-app.js?v=1752415445111 404 in 44ms
- GET /_next/static/chunks/app-pages-internals.js 404 in 44ms
- GET /_next/static/chunks/app/(protected2)/layout.js 404 in 43ms
- GET /favicon.ico 200 in 13ms
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 468ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 142ms
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 394ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 64ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 15ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 459ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 360ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 201ms
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 297ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 143ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 46ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 39ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 14ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&searchsite=g 200 in 42ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&searchsite=gr 200 in 34ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&searchsite=gra 200 in 24ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 15ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&searchsite=gran 200 in 21ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 14ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&searchsite=granr 200 in 43ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 17ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&searchsite=granra 200 in 47ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 30ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 29ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 29ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&searchsite=g 200 in 31ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&searchsite=gr 200 in 32ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&searchsite=gra 200 in 31ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 15ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 30ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 31ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 33ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 37ms
+ ✓ Compiled in 2.9s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 45ms
+ ✓ Compiled in 2.1s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 22ms
+ ✓ Compiled in 2.4s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 27ms
+ ✓ Compiled in 2.4s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 22ms
+ ✓ Compiled in 2.5s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 31ms
+ ✓ Compiled in 2.2s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 24ms
+ ✓ Compiled in 2.3s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 27ms
+ ✓ Compiled in 2.2s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 25ms
+ ✓ Compiled in 2.6s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 37ms
+ ✓ Compiled in 2.3s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 26ms
+ ✓ Compiled in 2.6s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 30ms
+ ✓ Compiled in 2.3s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 23ms
+ ✓ Compiled in 2.5s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 46ms
+ ✓ Compiled in 2.4s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 21ms
+ ✓ Compiled in 2.4s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 30ms
+ ✓ Compiled in 5.6s (1193 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2640ms
+ ✓ Compiled in 2.7s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 30ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/server-development/14.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/server-development/14.pack.gz'
+ ✓ Compiled in 2.4s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 37ms
+ ✓ Compiled in 2.6s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2592ms
+ ✓ Compiled in 2.6s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 41ms
+ ✓ Compiled in 2.7s (523 modules)
+ ✓ Compiled in 2.5s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2646ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 30ms
+ ✓ Compiled in 2.6s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2545ms
+ ✓ Compiled in 2.5s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 28ms
+ ✓ Compiled in 2.4s (523 modules)
+ ✓ Compiled in 2.8s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2869ms
+ ✓ Compiled in 2.6s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2582ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 27ms
+ ✓ Compiled in 3s (1193 modules)
+ ✓ Compiled in 2.6s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2661ms
+ ✓ Compiled /api/get_sites_by_tag in 136ms (860 modules)
+ ✓ Compiled (862 modules)
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 474ms
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 1133ms
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 1333ms
+ ✓ Compiled in 2.6s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2452ms
+ ✓ Compiled in 2.5s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 22ms
+ ✓ Compiled in 5.6s (1385 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 88ms
+ ✓ Compiled in 2.6s (1385 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 80ms
+ ✓ Compiled in 2.5s (523 modules)
+ ✓ Compiled in 2.8s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2913ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 34ms
+ ✓ Compiled in 2.5s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 23ms
+ ✓ Compiled in 6.2s (1193 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2608ms
+ ✓ Compiled in 5.6s (1193 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2443ms
+ ✓ Compiled in 2.6s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2406ms
+ ✓ Compiled in 2.4s (523 modules)
+ ✓ Compiled in 2.2s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2331ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 25ms
+ ✓ Compiled in 2.3s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 36ms
+ ✓ Compiled in 3.2s (1193 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2108ms
+ ✓ Compiled in 2.1s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 30ms
+ ✓ Compiled in 2.1s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 25ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 128ms
+ ✓ Compiled /icon.png in 102ms (686 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 180ms
+ ✓ Compiled /api/get_sitespren_data in 389ms (769 modules)
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 1092ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+ ✓ Compiled /api/get_sites_by_tag in 233ms (864 modules)
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 422ms
+ ✓ Compiled (866 modules)
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 602ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 618ms
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 124ms
