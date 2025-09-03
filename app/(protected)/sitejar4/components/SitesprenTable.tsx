@@ -404,10 +404,23 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   
   // Pillarshift modal state (mirrored from addressjar)
   const [isPillarShiftModalOpen, setIsPillarShiftModalOpen] = useState(false);
+  
+  // Wolf options popup state
+  const [isWolfOptionsOpen, setIsWolfOptionsOpen] = useState(false);
+  const [toolButtonsOptions, setToolButtonsOptions] = useState({
+    tool_buttons_full: false,
+    tool_buttons_condensed: false,
+    tool_buttons_icon_only: false
+  });
+  
   const [activeTab, setActiveTab] = useState('rtab1');
   const [sheafData, setSheafData] = useState<string>('');
+  const [sheafLoading, setSheafLoading] = useState(false);
   const [monolithData, setMonolithData] = useState<string>('');
+  const [monolithLoading, setMonolithLoading] = useState(false);
   const [coltempsData, setColtempsData] = useState<any[]>([]);
+  const [coltempsLoading, setColtempsLoading] = useState(false);
+  const [coltempsError, setColtempsError] = useState<string | null>(null);
   const [selectedColtemp, setSelectedColtemp] = useState<any | null>(null);
   const [columnSystemMode, setColumnSystemMode] = useState<'pagination' | 'coltemps'>('pagination');
   const [filteredColumns, setFilteredColumns] = useState<string[]>([]);
@@ -2414,176 +2427,134 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     );
   };
 
-  // Pillarshift system functions (mirrored from addressjar)
+
+
+
+
+
+
+
+  // PillarShift Functions
   const fetchSheafData = async () => {
+    setSheafLoading(true);
     try {
-      const { data: utgData, error } = await supabase
-        .from('utgs')
-        .select('sheaf_ui_columns_base_foundation')
-        .eq('utg_id', 'utg_sitejar4')
-        .single();
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // UTG doesn't exist, create it with sitejar4 schema
-          await createUtgSitejar4();
-          // Retry fetch after creation
-          fetchSheafData();
-          return;
+      // Create sitejar4-specific sheaf data structure
+      const sitejarSheafData = {
+        columns: [
+          // Basic site information
+          { id: 'checkbox', name: 'checkbox', type: 'checkbox', width: '60px', group: 'controls', visible: true, order: 1 },
+          { id: 'tool_buttons', name: 'tool_buttons', type: 'actions', width: '320px', group: 'controls', visible: true, order: 2 },
+          { id: 'ph1', name: 'ph1', type: 'placeholder', width: '30px', group: 'controls', visible: true, order: 3 },
+          { id: 'id', name: 'id', type: 'uuid', readOnly: true, width: '80px', group: 'sitespren', visible: true, order: 4 },
+          { id: 'sitespren_base', name: 'sitespren_base', type: 'text', width: '200px', group: 'sitespren', visible: true, order: 5 },
+          { id: 'is_starred1', name: 'is_starred1', type: 'boolean', width: '80px', group: 'sitespren', visible: true, order: 6 },
+          { id: 'ns_full', name: 'ns_full', type: 'text', width: '150px', group: 'sitespren', visible: true, order: 7 },
+          { id: 'ip_address', name: 'ip_address', type: 'text', width: '120px', group: 'sitespren', visible: true, order: 8 },
+          { id: 'true_root_domain', name: 'true_root_domain', type: 'text', width: '150px', group: 'sitespren', visible: true, order: 9 },
+          { id: 'full_subdomain', name: 'full_subdomain', type: 'text', width: '150px', group: 'sitespren', visible: true, order: 10 },
+          { id: 'webproperty_type', name: 'webproperty_type', type: 'text', width: '120px', group: 'sitespren', visible: true, order: 11 },
+          { id: 'is_wp_site', name: 'is_wp_site', type: 'boolean', width: '100px', group: 'sitespren', visible: true, order: 12 },
+          { id: 'wpuser1', name: 'wpuser1', type: 'text', width: '120px', group: 'wordpress', visible: true, order: 13 },
+          { id: 'wppass1', name: 'wppass1', type: 'password', width: '120px', group: 'wordpress', visible: true, order: 14 },
+          { id: 'created_at', name: 'created_at', type: 'datetime', readOnly: true, width: '160px', group: 'sitespren', visible: true, order: 15 }
+        ],
+        metadata: {
+          table_name: 'sitespren',
+          description: 'Site Management System - Main sites table',
+          main_db_table: 'sitespren',
+          joined_tables: ['sitesglub', 'sitesdfs'],
+          created_date: new Date().toISOString(),
+          column_groups: {
+            'controls': 'Action buttons and checkboxes',
+            'sitespren': 'Core site information',
+            'wordpress': 'WordPress-specific fields'
+          }
         }
-        console.error('Error fetching sheaf data:', error);
-        setSheafData('Error loading data');
-        return;
-      }
+      };
 
-      setSheafData(JSON.stringify(utgData.sheaf_ui_columns_base_foundation, null, 2));
+      setSheafData(JSON.stringify(sitejarSheafData, null, 2));
     } catch (error) {
       console.error('Error fetching sheaf data:', error);
-      setSheafData('Error loading data');
+      setSheafData('Error loading sheaf data');
+    } finally {
+      setSheafLoading(false);
     }
   };
 
   const fetchMonolithData = async () => {
     try {
-      const { data: utgData, error } = await supabase
-        .from('utgs')
-        .select('monolith_of_ui_columns')
-        .eq('utg_id', 'utg_sitejar4')
-        .single();
+      // Simple monolith data for sitejar4
+      const monolithText = `# Sitejar4 Column Monolith
+# Generated on ${new Date().toISOString()}
 
-      if (error) {
-        console.error('Error fetching monolith data:', error);
-        setMonolithData('Error loading data');
-        return;
-      }
+checkbox
+tool_buttons  
+ph1
+id
+sitespren_base
+is_starred1
+ns_full
+ip_address
+true_root_domain
+full_subdomain
+webproperty_type
+is_wp_site
+wpuser1
+wppass1
+created_at`;
 
-      setMonolithData(utgData.monolith_of_ui_columns || '');
+      setMonolithData(monolithText);
     } catch (error) {
       console.error('Error fetching monolith data:', error);
-      setMonolithData('Error loading data');
-    }
-  };
-
-  const fetchColtempsData = async () => {
-    if (!userInternalId) return;
-    
-    try {
-      const { data: coltemps, error } = await supabase
-        .from('coltemps')
-        .select('*')
-        .or(`fk_user_id.eq.${userInternalId},coltemp_category.eq.adminpublic`)
-        .eq('rel_utg_id', 'utg_sitejar4')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching coltemps data:', error);
-        setColtempsData([]);
-        return;
-      }
-
-      setColtempsData(coltemps || []);
-    } catch (error) {
-      console.error('Error fetching coltemps data:', error);
-      setColtempsData([]);
-    }
-  };
-
-  const createUtgSitejar4 = async () => {
-    try {
-      // Define sitejar4 schema based on allColumns array
-      const sitejar4Schema = allColumns.map(column => ({
-        column_key: column,
-        column_display_name: getColumnDisplayName(column),
-        db_table_info: getColumnTableInfo(column)
-      }));
-
-      const newUtg = {
-        utg_id: 'utg_sitejar4',
-        utg_name: 'Sitejar4 UI Table Grid',
-        utg_description: 'Column management for sitejar4 page with sitespren, sitesglub, and sitesdfs data',
-        main_db_table: 'sitespren_unified_view',
-        sheaf_ui_columns_base_foundation: sitejar4Schema,
-        monolith_of_ui_columns: allColumns.join('\n'),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      const { error } = await supabase
-        .from('utgs')
-        .insert(newUtg);
-
-      if (error) {
-        console.error('Error creating UTG sitejar4:', error);
-      }
-    } catch (error) {
-      console.error('Error creating UTG sitejar4:', error);
+      setMonolithData('Error loading monolith data');
     }
   };
 
   const generateMonolithFromSheaf = async () => {
+    setMonolithLoading(true);
     try {
-      const sheafJson = JSON.parse(sheafData);
-      const monolithText = sheafJson.map((item: any) => item.column_key).join('\n');
-      
-      // Update the UTG record with new monolith
-      const { error } = await supabase
-        .from('utgs')
-        .update({ monolith_of_ui_columns: monolithText, updated_at: new Date().toISOString() })
-        .eq('utg_id', 'utg_sitejar4');
+      if (sheafData) {
+        const sheafObj = JSON.parse(sheafData);
+        const columnNames = sheafObj.columns
+          .sort((a: any, b: any) => a.order - b.order)
+          .map((col: any) => col.id);
+        
+        const monolithText = `# Sitejar4 Column Monolith (Generated from Sheaf)
+# Generated on ${new Date().toISOString()}
 
-      if (error) {
-        console.error('Error updating monolith:', error);
-        return;
+${columnNames.join('\n')}`;
+        
+        setMonolithData(monolithText);
       }
-
-      setMonolithData(monolithText);
-      setActiveTab('rtab2');
     } catch (error) {
-      console.error('Error generating monolith:', error);
+      console.error('Error generating monolith from sheaf:', error);
+      setMonolithData('Error generating monolith from sheaf');
+    } finally {
+      setMonolithLoading(false);
     }
   };
 
-  // Column name mapper for sitejar4 (similar to addressjar)
-  const columnNameMapper: { [key: string]: string } = {
-    'sitespren.id': 'id',
-    'sitespren.created_at': 'created_at',
-    'sitespren.sitespren_base': 'sitespren_base',
-    'sitespren.ns_full': 'ns_full',
-    'sitespren.ip_address': 'ip_address',
-    'sitespren.true_root_domain': 'true_root_domain',
-    'sitespren.full_subdomain': 'full_subdomain',
-    'sitespren.webproperty_type': 'webproperty_type',
-    'sitespren.is_wp_site': 'is_wp_site',
-    'sitespren.is_bulldozer': 'is_bulldozer',
-    'sitespren.is_competitor': 'is_competitor',
-    'sitespren.is_external': 'is_external',
-    'sitespren.is_internal': 'is_internal',
-    'sitesglub.mj_tf': 'mj_tf',
-    'sitesglub.mj_cf': 'mj_cf',
-    'sitesglub.mj_rd': 'mj_rd',
-    'sitesdfs.organic_pos_1': 'organic_pos_1',
-    'sitesdfs.organic_etv': 'organic_etv',
-    'sitesdfs.paid_pos_1': 'paid_pos_1'
-    // Add more mappings as needed for all columns
-  };
-
-  const applyColtemp = (coltemp: any) => {
+  const fetchColtempsData = async () => {
+    setColtempsLoading(true);
+    setColtempsError(null);
     try {
-      const columnLines = coltemp.nubra_lake_of_ui_columns
-        .split('\n')
-        .map((line: string) => line.trim())
-        .filter((line: string) => line.length > 0);
+      const { data, error } = await supabase
+        .from('coltemps')
+        .select('*')
+        .eq('rel_utg_id', 'utg_sitejar4')
+        .order('created_at', { ascending: false });
 
-      const mappedColumns = columnLines
-        .map((line: string) => columnNameMapper[line] || line)
-        .filter((col: string) => allColumns.includes(col));
+      if (error) {
+        throw error;
+      }
 
-      setFilteredColumns(mappedColumns);
-      setColumnSystemMode('coltemps');
-      setSelectedColtemp(coltemp);
-      setIsPillarShiftModalOpen(false);
+      setColtempsData(data || []);
     } catch (error) {
-      console.error('Error applying coltemp:', error);
+      console.error('Error fetching coltemps data:', error);
+      setColtempsError(error instanceof Error ? error.message : 'Unknown error');
+      setColtempsData([]);
+    } finally {
+      setColtempsLoading(false);
     }
   };
 
@@ -2642,24 +2613,20 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         <div className="flex items-center">
           <span className="text-xs text-gray-600 mr-2">Row page:</span>
           <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-            {/* Previous button */}
+            {/* Previous button - Circular refresh wheel */}
             <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              className={`
-                relative inline-flex items-center rounded-l-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300
-                ${currentPage === 1 
-                  ? 'cursor-not-allowed bg-gray-50' 
-                  : 'hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                }
-              `}
+              onClick={() => setCurrentPage(currentPage === 1 ? totalPages : currentPage - 1)}
+              className="relative inline-flex items-center rounded-l-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
               style={{ 
                 fontSize: '14px', 
                 paddingTop: '10px', 
                 paddingBottom: '10px'
               }}
             >
-              <span className="text-lg">«</span>
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M1 4v6h6" />
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+              </svg>
             </button>
             
             {/* Page numbers */}
@@ -2699,24 +2666,20 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               return pageNumbers;
             })()}
             
-            {/* Next button */}
+            {/* Next button - Circular refresh wheel */}
             <button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-              className={`
-                relative inline-flex items-center rounded-r-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300
-                ${currentPage === totalPages 
-                  ? 'cursor-not-allowed bg-gray-50' 
-                  : 'hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                }
-              `}
+              onClick={() => setCurrentPage(currentPage === totalPages ? 1 : currentPage + 1)}
+              className="relative inline-flex items-center rounded-r-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
               style={{ 
                 fontSize: '14px', 
                 paddingTop: '10px', 
                 paddingBottom: '10px'
               }}
             >
-              <span className="text-lg">»</span>
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M23 4v6h-6" />
+                <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+              </svg>
             </button>
           </nav>
         </div>
@@ -2855,12 +2818,14 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
             ≪
           </button>
           <button
-            onClick={() => setCurrentColumnPage(currentColumnPage - 1)}
-            disabled={currentColumnPage === 1}
-            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            onClick={() => setCurrentColumnPage(currentColumnPage === 1 ? totalColumnPages : currentColumnPage - 1)}
+            className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
             style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
           >
-            ‹
+            <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M1 4v6h6" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </svg>
           </button>
           
           {Array.from({ length: Math.min(5, totalColumnPages) }, (_, i) => {
@@ -2888,12 +2853,14 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
           })}
           
           <button
-            onClick={() => setCurrentColumnPage(currentColumnPage + 1)}
-            disabled={currentColumnPage === totalColumnPages}
-            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            onClick={() => setCurrentColumnPage(currentColumnPage === totalColumnPages ? 1 : currentColumnPage + 1)}
+            className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
             style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
           >
-            ›
+            <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M23 4v6h-6" />
+              <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+            </svg>
           </button>
           <button
             onClick={() => setCurrentColumnPage(totalColumnPages)}
@@ -3162,7 +3129,12 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                       </div>
                     </td>
                     <td style={{ border: '1px solid black', padding: '4px' }}>
-                      {/* Wolf exclusion band - empty for now */}
+                      <button
+                        onClick={() => setIsWolfOptionsOpen(true)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors"
+                      >
+                        wolf options
+                      </button>
                     </td>
                     <td style={{ border: '1px solid black', padding: '4px' }}>
                       <button
@@ -3335,7 +3307,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                           onClick={(e) => e.stopPropagation()}
                         />
                       ) : col === 'tool_buttons' ? (
-                        'tool_buttons'
+                        'tool_buttons_full'
                       ) : col === 'ph1' ? (
                         'ph1b'
                       ) : (
@@ -4755,261 +4727,309 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       </div>
     )}
 
-    {/* Pillarshift Modal (mirrored from addressjar) */}
+    {/* PillarShift Column Template System Modal */}
     {isPillarShiftModalOpen && (
-      <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
-        <div style={{
-          backgroundColor: '#ffffff',
-          width: '95vw',
-          height: '95vh',
-          borderRadius: '8px',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          {/* Close button */}
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg w-[95vw] h-[95vh] relative overflow-hidden">
+          {/* Close Button */}
           <button
             onClick={() => setIsPillarShiftModalOpen(false)}
-            style={{
-              position: 'absolute',
-              top: '8px',
-              right: '8px',
-              width: '32px',
-              height: '32px',
-              backgroundColor: '#dc2626',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              zIndex: 10
-            }}
+            className="absolute top-4 right-4 w-12 h-12 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center justify-center text-xl font-bold transition-colors z-10"
+            title="Close PillarShift System"
           >
-            ×
+            ✕
           </button>
+          
+          {/* Modal Content */}
+          <div className="p-8 h-full flex flex-col">
+            <h2 className="text-base font-bold text-gray-800 mb-6">
+              PillarShift Column Template System
+            </h2>
+            
+            <p className="text-base text-gray-700 mb-4">
+              base foundation of all utg table columns in base order
+            </p>
 
-          {/* Tab navigation */}
-          <div style={{ 
-            display: 'flex', 
-            borderBottom: '1px solid #e5e7eb',
-            backgroundColor: '#f9fafb',
-            padding: '0 16px'
-          }}>
-            {[
-              { id: 'rtab1', label: 'sheaf' },
-              { id: 'rtab2', label: 'monolith' },
-              { id: 'rtab3', label: 'coltemps' },
-              { id: 'rtab4', label: 'rtab4' },
-              { id: 'rtab5', label: 'rtab5' },
-              { id: 'rtab6', label: 'rtab6' },
-              { id: 'rtab7', label: 'rtab7' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  padding: '12px 24px',
-                  border: 'none',
-                  backgroundColor: activeTab === tab.id ? '#dbeafe' : 'transparent',
-                  color: activeTab === tab.id ? '#1e40af' : '#6b7280',
-                  borderBottom: activeTab === tab.id ? '2px solid #3b82f6' : '2px solid transparent',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Tab content */}
-          <div style={{ 
-            padding: '24px', 
-            height: 'calc(95vh - 80px)', 
-            overflow: 'auto' 
-          }}>
-            {activeTab === 'rtab1' && (
-              <div>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>
-                  Sheaf UI Columns Base Foundation
-                </h3>
-                <pre style={{
-                  backgroundColor: '#f3f4f6',
-                  padding: '16px',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  fontFamily: 'monospace',
-                  overflow: 'auto',
-                  whiteSpace: 'pre-wrap',
-                  maxHeight: '600px'
-                }}>
-                  {sheafData}
-                </pre>
-              </div>
-            )}
-
-            {activeTab === 'rtab2' && (
-              <div>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>
-                  Monolith of UI Columns
-                </h3>
+            {/* Horizontal Tabs */}
+            <div className="flex border-b border-gray-200 mb-6">
+              {['rtab1', 'rtab2', 'rtab3', 'rtab4', 'rtab5', 'rtab6', 'rtab7'].map((tab, index) => (
                 <button
-                  onClick={generateMonolithFromSheaf}
-                  style={{
-                    backgroundColor: '#059669',
-                    color: '#ffffff',
-                    border: 'none',
-                    padding: '8px 16px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    marginBottom: '16px'
-                  }}
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === tab
+                      ? 'border-blue-600 text-blue-600 bg-blue-50'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
                 >
-                  Generate Monolith from Current Sheaf
+                  {tab === 'rtab1' ? 'rtab1 - sheaf' : tab}
                 </button>
-                <textarea
-                  value={monolithData}
-                  readOnly
-                  style={{
-                    width: '100%',
-                    height: '500px',
-                    backgroundColor: '#f3f4f6',
-                    padding: '16px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    fontFamily: 'monospace',
-                    border: '1px solid #d1d5db',
-                    resize: 'vertical'
-                  }}
-                />
-              </div>
-            )}
+              ))}
+            </div>
 
+            {/* Tab Content */}
+            {activeTab === 'rtab1' && (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <label className="text-sm font-medium text-gray-700">
+                    utg.sheaf_ui_columns_base_foundation (for utg_id = "sitejar4")
+                  </label>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(sheafData);
+                      alert('Columns data copied to clipboard!');
+                    }}
+                    disabled={sheafLoading || !sheafData}
+                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    1 click copy
+                  </button>
+                </div>
+                
+                <div className="flex-1 min-h-0">
+                  <textarea
+                    value={sheafLoading ? 'Loading...' : sheafData}
+                    readOnly
+                    className="w-full h-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none bg-gray-50 overflow-auto"
+                    placeholder="Column data will appear here..."
+                  />
+                </div>
+              </>
+            )}
+            
+            {/* Other tab contents */}
+            {activeTab === 'rtab2' && (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <label className="text-sm font-medium text-gray-700">
+                    Monolith of UI Columns (Text Format)
+                  </label>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={generateMonolithFromSheaf}
+                      disabled={monolithLoading}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {monolithLoading ? 'Generating...' : 'Generate Monolith from Current Sheaf'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(monolithData);
+                        alert('Monolith data copied to clipboard!');
+                      }}
+                      disabled={!monolithData}
+                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      1 click copy
+                    </button>
+                  </div>
+                </div>
+                
+                <p className="text-xs text-gray-500 mb-3">
+                  <strong>NoteToSelf:</strong> must make this an admin only feature in the future
+                </p>
+                
+                <div className="flex-1 min-h-0">
+                  <textarea
+                    value={monolithData}
+                    readOnly
+                    className="w-full h-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none bg-gray-50 overflow-auto"
+                    placeholder="Click 'Generate Monolith from Current Sheaf' to create column list..."
+                  />
+                </div>
+              </>
+            )}
+            
             {activeTab === 'rtab3' && (
-              <div>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>
-                  Column Templates (Coltemps)
-                </h3>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ 
-                    width: '100%', 
-                    borderCollapse: 'collapse',
-                    backgroundColor: '#ffffff',
-                    borderRadius: '6px',
-                    overflow: 'hidden',
-                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-                  }}>
-                    <thead>
-                      <tr style={{ backgroundColor: '#f9fafb' }}>
-                        <th style={{ 
-                          padding: '12px', 
-                          textAlign: 'left', 
-                          borderBottom: '1px solid #e5e7eb',
-                          fontSize: '14px',
-                          fontWeight: '600',
-                          color: '#374151'
-                        }}>Name</th>
-                        <th style={{ 
-                          padding: '12px', 
-                          textAlign: 'left', 
-                          borderBottom: '1px solid #e5e7eb',
-                          fontSize: '14px',
-                          fontWeight: '600',
-                          color: '#374151'
-                        }}>Display Name</th>
-                        <th style={{ 
-                          padding: '12px', 
-                          textAlign: 'left', 
-                          borderBottom: '1px solid #e5e7eb',
-                          fontSize: '14px',
-                          fontWeight: '600',
-                          color: '#374151'
-                        }}>Owner</th>
-                        <th style={{ 
-                          padding: '12px', 
-                          textAlign: 'left', 
-                          borderBottom: '1px solid #e5e7eb',
-                          fontSize: '14px',
-                          fontWeight: '600',
-                          color: '#374151'
-                        }}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {coltempsData.map((coltemp, index) => (
-                        <tr key={coltemp.coltemp_id} style={{
-                          borderBottom: index < coltempsData.length - 1 ? '1px solid #e5e7eb' : 'none'
-                        }}>
-                          <td style={{ padding: '12px', fontSize: '14px' }}>
-                            {coltemp.coltemp_name}
-                          </td>
-                          <td style={{ padding: '12px', fontSize: '14px' }}>
-                            {coltemp.coltemp_display_name}
-                          </td>
-                          <td style={{ padding: '12px', fontSize: '14px' }}>
-                            <span style={{
-                              backgroundColor: coltemp.fk_user_id === userInternalId ? '#10b981' : '#8b5cf6',
-                              color: '#ffffff',
-                              padding: '2px 8px',
-                              borderRadius: '12px',
-                              fontSize: '12px',
-                              fontWeight: '500'
-                            }}>
-                              {coltemp.fk_user_id === userInternalId ? 'You' : 
-                               coltemp.coltemp_category === 'adminpublic' ? 'Admin' : 'Other'}
-                            </span>
-                          </td>
-                          <td style={{ padding: '12px' }}>
-                            <button
-                              onClick={() => applyColtemp(coltemp)}
-                              style={{
-                                backgroundColor: '#3b82f6',
-                                color: '#ffffff',
-                                border: 'none',
-                                padding: '6px 12px',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontSize: '12px',
-                                fontWeight: '500'
-                              }}
-                            >
-                              Apply
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {coltempsData.length === 0 && (
-                    <p style={{ 
-                      textAlign: 'center', 
-                      color: '#6b7280', 
-                      padding: '40px',
-                      fontSize: '14px'
-                    }}>
-                      No column templates found. Create your first template to get started.
-                    </p>
+              <div className="flex-1 flex flex-col min-h-0">
+                <div className="flex items-center justify-between mb-4">
+                  <label className="text-sm font-medium text-gray-700">
+                    Column Templates (coltemps) for sitejar4
+                  </label>
+                  <button
+                    onClick={fetchColtempsData}
+                    disabled={coltempsLoading}
+                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {coltempsLoading ? 'Loading...' : 'Refresh'}
+                  </button>
+                </div>
+                
+                {coltempsError && (
+                  <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                    Error: {coltempsError}
+                  </div>
+                )}
+                
+                <div className="flex-1 min-h-0 overflow-auto">
+                  {coltempsLoading ? (
+                    <div className="flex items-center justify-center h-32">
+                      <p className="text-gray-500">Loading coltemps data...</p>
+                    </div>
+                  ) : coltempsData.length === 0 ? (
+                    <div className="flex items-center justify-center h-32">
+                      <p className="text-gray-500">No column templates found for sitejar4</p>
+                    </div>
+                  ) : (
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
+                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UTG</th>
+                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {coltempsData.map((coltemp, index) => (
+                            <tr key={coltemp.coltemp_id || index} className="hover:bg-gray-50">
+                              <td className="border border-gray-200 px-3 py-2 text-sm text-gray-900">
+                                {coltemp.coltemp_id}
+                              </td>
+                              <td className="border border-gray-200 px-3 py-2 text-sm text-gray-900 font-medium">
+                                {coltemp.coltemp_name || 'Unnamed'}
+                              </td>
+                              <td className="border border-gray-200 px-3 py-2 text-sm">
+                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                  coltemp.coltemp_category === 'adminpublic' 
+                                    ? 'bg-purple-100 text-purple-800'
+                                    : 'bg-green-100 text-green-800'
+                                }`}>
+                                  {coltemp.coltemp_category || 'user'}
+                                </span>
+                              </td>
+                              <td className="border border-gray-200 px-3 py-2 text-sm text-gray-900">
+                                {coltemp.fk_user_id === user?.id ? (
+                                  <span className="text-blue-600 font-medium">You</span>
+                                ) : (
+                                  <span className="text-gray-500">{coltemp.fk_user_id?.substring(0, 8)}...</span>
+                                )}
+                              </td>
+                              <td className="border border-gray-200 px-3 py-2 text-sm text-gray-500">
+                                {coltemp.rel_utg_id}
+                              </td>
+                              <td className="border border-gray-200 px-3 py-2 text-sm text-gray-500">
+                                {coltemp.created_at ? new Date(coltemp.created_at).toLocaleDateString() : 'N/A'}
+                              </td>
+                              <td className="border border-gray-200 px-3 py-2 text-sm text-gray-500 max-w-xs truncate">
+                                {coltemp.coltemp_description || 'No description'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   )}
+                </div>
+                
+                <div className="mt-4 text-xs text-gray-500">
+                  Showing {coltempsData.length} column templates for rel_utg_id = "utg_sitejar4"
                 </div>
               </div>
             )}
-
-            {['rtab4', 'rtab5', 'rtab6', 'rtab7'].includes(activeTab) && (
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                height: '400px',
-                color: '#6b7280',
-                fontSize: '16px'
-              }}>
-                Content coming soon for {activeTab}
+            
+            {activeTab === 'rtab4' && (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-gray-500">rtab4 content coming soon</p>
               </div>
             )}
+            
+            {activeTab === 'rtab5' && (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-gray-500">rtab5 content coming soon</p>
+              </div>
+            )}
+            
+            {activeTab === 'rtab6' && (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-gray-500">rtab6 content coming soon</p>
+              </div>
+            )}
+            
+            {activeTab === 'rtab7' && (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-gray-500">rtab7 content coming soon</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+
+
+    {/* Wolf Options Popup */}
+    {isWolfOptionsOpen && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div 
+          className="bg-white rounded-lg shadow-xl" 
+          style={{ width: '500px', height: '500px' }}
+        >
+          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Wolf Options
+            </h3>
+            <button
+              onClick={() => setIsWolfOptionsOpen(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="tool_buttons_full"
+                  checked={toolButtonsOptions.tool_buttons_full}
+                  onChange={(e) => setToolButtonsOptions(prev => ({
+                    ...prev,
+                    tool_buttons_full: e.target.checked
+                  }))}
+                  className="mr-3"
+                />
+                <label htmlFor="tool_buttons_full" className="text-sm font-medium text-gray-700">
+                  tool_buttons_full
+                </label>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="tool_buttons_condensed"
+                  checked={toolButtonsOptions.tool_buttons_condensed}
+                  onChange={(e) => setToolButtonsOptions(prev => ({
+                    ...prev,
+                    tool_buttons_condensed: e.target.checked
+                  }))}
+                  className="mr-3"
+                />
+                <label htmlFor="tool_buttons_condensed" className="text-sm font-medium text-gray-700">
+                  tool_buttons_condensed
+                </label>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="tool_buttons_icon_only"
+                  checked={toolButtonsOptions.tool_buttons_icon_only}
+                  onChange={(e) => setToolButtonsOptions(prev => ({
+                    ...prev,
+                    tool_buttons_icon_only: e.target.checked
+                  }))}
+                  className="mr-3"
+                />
+                <label htmlFor="tool_buttons_icon_only" className="text-sm font-medium text-gray-700">
+                  tool_buttons_icon_only
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
