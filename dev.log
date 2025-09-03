@@ -5610,3 +5610,20 @@ Import trace for requested module:
  GET /admin/utg_manager 404 in 65ms
  GET /admin/xpagesmanager1 404 in 46ms
  GET /admin/utg_manager 404 in 51ms
+ GET /admin/xpagesmanager1 404 in 66ms
+ GET /admin/utg_manager 404 in 58ms
+ GET /admin/xpagesmanager1 404 in 62ms
+ GET /admin/utg_manager 404 in 63ms
+ GET /admin/xpagesmanager1 404 in 64ms
+ GET /admin/utg_manager 404 in 60ms
+ GET /admin/xpagesmanager1 404 in 67ms
+ GET /admin/utg_manager 404 in 63ms
+ ✓ Compiled in 4.4s (1607 modules)
+ GET /admin/xpagesmanager1 200 in 1439ms
+ GET /admin/utg_manager 200 in 1443ms
+ GET /admin/xpagesmanager1 200 in 97ms
+ GET /admin/utg_manager 200 in 87ms
+ GET /_next/static/chunks/app/(protected)/admin/layout.js 404 in 320ms
+ GET /_next/static/chunks/app/(protected)/admin/utg_manager/page.js 404 in 44ms
+ GET /_next/static/chunks/app/(protected)/admin/xpagesmanager1/page.js 404 in 265ms
+ GET /_next/static/chunks/app/(protected)/admin/layout.js 404 in 227ms

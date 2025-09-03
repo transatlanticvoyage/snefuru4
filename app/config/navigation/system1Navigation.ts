@@ -9,7 +9,7 @@ export interface NavItem {
 export const system1Navigation: NavItem[] = [
   {
     name: 'Voyager Site Table',
-    path: '/sitejar'
+    path: '/sitejar4'
   },
   {
     name: 'Andromeda Editor',
