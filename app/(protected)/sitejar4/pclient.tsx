@@ -909,6 +909,219 @@ export default function Sitejar4Client() {
         </button>
       </div>
 
+      {/* Sky Banner - Site Voyager */}
+      <div className="mb-4">
+        <div 
+          className="px-6 py-1"
+          style={{
+            backgroundColor: '#000000',
+            backgroundImage: `
+              radial-gradient(1px 1px at 50px 25px, #722F37, transparent),
+              radial-gradient(2px 2px at 120px 15px, #808080, transparent),
+              radial-gradient(1px 1px at 200px 35px, #FFD700, transparent),
+              radial-gradient(2px 2px at 80px 40px, #ADD8E6, transparent),
+              radial-gradient(1px 1px at 300px 20px, #722F37, transparent),
+              radial-gradient(3px 3px at 180px 10px, #808080, transparent),
+              radial-gradient(1px 1px at 400px 45px, #FFD700, transparent),
+              radial-gradient(2px 2px at 250px 30px, #ADD8E6, transparent),
+              radial-gradient(1px 1px at 500px 15px, #722F37, transparent),
+              radial-gradient(2px 2px at 350px 40px, #808080, transparent),
+              radial-gradient(4px 4px at 450px 25px, #FFD700, transparent),
+              radial-gradient(1px 1px at 600px 35px, #ADD8E6, transparent),
+              radial-gradient(2px 2px at 550px 10px, #722F37, transparent),
+              radial-gradient(1px 1px at 700px 20px, #808080, transparent),
+              radial-gradient(3px 3px at 650px 45px, #FFD700, transparent),
+              radial-gradient(1px 1px at 750px 30px, #ADD8E6, transparent),
+              radial-gradient(2px 2px at 800px 15px, #722F37, transparent),
+              radial-gradient(1px 1px at 900px 40px, #808080, transparent),
+              radial-gradient(2px 2px at 850px 25px, #FFD700, transparent),
+              radial-gradient(1px 1px at 950px 35px, #ADD8E6, transparent),
+              radial-gradient(3px 3px at 1000px 10px, #722F37, transparent),
+              radial-gradient(1px 1px at 1100px 45px, #808080, transparent),
+              radial-gradient(2px 2px at 1050px 20px, #FFD700, transparent),
+              radial-gradient(1px 1px at 1150px 30px, #ADD8E6, transparent),
+              radial-gradient(2px 2px at 1200px 15px, #722F37, transparent),
+              radial-gradient(1px 1px at 1250px 40px, #808080, transparent),
+              radial-gradient(3px 3px at 1300px 25px, #FFD700, transparent),
+              radial-gradient(1px 1px at 1350px 35px, #ADD8E6, transparent),
+              radial-gradient(2px 2px at 1400px 10px, #722F37, transparent),
+              radial-gradient(1px 1px at 30px 10px, #808080, transparent),
+              radial-gradient(2px 2px at 150px 50px, #FFD700, transparent),
+              radial-gradient(1px 1px at 270px 5px, #ADD8E6, transparent),
+              radial-gradient(3px 3px at 380px 15px, #722F37, transparent),
+              radial-gradient(1px 1px at 480px 35px, #808080, transparent),
+              radial-gradient(2px 2px at 580px 45px, #FFD700, transparent),
+              radial-gradient(1px 1px at 680px 5px, #ADD8E6, transparent),
+              radial-gradient(2px 2px at 780px 35px, #722F37, transparent),
+              radial-gradient(1px 1px at 880px 15px, #808080, transparent),
+              radial-gradient(3px 3px at 980px 45px, #FFD700, transparent),
+              radial-gradient(1px 1px at 1080px 25px, #ADD8E6, transparent),
+              radial-gradient(2px 2px at 1180px 5px, #722F37, transparent),
+              radial-gradient(1px 1px at 70px 48px, #FFD700, transparent),
+              radial-gradient(2px 2px at 220px 8px, #722F37, transparent),
+              radial-gradient(1px 1px at 340px 42px, #808080, transparent),
+              radial-gradient(2px 2px at 420px 5px, #ADD8E6, transparent),
+              radial-gradient(1px 1px at 520px 48px, #FFD700, transparent),
+              radial-gradient(3px 3px at 620px 18px, #722F37, transparent),
+              radial-gradient(1px 1px at 570px 28px, #722F37, transparent),
+              radial-gradient(3px 3px at 720px 48px, #FFD700, transparent),
+              radial-gradient(1px 1px at 820px 8px, #808080, transparent),
+              radial-gradient(2px 2px at 920px 32px, #ADD8E6, transparent),
+              radial-gradient(1px 1px at 1020px 48px, #722F37, transparent),
+              radial-gradient(2px 2px at 1120px 5px, #FFD700, transparent),
+              radial-gradient(1px 1px at 1270px 18px, #808080, transparent),
+              radial-gradient(3px 3px at 1380px 42px, #ADD8E6, transparent),
+              radial-gradient(1px 1px at 160px 28px, #722F37, transparent)
+            `,
+            backgroundSize: '100% 100%',
+            padding: '8px',
+            borderRadius: '4px'
+          }}
+        >
+          {/* Site Voyager Logo */}
+          <div 
+            className="bg-black rounded flex items-center"
+            style={{
+              width: '280px',
+              minHeight: '70px',
+              border: '1px solid red',
+              backgroundImage: `
+                radial-gradient(1px 1px at 25px 12px, #722F37, transparent),
+                radial-gradient(2px 2px at 65px 8px, #808080, transparent),
+                radial-gradient(1px 1px at 110px 18px, #FFD700, transparent),
+                radial-gradient(2px 2px at 35px 28px, #ADD8E6, transparent),
+                radial-gradient(1px 1px at 85px 35px, #722F37, transparent),
+                radial-gradient(3px 3px at 145px 15px, #808080, transparent),
+                radial-gradient(1px 1px at 55px 42px, #FFD700, transparent),
+                radial-gradient(2px 2px at 15px 38px, #ADD8E6, transparent),
+                radial-gradient(1px 1px at 125px 45px, #722F37, transparent),
+                radial-gradient(2px 2px at 75px 6px, #808080, transparent),
+                radial-gradient(4px 4px at 165px 25px, #FFD700, transparent),
+                radial-gradient(1px 1px at 45px 18px, #ADD8E6, transparent),
+                radial-gradient(2px 2px at 95px 48px, #722F37, transparent),
+                radial-gradient(1px 1px at 185px 35px, #808080, transparent),
+                radial-gradient(3px 3px at 155px 8px, #FFD700, transparent),
+                radial-gradient(1px 1px at 115px 28px, #ADD8E6, transparent),
+                radial-gradient(2px 2px at 175px 42px, #722F37, transparent),
+                radial-gradient(1px 1px at 5px 25px, #808080, transparent),
+                radial-gradient(2px 2px at 220px 10px, #808080, transparent),
+                radial-gradient(1px 1px at 250px 30px, #FFD700, transparent),
+                radial-gradient(2px 2px at 270px 40px, #ADD8E6, transparent)
+              `,
+              backgroundSize: '280px 70px',
+              padding: '8px'
+            }}
+          >
+            {/* Voyager Logo wrapper with minimal padding and left margin */}
+            <div 
+              style={{
+                width: '40px',
+                height: '40px',
+                padding: '2px',
+                marginLeft: '5px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {/* White Voyager Spacecraft Logo */}
+              <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Main body of spacecraft */}
+                <rect x="40" y="30" width="20" height="40" fill="white" rx="2"/>
+                
+                {/* Antenna dish */}
+                <circle cx="50" cy="20" r="8" fill="none" stroke="white" strokeWidth="2"/>
+                <circle cx="50" cy="20" r="4" fill="white"/>
+                
+                {/* Antenna mast */}
+                <line x1="50" y1="28" x2="50" y2="30" stroke="white" strokeWidth="2"/>
+                
+                {/* Solar panels - left */}
+                <rect x="15" y="35" width="20" height="30" fill="none" stroke="white" strokeWidth="1.5"/>
+                <line x1="20" y1="35" x2="20" y2="65" stroke="white" strokeWidth="0.5"/>
+                <line x1="25" y1="35" x2="25" y2="65" stroke="white" strokeWidth="0.5"/>
+                <line x1="30" y1="35" x2="30" y2="65" stroke="white" strokeWidth="0.5"/>
+                <line x1="15" y1="40" x2="35" y2="40" stroke="white" strokeWidth="0.5"/>
+                <line x1="15" y1="45" x2="35" y2="45" stroke="white" strokeWidth="0.5"/>
+                <line x1="15" y1="50" x2="35" y2="50" stroke="white" strokeWidth="0.5"/>
+                <line x1="15" y1="55" x2="35" y2="55" stroke="white" strokeWidth="0.5"/>
+                <line x1="15" y1="60" x2="35" y2="60" stroke="white" strokeWidth="0.5"/>
+                
+                {/* Solar panels - right */}
+                <rect x="65" y="35" width="20" height="30" fill="none" stroke="white" strokeWidth="1.5"/>
+                <line x1="70" y1="35" x2="70" y2="65" stroke="white" strokeWidth="0.5"/>
+                <line x1="75" y1="35" x2="75" y2="65" stroke="white" strokeWidth="0.5"/>
+                <line x1="80" y1="35" x2="80" y2="65" stroke="white" strokeWidth="0.5"/>
+                <line x1="65" y1="40" x2="85" y2="40" stroke="white" strokeWidth="0.5"/>
+                <line x1="65" y1="45" x2="85" y2="45" stroke="white" strokeWidth="0.5"/>
+                <line x1="65" y1="50" x2="85" y2="50" stroke="white" strokeWidth="0.5"/>
+                <line x1="65" y1="55" x2="85" y2="55" stroke="white" strokeWidth="0.5"/>
+                <line x1="65" y1="60" x2="85" y2="60" stroke="white" strokeWidth="0.5"/>
+                
+                {/* Connecting arms to solar panels */}
+                <line x1="35" y1="50" x2="40" y2="50" stroke="white" strokeWidth="2"/>
+                <line x1="60" y1="50" x2="65" y2="50" stroke="white" strokeWidth="2"/>
+                
+                {/* Engine/thruster */}
+                <circle cx="50" cy="75" r="4" fill="white"/>
+                <rect x="48" y="75" width="4" height="8" fill="white"/>
+                
+                {/* Small instruments */}
+                <rect x="42" y="35" width="3" height="3" fill="white"/>
+                <rect x="55" y="35" width="3" height="3" fill="white"/>
+                <rect x="42" y="60" width="3" height="3" fill="white"/>
+                <rect x="55" y="60" width="3" height="3" fill="white"/>
+              </svg>
+            </div>
+            
+            {/* Text wrapper with stacked layout */}
+            <div 
+              className="flex flex-col items-center justify-center"
+              style={{
+                flex: '1',
+                marginLeft: '-20px'
+              }}
+            >
+              {/* Tregnar text */}
+              <div 
+                style={{
+                  color: '#20b2aa',
+                  fontSize: '14px',
+                  lineHeight: '1',
+                  marginBottom: '2px'
+                }}
+              >
+                tregnar
+              </div>
+              
+              {/* Site Voyager Table text */}
+              <div 
+                className="text-white font-bold"
+                style={{
+                  fontSize: '20px',
+                  lineHeight: '1',
+                  marginBottom: '4px'
+                }}
+              >
+                Site Voyager Table
+              </div>
+              
+              {/* View Tutorials button */}
+              <a
+                href="/tutorials"
+                className="bg-orange-500 hover:bg-orange-600 text-white rounded px-2 py-1 transition-colors"
+                style={{
+                  fontSize: '14px',
+                  textDecoration: 'none'
+                }}
+              >
+                View Tutorials
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Delete notification */}
       {deleteNotification && (
         <div className={`mb-4 p-4 rounded-md ${

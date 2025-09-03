@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { formatDateForCreatedAt } from '@/app/utils/dateUtils';
+import GiraffeSiteButtonBox from './GiraffeSiteButtonBox';
 
 interface SitesprenRecord {
   // Existing sitespren fields
@@ -212,7 +213,7 @@ const getColumnDisplayName = (col: string): string => {
 
 // Helper function to determine database table and CSS class for a column
 const getColumnTableInfo = (col: string) => {
-  if (col === 'checkbox' || col === 'tool_buttons' || col === 'ph1') {
+  if (col === 'checkbox' || col === 'tool_buttons_icon_only' || col === 'tool_buttons_condensed' || col === 'tool_buttons' || col === 'ph1') {
     return { dbTableName: '-', dbTableClass: '' };
   } else if (col === 'domain_registrar_info') {
     return { dbTableName: '-', dbTableClass: '' };
@@ -243,10 +244,12 @@ const getColumnTableInfo = (col: string) => {
 // Define all columns in order (including action columns)
 const allColumns = [
   // Existing columns (unchanged order)
-  'checkbox',           // 1
-  'tool_buttons',       // 2
-  'ph1',               // 2.5 - placeholder column to prevent overlap
-  'id',                // 3
+  'checkbox',                 // 1
+  'tool_buttons_icon_only',   // 2 - New giraffe button column
+  'tool_buttons_condensed',   // 3 - New condensed buttons column
+  'tool_buttons',            // 4 - Original full buttons (renamed to tool_buttons_full)
+  'ph1',                     // 5 - placeholder column to prevent overlap
+  'id',                      // 6
   'created_at',        // 4
   'is_starred1',       // 5
   'sitespren_base',    // 6
@@ -407,11 +410,36 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   
   // Wolf options popup state
   const [isWolfOptionsOpen, setIsWolfOptionsOpen] = useState(false);
-  const [toolButtonsOptions, setToolButtonsOptions] = useState({
-    tool_buttons_full: false,
-    tool_buttons_condensed: false,
-    tool_buttons_icon_only: false
+  const [toolButtonsOptions, setToolButtonsOptions] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sitejar4-wolf-options');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    }
+    // Default values: all checked except tool_buttons (which should be unchecked)
+    return {
+      checkbox: true,
+      tool_buttons_icon_only: true,
+      tool_buttons_condensed: true,
+      tool_buttons: false, // This one is unchecked by default
+      ph1: true,
+      id: true,
+      sitespren_base: true,
+      is_starred1: true
+    };
   });
+  
+  // Save wolf options to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sitejar4-wolf-options', JSON.stringify(toolButtonsOptions));
+    }
+  }, [toolButtonsOptions]);
+
+  // Giraffe popup state
+  const [giraffePopupOpen, setGiraffePopupOpen] = useState<string | null>(null);
+  const [giraffePopupPosition, setGiraffePopupPosition] = useState({ top: 0, left: 0 });
   
   const [activeTab, setActiveTab] = useState('rtab1');
   const [sheafData, setSheafData] = useState<string>('');
@@ -499,14 +527,21 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   }, [filterTag, userInternalId]);
 
   // WolfExclusionBand - Sticky columns that are excluded from the column pagination system (memoized)
-  const wolfExclusionBandColumns = useMemo(() => [
-    'checkbox',           // Selection control
-    'tool_buttons',       // Site actions
-    'ph1',               // Placeholder column to prevent overlap
-    'id',                // Unique identifier
-    'sitespren_base',    // Domain name
-    'is_starred1'        // Quick status
-  ], []);
+  const wolfExclusionBandColumns = useMemo(() => {
+    const allWolfColumns = [
+      'checkbox',                 // Selection control
+      'tool_buttons_icon_only',   // Giraffe button
+      'tool_buttons_condensed',   // Condensed site actions
+      'tool_buttons',            // Full site actions
+      'ph1',                     // Placeholder column to prevent overlap
+      'id',                      // Unique identifier
+      'sitespren_base',          // Domain name
+      'is_starred1'              // Quick status
+    ];
+    
+    // Filter based on toolButtonsOptions - only show checked columns
+    return allWolfColumns.filter(column => toolButtonsOptions[column as keyof typeof toolButtonsOptions]);
+  }, [toolButtonsOptions]);
 
   // Paginated columns - exclude WolfExclusionBand columns (memoized)
   const paginatedColumns = useMemo(() => allColumns.filter(column => 
@@ -2443,9 +2478,11 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         columns: [
           // Basic site information
           { id: 'checkbox', name: 'checkbox', type: 'checkbox', width: '60px', group: 'controls', visible: true, order: 1 },
-          { id: 'tool_buttons', name: 'tool_buttons', type: 'actions', width: '320px', group: 'controls', visible: true, order: 2 },
-          { id: 'ph1', name: 'ph1', type: 'placeholder', width: '30px', group: 'controls', visible: true, order: 3 },
-          { id: 'id', name: 'id', type: 'uuid', readOnly: true, width: '80px', group: 'sitespren', visible: true, order: 4 },
+          { id: 'tool_buttons_icon_only', name: 'tool_buttons_icon_only', type: 'actions', width: '80px', group: 'controls', visible: true, order: 2 },
+          { id: 'tool_buttons_condensed', name: 'tool_buttons_condensed', type: 'actions', width: '200px', group: 'controls', visible: true, order: 3 },
+          { id: 'tool_buttons', name: 'tool_buttons', type: 'actions', width: '320px', group: 'controls', visible: true, order: 4 },
+          { id: 'ph1', name: 'ph1', type: 'placeholder', width: '30px', group: 'controls', visible: true, order: 5 },
+          { id: 'id', name: 'id', type: 'uuid', readOnly: true, width: '80px', group: 'sitespren', visible: true, order: 6 },
           { id: 'sitespren_base', name: 'sitespren_base', type: 'text', width: '200px', group: 'sitespren', visible: true, order: 5 },
           { id: 'is_starred1', name: 'is_starred1', type: 'boolean', width: '80px', group: 'sitespren', visible: true, order: 6 },
           { id: 'ns_full', name: 'ns_full', type: 'text', width: '150px', group: 'sitespren', visible: true, order: 7 },
@@ -2488,6 +2525,8 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
 # Generated on ${new Date().toISOString()}
 
 checkbox
+tool_buttons_icon_only
+tool_buttons_condensed
 tool_buttons  
 ph1
 id
@@ -2623,7 +2662,7 @@ ${columnNames.join('\n')}`;
                 paddingBottom: '10px'
               }}
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                 <path d="M1 4v6h6" />
                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
               </svg>
@@ -2676,7 +2715,7 @@ ${columnNames.join('\n')}`;
                 paddingBottom: '10px'
               }}
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                 <path d="M23 4v6h-6" />
                 <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
               </svg>
@@ -2822,7 +2861,7 @@ ${columnNames.join('\n')}`;
             className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
             style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
           >
-            <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <path d="M1 4v6h6" />
               <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
             </svg>
@@ -2857,7 +2896,7 @@ ${columnNames.join('\n')}`;
             className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
             style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
           >
-            <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <path d="M23 4v6h-6" />
               <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
             </svg>
@@ -3026,9 +3065,6 @@ ${columnNames.join('\n')}`;
       {/* Selection controls and results count */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-600">
-            Showing {paginatedData.length} of {sortedData.length} results
-          </div>
           {selectedSites.size > 0 && (
             <div className="text-sm text-blue-600 font-medium">
               {selectedSites.size} site(s) selected
@@ -3084,8 +3120,11 @@ ${columnNames.join('\n')}`;
                 <tbody>
                   <tr>
                     <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        row pagination
+                      <div style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <span style={{ fontWeight: 'bold' }}>row pagination</span>
+                        <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
+                          Showing <span style={{ fontWeight: 'bold' }}>{paginatedData.length}</span> of <span style={{ fontWeight: 'bold' }}>{sortedData.length}</span> results
+                        </span>
                       </div>
                     </td>
                     <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
@@ -3104,8 +3143,11 @@ ${columnNames.join('\n')}`;
                       </div>
                     </td>
                     <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        column pagination
+                      <div style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <span style={{ fontWeight: 'bold' }}>column pagination</span>
+                        <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
+                          Showing <span style={{ fontWeight: 'bold' }}>{Math.min(columnsPerPage, paginatedColumns.length - ((currentColumnPage - 1) * columnsPerPage))}</span> non-sticky(non wolf band) columns of <span style={{ fontWeight: 'bold' }}>{allColumns.length}</span> sourcedef columns
+                        </span>
                       </div>
                     </td>
                   </tr>
@@ -3182,7 +3224,7 @@ ${columnNames.join('\n')}`;
                   // Fixed: Calculate proper left position based on actual column widths
                   const getStickyLeftPosition = (idx: number) => {
                     if (idx === 0) return 0;
-                    const widths = { checkbox: 60, tool_buttons: 320, ph1: 30, id: 80, sitespren_base: 200, is_starred1: 80 };
+                    const widths = { checkbox: 60, tool_buttons_icon_only: 80, tool_buttons_condensed: 200, tool_buttons: 320, ph1: 30, id: 80, sitespren_base: 200, is_starred1: 80 };
                     let totalWidth = 0;
                     for (let i = 0; i < idx; i++) {
                       const col = visibleColumns[i];
@@ -3199,7 +3241,7 @@ ${columnNames.join('\n')}`;
                   return (
                     <th
                       key={`table-name-${col}`}
-                      className={`${col === 'checkbox' || col === 'tool_buttons' || col === 'ph1' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} ${dbTableClass}`}
+                      className={`${col === 'checkbox' || col === 'tool_buttons_icon_only' || col === 'tool_buttons_condensed' || col === 'tool_buttons' || col === 'ph1' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} ${dbTableClass}`}
                       style={{
                         ...(isSticky ? { left: leftPosition } : {}),
                         // Let CSS handle backgroundColor for database table name row - shenfur CSS will set the colors
@@ -3247,7 +3289,7 @@ ${columnNames.join('\n')}`;
                   // Fixed: Calculate proper left position based on actual column widths
                   const getStickyLeftPosition = (idx: number) => {
                     if (idx === 0) return 0;
-                    const widths = { checkbox: 60, tool_buttons: 320, ph1: 30, id: 80, sitespren_base: 200, is_starred1: 80 };
+                    const widths = { checkbox: 60, tool_buttons_icon_only: 80, tool_buttons_condensed: 200, tool_buttons: 320, ph1: 30, id: 80, sitespren_base: 200, is_starred1: 80 };
                     let totalWidth = 0;
                     for (let i = 0; i < idx; i++) {
                       const col = visibleColumns[i];
@@ -3306,6 +3348,14 @@ ${columnNames.join('\n')}`;
                           style={{ width: '26px', height: '26px' }}
                           onClick={(e) => e.stopPropagation()}
                         />
+                      ) : col === 'tool_buttons_icon_only' ? (
+                        <div className="text-center">
+                          <div className="text-xs text-gray-400">-</div>
+                        </div>
+                      ) : col === 'tool_buttons_condensed' ? (
+                        <div className="text-center text-xs font-medium text-gray-700">
+                          tool_buttons_condensed
+                        </div>
                       ) : col === 'tool_buttons' ? (
                         'tool_buttons_full'
                       ) : col === 'ph1' ? (
@@ -3350,7 +3400,7 @@ ${columnNames.join('\n')}`;
                     // Fixed: Calculate proper left position based on actual column widths
                     const getStickyLeftPosition = (idx: number) => {
                       if (idx === 0) return 0;
-                      const widths = { checkbox: 60, tool_buttons: 320, ph1: 30, id: 80, sitespren_base: 200, is_starred1: 80 };
+                      const widths = { checkbox: 60, tool_buttons_icon_only: 80, tool_buttons_condensed: 200, tool_buttons: 320, ph1: 30, id: 80, sitespren_base: 200, is_starred1: 80 };
                       let totalWidth = 0;
                       for (let i = 0; i < idx; i++) {
                         const col = visibleColumns[i];
@@ -3410,6 +3460,110 @@ ${columnNames.join('\n')}`;
                             style={{ width: '26px', height: '26px' }}
                             onClick={(e) => e.stopPropagation()}
                           />
+                        ) : col === 'tool_buttons_icon_only' ? (
+                          <div className="relative">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                if (giraffePopupOpen === item.id) {
+                                  setGiraffePopupOpen(null);
+                                  return;
+                                }
+                                
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                const viewportWidth = window.innerWidth;
+                                const viewportHeight = window.innerHeight;
+                                const popupWidth = 400; // Approximate width of popup
+                                const popupHeight = 300; // Approximate height of popup
+                                
+                                // Position to the right of the button
+                                let left = rect.right + window.scrollX + 10;
+                                let top = rect.top + window.scrollY;
+                                
+                                // Adjust if popup would go off-screen to the right
+                                if (left + popupWidth > viewportWidth + window.scrollX) {
+                                  left = rect.left + window.scrollX - popupWidth - 10; // Show to the left instead
+                                }
+                                
+                                // Adjust if popup would go off-screen vertically
+                                if (top + popupHeight > viewportHeight + window.scrollY) {
+                                  top = viewportHeight + window.scrollY - popupHeight - 20;
+                                }
+                                
+                                // Ensure minimum positions
+                                if (left < 20) {
+                                  left = 20;
+                                }
+                                if (top < 20) {
+                                  top = 20;
+                                }
+                                
+                                setGiraffePopupPosition({
+                                  top: top,
+                                  left: left
+                                });
+                                setGiraffePopupOpen(item.id);
+                                
+                                console.log('Giraffe popup opened for:', item.id, 'Position:', {
+                                  top: top,
+                                  left: left,
+                                  buttonRect: rect
+                                });
+                              }}
+                              className="inline-flex items-center justify-center w-full h-8 border border-transparent text-xs font-medium rounded text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                              title="Open Giraffe Tools"
+                            >
+                              <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="white">
+                                {/* Giraffe Icon */}
+                                <circle cx="12" cy="4" r="2" fill="white"/>
+                                <rect x="11" y="6" width="2" height="6" fill="white"/>
+                                <circle cx="8" cy="8" r="1.5" fill="white"/>
+                                <circle cx="16" cy="8" r="1.5" fill="white"/>
+                                <rect x="7" y="9" width="2" height="4" fill="white"/>
+                                <rect x="15" y="9" width="2" height="4" fill="white"/>
+                                <rect x="10" y="12" width="4" height="8" fill="white"/>
+                                <rect x="9" y="20" width="2" height="2" fill="white"/>
+                                <rect x="13" y="20" width="2" height="2" fill="white"/>
+                              </svg>
+                              giraffe
+                            </button>
+                          </div>
+                        ) : col === 'tool_buttons_condensed' ? (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => window.open(`https://${item.sitespren_base}/wp-admin/`, '_blank')}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                              title="Open WP Admin"
+                            >
+                              WP
+                            </button>
+                            <button
+                              onClick={() => window.open(`https://${item.sitespren_base}`, '_blank')}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                              title="Open Site"
+                            >
+                              Site
+                            </button>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(item.sitespren_base || '');
+                                // Optional: You could add a toast notification here
+                              }}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                              title="Copy domain to clipboard"
+                            >
+                              📋
+                            </button>
+                            <button
+                              onClick={() => window.open(`https://www.google.com/search?q=site%3A${encodeURIComponent(item.sitespren_base || '')}`, '_blank')}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                              title="Google site: search"
+                            >
+                              G
+                            </button>
+                          </div>
                         ) : col === 'tool_buttons' ? (
                           <div className="flex items-center gap-1">
                             <Link
@@ -4985,16 +5139,32 @@ ${columnNames.join('\n')}`;
               <div className="flex items-center">
                 <input
                   type="checkbox"
-                  id="tool_buttons_full"
-                  checked={toolButtonsOptions.tool_buttons_full}
+                  id="checkbox"
+                  checked={toolButtonsOptions.checkbox}
                   onChange={(e) => setToolButtonsOptions(prev => ({
                     ...prev,
-                    tool_buttons_full: e.target.checked
+                    checkbox: e.target.checked
                   }))}
                   className="mr-3"
                 />
-                <label htmlFor="tool_buttons_full" className="text-sm font-medium text-gray-700">
-                  tool_buttons_full
+                <label htmlFor="checkbox" className="text-sm font-medium text-gray-700">
+                  checkbox
+                </label>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="tool_buttons_icon_only"
+                  checked={toolButtonsOptions.tool_buttons_icon_only}
+                  onChange={(e) => setToolButtonsOptions(prev => ({
+                    ...prev,
+                    tool_buttons_icon_only: e.target.checked
+                  }))}
+                  className="mr-3"
+                />
+                <label htmlFor="tool_buttons_icon_only" className="text-sm font-medium text-gray-700">
+                  tool_buttons_icon_only
                 </label>
               </div>
               
@@ -5017,22 +5187,141 @@ ${columnNames.join('\n')}`;
               <div className="flex items-center">
                 <input
                   type="checkbox"
-                  id="tool_buttons_icon_only"
-                  checked={toolButtonsOptions.tool_buttons_icon_only}
+                  id="tool_buttons"
+                  checked={toolButtonsOptions.tool_buttons}
                   onChange={(e) => setToolButtonsOptions(prev => ({
                     ...prev,
-                    tool_buttons_icon_only: e.target.checked
+                    tool_buttons: e.target.checked
                   }))}
                   className="mr-3"
                 />
-                <label htmlFor="tool_buttons_icon_only" className="text-sm font-medium text-gray-700">
-                  tool_buttons_icon_only
+                <label htmlFor="tool_buttons" className="text-sm font-medium text-gray-700">
+                  tool_buttons
+                </label>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="ph1"
+                  checked={toolButtonsOptions.ph1}
+                  onChange={(e) => setToolButtonsOptions(prev => ({
+                    ...prev,
+                    ph1: e.target.checked
+                  }))}
+                  className="mr-3"
+                />
+                <label htmlFor="ph1" className="text-sm font-medium text-gray-700">
+                  ph1
+                </label>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="id"
+                  checked={toolButtonsOptions.id}
+                  onChange={(e) => setToolButtonsOptions(prev => ({
+                    ...prev,
+                    id: e.target.checked
+                  }))}
+                  className="mr-3"
+                />
+                <label htmlFor="id" className="text-sm font-medium text-gray-700">
+                  id
+                </label>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="sitespren_base"
+                  checked={toolButtonsOptions.sitespren_base}
+                  onChange={(e) => setToolButtonsOptions(prev => ({
+                    ...prev,
+                    sitespren_base: e.target.checked
+                  }))}
+                  className="mr-3"
+                />
+                <label htmlFor="sitespren_base" className="text-sm font-medium text-gray-700">
+                  sitespren_base
+                </label>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_starred1"
+                  checked={toolButtonsOptions.is_starred1}
+                  onChange={(e) => setToolButtonsOptions(prev => ({
+                    ...prev,
+                    is_starred1: e.target.checked
+                  }))}
+                  className="mr-3"
+                />
+                <label htmlFor="is_starred1" className="text-sm font-medium text-gray-700">
+                  is_starred1
                 </label>
               </div>
             </div>
           </div>
         </div>
       </div>
+    )}
+
+    {/* Giraffe Popup - Positioned outside table structure */}
+    {giraffePopupOpen && (
+      <>
+        {/* Backdrop overlay */}
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-10"
+          style={{ zIndex: 999999 }}
+          onClick={() => setGiraffePopupOpen(null)}
+        />
+        
+        {/* Popup container with very high z-index */}
+        <div 
+          className="fixed bg-white rounded-lg shadow-2xl border border-gray-300"
+          style={{
+            zIndex: 9999999,
+            top: giraffePopupPosition.top + 'px',
+            left: giraffePopupPosition.left + 'px',
+            maxWidth: '400px'
+          }}
+        >
+          {/* Callout arrow pointing to the button */}
+          <div 
+            className="absolute w-4 h-4 bg-white border-l border-t border-gray-300 transform rotate-45"
+            style={{
+              top: '20px',
+              left: '-8px',
+              zIndex: 10000000
+            }}
+          ></div>
+          
+          {/* Debug indicator */}
+          <div className="absolute -top-8 left-0 bg-green-500 text-white px-2 py-1 text-xs rounded z-50">
+            POPUP FIXED - No margin
+          </div>
+          
+          <GiraffeSiteButtonBox 
+            sitesprenBase={data.find(item => item.id === giraffePopupOpen)?.sitespren_base || ''}
+            siteId={giraffePopupOpen}
+            onClose={() => setGiraffePopupOpen(null)}
+            onScrapeLinks={handleScrapeLinksFromHomepage}
+            onEditSite={(siteData) => {
+              const item = data.find(item => item.id === giraffePopupOpen);
+              if (item) {
+                setEditFormData(item);
+                setEditPopupOpen(item.id);
+                fetchHostAccountsForPopup();
+              }
+            }}
+            onToggleExpandedRow={toggleExpandedRow}
+            isScrapingLinks={giraffePopupOpen ? scrapingLinks.has(giraffePopupOpen) : false}
+          />
+        </div>
+      </>
     )}
 
     </div>
