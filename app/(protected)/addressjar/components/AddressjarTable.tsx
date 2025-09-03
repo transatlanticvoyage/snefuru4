@@ -11,6 +11,11 @@ const NubraTablefaceKite = dynamic(
   { ssr: false }
 );
 
+const AddressEntitiesRocketChamber = dynamic(
+  () => import('./AddressEntitiesRocketChamber'),
+  { ssr: false }
+);
+
 interface AddressData {
   // addresspren fields
   addresspren_id: number;
@@ -83,13 +88,15 @@ interface AddressjarTableProps {
   useColumnFiltering?: boolean;
   filteredColumns?: string[];
   wolfExclusionBandColumns?: string[];
+  onPillarShiftClick?: () => void;
 }
 
 export default function AddressjarTable({ 
   onColumnPaginationRender,
   useColumnFiltering = false,
   filteredColumns = [],
-  wolfExclusionBandColumns = []
+  wolfExclusionBandColumns = [],
+  onPillarShiftClick
 }: AddressjarTableProps) {
   const { user } = useAuth();
   const [data, setData] = useState<AddressData[]>([]);
@@ -108,6 +115,12 @@ export default function AddressjarTable({
   
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [rocketPaginationControls, setRocketPaginationControls] = useState<{
+    RowPaginationBar1: () => JSX.Element | null;
+    RowPaginationBar2: () => JSX.Element | null;
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  } | null>(null);
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
@@ -1506,38 +1519,55 @@ export default function AddressjarTable({
     );
   }
 
+  const handlePillarShiftClick = () => {
+    // Call the parent's PillarShift handler
+    if (onPillarShiftClick) {
+      onPillarShiftClick();
+    } else {
+      console.log('PillarShift clicked from rocket chamber - no handler provided');
+    }
+  };
+
+  const handleAddressOptionsClick = () => {
+    console.log('Address options clicked from rocket chamber');
+  };
+
   return (
     <div className="w-full">
-      {/* Top Header Area */}
-      <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
+      {/* Address Entities Rocket Chamber */}
+      <AddressEntitiesRocketChamber
+        data={data}
+        onPaginationRender={setRocketPaginationControls}
+        searchValue={searchTerm}
+        onSearchChange={(value) => {
+          setSearchTerm(value);
+          setCurrentPage(1);
+        }}
+        onPillarShiftClick={handlePillarShiftClick}
+        onAddressOptionsClick={handleAddressOptionsClick}
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        onPageChange={setCurrentPage}
+        onItemsPerPageChange={(value) => {
+          setItemsPerPage(value);
+          setCurrentPage(1);
+        }}
+        columnsPerPage={columnsPerPage}
+        currentColumnPage={currentColumnPage}
+        onColumnPageChange={setCurrentColumnPage}
+        onColumnsPerPageChange={(value) => {
+          setColumnsPerPage(value);
+          setCurrentColumnPage(1);
+        }}
+      />
+      {/* Original Header Area - Hidden but kept for NubraTablefaceKite */}
+      <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0" style={{ display: 'none' }}>
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-6">
             <NubraTablefaceKite tableType="addresspren-addressglub-join" />
             <div className="text-sm text-gray-600">
               {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} addresses
               {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
-            </div>
-            <PaginationControls />
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search all fields..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
-              />
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setCurrentPage(1);
-                }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
-              >
-                CL
-              </button>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -1800,15 +1830,36 @@ export default function AddressjarTable({
         </div>
       </div>
 
-      {/* Bottom Pagination */}
+      {/* Bottom Pagination - Now showing rocket chamber controls */}
       <div className="bg-white border-t border-gray-200 px-4 py-2">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-6">
+            <NubraTablefaceKite tableType="addresspren-addressglub-join" />
             <div className="text-sm text-gray-600">
               {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} addresses
               {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
             </div>
-            <PaginationControls />
+            {rocketPaginationControls && (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  {rocketPaginationControls.RowPaginationBar1()}
+                  {rocketPaginationControls.RowPaginationBar2()}
+                </div>
+                <div className="border-l border-gray-300 h-8 mx-4"></div>
+                <div className="flex items-center space-x-2">
+                  {rocketPaginationControls.ColumnPaginationBar1()}
+                  {rocketPaginationControls.ColumnPaginationBar2()}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={createNewRecordInline}
+              className="bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+            >
+              Create New (Inline)
+            </button>
           </div>
         </div>
       </div>

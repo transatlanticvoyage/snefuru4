@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import HostEntitiesRocketChamber from './HostEntitiesRocketChamber';
 
 interface HostCompany {
   id: string;
@@ -63,12 +64,18 @@ interface HostAccountsUITableV2Props {
   data: HostAccountRecord[];
   userId: string;
   onDataChange?: () => void;
+  onPaginationRender?: (controls: {
+    HostRowPaginationBar1: () => JSX.Element | null;
+    HostRowPaginationBar2: () => JSX.Element | null;
+    HostColumnPaginationBar1: () => JSX.Element | null;
+    HostColumnPaginationBar2: () => JSX.Element | null;
+  }) => void;
 }
 
 type SortField = keyof HostAccountRecord;
 type SortOrder = 'asc' | 'desc';
 
-export default function HostAccountsUITableV2({ data, onDataChange }: HostAccountsUITableV2Props) {
+export default function HostAccountsUITableV2({ data, onDataChange, onPaginationRender }: HostAccountsUITableV2Props) {
   const supabase = createClientComponentClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,6 +97,33 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   const [createPlanError, setCreatePlanError] = useState<string | null>(null);
   const [isCreatingPanel, setIsCreatingPanel] = useState(false);
   const [createPanelError, setCreatePanelError] = useState<string | null>(null);
+
+  // Rocket chamber search state (separate from main search)
+  const [rocketSearchTerm, setRocketSearchTerm] = useState('');
+
+  // Handle rocket chamber pagination render callback
+  const handleRocketPaginationRender = useCallback((controls: {
+    HostRowPaginationBar1: () => JSX.Element | null;
+    HostRowPaginationBar2: () => JSX.Element | null;
+    HostColumnPaginationBar1: () => JSX.Element | null;
+    HostColumnPaginationBar2: () => JSX.Element | null;
+  }) => {
+    if (onPaginationRender) {
+      onPaginationRender(controls);
+    }
+  }, [onPaginationRender]);
+
+  // Handle host options button click
+  const handleHostOptions = useCallback(() => {
+    console.log('Host options clicked');
+    // TODO: Implement host options modal
+  }, []);
+
+  // Handle host management button click
+  const handleHostManagement = useCallback(() => {
+    console.log('Host management clicked');
+    // TODO: Implement host management modal
+  }, []);
 
   // Filter and search logic
   const filteredData = useMemo(() => {
@@ -636,9 +670,9 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   };
 
   return (
-    <div className="space-y-4">
+    <div>
       {/* Search */}
-      <div className="bg-white p-4 rounded-lg shadow">
+      <div className="bg-white p-4 rounded-lg shadow" style={{ marginTop: '1rem' }}>
         <div className="flex items-center space-x-4">
           <input
             type="text"
@@ -654,12 +688,12 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
       </div>
 
       {/* Results count */}
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-gray-600" style={{ marginTop: '1rem' }}>
         Showing {paginatedData.length} of {sortedData.length} results
       </div>
 
       {/* Create New Host Account Button */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" style={{ marginTop: '1rem' }}>
         <button
           className={`px-6 py-3 rounded-md font-medium ${
             selectedCompanies.size === 1
@@ -681,7 +715,7 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
 
       {/* Create Account Error Display */}
       {createAccountError && (
-        <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md">
+        <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md" style={{ marginTop: '1rem' }}>
           Error: {createAccountError}
         </div>
       )}
@@ -709,7 +743,7 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
 
       {/* Create Plan Error Display */}
       {createPlanError && (
-        <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md">
+        <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md" style={{ marginTop: '1rem' }}>
           Error: {createPlanError}
         </div>
       )}
@@ -737,13 +771,29 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
 
       {/* Create Panel Error Display */}
       {createPanelError && (
-        <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md">
+        <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md" style={{ marginTop: '1rem' }}>
           Error: {createPanelError}
         </div>
       )}
 
+      {/* Host Entities Rocket Chamber */}
+      <HostEntitiesRocketChamber
+        data={data}
+        onPaginationRender={handleRocketPaginationRender}
+        searchValue={rocketSearchTerm}
+        onSearchChange={setRocketSearchTerm}
+        onHostOptionsClick={handleHostOptions}
+        onHostManagementClick={handleHostManagement}
+      />
       {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white shadow overflow-hidden" style={{ 
+        borderBottomLeftRadius: '0.5rem',
+        borderBottomRightRadius: '0.5rem',
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
+        borderTop: 'none',
+        marginTop: 0
+      }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
             <thead className="bg-gray-50">

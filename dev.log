@@ -5627,3 +5627,104 @@ Import trace for requested module:
  GET /_next/static/chunks/app/(protected)/admin/utg_manager/page.js 404 in 44ms
  GET /_next/static/chunks/app/(protected)/admin/xpagesmanager1/page.js 404 in 265ms
  GET /_next/static/chunks/app/(protected)/admin/layout.js 404 in 227ms
+ ✓ Compiled in 3.3s (799 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/50f81a3b81382ac5.webpack.hot-update.json 404 in 91ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/xpagesmanager1 404 in 173ms
+ GET /_next/static/webpack/50f81a3b81382ac5.webpack.hot-update.json 404 in 97ms
+ GET /admin/utg_manager 200 in 108ms
+ GET /admin/utg_manager 404 in 200ms
+ GET /admin/xpagesmanager1 404 in 157ms
+ GET /admin/utg_manager 404 in 130ms
+ ○ Compiling /icon.png ...
+ ✓ Compiled /icon.png in 516ms (824 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 1056ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 17ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/5.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/5.pack.gz'
+ ✓ Compiled in 2.8s (799 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/f0e158ae61585f16.webpack.hot-update.json 404 in 207ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/utg_manager 200 in 158ms
+ GET /admin/xpagesmanager1 404 in 338ms
+ GET /admin/utg_manager 404 in 362ms
+ GET /_next/static/webpack/f0e158ae61585f16.webpack.hot-update.json 404 in 156ms
+ GET /admin/xpagesmanager1 404 in 185ms
+ GET /admin/utg_manager 404 in 188ms
+ GET /icon.png?2209c3ca9768d2f0 404 in 616ms
+ GET /icon.png?2209c3ca9768d2f0 404 in 53ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 2.9s (799 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/7aafca77c2ac3001.webpack.hot-update.json 404 in 80ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/utg_manager 404 in 181ms
+ GET /admin/xpagesmanager1 404 in 179ms
+ GET /_next/static/webpack/7aafca77c2ac3001.webpack.hot-update.json 404 in 75ms
+ GET /admin/utg_manager 404 in 176ms
+ GET /admin/xpagesmanager1 404 in 171ms
+ ✓ Compiled in 2.8s (799 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/b08064a07ef9eb37.webpack.hot-update.json 404 in 103ms
+ GET /admin/utg_manager 200 in 76ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/utg_manager 404 in 172ms
+ GET /admin/xpagesmanager1 404 in 193ms
+ GET /_next/static/webpack/b08064a07ef9eb37.webpack.hot-update.json 404 in 116ms
+ GET /admin/utg_manager 404 in 174ms
+ GET /admin/xpagesmanager1 404 in 155ms
+ ✓ Compiled in 2.8s (799 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/80a24e1777aa9d2e.webpack.hot-update.json 404 in 78ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/utg_manager 404 in 195ms
+ GET /admin/xpagesmanager1 404 in 200ms
+ GET /_next/static/webpack/80a24e1777aa9d2e.webpack.hot-update.json 404 in 107ms
+ GET /admin/utg_manager 404 in 206ms
+ GET /admin/xpagesmanager1 404 in 199ms
+ ✓ Compiled in 3.4s (799 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/339bd95a0c0c1a2e.webpack.hot-update.json 404 in 124ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/xpagesmanager1 404 in 388ms
+ GET /admin/utg_manager 404 in 399ms
+ GET /_next/static/webpack/339bd95a0c0c1a2e.webpack.hot-update.json 404 in 209ms
+ GET /admin/utg_manager 404 in 152ms
+ GET /admin/xpagesmanager1 404 in 222ms
+ ✓ Compiled in 3.2s (799 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/339bd95a0c0c1a2e.webpack.hot-update.json 404 in 92ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/utg_manager 200 in 99ms
+ GET /admin/xpagesmanager1 404 in 184ms
+ GET /admin/utg_manager 404 in 199ms
+ GET /_next/static/webpack/339bd95a0c0c1a2e.webpack.hot-update.json 404 in 104ms
+ GET /admin/xpagesmanager1 404 in 121ms
+ GET /admin/utg_manager 404 in 140ms
+ ✓ Compiled in 2.5s (799 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/b6f2d117b8e4ec26.webpack.hot-update.json 404 in 77ms
+ GET /admin/xpagesmanager1 200 in 62ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/utg_manager 404 in 151ms
+ GET /admin/xpagesmanager1 404 in 158ms
+ GET /_next/static/webpack/b6f2d117b8e4ec26.webpack.hot-update.json 404 in 82ms
+ GET /admin/xpagesmanager1 404 in 120ms
+ GET /admin/utg_manager 404 in 115ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 2.4s (799 modules)
+ GET /admin/xpagesmanager1 404 in 59ms
+ GET /admin/utg_manager 404 in 66ms
+ GET /admin/xpagesmanager1 404 in 82ms
+ GET /admin/utg_manager 404 in 80ms
+ ✓ Compiled in 2.3s (799 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/9fcfa883c0870df0.webpack.hot-update.json 404 in 72ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/xpagesmanager1 404 in 160ms
+ GET /admin/utg_manager 404 in 172ms
+ GET /_next/static/webpack/9fcfa883c0870df0.webpack.hot-update.json 404 in 63ms
+ GET /admin/utg_manager 404 in 124ms
+ GET /admin/xpagesmanager1 404 in 114ms
+[?25h

@@ -411,22 +411,9 @@ export default function AddressjarClient() {
               <strong>Address Constellation System</strong>
             </h1>
             
-            {/* PillarShift Column Template System Button */}
-            <button
-              onClick={() => {
-                setIsPillarShiftModalOpen(true);
-                fetchSheafData();
-                fetchMonolithData();
-                fetchColtempsData();
-              }}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors"
-            >
-              use the pillarshift coltemp system
-            </button>
-            
-            {/* Column System Selector - Either/Or Radio System */}
+            {/* Column System Selector - Compact Version */}
             <div className="flex items-center border border-gray-300 rounded-lg p-2 bg-gray-50">
-              <div className="flex items-center mr-4">
+              <div className="flex items-center">
                 <input
                   type="radio"
                   id="column-pagination"
@@ -442,17 +429,6 @@ export default function AddressjarClient() {
                 <label htmlFor="column-pagination" className="text-sm font-medium text-gray-700 mr-4">
                   Column Pagination
                 </label>
-                
-                {columnSystemMode === 'pagination' && columnPaginationControls && (
-                  <>
-                    <div className="flex items-center mr-2">
-                      {columnPaginationControls.ColumnPaginationBar1()}
-                    </div>
-                    <div className="flex items-center">
-                      {columnPaginationControls.ColumnPaginationBar2()}
-                    </div>
-                  </>
-                )}
               </div>
               
               <div className="border-l border-gray-300 h-8 mx-4"></div>
@@ -508,6 +484,12 @@ export default function AddressjarClient() {
           useColumnFiltering={columnSystemMode === 'coltemps'}
           filteredColumns={filteredColumns}
           wolfExclusionBandColumns={wolfExclusionBandColumns}
+          onPillarShiftClick={() => {
+            setIsPillarShiftModalOpen(true);
+            fetchSheafData();
+            fetchMonolithData();
+            fetchColtempsData();
+          }}
         />
       </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import HostAccountsUITableV2 from './components/HostAccountsUITableV2';
@@ -10,6 +10,15 @@ export default function Haccjar2Client() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
+  
+  // Pagination bars state (similar to sitejar4)
+  const [paginationBars, setPaginationBars] = useState<{
+    HostRowPaginationBar1: () => JSX.Element | null;
+    HostRowPaginationBar2: () => JSX.Element | null;
+    HostColumnPaginationBar1: () => JSX.Element | null;
+    HostColumnPaginationBar2: () => JSX.Element | null;
+  } | null>(null);
+  
   const { user } = useAuth();
   const supabase = createClientComponentClient();
 
@@ -61,6 +70,16 @@ export default function Haccjar2Client() {
 
     fetchHostAccountsData();
   }, [user?.id, supabase]);
+
+  // Handle pagination from HostAccountsUITableV2 (rocket chamber) - use useCallback to prevent infinite loop
+  const handleHostPaginationRender = useCallback((controls: {
+    HostRowPaginationBar1: () => JSX.Element | null;
+    HostRowPaginationBar2: () => JSX.Element | null;
+    HostColumnPaginationBar1: () => JSX.Element | null;
+    HostColumnPaginationBar2: () => JSX.Element | null;
+  }) => {
+    setPaginationBars(controls);
+  }, []);
 
   // Function to refetch data after any modifications
   const refetchHostAccountsData = async () => {
@@ -132,6 +151,7 @@ export default function Haccjar2Client() {
         data={hostAccountsData} 
         userId={user.id}
         onDataChange={refetchHostAccountsData}
+        onPaginationRender={handleHostPaginationRender}
       />
     </div>
   );
