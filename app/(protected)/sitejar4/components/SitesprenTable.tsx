@@ -104,7 +104,8 @@ type SortOrder = 'asc' | 'desc';
 // Define all columns in order (including action columns)
 const allColumns = [
   'checkbox',           // 1
-  'tool_buttons',       // 2  
+  'tool_buttons',       // 2
+  'ph1',               // 2.5 - placeholder column to prevent overlap
   'id',                // 3
   'created_at',        // 4
   'is_starred1',       // 5
@@ -260,7 +261,8 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   // WolfExclusionBand - Sticky columns that are excluded from pagination (memoized)
   const wolfExclusionBandColumns = useMemo(() => [
     'checkbox',           // Selection control
-    'tool_buttons',       // Site actions  
+    'tool_buttons',       // Site actions
+    'ph1',               // Placeholder column to prevent overlap
     'id',                // Unique identifier
     'sitespren_base',    // Domain name
     'is_starred1'        // Quick status
@@ -2684,7 +2686,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   // Fixed: Calculate proper left position based on actual column widths
                   const getStickyLeftPosition = (idx: number) => {
                     if (idx === 0) return 0;
-                    const widths = { checkbox: 60, tool_buttons: 180, id: 80, sitespren_base: 200, is_starred1: 80 };
+                    const widths = { checkbox: 60, tool_buttons: 320, ph1: 30, id: 80, sitespren_base: 200, is_starred1: 80 };
                     let totalWidth = 0;
                     for (let i = 0; i < idx; i++) {
                       const col = visibleColumns[i];
@@ -2697,7 +2699,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
 
                   // Determine database table name for this column
                   let dbTableName = "-";
-                  if (col === 'checkbox' || col === 'tool_buttons') {
+                  if (col === 'checkbox' || col === 'tool_buttons' || col === 'ph1') {
                     dbTableName = "-";
                   } else if (col === 'domain_registrar_info') {
                     dbTableName = "-"; // This doesn't correspond to a specific db column
@@ -2708,7 +2710,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   return (
                     <th
                       key={`table-name-${col}`}
-                      className={`${col === 'checkbox' || col === 'tool_buttons' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} for_db_table_sitespren`}
+                      className={`${col === 'checkbox' || col === 'tool_buttons' || col === 'ph1' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} for_db_table_sitespren`}
                       style={{
                         ...(isSticky ? { left: leftPosition } : {}),
                         // Let CSS handle backgroundColor for database table name row - shenfur CSS will set the colors
@@ -2723,6 +2725,11 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                           paddingBottom: '12px',
                           paddingLeft: '8px',
                           paddingRight: '8px'
+                        } : col === 'ph1' ? {
+                          paddingTop: '6px',
+                          paddingBottom: '6px',
+                          paddingLeft: '4px',
+                          paddingRight: '4px'
                         } : {})
                       }}
                     >
@@ -2730,7 +2737,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
                       )}
                       <span className="text-xs lowercase">
-                        {dbTableName}
+                        {col === 'ph1' ? 'ph1' : dbTableName}
                       </span>
                       {hasRightSeparator && (
                         <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
@@ -2751,7 +2758,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   // Fixed: Calculate proper left position based on actual column widths
                   const getStickyLeftPosition = (idx: number) => {
                     if (idx === 0) return 0;
-                    const widths = { checkbox: 60, tool_buttons: 180, id: 80, sitespren_base: 200, is_starred1: 80 };
+                    const widths = { checkbox: 60, tool_buttons: 320, ph1: 30, id: 80, sitespren_base: 200, is_starred1: 80 };
                     let totalWidth = 0;
                     for (let i = 0; i < idx; i++) {
                       const col = visibleColumns[i];
@@ -2765,14 +2772,14 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   return (
                     <th
                       key={col}
-                      className={`${col === 'checkbox' || col === 'tool_buttons' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} ${
+                      className={`${col === 'checkbox' || col === 'tool_buttons' || col === 'ph1' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} ${
                         ['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) 
                           ? 'cursor-pointer hover:brightness-95' 
                           : ''
                       } ${col === 'checkbox' ? 'cursor-pointer' : ''}`}
                       style={{
                         ...(isSticky ? { left: leftPosition } : {}),
-                        backgroundColor: col === 'checkbox' || col === 'tool_buttons' 
+                        backgroundColor: col === 'checkbox' || col === 'tool_buttons' || col === 'ph1'
                           ? '#e5e7eb' // gray-200 for action columns
                           : col === 'domain_registrar_info'
                           ? '#fbbf24' // amber-400 for domain registrar info column
@@ -2788,6 +2795,11 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                           paddingBottom: '12px',
                           paddingLeft: '8px',
                           paddingRight: '8px'
+                        } : col === 'ph1' ? {
+                          paddingTop: '6px',
+                          paddingBottom: '6px',
+                          paddingLeft: '4px',
+                          paddingRight: '4px'
                         } : {})
                       }}
                       onClick={col === 'checkbox' ? (isAllSelected ? handleClearAll : handleSelectAll) : 
@@ -2807,6 +2819,8 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         />
                       ) : col === 'tool_buttons' ? (
                         'tool_buttons'
+                      ) : col === 'ph1' ? (
+                        'ph1b'
                       ) : (
                         <>
                           {col === 'is_starred1' ? '•str1' : col === 'is_bulldozer' ? 'is_bulldozer' : col === 'is_competitor' ? 'is_competitor' : col === 'is_external' ? 'is_external' : col === 'is_internal' ? 'is_internal' : col === 'is_ppx' ? 'is_ppx' : col === 'is_ms' ? 'is_ms' : col === 'is_wayback_rebuild' ? 'wayback_rebuild' : col === 'is_naked_wp_build' ? 'naked_wp_build' : col === 'is_rnr' ? 'is_rnr' : col === 'is_aff' ? 'is_aff' : col === 'is_other1' ? 'is_other1' : col === 'is_other2' ? 'is_other2' : col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
@@ -2834,7 +2848,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                     // Fixed: Calculate proper left position based on actual column widths
                     const getStickyLeftPosition = (idx: number) => {
                       if (idx === 0) return 0;
-                      const widths = { checkbox: 60, tool_buttons: 180, id: 80, sitespren_base: 200, is_starred1: 80 };
+                      const widths = { checkbox: 60, tool_buttons: 320, ph1: 30, id: 80, sitespren_base: 200, is_starred1: 80 };
                       let totalWidth = 0;
                       for (let i = 0; i < idx; i++) {
                         const col = visibleColumns[i];
@@ -2850,8 +2864,8 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                       <td
                         key={col}
                         className={`text-sm text-gray-900 relative border-r border-gray-200 ${stickyClass} ${bgClass} ${
-                          col === 'checkbox' || col === 'tool_buttons' ? 'whitespace-nowrap' : ''
-                        } ${col === 'checkbox' ? 'cursor-pointer' : ''} ${col === 'checkbox' || col === 'tool_buttons' || col === 'is_starred1' || col === 'domain_registrar_info' ? '' : 'align-top'}`}
+                          col === 'checkbox' || col === 'tool_buttons' || col === 'ph1' ? 'whitespace-nowrap' : ''
+                        } ${col === 'checkbox' ? 'cursor-pointer' : ''} ${col === 'checkbox' || col === 'tool_buttons' || col === 'ph1' || col === 'is_starred1' || col === 'domain_registrar_info' ? '' : 'align-top'}`}
                         style={{
                           ...(isSticky ? { left: leftPosition } : {}),
                           verticalAlign: 'top'
@@ -2861,7 +2875,30 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         {hasLeftSeparator && (
                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
                         )}
-                        <div style={{ height: '48px', maxHeight: '48px', minHeight: '48px', overflow: 'hidden' }}>
+                        <div style={{ 
+                          height: '48px', 
+                          maxHeight: '48px', 
+                          minHeight: '48px', 
+                          overflow: 'hidden',
+                          ...(col === 'checkbox' ? { 
+                            paddingLeft: '10px', 
+                            paddingRight: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          } : col === 'tool_buttons' ? {
+                            paddingLeft: '8px',
+                            paddingRight: '8px',
+                            display: 'flex',
+                            alignItems: 'center'
+                          } : col === 'ph1' ? {
+                            paddingLeft: '4px',
+                            paddingRight: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          } : {})
+                        }}>
                         {col === 'checkbox' ? (
                           <input
                             type="checkbox"
@@ -2972,6 +3009,14 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                               IN
                             </Link>
                           </div>
+                        ) : col === 'ph1' ? (
+                          <span style={{ 
+                            padding: '4px 8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            height: '100%'
+                          }}>-</span>
                         ) : col === 'id' ? (
                           renderCopyableContent(`${item.id.substring(0, 3)}..`, col, '-', item.id)
                         ) : col === 'created_at' ? (

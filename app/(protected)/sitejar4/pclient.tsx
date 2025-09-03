@@ -2013,6 +2013,10 @@ http://www.drogs.com`}
                             checked={copperChamberVisible}
                             onChange={(e) => {
                               setCopperChamberVisible(e.target.checked);
+                              // Dispatch event to sync with bezel system
+                              window.dispatchEvent(new CustomEvent('copperChamberVisibilityChange', { 
+                                detail: { visible: e.target.checked } 
+                              }));
                             }}
                             className="sr-only peer"
                           />
