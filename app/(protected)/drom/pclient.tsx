@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DriggsmanTable from './components/DriggsmanTable';
@@ -64,6 +64,182 @@ export default function DriggsmanClient() {
   const [showVerificationColumn, setShowVerificationColumn] = useState(false);
   const [showCompetitorSites, setShowCompetitorSites] = useState(false);
   const [sitesCount, setSitesCount] = useState(0);
+  
+  // Rocket chamber search state
+  const [rocketSearchTerm, setRocketSearchTerm] = useState('');
+  
+  // Shared pagination state for both sky banner and rocket chamber
+  const [itemsPerPage, setItemsPerPage] = useState(100);
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Calculate total pages
+  const totalPages = Math.ceil(sitesCount / itemsPerPage);
+  const totalColumnPages = Math.ceil(100 / sitesPerView); // Using 100 as placeholder for total columns
+  
+  // Create separate components for the 4 pagination bars in rocket chamber (memoized for performance)
+  const RocketRowBar1 = useCallback(() => {
+    // Items per page selector - uses shared state
+    return (
+      <div className="flex items-center">
+        <span className="text-xs text-gray-600 mr-2">Rows/page:</span>
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          {[10, 20, 50, 100, 200, 500, -1].map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => {
+                setItemsPerPage(value);
+                setCurrentPage(1);
+              }}
+              className={`
+                px-2 py-2.5 text-sm font-medium border -mr-px cursor-pointer
+                ${value === 10 ? 'rounded-l' : ''}
+                ${value === -1 ? 'rounded-r' : ''}
+                ${(value === -1 && itemsPerPage === -1) || itemsPerPage === value
+                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }
+              `}
+              style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+            >
+              {value === -1 ? 'All' : value}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }, [itemsPerPage, setItemsPerPage, setCurrentPage]);
+  
+  const RocketRowBar2 = useCallback(() => {
+    // Page navigation - uses shared state
+    return (
+      <div className="flex items-center">
+        <span className="text-xs text-gray-600 mr-2">Page:</span>
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          <button
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            className={`
+              px-3 py-2 text-sm font-medium border rounded-l-md
+              ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100'}
+            `}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            ←
+          </button>
+          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+            const pageNum = i + 1;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`
+                  px-3 py-2 text-sm font-medium border border-l-0
+                  ${currentPage === pageNum ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}
+                `}
+                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+            className={`
+              px-3 py-2 text-sm font-medium border border-l-0 rounded-r-md
+              ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100'}
+            `}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            →
+          </button>
+        </div>
+      </div>
+    );
+  }, [currentPage, totalPages, setCurrentPage]);
+  
+  const RocketColumnBar1 = useCallback(() => {
+    // Sites per view selector - uses shared state
+    return (
+      <div className="flex items-center">
+        <span className="text-xs text-gray-600 mr-2">Sites/view:</span>
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          {[1, 2, 5, 10, 15, 20].map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => {
+                setSitesPerView(value);
+                setSpecColumnPage(1);
+              }}
+              className={`
+                px-2 py-2.5 text-sm font-medium border -mr-px cursor-pointer
+                ${value === 1 ? 'rounded-l' : ''}
+                ${value === 20 ? 'rounded-r' : ''}
+                ${sitesPerView === value
+                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }
+              `}
+              style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }, [sitesPerView, setSitesPerView, setSpecColumnPage]);
+  
+  const RocketColumnBar2 = useCallback(() => {
+    // Column page navigation - uses shared state
+    return (
+      <div className="flex items-center">
+        <span className="text-xs text-gray-600 mr-2">Col Page:</span>
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          <button
+            onClick={() => setSpecColumnPage(Math.max(1, specColumnPage - 1))}
+            disabled={specColumnPage === 1}
+            className={`
+              px-3 py-2 text-sm font-medium border rounded-l-md
+              ${specColumnPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100'}
+            `}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            ←
+          </button>
+          {Array.from({ length: Math.min(5, totalColumnPages) }, (_, i) => {
+            const pageNum = i + 1;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setSpecColumnPage(pageNum)}
+                className={`
+                  px-3 py-2 text-sm font-medium border border-l-0
+                  ${specColumnPage === pageNum ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}
+                `}
+                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setSpecColumnPage(Math.min(totalColumnPages, specColumnPage + 1))}
+            disabled={specColumnPage === totalColumnPages}
+            className={`
+              px-3 py-2 text-sm font-medium border border-l-0 rounded-r-md
+              ${specColumnPage === totalColumnPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100'}
+            `}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            →
+          </button>
+        </div>
+      </div>
+    );
+  }, [specColumnPage, totalColumnPages, setSpecColumnPage]);
 
   useEffect(() => {
     if (!user) {
@@ -354,6 +530,149 @@ export default function DriggsmanClient() {
         </div>
       )}
 
+      {/* Spider Chamber Section */}
+      <div 
+        className="w-full bg-gray-50 border border-black"
+        style={{
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          borderColor: 'black',
+          padding: '16px'
+        }}
+      >
+        <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '16px' }}>
+          spider_chamber
+        </div>
+
+        {/* Rocket Chamber Div - Contains the 4 pagination button bars */}
+        <div className="rocket_chamber_div" style={{ 
+          border: '1px solid black', 
+          padding: 0,
+          margin: 0,
+          position: 'relative'
+        }}>
+          <div style={{ 
+            position: 'absolute', 
+            top: '4px', 
+            left: '4px', 
+            fontSize: '16px', 
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <svg 
+              width="22" 
+              height="22" 
+              viewBox="0 0 24 24" 
+              fill="black"
+              style={{ transform: 'rotate(15deg)' }}
+            >
+              {/* Rocket body */}
+              <ellipse cx="12" cy="8" rx="3" ry="6" fill="black"/>
+              {/* Rocket nose cone */}
+              <path d="M12 2 L15 8 L9 8 Z" fill="black"/>
+              {/* Left fin */}
+              <path d="M9 12 L7 14 L9 16 Z" fill="black"/>
+              {/* Right fin */}
+              <path d="M15 12 L17 14 L15 16 Z" fill="black"/>
+              {/* Exhaust flames */}
+              <path d="M10 14 L9 18 L10.5 16 L12 20 L13.5 16 L15 18 L14 14 Z" fill="black"/>
+              {/* Window */}
+              <circle cx="12" cy="6" r="1" fill="white"/>
+            </svg>
+            rocket_chamber
+          </div>
+          <div style={{ marginTop: '24px', paddingTop: '4px', paddingBottom: 0, paddingLeft: '8px', paddingRight: '8px' }}>
+            <div className="flex items-end justify-between">
+              <div className="flex items-end space-x-8">
+                {/* Row pagination, search box, and column pagination table */}
+                <table style={{ borderCollapse: 'collapse' }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: 'bold' }}>row pagination</span>
+                          <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
+                            Showing <span style={{ fontWeight: 'bold' }}>{sitesCount}</span> of <span style={{ fontWeight: 'bold' }}>{sitesCount}</span> results
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                          search box 2
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                          wolf exclusion band
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                          column templates
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: 'bold' }}>column pagination</span>
+                          <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
+                            Showing <span style={{ fontWeight: 'bold' }}>{sitesPerView}</span> non-sticky(non wolf band) columns of <span style={{ fontWeight: 'bold' }}>100</span> sourcedef columns
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: '1px solid black', padding: '4px' }}>
+                        <div className="flex items-end space-x-4">
+                          {/* Row Pagination Controls - 2 bars */}
+                          <RocketRowBar1 />
+                          <RocketRowBar2 />
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px' }}>
+                        <div className="flex items-end">
+                          <input
+                            type="text"
+                            value={rocketSearchTerm}
+                            onChange={(e) => setRocketSearchTerm(e.target.value)}
+                            placeholder="Search sitespren_base..."
+                            className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm w-full"
+                          />
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px' }}>
+                        <button
+                          onClick={() => {/* No functionality */}}
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors"
+                        >
+                          wolf options
+                        </button>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px' }}>
+                        <button
+                          onClick={() => {/* No functionality */}}
+                          className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors"
+                        >
+                          use the pillarshift coltemp system
+                        </button>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px' }}>
+                        <div className="flex items-end space-x-4">
+                          {/* Column Pagination Controls - 2 bars */}
+                          <RocketColumnBar1 />
+                          <RocketColumnBar2 />
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content - Full Width DriggsmanTable */}
       <div className="flex-1 overflow-hidden">
         <DriggsmanTable 
@@ -369,6 +688,10 @@ export default function DriggsmanClient() {
           onSitesPerViewChange={setSitesPerView}
           specColumnPage={specColumnPage}
           onSpecColumnPageChange={setSpecColumnPage}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={setItemsPerPage}
+          currentPage={currentPage}
+          onCurrentPageChange={setCurrentPage}
         />
       </div>
     </div>

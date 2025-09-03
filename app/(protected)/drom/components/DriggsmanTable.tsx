@@ -213,6 +213,10 @@ interface DriggsmanTableProps {
   onSitesPerViewChange?: (count: number) => void;
   specColumnPage?: number;
   onSpecColumnPageChange?: (page: number) => void;
+  itemsPerPage?: number;
+  onItemsPerPageChange?: (count: number) => void;
+  currentPage?: number;
+  onCurrentPageChange?: (page: number) => void;
 }
 
 // Helper component for vacuum/zarpscrape cell display
@@ -362,15 +366,27 @@ export default function DriggsmanTable({
   sitesPerView = 1,
   onSitesPerViewChange,
   specColumnPage = 1,
-  onSpecColumnPageChange
+  onSpecColumnPageChange,
+  itemsPerPage: propsItemsPerPage = 100,
+  onItemsPerPageChange,
+  currentPage: propsCurrentPage = 1,
+  onCurrentPageChange
 }: DriggsmanTableProps) {
   const searchParams = useSearchParams();
   const [sites, setSites] = useState<SitesprenSite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(100);
+  
+  // Use props if callbacks are provided, otherwise use internal state
+  const [internalCurrentPage, setInternalCurrentPage] = useState(1);
+  const [internalItemsPerPage, setInternalItemsPerPage] = useState(100);
+  
+  const currentPage = onCurrentPageChange ? propsCurrentPage : internalCurrentPage;
+  const setCurrentPage = onCurrentPageChange || setInternalCurrentPage;
+  const itemsPerPage = onItemsPerPageChange ? propsItemsPerPage : internalItemsPerPage;
+  const setItemsPerPage = onItemsPerPageChange || setInternalItemsPerPage;
+  
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   
   // Column pagination for sites (connected to URL params via props)
