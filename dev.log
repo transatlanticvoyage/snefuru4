@@ -1595,3 +1595,1110 @@ Sample is_external values: [
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
  GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 124ms
+ ✓ Compiled in 3.3s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 66ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 18ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 15ms
+ ✓ Compiled in 2.6s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 26ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 25ms
+ ✓ Compiled in 3s (523 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2649ms
+ ✓ Compiled in 6s (1209 modules)
+ ○ Compiling /drom ...
+ ✓ Compiled /drom in 6.8s (1247 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 9333ms
+ GET /drom 200 in 9656ms
+ ✓ Compiled in 2.5s (540 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2282ms
+ ✓ Compiled in 2.2s (540 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 184ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 31ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 24ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 63ms
+ ○ Compiling /api/sitespren_tags ...
+ ✓ Compiled /api/sitespren_tags in 2.8s (1423 modules)
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 5778ms
+ ✓ Compiled in 2.8s (540 modules)
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 2857ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2858ms
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ ○ Compiling /_not-found ...
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 2375ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2315ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 2317ms
+ ✓ Compiled /_not-found in 2.7s (1410 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/322197b071985f8d.webpack.hot-update.json 404 in 3216ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 191ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 264ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 132ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 38ms
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 163ms
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 139ms
+ ✓ Compiled in 2.5s (540 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 62ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 66ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 76ms
+ ✓ Compiled in 2.5s (540 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 147ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 65ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 67ms
+ ✓ Compiled in 5.3s (1424 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 5068ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 107ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 107ms
+ ✓ Compiled in 2.3s (540 modules)
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 82ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 83ms
+ ✓ Compiled in 2.3s (540 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 49ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 49ms
+ ✓ Compiled in 2s (540 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 43ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 44ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1424ms (1565 modules)
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 692ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&fpop=open&ptab1=active 200 in 692ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show&fpop=open&ptab7=active 200 in 413ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 19ms
+ GET /icon.png?2209c3ca9768d2f0 404 in 1871ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 16ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 26ms
+ ✓ Compiled in 3s (783 modules)
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 71ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 72ms
+ ✓ Compiled in 2.5s (783 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 59ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 61ms
+ ✓ Compiled in 2.7s (783 modules)
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 61ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 62ms
+ ✓ Compiled in 2.6s (783 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 57ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 57ms
+ ✓ Compiled in 3.1s (1519 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 2941ms
+ ✓ Compiled in 2.9s (783 modules)
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 3056ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 48ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 44ms
+ ✓ Compiled in 2.6s (783 modules)
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 65ms
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 65ms
+ ✓ Compiled in 2.3s (783 modules)
+ GET /sitejar4?stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261&is_external=show 200 in 61ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 62ms
+ ○ Compiling /icon.png ...
+ ✓ Compiled /icon.png in 8.9s (1711 modules)
+ ✓ Compiled /_not-found in 357ms (929 modules)
+ ✓ Compiled in 2.5s (1712 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 3445ms
+ GET /drom?activefilterchamber=daylight&showtundrachamber=no&sitesperview=1&speccolumnpage=1 200 in 3446ms
+ ○ Compiling /_error ...
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 2428ms
+ ✓ Compiled /_error in 7.8s (1755 modules)
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=20d5bda9-7c1d-4a6e-8a29-105356cbda22 404 in 17859ms
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 404 in 14543ms
+ GET /icon.png?2209c3ca9768d2f0 404 in 17864ms
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 194ms
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 5395ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 23ms
+ ✓ Compiled /api/get_sitespren_data in 159ms (973 modules)
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz'
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 735ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+ ✓ Compiled /api/sitespren_tags in 139ms (975 modules)
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 363ms
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 441ms
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 120ms
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 633ms
+ ✓ Compiled in 2.3s (783 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 65ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 20ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 15ms
+ ✓ Compiled in 2.3s (783 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 30ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 21ms
+ ✓ Compiled in 2.9s (1535 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 123ms
+ ✓ Compiled in 2.6s (783 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 29ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 2.3s (783 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 30ms
+ ✓ Compiled in 2.5s (783 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 40ms
+ ✓ Compiled in 2.7s (1519 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 194ms
+ ✓ Compiled in 2.5s (783 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 34ms
+ ✓ Compiled in 2.1s (783 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 26ms
+ ✓ Compiled in 2.5s (783 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 33ms
+ ✓ Compiled in 5.1s (1519 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 2385ms
+ ✓ Compiled in 2.4s (783 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 36ms
+ ✓ Compiled in 2.3s (783 modules)
+ GET /sitejar4?is_external=show&stag=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 35ms
+ ✓ Compiled /icon.png in 146ms (752 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 296ms
+ ✓ Compiled in 2.4s (783 modules)
+ GET /sitejar4?is_external=show 200 in 64ms
+ ✓ Compiled in 2.6s (1519 modules)
+ GET /sitejar4?is_external=show 200 in 172ms
+ ✓ Compiled in 2.5s (783 modules)
+ GET /sitejar4?is_external=show 200 in 30ms
+ ✓ Compiled in 2.3s (783 modules)
+ GET /sitejar4?is_external=show 200 in 28ms
+ ✓ Compiled in 2.6s (783 modules)
+ GET /sitejar4?is_external=show 200 in 51ms
+ ✓ Compiled in 2.5s (783 modules)
+ GET /sitejar4?is_external=show 200 in 38ms
+ ✓ Compiled in 2.4s (783 modules)
+ GET /sitejar4?is_external=show 200 in 30ms
+ ✓ Compiled in 2.4s (783 modules)
+ GET /sitejar4?is_external=show 200 in 31ms
+ ✓ Compiled in 2.4s (783 modules)
+ GET /sitejar4?is_external=show 200 in 33ms
+ ✓ Compiled in 2.4s (783 modules)
+ GET /sitejar4?is_external=show 200 in 32ms
+ ✓ Compiled in 5.3s (1519 modules)
+ GET /sitejar4?is_external=show 200 in 86ms
+ ✓ Compiled in 5.3s (1519 modules)
+ GET /sitejar4?is_external=show 200 in 168ms
+ ✓ Compiled in 2.6s (783 modules)
+ GET /sitejar4?is_external=show 200 in 96ms
+ ✓ Compiled in 2.7s (783 modules)
+ GET /sitejar4?is_external=show 200 in 45ms
+ ✓ Compiled in 2.5s (1519 modules)
+ GET /sitejar4?is_external=show 200 in 68ms
+ ✓ Compiled in 5.5s (1519 modules)
+ ✓ Compiled in 2.5s (783 modules)
+ GET /sitejar4?is_external=show 200 in 2599ms
+ ✓ Compiled in 2.4s (783 modules)
+ GET /sitejar4?is_external=show 200 in 2378ms
+ GET /sitejar4?is_external=show 200 in 30ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 2.2s (783 modules)
+ GET /sitejar4?is_external=show 200 in 28ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 2.5s (783 modules)
+ GET /sitejar4?is_external=show 200 in 35ms
+ ✓ Compiled in 2.9s (1519 modules)
+ GET /sitejar4?is_external=show 200 in 2719ms
+ ✓ Compiled in 2.7s (783 modules)
+ GET /sitejar4?is_external=show 200 in 2373ms
+ ✓ Compiled in 2.4s (783 modules)
+ GET /sitejar4?is_external=show 200 in 35ms
+ ✓ Compiled in 2.6s (1519 modules)
+ GET /sitejar4?is_external=show 200 in 72ms
+ ✓ Compiled in 2.6s (783 modules)
+ GET /sitejar4?is_external=show 200 in 30ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 2.2s (783 modules)
+ GET /sitejar4?is_external=show 200 in 25ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/length code
+ GET /drom 200 in 157ms
+ ✓ Compiled /icon.png in 278ms (752 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 423ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 14ms
+ ✓ Compiled /api/sitespren_tags in 496ms (928 modules)
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 839ms
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 129ms
+ ○ Compiling /addressjar ...
+ ✓ Compiled /addressjar in 532ms (1709 modules)
+ GET /addressjar 200 in 800ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 29ms
+ ✓ Compiled /admin/utg_manager in 412ms (1729 modules)
+ GET /admin/utg_manager 200 in 736ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 41ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/length code
+ ✓ Compiled /_not-found in 306ms (758 modules)
+ GET /dashboard 404 in 459ms
+ ✓ Compiled /icon.png in 145ms (774 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 234ms
+ ✓ Compiled /admin/xpagesmanager1 in 455ms (1564 modules)
+ GET /admin/xpagesmanager1 200 in 730ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /icon.png?2209c3ca9768d2f0 200 in 35ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/length code
+ GET /admin/utg_manager 200 in 91ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 34ms
+ ✓ Compiled in 2.5s (797 modules)
+ GET /sitejar4?is_external=show 200 in 90ms
+ GET /addressjar 200 in 108ms
+ GET /admin/utg_manager 200 in 112ms
+ GET /admin/xpagesmanager1 200 in 112ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 33ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 23ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 27ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 14ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 14ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 16ms
+ ✓ Compiled in 2.3s (797 modules)
+ GET /sitejar4?is_external=show 200 in 124ms
+ GET /addressjar 200 in 132ms
+ GET /admin/xpagesmanager1 200 in 139ms
+ GET /admin/utg_manager 200 in 148ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 33ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 31ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 22ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/length code
+ ✓ Compiled in 2.7s (797 modules)
+ GET /sitejar4?is_external=show 200 in 72ms
+ GET /addressjar 200 in 90ms
+ GET /admin/utg_manager 200 in 95ms
+ GET /admin/xpagesmanager1 200 in 95ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/length code
+ ✓ Compiled in 2.5s (797 modules)
+ GET /admin/xpagesmanager1 200 in 134ms
+ GET /addressjar 200 in 134ms
+ GET /admin/utg_manager 200 in 143ms
+ ⨯ [TypeError: Cannot read properties of undefined (reading 'entryCSSFiles')] {
+  page: '/sitejar4'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 646ms (1590 modules)
+ GET /sitejar4?is_external=show 500 in 1459ms
+ GET /sitejar4?is_external=show 200 in 312ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/length code
+ ✓ Compiled /icon.png in 180ms (822 modules)
+ ✓ Compiled /api/get_sitespren_data in 407ms (905 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 844ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 1176ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+ ○ Compiling /api/sitespren_tags ...
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 2858ms
+ ✓ Compiled /api/sitespren_tags in 5.5s (1798 modules)
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 5699ms
+ GET /addressjar 200 in 276ms
+ GET /sitejar4?is_external=show 200 in 276ms
+ GET /admin/utg_manager 200 in 282ms
+ GET /admin/xpagesmanager1 200 in 291ms
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 142ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 27ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 20ms
+ ✓ Compiled in 5.3s (1798 modules)
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 7.8s (1799 modules)
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /addressjar 404 in 9919ms
+ GET /admin/xpagesmanager1 404 in 9919ms
+ GET /admin/utg_manager 404 in 9919ms
+ GET /sitejar4?is_external=show 404 in 9920ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 7262ms
+ ✓ Compiled in 2.2s (798 modules)
+ GET /addressjar 200 in 2170ms
+ GET /sitejar4?is_external=show 200 in 484ms
+ GET /admin/xpagesmanager1 200 in 2576ms
+ GET /admin/utg_manager 200 in 2585ms
+ ✓ Compiled in 2.4s (798 modules)
+ GET /addressjar 200 in 2364ms
+ GET /sitejar4?is_external=show 200 in 244ms
+ GET /admin/xpagesmanager1 200 in 265ms
+ GET /addressjar 200 in 218ms
+ GET /admin/utg_manager 200 in 495ms
+ GET /addressjar 200 in 382ms
+ GET /sitejar4?is_external=show 200 in 2679ms
+ GET /admin/xpagesmanager1 200 in 2726ms
+ ✓ Compiled in 2.6s (798 modules)
+ GET /admin/utg_manager 200 in 2612ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /admin/xpagesmanager1 200 in 115ms
+ GET /sitejar4?is_external=show 200 in 368ms
+ GET /admin/xpagesmanager1 200 in 347ms
+ GET /admin/utg_manager 200 in 178ms
+ GET /admin/utg_manager 200 in 2496ms
+ ✓ Compiled in 2.6s (798 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 2442ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+ ✓ Compiled in 2.8s (798 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 270ms
+ GET /admin/xpagesmanager1 200 in 82ms
+ GET /sitejar4?is_external=show 200 in 83ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 24ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 24ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 19ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 25ms
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 3012ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 2169ms
+ ✓ Compiled in 2.4s (798 modules)
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ ✓ Compiled in 2.8s (798 modules)
+ GET /sitejar4?is_external=show 200 in 2754ms
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 2749ms
+ GET /admin/xpagesmanager1 200 in 2906ms
+ GET /admin/utg_manager 200 in 2926ms
+Found sitespren records: 171
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done',
+  'screenshot_url',
+  'screenshot_taken_at',
+  'screenshot_status',
+  'screenshot_error_message',
+  'screenshot_file_size',
+  'screenshot_dimensions',
+  'rel_cncglub_id',
+  'rel_city_id',
+  'rel_industry_id',
+  'fk_sitesglub_id',
+  'registrar_username',
+  'registrar_company_id',
+  'registrar_company_name',
+  'registrar_portal_url',
+  'sitesglub_id',
+  'glub_sitesglub_base',
+  'glub_ns_full',
+  'glub_ip_address',
+  'mj_tf',
+  'mj_cf',
+  'mj_rd',
+  'mj_refips',
+  'mj_refsubnets',
+  'mj_bl',
+  'fk_sitesdfs_id',
+  'glub_created_at',
+  'glub_updated_at',
+  'sitesdfs_id',
+  'dfs_sitesdfs_base',
+  'dfs_domain',
+  'dfs_created_datetime',
+  'dfs_changed_datetime',
+  'dfs_expiration_datetime',
+  'dfs_updated_datetime',
+  'dfs_first_seen',
+  ... 51 more items
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: '8aa9583b-c3df-4949-8db7-d2d96cc555c1', is_external: true },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 3346ms
+ GET /sitejar4?is_external=show 200 in 2406ms
+ ✓ Compiled in 2.6s (798 modules)
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/sitespren_tags" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /admin/utg_manager 200 in 2533ms
+ GET /admin/xpagesmanager1 200 in 2539ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /api/sitespren_tags?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 2637ms
+ GET /_next/static/webpack/bf086e4a549eb744.webpack.hot-update.json 404 in 99ms
+ GET /sitejar4?is_external=show 200 in 106ms
+ GET /admin/utg_manager 200 in 111ms
+ GET /admin/xpagesmanager1 200 in 131ms
+ GET /admin/utg_manager 200 in 84ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 17ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 29ms
+ GET /icon.png?2209c3ca9768d2f0 200 in 19ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 2.6s (1756 modules)
+ GET /sitejar4?is_external=show 200 in 167ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 3s (1799 modules)
+ GET /admin/utg_manager 404 in 3603ms
+ GET /admin/xpagesmanager1 404 in 3605ms
+ GET /sitejar4?is_external=show 200 in 139ms
+ GET /admin/xpagesmanager1 200 in 85ms
+ GET /admin/utg_manager 200 in 87ms
+ ✓ Compiled in 2.9s (1799 modules)
+ GET /sitejar4?is_external=show 200 in 110ms
+ GET /admin/xpagesmanager1 404 in 3212ms
+ GET /admin/utg_manager 404 in 3100ms
+ GET /admin/utg_manager 404 in 270ms
+ GET /admin/xpagesmanager1 404 in 273ms
+ ✓ Compiled in 2.1s (798 modules)
+ GET /sitejar4?is_external=show 200 in 36ms
+ ✓ Compiled in 2.4s (798 modules)
+ GET /sitejar4?is_external=show 200 in 50ms
+ ✓ Compiled in 2.3s (798 modules)
+ GET /sitejar4?is_external=show 200 in 31ms
+ ✓ Compiled in 2.3s (798 modules)
+ GET /sitejar4?is_external=show 200 in 37ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/1.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/1.pack.gz'
+ ✓ Compiled in 2.3s (798 modules)
+ GET /sitejar4?is_external=show 200 in 32ms
+ ✓ Compiled in 3.1s (1605 modules)
+ GET /sitejar4?is_external=show 200 in 170ms
+ ✓ Compiled in 2.4s (798 modules)
+ GET /sitejar4?is_external=show 200 in 39ms
+ ✓ Compiled in 2.4s (798 modules)
+ GET /sitejar4?is_external=show 200 in 32ms
+ ✓ Compiled in 2.3s (797 modules)
+ GET /sitejar4?is_external=show 200 in 33ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/server-development/6.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/server-development/6.pack.gz'
+ ✓ Compiled /icon.png in 249ms (954 modules)
+ ✓ Compiled (956 modules)
+ GET /icon.png?2209c3ca9768d2f0 200 in 491ms
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/get_sites_by_tag" used `cookies().get('sb-jerylujyofmmjukwlwvn-auth-token')`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/get_sites_by_tag?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64&tag_id=9eee1aa0-5a1a-44a2-8953-587c8a5c8261 200 in 827ms

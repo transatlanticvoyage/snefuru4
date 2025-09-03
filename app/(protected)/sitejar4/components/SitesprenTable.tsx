@@ -402,6 +402,16 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   const [currentColumnPage, setCurrentColumnPage] = useState(1);
   const [sitesprenBaseSearch, setSitesprenBaseSearch] = useState('');
   
+  // Pillarshift modal state (mirrored from addressjar)
+  const [isPillarShiftModalOpen, setIsPillarShiftModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('rtab1');
+  const [sheafData, setSheafData] = useState<string>('');
+  const [monolithData, setMonolithData] = useState<string>('');
+  const [coltempsData, setColtempsData] = useState<any[]>([]);
+  const [selectedColtemp, setSelectedColtemp] = useState<any | null>(null);
+  const [columnSystemMode, setColumnSystemMode] = useState<'pagination' | 'coltemps'>('pagination');
+  const [filteredColumns, setFilteredColumns] = useState<string[]>([]);
+  
   const supabase = createClientComponentClient();
   
   // Load state from URL parameters on component mount
@@ -2404,6 +2414,179 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     );
   };
 
+  // Pillarshift system functions (mirrored from addressjar)
+  const fetchSheafData = async () => {
+    try {
+      const { data: utgData, error } = await supabase
+        .from('utgs')
+        .select('sheaf_ui_columns_base_foundation')
+        .eq('utg_id', 'utg_sitejar4')
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // UTG doesn't exist, create it with sitejar4 schema
+          await createUtgSitejar4();
+          // Retry fetch after creation
+          fetchSheafData();
+          return;
+        }
+        console.error('Error fetching sheaf data:', error);
+        setSheafData('Error loading data');
+        return;
+      }
+
+      setSheafData(JSON.stringify(utgData.sheaf_ui_columns_base_foundation, null, 2));
+    } catch (error) {
+      console.error('Error fetching sheaf data:', error);
+      setSheafData('Error loading data');
+    }
+  };
+
+  const fetchMonolithData = async () => {
+    try {
+      const { data: utgData, error } = await supabase
+        .from('utgs')
+        .select('monolith_of_ui_columns')
+        .eq('utg_id', 'utg_sitejar4')
+        .single();
+
+      if (error) {
+        console.error('Error fetching monolith data:', error);
+        setMonolithData('Error loading data');
+        return;
+      }
+
+      setMonolithData(utgData.monolith_of_ui_columns || '');
+    } catch (error) {
+      console.error('Error fetching monolith data:', error);
+      setMonolithData('Error loading data');
+    }
+  };
+
+  const fetchColtempsData = async () => {
+    if (!userInternalId) return;
+    
+    try {
+      const { data: coltemps, error } = await supabase
+        .from('coltemps')
+        .select('*')
+        .or(`fk_user_id.eq.${userInternalId},coltemp_category.eq.adminpublic`)
+        .eq('rel_utg_id', 'utg_sitejar4')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching coltemps data:', error);
+        setColtempsData([]);
+        return;
+      }
+
+      setColtempsData(coltemps || []);
+    } catch (error) {
+      console.error('Error fetching coltemps data:', error);
+      setColtempsData([]);
+    }
+  };
+
+  const createUtgSitejar4 = async () => {
+    try {
+      // Define sitejar4 schema based on allColumns array
+      const sitejar4Schema = allColumns.map(column => ({
+        column_key: column,
+        column_display_name: getColumnDisplayName(column),
+        db_table_info: getColumnTableInfo(column)
+      }));
+
+      const newUtg = {
+        utg_id: 'utg_sitejar4',
+        utg_name: 'Sitejar4 UI Table Grid',
+        utg_description: 'Column management for sitejar4 page with sitespren, sitesglub, and sitesdfs data',
+        main_db_table: 'sitespren_unified_view',
+        sheaf_ui_columns_base_foundation: sitejar4Schema,
+        monolith_of_ui_columns: allColumns.join('\n'),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase
+        .from('utgs')
+        .insert(newUtg);
+
+      if (error) {
+        console.error('Error creating UTG sitejar4:', error);
+      }
+    } catch (error) {
+      console.error('Error creating UTG sitejar4:', error);
+    }
+  };
+
+  const generateMonolithFromSheaf = async () => {
+    try {
+      const sheafJson = JSON.parse(sheafData);
+      const monolithText = sheafJson.map((item: any) => item.column_key).join('\n');
+      
+      // Update the UTG record with new monolith
+      const { error } = await supabase
+        .from('utgs')
+        .update({ monolith_of_ui_columns: monolithText, updated_at: new Date().toISOString() })
+        .eq('utg_id', 'utg_sitejar4');
+
+      if (error) {
+        console.error('Error updating monolith:', error);
+        return;
+      }
+
+      setMonolithData(monolithText);
+      setActiveTab('rtab2');
+    } catch (error) {
+      console.error('Error generating monolith:', error);
+    }
+  };
+
+  // Column name mapper for sitejar4 (similar to addressjar)
+  const columnNameMapper: { [key: string]: string } = {
+    'sitespren.id': 'id',
+    'sitespren.created_at': 'created_at',
+    'sitespren.sitespren_base': 'sitespren_base',
+    'sitespren.ns_full': 'ns_full',
+    'sitespren.ip_address': 'ip_address',
+    'sitespren.true_root_domain': 'true_root_domain',
+    'sitespren.full_subdomain': 'full_subdomain',
+    'sitespren.webproperty_type': 'webproperty_type',
+    'sitespren.is_wp_site': 'is_wp_site',
+    'sitespren.is_bulldozer': 'is_bulldozer',
+    'sitespren.is_competitor': 'is_competitor',
+    'sitespren.is_external': 'is_external',
+    'sitespren.is_internal': 'is_internal',
+    'sitesglub.mj_tf': 'mj_tf',
+    'sitesglub.mj_cf': 'mj_cf',
+    'sitesglub.mj_rd': 'mj_rd',
+    'sitesdfs.organic_pos_1': 'organic_pos_1',
+    'sitesdfs.organic_etv': 'organic_etv',
+    'sitesdfs.paid_pos_1': 'paid_pos_1'
+    // Add more mappings as needed for all columns
+  };
+
+  const applyColtemp = (coltemp: any) => {
+    try {
+      const columnLines = coltemp.nubra_lake_of_ui_columns
+        .split('\n')
+        .map((line: string) => line.trim())
+        .filter((line: string) => line.length > 0);
+
+      const mappedColumns = columnLines
+        .map((line: string) => columnNameMapper[line] || line)
+        .filter((col: string) => allColumns.includes(col));
+
+      setFilteredColumns(mappedColumns);
+      setColumnSystemMode('coltemps');
+      setSelectedColtemp(coltemp);
+      setIsPillarShiftModalOpen(false);
+    } catch (error) {
+      console.error('Error applying coltemp:', error);
+    }
+  };
+
   // Row Pagination Components (moved from Essex area)
   // Bar 1: Items per page selector
   const RowPaginationBar1 = () => {
@@ -2425,15 +2608,20 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   setCurrentPage(1);
                 }}
                 className={`
-                  px-4 py-2 text-sm font-medium border
-                  ${value === 10 ? 'rounded-l-lg' : ''}
-                  ${value === 'All' ? 'rounded-r-lg' : ''}
+                  px-2 py-2.5 text-sm font-medium border -mr-px cursor-pointer
+                  ${value === 10 ? 'rounded-l' : ''}
+                  ${value === 'All' ? 'rounded-r' : ''}
                   ${(value === 'All' && itemsPerPage >= sortedData.length) || itemsPerPage === value
                     ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 focus:bg-blue-700 focus:text-white'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                   }
                   focus:z-10 focus:ring-2 focus:ring-blue-500
                 `}
+                style={{ 
+                  fontSize: '14px', 
+                  paddingTop: '10px', 
+                  paddingBottom: '10px'
+                }}
               >
                 {value}
               </button>
@@ -2459,12 +2647,17 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
               className={`
-                relative inline-flex items-center rounded-l-md px-3 py-2 text-gray-400 ring-1 ring-inset ring-gray-300
+                relative inline-flex items-center rounded-l-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300
                 ${currentPage === 1 
                   ? 'cursor-not-allowed bg-gray-50' 
                   : 'hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
                 }
               `}
+              style={{ 
+                fontSize: '14px', 
+                paddingTop: '10px', 
+                paddingBottom: '10px'
+              }}
             >
               <span className="text-lg">«</span>
             </button>
@@ -2486,12 +2679,17 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                     key={i}
                     onClick={() => setCurrentPage(i)}
                     className={`
-                      relative inline-flex items-center px-4 py-2 text-sm font-semibold
+                      relative inline-flex items-center px-2 py-2.5 text-sm font-semibold
                       ${currentPage === i
                         ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
                         : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
                       }
                     `}
+                    style={{ 
+                      fontSize: '14px', 
+                      paddingTop: '10px', 
+                      paddingBottom: '10px'
+                    }}
                   >
                     {i}
                   </button>
@@ -2506,12 +2704,17 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
               className={`
-                relative inline-flex items-center rounded-r-md px-3 py-2 text-gray-400 ring-1 ring-inset ring-gray-300
+                relative inline-flex items-center rounded-r-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300
                 ${currentPage === totalPages 
                   ? 'cursor-not-allowed bg-gray-50' 
                   : 'hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
                 }
               `}
+              style={{ 
+                fontSize: '14px', 
+                paddingTop: '10px', 
+                paddingBottom: '10px'
+              }}
             >
               <span className="text-lg">»</span>
             </button>
@@ -2788,6 +2991,10 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
             <select
               id="tag-filter"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              style={{
+                backgroundColor: filterTag !== '' ? '#19306e' : '',
+                color: filterTag !== '' ? '#ffffff' : ''
+              }}
               value={filterTag}
               onChange={(e) => handleTagFilterChange(e.target.value)}
             >
@@ -2806,6 +3013,10 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
             <select
               id="wp-filter"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              style={{
+                backgroundColor: filterWpSite !== '' ? '#19306e' : '',
+                color: filterWpSite !== '' ? '#ffffff' : ''
+              }}
               value={filterWpSite}
               onChange={(e) => {
                 setFilterWpSite(e.target.value);
@@ -2825,6 +3036,10 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
             <select
               id="bulldozer-filter"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              style={{
+                backgroundColor: filterBulldozer !== '' ? '#19306e' : '',
+                color: filterBulldozer !== '' ? '#ffffff' : ''
+              }}
               value={filterBulldozer}
               onChange={(e) => {
                 setFilterBulldozer(e.target.value);
@@ -2867,34 +3082,110 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
           top: '4px', 
           left: '4px', 
           fontSize: '16px', 
-          fontWeight: 'bold' 
+          fontWeight: 'bold',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px'
         }}>
+          <svg 
+            width="22" 
+            height="22" 
+            viewBox="0 0 24 24" 
+            fill="black"
+            style={{ transform: 'rotate(15deg)' }}
+          >
+            {/* Rocket body */}
+            <ellipse cx="12" cy="8" rx="3" ry="6" fill="black"/>
+            {/* Rocket nose cone */}
+            <path d="M12 2 L15 8 L9 8 Z" fill="black"/>
+            {/* Left fin */}
+            <path d="M9 12 L7 14 L9 16 Z" fill="black"/>
+            {/* Right fin */}
+            <path d="M15 12 L17 14 L15 16 Z" fill="black"/>
+            {/* Exhaust flames */}
+            <path d="M10 14 L9 18 L10.5 16 L12 20 L13.5 16 L15 18 L14 14 Z" fill="black"/>
+            {/* Window */}
+            <circle cx="12" cy="6" r="1" fill="white"/>
+          </svg>
           rocket_chamber
         </div>
         <div style={{ marginTop: '24px', paddingTop: '4px', paddingBottom: 0, paddingLeft: '8px', paddingRight: '8px' }}>
           <div className="flex items-end justify-between">
             <div className="flex items-end space-x-8">
-              {/* Row pagination first (left side) */}
-              <div className="flex items-end space-x-4">
-                {RowPaginationBar1()}
-                {RowPaginationBar2()}
-              </div>
-              {/* Sitespren Base Search Box */}
-              <div className="flex items-end">
-                <input
-                  type="text"
-                  value={sitesprenBaseSearch}
-                  onChange={(e) => setSitesprenBaseSearch(e.target.value)}
-                  placeholder="Search sitespren_base..."
-                  className="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  style={{ width: '200px', marginBottom: '3px' }}
-                />
-              </div>
-              {/* Column pagination second */}
-              <div className="flex items-end space-x-4">
-                {ColumnPaginationBar1()}
-                {ColumnPaginationBar2()}
-              </div>
+              {/* Row pagination, search box, and column pagination table */}
+              <table style={{ borderCollapse: 'collapse' }}>
+                <tbody>
+                  <tr>
+                    <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                        row pagination
+                      </div>
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                        search box 2
+                      </div>
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                        wolf exclusion band
+                      </div>
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                        column templates
+                      </div>
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                        column pagination
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid black', padding: '4px' }}>
+                      <div className="flex items-end space-x-4">
+                        {RowPaginationBar1()}
+                        {RowPaginationBar2()}
+                      </div>
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '4px' }}>
+                      <div className="flex items-end">
+                        <input
+                          type="text"
+                          value={sitesprenBaseSearch}
+                          onChange={(e) => setSitesprenBaseSearch(e.target.value)}
+                          placeholder="Search sitespren_base..."
+                          className="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          style={{ width: '200px', marginBottom: '3px' }}
+                        />
+                      </div>
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '4px' }}>
+                      {/* Wolf exclusion band - empty for now */}
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '4px' }}>
+                      <button
+                        onClick={() => {
+                          setIsPillarShiftModalOpen(true);
+                          fetchSheafData();
+                          fetchMonolithData();
+                          fetchColtempsData();
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors"
+                      >
+                        use the pillarshift coltemp system
+                      </button>
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '4px' }}>
+                      <div className="flex items-end space-x-4">
+                        {ColumnPaginationBar1()}
+                        {ColumnPaginationBar2()}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -2908,7 +3199,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         marginTop: 0
       }}>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
+          <table className="text-sm" style={{ borderCollapse: 'collapse', borderSpacing: 0, width: 'auto', tableLayout: 'auto' }}>
             <thead>
               {/* Database table name row */}
               <tr className="shenfur_db_table_name_tr">
@@ -4463,6 +4754,267 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         </div>
       </div>
     )}
+
+    {/* Pillarshift Modal (mirrored from addressjar) */}
+    {isPillarShiftModalOpen && (
+      <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div style={{
+          backgroundColor: '#ffffff',
+          width: '95vw',
+          height: '95vh',
+          borderRadius: '8px',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Close button */}
+          <button
+            onClick={() => setIsPillarShiftModalOpen(false)}
+            style={{
+              position: 'absolute',
+              top: '8px',
+              right: '8px',
+              width: '32px',
+              height: '32px',
+              backgroundColor: '#dc2626',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              zIndex: 10
+            }}
+          >
+            ×
+          </button>
+
+          {/* Tab navigation */}
+          <div style={{ 
+            display: 'flex', 
+            borderBottom: '1px solid #e5e7eb',
+            backgroundColor: '#f9fafb',
+            padding: '0 16px'
+          }}>
+            {[
+              { id: 'rtab1', label: 'sheaf' },
+              { id: 'rtab2', label: 'monolith' },
+              { id: 'rtab3', label: 'coltemps' },
+              { id: 'rtab4', label: 'rtab4' },
+              { id: 'rtab5', label: 'rtab5' },
+              { id: 'rtab6', label: 'rtab6' },
+              { id: 'rtab7', label: 'rtab7' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  padding: '12px 24px',
+                  border: 'none',
+                  backgroundColor: activeTab === tab.id ? '#dbeafe' : 'transparent',
+                  color: activeTab === tab.id ? '#1e40af' : '#6b7280',
+                  borderBottom: activeTab === tab.id ? '2px solid #3b82f6' : '2px solid transparent',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab content */}
+          <div style={{ 
+            padding: '24px', 
+            height: 'calc(95vh - 80px)', 
+            overflow: 'auto' 
+          }}>
+            {activeTab === 'rtab1' && (
+              <div>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>
+                  Sheaf UI Columns Base Foundation
+                </h3>
+                <pre style={{
+                  backgroundColor: '#f3f4f6',
+                  padding: '16px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  overflow: 'auto',
+                  whiteSpace: 'pre-wrap',
+                  maxHeight: '600px'
+                }}>
+                  {sheafData}
+                </pre>
+              </div>
+            )}
+
+            {activeTab === 'rtab2' && (
+              <div>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>
+                  Monolith of UI Columns
+                </h3>
+                <button
+                  onClick={generateMonolithFromSheaf}
+                  style={{
+                    backgroundColor: '#059669',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    marginBottom: '16px'
+                  }}
+                >
+                  Generate Monolith from Current Sheaf
+                </button>
+                <textarea
+                  value={monolithData}
+                  readOnly
+                  style={{
+                    width: '100%',
+                    height: '500px',
+                    backgroundColor: '#f3f4f6',
+                    padding: '16px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontFamily: 'monospace',
+                    border: '1px solid #d1d5db',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+            )}
+
+            {activeTab === 'rtab3' && (
+              <div>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>
+                  Column Templates (Coltemps)
+                </h3>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ 
+                    width: '100%', 
+                    borderCollapse: 'collapse',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                  }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f9fafb' }}>
+                        <th style={{ 
+                          padding: '12px', 
+                          textAlign: 'left', 
+                          borderBottom: '1px solid #e5e7eb',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#374151'
+                        }}>Name</th>
+                        <th style={{ 
+                          padding: '12px', 
+                          textAlign: 'left', 
+                          borderBottom: '1px solid #e5e7eb',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#374151'
+                        }}>Display Name</th>
+                        <th style={{ 
+                          padding: '12px', 
+                          textAlign: 'left', 
+                          borderBottom: '1px solid #e5e7eb',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#374151'
+                        }}>Owner</th>
+                        <th style={{ 
+                          padding: '12px', 
+                          textAlign: 'left', 
+                          borderBottom: '1px solid #e5e7eb',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#374151'
+                        }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {coltempsData.map((coltemp, index) => (
+                        <tr key={coltemp.coltemp_id} style={{
+                          borderBottom: index < coltempsData.length - 1 ? '1px solid #e5e7eb' : 'none'
+                        }}>
+                          <td style={{ padding: '12px', fontSize: '14px' }}>
+                            {coltemp.coltemp_name}
+                          </td>
+                          <td style={{ padding: '12px', fontSize: '14px' }}>
+                            {coltemp.coltemp_display_name}
+                          </td>
+                          <td style={{ padding: '12px', fontSize: '14px' }}>
+                            <span style={{
+                              backgroundColor: coltemp.fk_user_id === userInternalId ? '#10b981' : '#8b5cf6',
+                              color: '#ffffff',
+                              padding: '2px 8px',
+                              borderRadius: '12px',
+                              fontSize: '12px',
+                              fontWeight: '500'
+                            }}>
+                              {coltemp.fk_user_id === userInternalId ? 'You' : 
+                               coltemp.coltemp_category === 'adminpublic' ? 'Admin' : 'Other'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px' }}>
+                            <button
+                              onClick={() => applyColtemp(coltemp)}
+                              style={{
+                                backgroundColor: '#3b82f6',
+                                color: '#ffffff',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: '500'
+                              }}
+                            >
+                              Apply
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {coltempsData.length === 0 && (
+                    <p style={{ 
+                      textAlign: 'center', 
+                      color: '#6b7280', 
+                      padding: '40px',
+                      fontSize: '14px'
+                    }}>
+                      No column templates found. Create your first template to get started.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {['rtab4', 'rtab5', 'rtab6', 'rtab7'].includes(activeTab) && (
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                height: '400px',
+                color: '#6b7280',
+                fontSize: '16px'
+              }}>
+                Content coming soon for {activeTab}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+
     </div>
   );
 }
