@@ -892,27 +892,10 @@ export default function Sitejar4Client() {
       )}
 
       {/* Functions popup button */}
-      <div className="mb-4">
-        <button
-          onClick={handlePopupOpen}
-          className="font-bold text-white rounded"
-          style={{
-            backgroundColor: '#800000', // maroon color
-            fontSize: '20px',
-            paddingLeft: '14px',
-            paddingRight: '14px',
-            paddingTop: '10px',
-            paddingBottom: '10px'
-          }}
-        >
-          functions popup
-        </button>
-      </div>
-
       {/* Sky Banner - Site Voyager */}
       <div className="mb-4">
         <div 
-          className="px-6 py-1"
+          className="px-6 py-1 flex items-center gap-4"
           style={{
             backgroundColor: '#000000',
             backgroundImage: `
@@ -1119,6 +1102,22 @@ export default function Sitejar4Client() {
               </a>
             </div>
           </div>
+
+          {/* Functions popup button */}
+          <button
+            onClick={handlePopupOpen}
+            className="font-bold text-white rounded"
+            style={{
+              backgroundColor: '#800000', // maroon color
+              fontSize: '20px',
+              paddingLeft: '14px',
+              paddingRight: '14px',
+              paddingTop: '10px',
+              paddingBottom: '10px'
+            }}
+          >
+            functions popup
+          </button>
         </div>
       </div>
 
@@ -1374,17 +1373,25 @@ export default function Sitejar4Client() {
               {/* Tab Navigation */}
               <div className="border-b border-gray-200 bg-gray-50">
                 <nav className="flex">
-                  {['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].map((tab) => (
+                  {[
+                    { id: 'ptab1', label: 'ptab1 - add new sites' },
+                    { id: 'ptab2', label: 'delete sites' },
+                    { id: 'ptab3', label: 'ptab3 - site tags' },
+                    { id: 'ptab4', label: 'ptab4 - export' },
+                    { id: 'ptab5', label: 'ptab5 - chepno' },
+                    { id: 'ptab6', label: 'ptab6 - bezel duplicated' },
+                    { id: 'ptab7', label: 'ptab7' }
+                  ].map(({ id, label }) => (
                     <button
-                      key={tab}
-                      onClick={() => handleTabChange(tab)}
+                      key={id}
+                      onClick={() => handleTabChange(id)}
                       className={`px-4 py-2 font-medium text-sm transition-colors ${
-                        activePopupTab === tab
+                        activePopupTab === id
                           ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
                           : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                       }`}
                     >
-                      {tab}
+                      {label}
                     </button>
                   ))}
                 </nav>
