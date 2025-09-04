@@ -1,4 +1,5 @@
 <?php
+// TEST COMMENT - Testing git tracking in both repos
 
 /**
  * Beacon Database Class

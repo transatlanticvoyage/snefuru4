@@ -1,4 +1,5 @@
 <?php
+// TEST COMMENT - Testing git tracking in both repos
 /**
  * Plugin Name: Beacon
  * Plugin URI: https://github.com/transatlanticvoyage/beacon-wp-plugin
