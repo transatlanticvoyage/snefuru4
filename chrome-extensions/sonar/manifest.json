@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Bird Copy Paste URLs",
+  "name": "Sonar",
   "version": "1.0",
   "description": "Copy all tab URLs or paste URLs to open in new tabs",
   "permissions": [

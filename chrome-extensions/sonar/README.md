@@ -1,4 +1,4 @@
-# Bird Copy Paste URLs Chrome Extension
+# Sonar Chrome Extension
 
 A simple Chrome extension that allows you to copy all tab URLs from the current window or paste URLs from clipboard to open them in new tabs.
 
@@ -15,19 +15,19 @@ A simple Chrome extension that allows you to copy all tab URLs from the current 
 1. Open Chrome and navigate to `chrome://extensions/`
 2. Enable "Developer mode" (toggle in top right)
 3. Click "Load unpacked"
-4. Select the `bird_copy_paste_urls` folder
-5. The Bird extension icon will appear in your Chrome toolbar
+4. Select the `sonar` folder
+5. The Sonar extension icon will appear in your Chrome toolbar
 
 ## Usage
 
 ### Copy URLs
-1. Click the Bird extension icon in Chrome toolbar
+1. Click the Sonar extension icon in Chrome toolbar
 2. Click "Copy All Tab URLs"
 3. All URLs from tabs in the current window are copied to clipboard
 
 ### Paste URLs
 1. Copy some URLs to your clipboard (separated by newlines, spaces, or commas)
-2. Click the Bird extension icon in Chrome toolbar
+2. Click the Sonar extension icon in Chrome toolbar
 3. Click "Paste URLs to Open"
 4. Each URL opens in a new tab (max 20 tabs for safety)
 
