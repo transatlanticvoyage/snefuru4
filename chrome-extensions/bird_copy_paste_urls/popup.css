@@ -78,6 +78,40 @@ h1::before {
   color: white;
 }
 
+/* WP Pusher buttons container */
+.wppusher-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.wppusher-buttons .btn {
+  margin-bottom: 0;
+}
+
+.btn-wppusher {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  flex: 2;
+}
+
+.btn-wppusher:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-wppusher-http {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+  flex: 1;
+  min-width: 80px;
+}
+
+.btn-wppusher-http:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+}
+
 .btn-copy:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);

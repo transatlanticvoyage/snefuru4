@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const rootlifyBtn = document.getElementById('rootlifyBtn');
   const driggsmanRootBtn = document.getElementById('driggsmanRootBtn');
   const driggsmanSubBtn = document.getElementById('driggsmanSubBtn');
+  const wppusherHttpsBtn = document.getElementById('wppusherHttpsBtn');
+  const wppusherHttpBtn = document.getElementById('wppusherHttpBtn');
   const statusDiv = document.getElementById('status');
 
   // Copy all tab URLs to clipboard
@@ -273,6 +275,94 @@ document.addEventListener('DOMContentLoaded', function() {
       showStatus('Failed to open driggsman', 'error');
     } finally {
       driggsmanSubBtn.classList.remove('loading');
+    }
+  });
+
+  // WP Pusher HTTPS button - Links to https version
+  wppusherHttpsBtn.addEventListener('click', async function() {
+    try {
+      // Add loading state
+      wppusherHttpsBtn.classList.add('loading');
+      
+      // Get current active tab
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (!activeTab || !activeTab.url) {
+        showStatus('Cannot access current tab URL', 'error');
+        wppusherHttpsBtn.classList.remove('loading');
+        return;
+      }
+      
+      try {
+        const url = new URL(activeTab.url);
+        const domain = url.hostname;
+        
+        // Create HTTPS WP Pusher URL
+        const wppusherUrl = `https://${domain}/wp-admin/admin.php?page=wppusher-plugins`;
+        
+        // Open in new tab
+        await chrome.tabs.create({ url: wppusherUrl, active: true });
+        
+        showStatus(`Opened WP Pusher plugins page (HTTPS)`, 'success');
+        
+        // Close popup after a short delay
+        setTimeout(() => {
+          window.close();
+        }, 1500);
+        
+      } catch (urlError) {
+        showStatus('Invalid URL in current tab', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error opening WP Pusher HTTPS:', error);
+      showStatus('Failed to open WP Pusher page', 'error');
+    } finally {
+      wppusherHttpsBtn.classList.remove('loading');
+    }
+  });
+
+  // WP Pusher HTTP button - Links to http version
+  wppusherHttpBtn.addEventListener('click', async function() {
+    try {
+      // Add loading state
+      wppusherHttpBtn.classList.add('loading');
+      
+      // Get current active tab
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (!activeTab || !activeTab.url) {
+        showStatus('Cannot access current tab URL', 'error');
+        wppusherHttpBtn.classList.remove('loading');
+        return;
+      }
+      
+      try {
+        const url = new URL(activeTab.url);
+        const domain = url.hostname;
+        
+        // Create HTTP WP Pusher URL
+        const wppusherUrl = `http://${domain}/wp-admin/admin.php?page=wppusher-plugins`;
+        
+        // Open in new tab
+        await chrome.tabs.create({ url: wppusherUrl, active: true });
+        
+        showStatus(`Opened WP Pusher plugins page (HTTP)`, 'success');
+        
+        // Close popup after a short delay
+        setTimeout(() => {
+          window.close();
+        }, 1500);
+        
+      } catch (urlError) {
+        showStatus('Invalid URL in current tab', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error opening WP Pusher HTTP:', error);
+      showStatus('Failed to open WP Pusher page', 'error');
+    } finally {
+      wppusherHttpBtn.classList.remove('loading');
     }
   });
 
