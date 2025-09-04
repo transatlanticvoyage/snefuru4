@@ -11,6 +11,30 @@
 		},
 		{
 			"path": "./shenzi-wordpress-plugins/beacon"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/lumora"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/veyra"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/harbor"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/klyra"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/brimora"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/nivaro"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/trillan"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/fathom"
 		}
 	]
 }
