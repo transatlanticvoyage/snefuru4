@@ -646,6 +646,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const refreshMetricsBtn = document.getElementById('refreshMetricsBtn');
   const sitesprivateBaseInput = document.getElementById('sitesprivate_base');
   const sitesglobalIpAddressInput = document.getElementById('sitesglobal_ip_address');
+  const sonarExtractedDomainInput = document.getElementById('sonar_extracted_domain_base');
+  const copyExtractedDomainBtn = document.getElementById('copyExtractedDomainBtn');
   const tregnarStatus = document.getElementById('tregnarStatus');
   
   // Cache configuration
@@ -661,6 +663,46 @@ document.addEventListener('DOMContentLoaded', function() {
       tregnarStatus.classList.remove('show');
     }, 3000);
   }
+  
+  // Extract domain from current tab (remove www, keep subdomains)
+  async function extractCurrentDomain() {
+    try {
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!activeTab || !activeTab.url) {
+        return '';
+      }
+      
+      const url = new URL(activeTab.url);
+      let domain = url.hostname;
+      
+      // Remove www. prefix if present, but keep other subdomains
+      if (domain.startsWith('www.')) {
+        domain = domain.substring(4);
+      }
+      
+      return domain;
+    } catch (error) {
+      console.error('Error extracting domain:', error);
+      return '';
+    }
+  }
+  
+  // Copy extracted domain button functionality
+  copyExtractedDomainBtn.addEventListener('click', async function() {
+    try {
+      const domain = sonarExtractedDomainInput.value;
+      if (!domain) {
+        showTregnarStatus('No domain to copy', 'error');
+        return;
+      }
+      
+      await navigator.clipboard.writeText(domain);
+      showTregnarStatus('Domain copied to clipboard', 'success');
+    } catch (error) {
+      console.error('Error copying domain:', error);
+      showTregnarStatus('Failed to copy domain', 'error');
+    }
+  });
   
   async function getCachedData(domain) {
     try {
@@ -718,6 +760,10 @@ document.addEventListener('DOMContentLoaded', function() {
       // Clear inputs
       sitesprivateBaseInput.value = '';
       sitesglobalIpAddressInput.value = '';
+      
+      // Always update the extracted domain field
+      const extractedDomain = await extractCurrentDomain();
+      sonarExtractedDomainInput.value = extractedDomain;
       
       // Get current domain
       const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -859,12 +905,18 @@ document.addEventListener('DOMContentLoaded', function() {
           showTregnarStatus('Cannot access this page - try a different tab', 'error');
         } else if (scriptError.message && scriptError.message.includes('chrome://')) {
           showTregnarStatus('Cannot run on Chrome pages - try a regular website', 'error');
+        } else if (scriptError.message && scriptError.message.includes('extension://')) {
+          showTregnarStatus('Cannot run on extension pages - try a regular website', 'error');
+        } else if (scriptError.message && scriptError.message.includes('about:')) {
+          showTregnarStatus('Cannot run on browser pages - try a regular website', 'error');
+        } else if (activeTab.url && (activeTab.url.startsWith('chrome://') || activeTab.url.startsWith('chrome-extension://') || activeTab.url.startsWith('about:'))) {
+          showTregnarStatus('Cannot run on system pages - try a regular website', 'error');
         } else {
           // If we had cached data, keep showing it
           if (cachedData) {
             showTregnarStatus('Using cached data (refresh failed)', 'info');
           } else {
-            showTregnarStatus('Failed to execute - try refreshing the current tab', 'error');
+            showTregnarStatus('Failed to execute - try refreshing the current tab or switching to a regular website', 'error');
           }
         }
       }
@@ -880,6 +932,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Auto-load metrics on popup open if cache exists
   (async function autoLoadMetrics() {
     try {
+      // Always populate the extracted domain field
+      const extractedDomain = await extractCurrentDomain();
+      sonarExtractedDomainInput.value = extractedDomain;
+      
       const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (activeTab && activeTab.url) {
         const url = new URL(activeTab.url);

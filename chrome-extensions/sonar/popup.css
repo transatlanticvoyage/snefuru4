@@ -592,3 +592,40 @@ h1::before {
   color: #3b82f6;
   border: 1px solid rgba(59, 130, 246, 0.3);
 }
+
+/* Input with copy button container */
+.input-with-copy {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-with-copy .chamber-input {
+  flex: 1;
+}
+
+.copy-btn {
+  padding: 6px;
+  background: rgba(233, 69, 96, 0.8);
+  border: 1px solid rgba(233, 69, 96, 0.6);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+}
+
+.copy-btn:hover {
+  background: rgba(233, 69, 96, 1);
+  border-color: #e94560;
+  transform: scale(1.05);
+}
+
+.copy-icon {
+  width: 14px;
+  height: 14px;
+  color: #f3f4f6;
+}
