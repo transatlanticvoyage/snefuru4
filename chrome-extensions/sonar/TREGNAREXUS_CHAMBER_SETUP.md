@@ -21,12 +21,14 @@ The extension now calls the correct API endpoint with proper error handling.
 
 ## 🎯 How It Works
 
-### Authentication Flow
-1. **Extension shares cookies** with your main Tregnar app
-2. **API validates session** using `createRouteHandlerClient`
-3. **Gets user internal ID** from `users` table via `auth_id`
-4. **Verifies domain ownership** via `sitespren_unified_view`
-5. **Returns data** with pseudo names for security
+### Authentication Flow (Content Script Approach)
+1. **Extension injects script** into current tab (where you're logged in)
+2. **Content script makes API call** from tab's context (has cookies!)
+3. **API validates session** using `createRouteHandlerClient`
+4. **Gets user internal ID** from `users` table via `auth_id`
+5. **Verifies domain ownership** via `sitespren_unified_view`
+6. **Returns data** with pseudo names for security
+7. **Extension popup displays** the data
 
 ### Security Features
 - ✅ **Domain ownership verification** - Users can only get data for sites they own
@@ -54,9 +56,11 @@ The extension now calls the correct API endpoint with proper error handling.
 4. Check browser console for detailed logs
 
 ### 3. Debug Issues
-**"Not logged in"**: Make sure you're logged into your Tregnar app in the same browser
+**"Not logged in"**: Make sure you're logged into your Tregnar app in any tab in the same browser
 **"Site not found"**: Domain must exist in your sitespren table with exact match
 **"Rate limit exceeded"**: You've hit 500 calls for the day
+**"Cannot access this page"**: Try using the extension on a regular website (not chrome:// pages)
+**"Failed to execute"**: Try refreshing the current tab and retry
 
 ## 📊 Database Schema
 
@@ -101,8 +105,9 @@ Already configured in `manifest.json`:
 
 **1. "Connection failed"**
 - Check if API endpoint exists at `/api/sonar/site-data-for-users-own-sites`
-- Verify CORS headers in browser Network tab
-- Ensure you're logged into Tregnar app
+- Ensure you're logged into Tregnar app in ANY browser tab
+- Try refreshing the current tab and retry extension
+- Avoid using on chrome:// pages or extension pages
 
 **2. "Site not found"**  
 - Domain must exist in `sitespren` table

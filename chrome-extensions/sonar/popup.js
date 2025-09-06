@@ -745,77 +745,126 @@ document.addEventListener('DOMContentLoaded', function() {
         // Continue to fetch fresh data in background
       }
       
-      // Make API call to your Next.js backend
+      // Make API call using content script (runs in tab context with cookies)
       try {
-        console.log('Calling API:', `${TREGNAR_API_BASE}/api/sonar/site-data-for-users-own-sites?domain=${encodeURIComponent(domain)}`);
+        console.log('Making API call via content script for domain:', domain);
         
-        const response = await fetch(`${TREGNAR_API_BASE}/api/sonar/site-data-for-users-own-sites?domain=${encodeURIComponent(domain)}`, {
-          method: 'GET',
-          credentials: 'include', // Include cookies for authentication
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Extension-ID': chrome.runtime.id, // Send extension ID for validation
-            'Accept': 'application/json'
-          }
+        // Execute script in the current tab context (where user is logged in)
+        const results = await chrome.scripting.executeScript({
+          target: { tabId: activeTab.id },
+          func: async (apiUrl, domain, extensionId) => {
+            try {
+              console.log('Content script: Making API call to:', apiUrl);
+              
+              const response = await fetch(apiUrl, {
+                method: 'GET',
+                credentials: 'include', // This will include cookies from the tab's domain
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Extension-ID': extensionId,
+                  'Accept': 'application/json'
+                }
+              });
+              
+              console.log('Content script: Response status:', response.status);
+              
+              if (!response.ok) {
+                return {
+                  success: false,
+                  error: `HTTP ${response.status}`,
+                  status: response.status
+                };
+              }
+              
+              const result = await response.json();
+              return {
+                success: true,
+                data: result,
+                status: response.status
+              };
+              
+            } catch (error) {
+              console.error('Content script: Fetch error:', error);
+              return {
+                success: false,
+                error: error.message,
+                errorType: error.name
+              };
+            }
+          },
+          args: [
+            `${TREGNAR_API_BASE}/api/sonar/site-data-for-users-own-sites?domain=${encodeURIComponent(domain)}`,
+            domain,
+            chrome.runtime.id
+          ]
         });
         
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
+        if (!results || !results[0]) {
+          showTregnarStatus('Failed to execute content script', 'error');
+          refreshMetricsBtn.classList.remove('loading');
+          return;
+        }
         
-        if (!response.ok) {
-          if (response.status === 401) {
+        const scriptResult = results[0].result;
+        console.log('Content script result:', scriptResult);
+        
+        if (!scriptResult.success) {
+          // Handle different error types
+          if (scriptResult.status === 401) {
             showTregnarStatus('Not logged in to Tregnar account', 'error');
-          } else if (response.status === 404) {
+          } else if (scriptResult.status === 404) {
             showTregnarStatus('Site not found in your account', 'error');
-          } else if (response.status === 429) {
+          } else if (scriptResult.status === 429) {
             showTregnarStatus('Rate limit exceeded (500 calls/day)', 'error');
+          } else if (scriptResult.errorType === 'TypeError' && scriptResult.error.includes('Failed to fetch')) {
+            showTregnarStatus('Network error - API endpoint not available', 'error');
           } else {
-            showTregnarStatus('Failed to fetch metrics', 'error');
+            showTregnarStatus(scriptResult.error || 'Failed to fetch metrics', 'error');
           }
           refreshMetricsBtn.classList.remove('loading');
           return;
         }
         
-        const result = await response.json();
+        const apiResult = scriptResult.data;
         
-        if (result.success && result.data) {
+        if (apiResult.success && apiResult.data) {
           // Update inputs with fetched data (using pseudo names in frontend)
-          sitesprivateBaseInput.value = result.data.sitesprivate_base || '';
-          sitesglobalIpAddressInput.value = result.data.sitesglobal_ip_address || '';
+          sitesprivateBaseInput.value = apiResult.data.sitesprivate_base || '';
+          sitesglobalIpAddressInput.value = apiResult.data.sitesglobal_ip_address || '';
           
           // Cache the data
           await setCachedData(domain, {
-            sitesprivate_base: result.data.sitesprivate_base,
-            sitesglobal_ip_address: result.data.sitesglobal_ip_address,
+            sitesprivate_base: apiResult.data.sitesprivate_base,
+            sitesglobal_ip_address: apiResult.data.sitesglobal_ip_address,
             domain: domain
           });
+          
+          showTregnarStatus('Metrics refreshed successfully', 'success');
         } else {
-          showTregnarStatus(result.error || 'Failed to fetch data', 'error');
+          showTregnarStatus(apiResult.error || 'Failed to fetch data', 'error');
           refreshMetricsBtn.classList.remove('loading');
           return;
         }
         
-        showTregnarStatus('Metrics refreshed successfully', 'success');
-        
-      } catch (fetchError) {
-        console.error('API fetch error:', fetchError);
+      } catch (scriptError) {
+        console.error('Content script execution error:', scriptError);
         console.error('Error details:', {
-          name: fetchError.name,
-          message: fetchError.message,
-          stack: fetchError.stack
+          name: scriptError.name,
+          message: scriptError.message,
+          stack: scriptError.stack
         });
         
-        // More specific error messages
-        if (fetchError.name === 'TypeError' && fetchError.message.includes('Failed to fetch')) {
-          showTregnarStatus('Network error - API endpoint not available', 'error');
-        } else if (fetchError.name === 'TypeError' && fetchError.message.includes('CORS')) {
-          showTregnarStatus('CORS error - check API configuration', 'error');
+        // More specific error messages for content script issues
+        if (scriptError.message && scriptError.message.includes('Cannot access')) {
+          showTregnarStatus('Cannot access this page - try a different tab', 'error');
+        } else if (scriptError.message && scriptError.message.includes('chrome://')) {
+          showTregnarStatus('Cannot run on Chrome pages - try a regular website', 'error');
         } else {
           // If we had cached data, keep showing it
           if (cachedData) {
             showTregnarStatus('Using cached data (refresh failed)', 'info');
           } else {
-            showTregnarStatus('Connection failed - check if logged in', 'error');
+            showTregnarStatus('Failed to execute - try refreshing the current tab', 'error');
           }
         }
       }
