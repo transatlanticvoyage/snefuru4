@@ -260,7 +260,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto">
+        <div className="mx-auto" style={{ maxWidth: '1200px' }}>
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -386,8 +386,11 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
                 </div>
 
                 <div className="silver_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
-                  <div className="flex justify-between items-center">
-                    <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                    silver_chamber_div
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <div style={{ fontSize: '16px' }}>
                       SilverFunctionDetectGconRowFromRawURLs
                     </div>
                     <div className="relative">
@@ -513,6 +516,184 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                 <div className="nickel_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                     nickel_chamber_div
+                  </div>
+                  
+                  {/* Chepno Functions Reference Table */}
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">Chepno Functions Reference</h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border border-gray-300 bg-white text-sm">
+                        <thead>
+                          <tr className="bg-gray-100">
+                            <th className="border border-gray-300 px-3 py-2 text-center font-medium w-12">Select</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left font-medium">Function Name (ID)</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left font-medium">Description & DB Tables</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left font-medium">Connection Type</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <input type="checkbox" className="form-checkbox h-4 w-4" />
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <strong>chep11 - Plugin API</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Calls WordPress site via Plugin API endpoint <code>/wp-json/snefuru/v1/posts</code>. 
+                              Syncs WordPress posts/pages to <code>nwpi_posts</code> table. 
+                              Updates <code>ywp_sites.last_sync_at</code> timestamp.
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Plugin API (Snefuru WordPress plugin)
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <input type="checkbox" className="form-checkbox h-4 w-4" />
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 bg-blue-100">
+                              <strong>chep15 - f22_nwpi_to_gcon_pusher</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Transfers content from <code>nwpi_posts</code> to <code>gcon_pieces</code> table. 
+                              Applies BozoHTMLNormalizationProcess1 and TontoNormalizationProcess1 transformations. 
+                              Updates fields like <code>mud_content</code>, <code>mud_title</code>, <code>aval_content</code>, 
+                              and <code>mud_deplines</code> for content processing.
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Internal Database API
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <input type="checkbox" className="form-checkbox h-4 w-4" />
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 bg-blue-100">
+                              <strong>chep16 - f47_generate_gcon_pieces</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Generates new <code>gcon_pieces</code> records from <code>nwpi_posts</code> data. 
+                              Creates structured content pieces for further processing. 
+                              Works with selected items or all items from the nwpi dataset.
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Internal Database API
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <input type="checkbox" className="form-checkbox h-4 w-4" />
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <strong>chep21 - REST API</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Calls WordPress site via standard REST API <code>/wp-json/wp/v2/posts</code>. 
+                              Syncs WordPress posts/pages to <code>nwpi_posts</code> table. 
+                              Updates <code>ywp_sites.last_sync_at</code> timestamp.
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              WordPress REST API
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <input type="checkbox" className="form-checkbox h-4 w-4" />
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <strong>chep31 - Test Plugin</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Tests plugin connectivity by checking: 1) WordPress REST API availability, 
+                              2) Snefuru plugin status endpoint, 3) Plugin posts endpoint. 
+                              No database writes, only reads from <code>ywp_sites</code>.
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Plugin API (Snefuru WordPress plugin)
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <input type="checkbox" className="form-checkbox h-4 w-4" />
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <strong>chep41 - Check Version</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Checks current plugin version installed on WordPress site via plugin API endpoint. 
+                              Reads from <code>barkro_plugin_versions</code> table to compare versions.
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Plugin API (Snefuru WordPress plugin)
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <input type="checkbox" className="form-checkbox h-4 w-4" />
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <strong>chep51 - Update Plugin</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Updates the Snefuru plugin on WordPress site. 
+                              Writes to <code>barkro_update_pushes</code> and <code>barkro_site_status</code> tables 
+                              to track update attempts and status.
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Plugin API (Snefuru WordPress plugin)
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <input type="checkbox" className="form-checkbox h-4 w-4" />
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <strong>chep61 - Barkro Push</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Pushes plugin updates from local <code>snefuruplin</code> directory to WordPress site. 
+                              Creates ZIP file and sends via <code>/wp-json/snefuru/v1/check-update</code>. 
+                              Updates <code>barkro_update_pushes</code>, <code>barkro_plugin_versions</code>, 
+                              and <code>barkro_site_status</code> tables.
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Plugin API (Snefuru WordPress plugin)
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <input type="checkbox" className="form-checkbox h-4 w-4" />
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <strong>wpsv2_sync (Plugin API)</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Extended sync operation that syncs WordPress content to database via Plugin API. 
+                              Articles flow: wp → nwpi. Updates <code>nwpi_posts</code> and <code>ywp_sites</code> tables.
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Plugin API (Snefuru WordPress plugin)
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <input type="checkbox" className="form-checkbox h-4 w-4" />
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <strong>wpsv2_sync (REST API)</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              Extended sync operation that syncs WordPress content to database via REST API. 
+                              Articles flow: wp → nwpi. Updates <code>nwpi_posts</code> and <code>ywp_sites</code> tables.
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              WordPress REST API
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
