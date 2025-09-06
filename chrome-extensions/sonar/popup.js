@@ -6,7 +6,121 @@ document.addEventListener('DOMContentLoaded', function() {
   const driggsmanSubBtn = document.getElementById('driggsmanSubBtn');
   const wppusherHttpsBtn = document.getElementById('wppusherHttpsBtn');
   const wppusherHttpBtn = document.getElementById('wppusherHttpBtn');
+  const filezillaPathBtn = document.getElementById('filezillaPathBtn');
+  const metaTitleBtn = document.getElementById('metaTitleBtn');
   const statusDiv = document.getElementById('status');
+
+  // Meta Title Copy button - Copy page meta title to clipboard
+  metaTitleBtn.addEventListener('click', async function() {
+    try {
+      // Add loading state
+      metaTitleBtn.classList.add('loading');
+      
+      // Get current active tab
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (!activeTab || !activeTab.id) {
+        showStatus('Cannot access current tab', 'error');
+        metaTitleBtn.classList.remove('loading');
+        return;
+      }
+      
+      try {
+        // Execute script to get the page title
+        const results = await chrome.scripting.executeScript({
+          target: { tabId: activeTab.id },
+          func: () => {
+            // Try to get meta title first
+            const metaTitle = document.querySelector('meta[property="og:title"]')?.content ||
+                            document.querySelector('meta[name="twitter:title"]')?.content ||
+                            document.querySelector('meta[name="title"]')?.content;
+            
+            // Fall back to document title if no meta title found
+            return metaTitle || document.title;
+          }
+        });
+        
+        if (results && results[0] && results[0].result) {
+          const pageTitle = results[0].result;
+          
+          // Copy to clipboard
+          await navigator.clipboard.writeText(pageTitle);
+          
+          // Show success message (truncate if too long)
+          const displayTitle = pageTitle.length > 50 ? 
+            pageTitle.substring(0, 50) + '...' : pageTitle;
+          showStatus(`Title copied: ${displayTitle}`, 'success');
+        } else {
+          showStatus('Could not get page title', 'error');
+        }
+        
+      } catch (scriptError) {
+        // This might happen on chrome:// pages or other restricted pages
+        console.error('Script execution error:', scriptError);
+        
+        // Try to use just the tab title as fallback
+        if (activeTab.title) {
+          await navigator.clipboard.writeText(activeTab.title);
+          const displayTitle = activeTab.title.length > 50 ? 
+            activeTab.title.substring(0, 50) + '...' : activeTab.title;
+          showStatus(`Tab title copied: ${displayTitle}`, 'success');
+        } else {
+          showStatus('Cannot access page title on this tab', 'error');
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error copying meta title:', error);
+      showStatus('Failed to copy page title', 'error');
+    } finally {
+      metaTitleBtn.classList.remove('loading');
+    }
+  });
+
+  // FileZilla path for allinone - Copy path to clipboard
+  filezillaPathBtn.addEventListener('click', async function() {
+    try {
+      // Add loading state
+      filezillaPathBtn.classList.add('loading');
+      
+      // Get current active tab
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (!activeTab || !activeTab.url) {
+        showStatus('Cannot access current tab URL', 'error');
+        filezillaPathBtn.classList.remove('loading');
+        return;
+      }
+      
+      try {
+        const url = new URL(activeTab.url);
+        let domain = url.hostname;
+        
+        // Remove www. if present
+        if (domain.startsWith('www.')) {
+          domain = domain.substring(4);
+        }
+        
+        // Create FileZilla path
+        const filezillaPath = `/${domain}/wp-content/ai1wm-backups`;
+        
+        // Copy to clipboard
+        await navigator.clipboard.writeText(filezillaPath);
+        
+        // Show success message
+        showStatus(`FileZilla path copied: ${filezillaPath}`, 'success');
+        
+      } catch (urlError) {
+        showStatus('Invalid URL in current tab', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error copying FileZilla path:', error);
+      showStatus('Failed to copy FileZilla path', 'error');
+    } finally {
+      filezillaPathBtn.classList.remove('loading');
+    }
+  });
 
   // Copy all tab URLs to clipboard
   copyBtn.addEventListener('click', async function() {

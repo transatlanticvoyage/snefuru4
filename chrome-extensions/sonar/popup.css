@@ -112,6 +112,28 @@ h1::before {
   box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
 }
 
+/* Meta Title button */
+.btn-meta-title {
+  background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
+  color: white;
+}
+
+.btn-meta-title:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(128, 90, 213, 0.4);
+}
+
+/* FileZilla path button */
+.btn-filezilla {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  color: white;
+}
+
+.btn-filezilla:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(229, 62, 62, 0.4);
+}
+
 .btn-copy:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);

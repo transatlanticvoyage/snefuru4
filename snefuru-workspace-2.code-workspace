@@ -4,6 +4,10 @@
 			"path": "."
 		},
 		{
+			"path": "../localrepo-vulcanhatch",
+			"name": "🌋 VulcanHatch (WP Dev)"
+		},
+		{
 			"path": "./snefuruplin"
 		},
 		{
@@ -36,5 +40,12 @@
 		{
 			"path": "./shenzi-wordpress-plugins/fathom"
 		}
-	]
+	],
+	"settings": {
+		"git.detectSubmodules": false,
+		"git.repositories": [
+			".",
+			"../localrepo-vulcanhatch"
+		]
+	}
 }
