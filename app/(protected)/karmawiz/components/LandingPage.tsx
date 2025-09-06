@@ -27,6 +27,14 @@ interface DetectionResult {
   matchType: 'post_id' | 'pageslug';
 }
 
+interface SitesprenMatch {
+  id: string;
+  sitespren_base: string;
+  driggs_brand_name?: string;
+  driggs_city?: string;
+  created_at: string;
+}
+
 export default function LandingPage({ onCreateSession, loading, sourceUrl, matchingGconPieces }: LandingPageProps) {
   const [gconPieceId, setGconPieceId] = useState('');
   const [sessionName, setSessionName] = useState('');
@@ -40,6 +48,9 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
   const [detectionResults, setDetectionResults] = useState<DetectionResult[]>([]);
   const [postIdResult, setPostIdResult] = useState('None found');
   const [pageslugResult, setPageslugResult] = useState('None found');
+  const [extractedDomainBase, setExtractedDomainBase] = useState('');
+  const [sitesprenMatches, setSitesprenMatches] = useState<SitesprenMatch[]>([]);
+  const [sitesprenResult, setSitesprenResult] = useState('None found');
 
   const handleSelectFromMatch = (piece: GconPiece) => {
     setSelectedFromMatch(piece.id);
@@ -67,8 +78,103 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
     }
   };
 
+  const extractDomainBase = (url: string): string => {
+    if (!url.trim()) return '';
+    
+    try {
+      // Add protocol if missing
+      const urlToProcess = url.includes('://') ? url : `https://${url}`;
+      const urlObj = new URL(urlToProcess);
+      
+      let hostname = urlObj.hostname.toLowerCase();
+      
+      // Remove www. if present
+      if (hostname.startsWith('www.')) {
+        hostname = hostname.substring(4);
+      }
+      
+      return hostname;
+    } catch (error) {
+      // Fallback for malformed URLs
+      try {
+        let cleanUrl = url.trim().toLowerCase();
+        
+        // Remove protocol
+        cleanUrl = cleanUrl.replace(/^https?:\/\//, '');
+        
+        // Remove www.
+        cleanUrl = cleanUrl.replace(/^www\./, '');
+        
+        // Take only the domain part (before first slash)
+        const domainPart = cleanUrl.split('/')[0];
+        
+        return domainPart;
+      } catch {
+        return '';
+      }
+    }
+  };
+
+  const handleCopyDomainBase = async () => {
+    try {
+      await navigator.clipboard.writeText(extractedDomainBase);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = extractedDomainBase;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const matchSitespren = async (domainBase: string) => {
+    if (!domainBase.trim()) {
+      setSitesprenMatches([]);
+      setSitesprenResult('None found');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/karmawiz/match-sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ domainBase }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.matches) {
+        setSitesprenMatches(data.matches);
+        
+        if (data.matches.length > 0) {
+          const match = data.matches[0];
+          setSitesprenResult(`${match.id} - ${match.sitespren_base}`);
+        } else {
+          setSitesprenResult('None found');
+        }
+      } else {
+        console.error('Sitespren matching failed:', data.error);
+        setSitesprenResult('Matching failed');
+      }
+    } catch (error) {
+      console.error('Error calling sitespren matching API:', error);
+      setSitesprenResult('Error occurred');
+    }
+  };
+
   const handleUrlDetection = async () => {
     if (!urlInput.trim()) return;
+    
+    // Extract domain base from URL
+    const domainBase = extractDomainBase(urlInput);
+    setExtractedDomainBase(domainBase);
+    
+    // Match sitespren records based on domain base
+    await matchSitespren(domainBase);
     
     setIsDetecting(true);
     
@@ -277,82 +383,131 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                     metalron_chamber_div
                   </div>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setShowTooltip(!showTooltip)}
-                      className="w-6 h-6 bg-gray-500 text-white rounded-sm flex items-center justify-center text-xs font-bold hover:bg-gray-600"
-                    >
-                      ?
-                    </button>
-                    {showTooltip && (
-                      <div className="absolute right-0 top-8 w-80 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-10">
-                        <p className="text-sm text-gray-700 mb-3">you may enter text like this:</p>
-                        <div className="bg-gray-100 border rounded p-3 mb-3">
-                          <code className="text-sm block whitespace-pre-wrap">
+                </div>
+
+                <div className="silver_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
+                  <div className="flex justify-between items-center">
+                    <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                      SilverFunctionDetectGconRowFromRawURLs
+                    </div>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowTooltip(!showTooltip)}
+                        className="w-6 h-6 bg-gray-500 text-white rounded-sm flex items-center justify-center text-xs font-bold hover:bg-gray-600"
+                      >
+                        ?
+                      </button>
+                      {showTooltip && (
+                        <div className="absolute right-0 top-8 w-80 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-10">
+                          <p className="text-sm text-gray-700 mb-3">you may enter text like this:</p>
+                          <div className="bg-gray-100 border rounded p-3 mb-3">
+                            <code className="text-sm block whitespace-pre-wrap">
 https://airductcharleston.com/bed-bugs-control/
 https://airductcharleston.com/wp-admin/post.php?post=826&action=edit
 https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
-                          </code>
+                            </code>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleCopyUrls}
+                            className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                          >
+                            Copy All to Clipboard
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={handleCopyUrls}
-                          className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                        >
-                          Copy All to Clipboard
-                        </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    enter url
-                  </label>
-                  <div className="flex space-x-2">
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      enter url
+                    </label>
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        value={urlInput}
+                        onChange={(e) => setUrlInput(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleUrlDetection()}
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="https://elcajonplumber.net/emergency-plumber-el-cajon/"
+                        disabled={isDetecting}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleUrlDetection}
+                        disabled={isDetecting || !urlInput.trim()}
+                        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isDetecting ? 'Searching...' : 'Detect'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      found from wp post id: gcon_pieces.g_post_id (corresponds to wp_posts.post_id)
+                    </label>
                     <input
                       type="text"
-                      value={urlInput}
-                      onChange={(e) => setUrlInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleUrlDetection()}
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="https://elcajonplumber.net/emergency-plumber-el-cajon/"
-                      disabled={isDetecting}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={postIdResult}
+                      readOnly
                     />
-                    <button
-                      type="button"
-                      onClick={handleUrlDetection}
-                      disabled={isDetecting || !urlInput.trim()}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isDetecting ? 'Searching...' : 'Detect'}
-                    </button>
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      found from gcon_pieces.pageslug (corresponds to wp_posts.post_name)
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={pageslugResult}
+                      readOnly
+                    />
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    found from wp post id: gcon_pieces.g_post_id (corresponds to wp_posts.post_id)
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    value={postIdResult}
-                    readOnly
-                  />
-                </div>
+                <div className="platinum_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                    platinum_chamber_div
+                  </div>
+                  
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      extracted_domain_base
+                    </label>
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        value={extractedDomainBase}
+                        readOnly
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleCopyDomainBase}
+                        disabled={!extractedDomainBase}
+                        className="w-12 h-12 bg-gray-500 text-white rounded-sm hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      >
+                        📋
+                      </button>
+                    </div>
+                  </div>
 
-                <div className="mt-4">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    found from gcon_pieces.pageslug (corresponds to wp_posts.post_name)
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    value={pageslugResult}
-                    readOnly
-                  />
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      matching sitespren_base inside your user account
+                    </label>
+                    <input
+                      type="text"
+                      value={sitesprenResult}
+                      readOnly
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                    />
+                  </div>
                 </div>
               </div>
 
