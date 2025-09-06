@@ -19,12 +19,27 @@ interface LandingPageProps {
   matchingGconPieces?: GconPiece[];
 }
 
+interface DetectionResult {
+  g_post_id: string;
+  pageslug: string;
+  pageurl: string;
+  meta_title: string;
+  matchType: 'post_id' | 'pageslug';
+}
+
 export default function LandingPage({ onCreateSession, loading, sourceUrl, matchingGconPieces }: LandingPageProps) {
   const [gconPieceId, setGconPieceId] = useState('');
   const [sessionName, setSessionName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [selectedFromMatch, setSelectedFromMatch] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  
+  // URL detection states
+  const [urlInput, setUrlInput] = useState('');
+  const [isDetecting, setIsDetecting] = useState(false);
+  const [detectionResults, setDetectionResults] = useState<DetectionResult[]>([]);
+  const [postIdResult, setPostIdResult] = useState('None found');
+  const [pageslugResult, setPageslugResult] = useState('None found');
 
   const handleSelectFromMatch = (piece: GconPiece) => {
     setSelectedFromMatch(piece.id);
@@ -49,6 +64,61 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
+    }
+  };
+
+  const handleUrlDetection = async () => {
+    if (!urlInput.trim()) return;
+    
+    setIsDetecting(true);
+    
+    try {
+      const response = await fetch('/api/karmawiz/detect-gcon-from-url', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ rawUrl: urlInput }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setDetectionResults(data.results);
+        
+        // Update the result fields based on matches
+        const postIdMatches = data.results.filter((r: DetectionResult) => r.matchType === 'post_id');
+        const pageslugMatches = data.results.filter((r: DetectionResult) => r.matchType === 'pageslug');
+        
+        // Format results for display
+        if (postIdMatches.length > 0) {
+          const match = postIdMatches[0];
+          setPostIdResult(`${match.g_post_id} - ${match.pageslug} - ${match.pageurl} - ${match.meta_title}`);
+        } else {
+          setPostIdResult('None found');
+        }
+        
+        if (pageslugMatches.length > 0) {
+          const match = pageslugMatches[0];
+          setPageslugResult(`${match.g_post_id} - ${match.pageslug} - ${match.pageurl} - ${match.meta_title}`);
+        } else if (data.results.length > 0 && postIdMatches.length === 0) {
+          // If we found results but not specifically by post_id, show in pageslug field
+          const match = data.results[0];
+          setPageslugResult(`${match.g_post_id} - ${match.pageslug} - ${match.pageurl} - ${match.meta_title}`);
+        } else {
+          setPageslugResult('None found');
+        }
+      } else {
+        console.error('Detection failed:', data.error);
+        setPostIdResult('Detection failed');
+        setPageslugResult('Detection failed');
+      }
+    } catch (error) {
+      console.error('Error calling detection API:', error);
+      setPostIdResult('Error occurred');
+      setPageslugResult('Error occurred');
+    } finally {
+      setIsDetecting(false);
     }
   };
 
@@ -240,11 +310,25 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     enter url
                   </label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="https://elcajonplumber.net/emergency-plumber-el-cajon/"
-                  />
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleUrlDetection()}
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="https://elcajonplumber.net/emergency-plumber-el-cajon/"
+                      disabled={isDetecting}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleUrlDetection}
+                      disabled={isDetecting || !urlInput.trim()}
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isDetecting ? 'Searching...' : 'Detect'}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mt-4">
@@ -254,7 +338,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   <input
                     type="text"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    value="None found"
+                    value={postIdResult}
                     readOnly
                   />
                 </div>
@@ -266,7 +350,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   <input
                     type="text"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    value="None found"
+                    value={pageslugResult}
                     readOnly
                   />
                 </div>
