@@ -24,12 +24,31 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
   const [sessionName, setSessionName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [selectedFromMatch, setSelectedFromMatch] = useState<string | null>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const handleSelectFromMatch = (piece: GconPiece) => {
     setSelectedFromMatch(piece.id);
     setGconPieceId(piece.id);
     if (!sessionName) {
       setSessionName(`Karma Session - ${piece.meta_title || piece.h1title || 'Content Enhancement'}`);
+    }
+  };
+
+  const handleCopyUrls = async () => {
+    const urlText = `https://airductcharleston.com/bed-bugs-control/
+https://airductcharleston.com/wp-admin/post.php?post=826&action=edit
+https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
+    
+    try {
+      await navigator.clipboard.writeText(urlText);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = urlText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
     }
   };
 
@@ -183,9 +202,73 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="metalron_chamber_div" style={{ border: '1px solid black', padding: '16px' }}>
-                <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                  metalron_chamber_div
+              <div className="metalron_chamber_div" style={{ border: '1px solid black', padding: '16px', position: 'relative' }}>
+                <div className="flex justify-between items-center">
+                  <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                    metalron_chamber_div
+                  </div>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowTooltip(!showTooltip)}
+                      className="w-6 h-6 bg-gray-500 text-white rounded-sm flex items-center justify-center text-xs font-bold hover:bg-gray-600"
+                    >
+                      ?
+                    </button>
+                    {showTooltip && (
+                      <div className="absolute right-0 top-8 w-80 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-10">
+                        <p className="text-sm text-gray-700 mb-3">you may enter text like this:</p>
+                        <div className="bg-gray-100 border rounded p-3 mb-3">
+                          <code className="text-sm block whitespace-pre-wrap">
+https://airductcharleston.com/bed-bugs-control/
+https://airductcharleston.com/wp-admin/post.php?post=826&action=edit
+https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
+                          </code>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleCopyUrls}
+                          className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        >
+                          Copy All to Clipboard
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    enter url
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="https://elcajonplumber.net/emergency-plumber-el-cajon/"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    found from wp post id: gcon_pieces.g_post_id (corresponds to wp_posts.post_id)
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value="None found"
+                    readOnly
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    found from gcon_pieces.pageslug (corresponds to wp_posts.post_name)
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value="None found"
+                    readOnly
+                  />
                 </div>
               </div>
 
