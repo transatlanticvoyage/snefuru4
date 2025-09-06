@@ -173,7 +173,7 @@ export default function KarmawizClient() {
   }, [user, router, wizsessionParam, stepParam, currentStep, sourceUrlParam]);
 
   // Create new session
-  const createNewSession = async (gconPieceId: string, sessionName: string = 'New Karma Wizard Session') => {
+  const createNewSession = async (gconPieceId: string, sessionName: string = 'New Karma Wizard Session', jankyRelSitesprenId?: string) => {
     if (!userInternalId) {
       setError('User not authenticated');
       return;
@@ -182,31 +182,57 @@ export default function KarmawizClient() {
     try {
       setLoading(true);
 
-      // Validate that gcon_piece exists (optional - you might want to skip this check)
-      const { data: gconPiece, error: gconError } = await supabase
-        .from('gcon_pieces')
-        .select('id')
-        .eq('id', gconPieceId)
-        .single();
+      // Validate gcon_piece if provided
+      if (gconPieceId && gconPieceId.trim()) {
+        const { data: gconPiece, error: gconError } = await supabase
+          .from('gcon_pieces')
+          .select('id')
+          .eq('id', gconPieceId)
+          .single();
 
-      if (gconError) {
-        setError('Invalid gcon_piece_id. Please check the ID and try again.');
-        setLoading(false);
-        return;
+        if (gconError) {
+          setError('Invalid gcon_piece_id. Please check the ID and try again.');
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Validate sitespren if provided and no gcon_piece
+      if (!gconPieceId && jankyRelSitesprenId && jankyRelSitesprenId.trim()) {
+        const { data: sitespren, error: sitesprenError } = await supabase
+          .from('sitespren')
+          .select('id')
+          .eq('id', jankyRelSitesprenId)
+          .single();
+
+        if (sitesprenError) {
+          setError('Invalid sitespren ID. Please check the ID and try again.');
+          setLoading(false);
+          return;
+        }
       }
 
       // Create new session
+      const sessionData: any = {
+        session_name: sessionName,
+        user_id: userInternalId,
+        session_status: 'active',
+        steps_completed: 0,
+        step_left_off_at: 1,
+        total_steps_planned: 4
+      };
+
+      // Add either gcon_piece_id or janky_rel_sitespren_id
+      if (gconPieceId && gconPieceId.trim()) {
+        sessionData.rel_gcon_piece_id = gconPieceId;
+      }
+      if (jankyRelSitesprenId && jankyRelSitesprenId.trim()) {
+        sessionData.janky_rel_sitespren_id = jankyRelSitesprenId;
+      }
+
       const { data: newSession, error: createError } = await supabase
         .from('karma_wizard_sessions')
-        .insert({
-          session_name: sessionName,
-          rel_gcon_piece_id: gconPieceId,
-          user_id: userInternalId,
-          session_status: 'active',
-          steps_completed: 0,
-          step_left_off_at: 1,
-          total_steps_planned: 4
-        })
+        .insert(sessionData)
         .select()
         .single();
 

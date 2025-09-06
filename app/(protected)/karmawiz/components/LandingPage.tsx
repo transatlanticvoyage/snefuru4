@@ -13,7 +13,7 @@ interface GconPiece {
 }
 
 interface LandingPageProps {
-  onCreateSession: (gconPieceId: string, sessionName?: string) => void;
+  onCreateSession: (gconPieceId: string, sessionName?: string, jankyRelSitesprenId?: string) => void;
   loading: boolean;
   sourceUrl?: string | null;
   matchingGconPieces?: GconPiece[];
@@ -41,6 +41,8 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
   const [isCreating, setIsCreating] = useState(false);
   const [selectedFromMatch, setSelectedFromMatch] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [jankyRelSitesprenId, setJankyRelSitesprenId] = useState('');
+  const [showApiKeys, setShowApiKeys] = useState(false);
   
   // URL detection states
   const [urlInput, setUrlInput] = useState('');
@@ -231,16 +233,17 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!gconPieceId.trim()) {
-      alert('Please enter a gcon piece ID or select from matching content');
+    if (!gconPieceId.trim() && !jankyRelSitesprenId.trim()) {
+      alert('Please enter either a gcon piece ID or sitespren ID');
       return;
     }
 
     setIsCreating(true);
     try {
       await onCreateSession(
-        gconPieceId.trim(), 
-        sessionName.trim() || 'New Karma Wizard Session'
+        gconPieceId.trim() || '', 
+        sessionName.trim() || 'New Karma Wizard Session',
+        jankyRelSitesprenId.trim() || undefined
       );
     } finally {
       setIsCreating(false);
@@ -504,13 +507,133 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       matching sitespren_base inside your user account
                     </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={sitesprenResult}
+                        readOnly
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                      />
+                      <button
+                        onClick={() => {
+                          if (sitesprenMatches.length > 0) {
+                            setJankyRelSitesprenId(sitesprenMatches[0].id);
+                          }
+                        }}
+                        disabled={sitesprenMatches.length === 0}
+                        className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                          sitesprenMatches.length === 0
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                      >
+                        pass to janky
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="sulfur_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                    sulfur_chamber_div
+                  </div>
+                  
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      vez_karmawizardsessions.vez_janky_rel_sitesprivate_id
+                    </label>
                     <input
                       type="text"
-                      value={sitesprenResult}
-                      readOnly
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                      value={jankyRelSitesprenId}
+                      onChange={(e) => setJankyRelSitesprenId(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter sitespren ID..."
                     />
+                    
+                    <button
+                      onClick={async () => {
+                        if (!jankyRelSitesprenId.trim() && !gconPieceId.trim()) {
+                          alert('Please enter either a sitespren ID or gcon piece ID');
+                          return;
+                        }
+                        setIsCreating(true);
+                        try {
+                          await onCreateSession(
+                            gconPieceId.trim() || '', 
+                            sessionName.trim() || 'New Karma Wizard Session',
+                            jankyRelSitesprenId.trim() || undefined
+                          );
+                        } catch (error) {
+                          console.error('Failed to create session:', error);
+                        } finally {
+                          setIsCreating(false);
+                        }
+                      }}
+                      disabled={!jankyRelSitesprenId.trim() && !gconPieceId.trim()}
+                      className={`mt-3 px-4 py-2 rounded font-medium transition-colors ${
+                        (!jankyRelSitesprenId.trim() && !gconPieceId.trim())
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      Create New Karma Wizard Session
+                    </button>
                   </div>
+                </div>
+
+                <div className="plutonium_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
+                  <div className="flex justify-between items-center">
+                    <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                      plutonium_chamber_div
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowApiKeys(!showApiKeys)}
+                      className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors"
+                    >
+                      {showApiKeys ? 'Collapse' : 'Expand'}
+                    </button>
+                  </div>
+                  
+                  {showApiKeys && (
+                    <div className="mt-4 space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          ruplin_api_key_site_specific
+                        </label>
+                        <input
+                          type="text"
+                          value=""
+                          readOnly
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          harbor_api_key_site_specific
+                        </label>
+                        <input
+                          type="text"
+                          value=""
+                          readOnly
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          klyra_api_key_site_specific
+                        </label>
+                        <input
+                          type="text"
+                          value=""
+                          readOnly
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="nickel_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
@@ -703,7 +826,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   htmlFor="gconPieceId" 
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Gcon Piece ID *
+                  Gcon Piece ID (Optional - provide either this or Sitespren ID)
                 </label>
                 <input
                   type="text"
@@ -713,7 +836,6 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter the UUID of the content piece to enhance"
                   disabled={isCreating}
-                  required
                 />
                 <p className="mt-1 text-sm text-gray-500">
                   This should be a UUID from the gcon_pieces table representing the content you want to work on.
@@ -744,7 +866,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
               <div className="pt-4">
                 <button
                   type="submit"
-                  disabled={isCreating || !gconPieceId.trim()}
+                  disabled={isCreating || (!gconPieceId.trim() && !jankyRelSitesprenId.trim())}
                   className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {isCreating ? (
