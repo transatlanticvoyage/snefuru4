@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const wppusherHttpBtn = document.getElementById('wppusherHttpBtn');
   const filezillaPathBtn = document.getElementById('filezillaPathBtn');
   const metaTitleBtn = document.getElementById('metaTitleBtn');
+  const karmawizBtn = document.getElementById('karmawizBtn');
   const statusDiv = document.getElementById('status');
 
   // Meta Title Copy button - Copy page meta title to clipboard
@@ -76,6 +77,85 @@ document.addEventListener('DOMContentLoaded', function() {
       metaTitleBtn.classList.remove('loading');
     }
   });
+
+  // Karma Wizard button - Open current tab URL in /karmawiz
+  if (karmawizBtn) {
+    karmawizBtn.addEventListener('click', async function() {
+    console.log('Karma Wizard button clicked');
+    try {
+      // Add loading state
+      karmawizBtn.classList.add('loading');
+      
+      console.log('Getting active tab...');
+      // Get current active tab
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      console.log('Active tab:', activeTab);
+      
+      if (!activeTab || !activeTab.url) {
+        console.log('No active tab or URL found');
+        showStatus('Cannot access current tab URL', 'error');
+        karmawizBtn.classList.remove('loading');
+        return;
+      }
+      
+      try {
+        console.log('Processing URL:', activeTab.url);
+        const url = new URL(activeTab.url);
+        let domain = url.hostname;
+        console.log('Extracted domain:', domain);
+        
+        // Remove www. if present
+        if (domain.startsWith('www.')) {
+          domain = domain.substring(4);
+          console.log('Domain after www removal:', domain);
+        }
+        
+        // Get the current environment setting
+        console.log('Getting environment setting...');
+        const result = await chrome.storage.local.get(['environment']);
+        const currentEnv = result.environment || 'localhost';
+        console.log('Current environment:', currentEnv);
+        
+        // Determine the base URL based on environment
+        let baseUrl;
+        if (currentEnv === 'localhost') {
+          baseUrl = 'http://localhost:3000';
+        } else {
+          baseUrl = 'https://snef.me';
+        }
+        console.log('Base URL:', baseUrl);
+        
+        // Create the karmawiz URL with the source URL parameter
+        const karmawizUrl = `${baseUrl}/karmawiz?sourceUrl=${encodeURIComponent(domain)}`;
+        console.log('Final karmawiz URL:', karmawizUrl);
+        
+        // Open in new tab
+        console.log('Creating new tab...');
+        await chrome.tabs.create({ url: karmawizUrl });
+        console.log('Tab created successfully');
+        
+        showStatus(`Opening karmawiz for: ${domain}`, 'success');
+        
+        // Close the popup after a brief delay
+        setTimeout(() => {
+          window.close();
+        }, 1000);
+        
+      } catch (urlError) {
+        console.error('URL parsing error:', urlError);
+        showStatus('Invalid URL format', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error opening karmawiz:', error);
+      showStatus('Failed to open karmawiz', 'error');
+    } finally {
+      karmawizBtn.classList.remove('loading');
+    }
+  });
+  } else {
+    console.error('karmawizBtn element not found');
+  }
 
   // FileZilla path for allinone - Copy path to clipboard
   filezillaPathBtn.addEventListener('click', async function() {
@@ -497,8 +577,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const localhostBtn = document.getElementById('localhostBtn');
   const cloudBtn = document.getElementById('cloudBtn');
   
-  function updateEnvironment(env) {
+  async function updateEnvironment(env) {
     currentEnvironment = env;
+    
+    // Save to chrome storage
+    await chrome.storage.local.set({ environment: env });
     
     // Update button states
     if (env === 'localhost') {
@@ -512,6 +595,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   localhostBtn.addEventListener('click', () => updateEnvironment('localhost'));
   cloudBtn.addEventListener('click', () => updateEnvironment('cloud'));
+  
+  // Initialize environment from storage on popup load
+  chrome.storage.local.get(['environment']).then(result => {
+    const storedEnv = result.environment || 'localhost';
+    updateEnvironment(storedEnv);
+  });
   
   // Dromdori functionality
   async function getCurrentDomain() {

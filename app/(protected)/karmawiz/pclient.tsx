@@ -29,12 +29,15 @@ export default function KarmawizClient() {
   const [error, setError] = useState<string | null>(null);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
   const [currentSession, setCurrentSession] = useState<KarmaWizardSession | null>(null);
+  const [sourceUrl, setSourceUrl] = useState<string | null>(null);
+  const [matchingGconPieces, setMatchingGconPieces] = useState<any[]>([]);
 
   const supabase = createClientComponentClient();
 
   // Parse URL parameters
   const wizsessionParam = searchParams.get('wizsession');
   const stepParam = searchParams.get('step');
+  const sourceUrlParam = searchParams.get('sourceUrl');
   const currentStep = stepParam ? parseInt(stepParam, 10) : null;
 
   // Get user internal ID
@@ -68,6 +71,30 @@ export default function KarmawizClient() {
       setError('Failed to fetch user data');
       setLoading(false);
       return null;
+    }
+  };
+
+  // Search for matching gcon_pieces based on source URL
+  const searchForMatchingGconPieces = async (url: string, userId: string) => {
+    try {
+      // Search gcon_pieces for matching URLs
+      const { data: pieces, error } = await supabase
+        .from('gcon_pieces')
+        .select('id, meta_title, h1title, asn_sitespren_base, pageurl, pageslug, created_at')
+        .eq('fk_users_id', userId)
+        .or(`asn_sitespren_base.ilike.%${url}%,pageurl.ilike.%${url}%`)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error searching gcon_pieces:', error);
+        return [];
+      }
+
+      setMatchingGconPieces(pieces || []);
+      return pieces || [];
+    } catch (error) {
+      console.error('Error searching for matching content:', error);
+      return [];
     }
   };
 
@@ -110,6 +137,12 @@ export default function KarmawizClient() {
       const userId = await fetchUserInternalId();
       if (!userId) return;
 
+      // If we have a sourceUrl param, search for matching content and store it
+      if (sourceUrlParam) {
+        setSourceUrl(sourceUrlParam);
+        await searchForMatchingGconPieces(sourceUrlParam, userId);
+      }
+
       // If we have a wizsession param, fetch that session
       if (wizsessionParam) {
         const session = await fetchSession(wizsessionParam, userId);
@@ -137,7 +170,7 @@ export default function KarmawizClient() {
     };
 
     initializePage();
-  }, [user, router, wizsessionParam, stepParam, currentStep]);
+  }, [user, router, wizsessionParam, stepParam, currentStep, sourceUrlParam]);
 
   // Create new session
   const createNewSession = async (gconPieceId: string, sessionName: string = 'New Karma Wizard Session') => {
@@ -293,6 +326,8 @@ export default function KarmawizClient() {
       <LandingPage 
         onCreateSession={createNewSession}
         loading={loading}
+        sourceUrl={sourceUrl}
+        matchingGconPieces={matchingGconPieces}
       />
     );
   }

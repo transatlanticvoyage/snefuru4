@@ -2,21 +2,42 @@
 
 import { useState } from 'react';
 
+interface GconPiece {
+  id: string;
+  meta_title: string;
+  h1title: string;
+  asn_sitespren_base: string;
+  pageurl: string;
+  pageslug: string;
+  created_at: string;
+}
+
 interface LandingPageProps {
   onCreateSession: (gconPieceId: string, sessionName?: string) => void;
   loading: boolean;
+  sourceUrl?: string | null;
+  matchingGconPieces?: GconPiece[];
 }
 
-export default function LandingPage({ onCreateSession, loading }: LandingPageProps) {
+export default function LandingPage({ onCreateSession, loading, sourceUrl, matchingGconPieces }: LandingPageProps) {
   const [gconPieceId, setGconPieceId] = useState('');
   const [sessionName, setSessionName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [selectedFromMatch, setSelectedFromMatch] = useState<string | null>(null);
+
+  const handleSelectFromMatch = (piece: GconPiece) => {
+    setSelectedFromMatch(piece.id);
+    setGconPieceId(piece.id);
+    if (!sessionName) {
+      setSessionName(`Karma Session - ${piece.meta_title || piece.h1title || 'Content Enhancement'}`);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!gconPieceId.trim()) {
-      alert('Please enter a gcon piece ID');
+      alert('Please enter a gcon piece ID or select from matching content');
       return;
     }
 
@@ -55,6 +76,94 @@ export default function LandingPage({ onCreateSession, loading }: LandingPagePro
               </p>
             </div>
 
+            {sourceUrl && (
+              <div className="mb-8">
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-green-700">
+                        <strong>Source URL Detected:</strong> {sourceUrl}
+                      </p>
+                      <p className="text-xs text-green-600 mt-1">
+                        Searched your content for matching pieces based on this URL.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {matchingGconPieces && matchingGconPieces.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">
+                      Matching Content Found ({matchingGconPieces.length})
+                    </h3>
+                    <div className="space-y-3 max-h-80 overflow-y-auto">
+                      {matchingGconPieces.map((piece) => (
+                        <div
+                          key={piece.id}
+                          className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                            selectedFromMatch === piece.id
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => handleSelectFromMatch(piece)}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-gray-900 mb-1">
+                                {piece.meta_title || piece.h1title || 'Untitled'}
+                              </h4>
+                              <p className="text-sm text-gray-600 mb-2">
+                                {piece.pageurl || piece.asn_sitespren_base}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Created: {new Date(piece.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="ml-3">
+                              {selectedFromMatch === piece.id ? (
+                                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                              ) : (
+                                <div className="w-5 h-5 border-2 border-gray-300 rounded-full"></div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {matchingGconPieces && matchingGconPieces.length === 0 && (
+                  <div className="mb-6">
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm text-yellow-700">
+                            <strong>No matching content found</strong> for "{sourceUrl}". 
+                            You can still manually enter a gcon piece ID below.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="mb-8">
               <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
                 <div className="flex">
@@ -65,7 +174,7 @@ export default function LandingPage({ onCreateSession, loading }: LandingPagePro
                   </div>
                   <div className="ml-3">
                     <p className="text-sm text-blue-700">
-                      <strong>How it works:</strong> Enter the ID of a content piece (gcon_pieces) that you want to enhance with images. 
+                      <strong>How it works:</strong> {sourceUrl ? 'Select from matching content above or' : 'Enter the ID of a content piece (gcon_pieces) that you want to enhance with images.'} 
                       The wizard will guide you through fetching page info, generating images, and updating your WordPress site.
                     </p>
                   </div>
@@ -74,6 +183,12 @@ export default function LandingPage({ onCreateSession, loading }: LandingPagePro
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="metalron_chamber_div" style={{ border: '1px solid black', padding: '16px' }}>
+                <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                  metalron_chamber_div
+                </div>
+              </div>
+
               <div>
                 <label 
                   htmlFor="gconPieceId" 
