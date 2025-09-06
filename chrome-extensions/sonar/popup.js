@@ -747,14 +747,20 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Make API call to your Next.js backend
       try {
+        console.log('Calling API:', `${TREGNAR_API_BASE}/api/extension/site-metrics?domain=${encodeURIComponent(domain)}`);
+        
         const response = await fetch(`${TREGNAR_API_BASE}/api/extension/site-metrics?domain=${encodeURIComponent(domain)}`, {
           method: 'GET',
           credentials: 'include', // Include cookies for authentication
           headers: {
             'Content-Type': 'application/json',
-            'X-Extension-ID': chrome.runtime.id // Send extension ID for validation
+            'X-Extension-ID': chrome.runtime.id, // Send extension ID for validation
+            'Accept': 'application/json'
           }
         });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
         
         if (!response.ok) {
           if (response.status === 401) {
@@ -770,7 +776,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const data = await response.json();
         
-        // Update inputs with fetched data
+        // Update inputs with fetched data (using pseudo names in frontend)
         sitesprivateBaseInput.value = data.sitesprivate_base || '';
         sitesglobalIpAddressInput.value = data.sitesglobal_ip_address || '';
         
@@ -785,12 +791,24 @@ document.addEventListener('DOMContentLoaded', function() {
         
       } catch (fetchError) {
         console.error('API fetch error:', fetchError);
+        console.error('Error details:', {
+          name: fetchError.name,
+          message: fetchError.message,
+          stack: fetchError.stack
+        });
         
-        // If we had cached data, keep showing it
-        if (cachedData) {
-          showTregnarStatus('Using cached data (refresh failed)', 'info');
+        // More specific error messages
+        if (fetchError.name === 'TypeError' && fetchError.message.includes('Failed to fetch')) {
+          showTregnarStatus('Network error - API endpoint not available', 'error');
+        } else if (fetchError.name === 'TypeError' && fetchError.message.includes('CORS')) {
+          showTregnarStatus('CORS error - check API configuration', 'error');
         } else {
-          showTregnarStatus('Connection failed - check if logged in', 'error');
+          // If we had cached data, keep showing it
+          if (cachedData) {
+            showTregnarStatus('Using cached data (refresh failed)', 'info');
+          } else {
+            showTregnarStatus('Connection failed - check if logged in', 'error');
+          }
         }
       }
       
