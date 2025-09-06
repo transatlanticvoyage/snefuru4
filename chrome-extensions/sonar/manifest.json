@@ -8,7 +8,13 @@
     "clipboardRead",
     "clipboardWrite",
     "scripting",
-    "activeTab"
+    "activeTab",
+    "storage",
+    "cookies"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://snef.me/*"
   ],
   "action": {
     "default_popup": "popup.html",

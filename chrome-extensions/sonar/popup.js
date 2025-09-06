@@ -641,4 +641,188 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.tabs.create({ url: url });
     }
   });
+
+  // Tregnarexus Chamber functionality
+  const refreshMetricsBtn = document.getElementById('refreshMetricsBtn');
+  const sitesprivateBaseInput = document.getElementById('sitesprivate_base');
+  const sitesglobalIpAddressInput = document.getElementById('sitesglobal_ip_address');
+  const tregnarStatus = document.getElementById('tregnarStatus');
+  
+  // Cache configuration
+  const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  const TREGNAR_API_BASE = currentEnvironment === 'cloud' ? 'https://snef.me' : 'http://localhost:3000';
+  
+  function showTregnarStatus(message, type = 'info') {
+    tregnarStatus.textContent = message;
+    tregnarStatus.className = `chamber-status ${type} show`;
+    
+    // Hide message after 3 seconds
+    setTimeout(() => {
+      tregnarStatus.classList.remove('show');
+    }, 3000);
+  }
+  
+  async function getCachedData(domain) {
+    try {
+      const cacheKey = `tregnar_cache_${domain}`;
+      const cached = await chrome.storage.local.get([cacheKey]);
+      
+      if (cached[cacheKey]) {
+        const cacheData = cached[cacheKey];
+        // Check if cache is still valid
+        if (Date.now() - cacheData.timestamp < CACHE_TTL) {
+          return cacheData;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error reading cache:', error);
+      return null;
+    }
+  }
+  
+  async function setCachedData(domain, data) {
+    try {
+      const cacheKey = `tregnar_cache_${domain}`;
+      const cacheData = {
+        ...data,
+        timestamp: Date.now()
+      };
+      await chrome.storage.local.set({ [cacheKey]: cacheData });
+    } catch (error) {
+      console.error('Error setting cache:', error);
+    }
+  }
+  
+  async function clearAllCache() {
+    try {
+      const allStorage = await chrome.storage.local.get(null);
+      const cacheKeys = Object.keys(allStorage).filter(key => key.startsWith('tregnar_cache_'));
+      await chrome.storage.local.remove(cacheKeys);
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+    }
+  }
+  
+  // Clear cache on extension startup
+  chrome.runtime.onStartup?.addListener(() => {
+    clearAllCache();
+  });
+  
+  refreshMetricsBtn.addEventListener('click', async function() {
+    try {
+      // Add loading state
+      refreshMetricsBtn.classList.add('loading');
+      showTregnarStatus('Connecting to Tregnar...', 'info');
+      
+      // Clear inputs
+      sitesprivateBaseInput.value = '';
+      sitesglobalIpAddressInput.value = '';
+      
+      // Get current domain
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!activeTab || !activeTab.url) {
+        showTregnarStatus('Cannot access current tab', 'error');
+        refreshMetricsBtn.classList.remove('loading');
+        return;
+      }
+      
+      const url = new URL(activeTab.url);
+      let domain = url.hostname;
+      
+      // Remove www. if present
+      if (domain.startsWith('www.')) {
+        domain = domain.substring(4);
+      }
+      
+      // Check cache first
+      const cachedData = await getCachedData(domain);
+      if (cachedData) {
+        sitesprivateBaseInput.value = cachedData.sitesprivate_base || '';
+        sitesglobalIpAddressInput.value = cachedData.sitesglobal_ip_address || '';
+        showTregnarStatus('Loaded from cache (refreshing in background)', 'success');
+        
+        // Continue to fetch fresh data in background
+      }
+      
+      // Make API call to your Next.js backend
+      try {
+        const response = await fetch(`${TREGNAR_API_BASE}/api/extension/site-metrics?domain=${encodeURIComponent(domain)}`, {
+          method: 'GET',
+          credentials: 'include', // Include cookies for authentication
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Extension-ID': chrome.runtime.id // Send extension ID for validation
+          }
+        });
+        
+        if (!response.ok) {
+          if (response.status === 401) {
+            showTregnarStatus('Not logged in to Tregnar account', 'error');
+          } else if (response.status === 404) {
+            showTregnarStatus('Site not found in your account', 'error');
+          } else {
+            showTregnarStatus('Failed to fetch metrics', 'error');
+          }
+          refreshMetricsBtn.classList.remove('loading');
+          return;
+        }
+        
+        const data = await response.json();
+        
+        // Update inputs with fetched data
+        sitesprivateBaseInput.value = data.sitesprivate_base || '';
+        sitesglobalIpAddressInput.value = data.sitesglobal_ip_address || '';
+        
+        // Cache the data
+        await setCachedData(domain, {
+          sitesprivate_base: data.sitesprivate_base,
+          sitesglobal_ip_address: data.sitesglobal_ip_address,
+          domain: domain
+        });
+        
+        showTregnarStatus('Metrics refreshed successfully', 'success');
+        
+      } catch (fetchError) {
+        console.error('API fetch error:', fetchError);
+        
+        // If we had cached data, keep showing it
+        if (cachedData) {
+          showTregnarStatus('Using cached data (refresh failed)', 'info');
+        } else {
+          showTregnarStatus('Connection failed - check if logged in', 'error');
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error refreshing metrics:', error);
+      showTregnarStatus('Unexpected error occurred', 'error');
+    } finally {
+      refreshMetricsBtn.classList.remove('loading');
+    }
+  });
+  
+  // Auto-load metrics on popup open if cache exists
+  (async function autoLoadMetrics() {
+    try {
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (activeTab && activeTab.url) {
+        const url = new URL(activeTab.url);
+        let domain = url.hostname;
+        
+        // Remove www. if present
+        if (domain.startsWith('www.')) {
+          domain = domain.substring(4);
+        }
+        
+        const cachedData = await getCachedData(domain);
+        if (cachedData) {
+          sitesprivateBaseInput.value = cachedData.sitesprivate_base || '';
+          sitesglobalIpAddressInput.value = cachedData.sitesglobal_ip_address || '';
+        }
+      }
+    } catch (error) {
+      console.error('Error auto-loading metrics:', error);
+    }
+  })();
 });

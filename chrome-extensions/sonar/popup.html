@@ -121,6 +121,33 @@
           </svg>
           <span>/driggsman - open w all subdomains</span>
         </button>
+        
+        <!-- Tregnarexus Chamber -->
+        <div class="tregnarexus_chamber_div">
+          <h3 class="chamber-title">Tregnarexus Chamber</h3>
+          <div class="chamber-content">
+            <div class="field-group">
+              <label for="sitesprivate_base">sitesprivate_base</label>
+              <input type="text" id="sitesprivate_base" class="chamber-input" readonly>
+            </div>
+            
+            <div class="field-group">
+              <label for="sitesglobal_ip_address">sitesglobal_ip_address</label>
+              <input type="text" id="sitesglobal_ip_address" class="chamber-input" readonly>
+            </div>
+            
+            <button id="refreshMetricsBtn" class="btn btn-refresh-metrics">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23,4 23,10 17,10"></polyline>
+                <polyline points="1,20 1,14 7,14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>refresh metrics from my tregnar account</span>
+            </button>
+            
+            <div id="tregnarStatus" class="chamber-status"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Column 3: Dromdori Tools -->
