@@ -747,9 +747,9 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Make API call to your Next.js backend
       try {
-        console.log('Calling API:', `${TREGNAR_API_BASE}/api/extension/site-metrics?domain=${encodeURIComponent(domain)}`);
+        console.log('Calling API:', `${TREGNAR_API_BASE}/api/sonar/site-data-for-users-own-sites?domain=${encodeURIComponent(domain)}`);
         
-        const response = await fetch(`${TREGNAR_API_BASE}/api/extension/site-metrics?domain=${encodeURIComponent(domain)}`, {
+        const response = await fetch(`${TREGNAR_API_BASE}/api/sonar/site-data-for-users-own-sites?domain=${encodeURIComponent(domain)}`, {
           method: 'GET',
           credentials: 'include', // Include cookies for authentication
           headers: {
@@ -767,6 +767,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showTregnarStatus('Not logged in to Tregnar account', 'error');
           } else if (response.status === 404) {
             showTregnarStatus('Site not found in your account', 'error');
+          } else if (response.status === 429) {
+            showTregnarStatus('Rate limit exceeded (500 calls/day)', 'error');
           } else {
             showTregnarStatus('Failed to fetch metrics', 'error');
           }
@@ -774,18 +776,24 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
         
-        const data = await response.json();
+        const result = await response.json();
         
-        // Update inputs with fetched data (using pseudo names in frontend)
-        sitesprivateBaseInput.value = data.sitesprivate_base || '';
-        sitesglobalIpAddressInput.value = data.sitesglobal_ip_address || '';
-        
-        // Cache the data
-        await setCachedData(domain, {
-          sitesprivate_base: data.sitesprivate_base,
-          sitesglobal_ip_address: data.sitesglobal_ip_address,
-          domain: domain
-        });
+        if (result.success && result.data) {
+          // Update inputs with fetched data (using pseudo names in frontend)
+          sitesprivateBaseInput.value = result.data.sitesprivate_base || '';
+          sitesglobalIpAddressInput.value = result.data.sitesglobal_ip_address || '';
+          
+          // Cache the data
+          await setCachedData(domain, {
+            sitesprivate_base: result.data.sitesprivate_base,
+            sitesglobal_ip_address: result.data.sitesglobal_ip_address,
+            domain: domain
+          });
+        } else {
+          showTregnarStatus(result.error || 'Failed to fetch data', 'error');
+          refreshMetricsBtn.classList.remove('loading');
+          return;
+        }
         
         showTregnarStatus('Metrics refreshed successfully', 'success');
         
