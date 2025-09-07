@@ -5,6 +5,7 @@ import Step1 from './steps/Step1';
 import Step2 from './steps/Step2';
 import Step3 from './steps/Step3';
 import Step4 from './steps/Step4';
+import Step5 from './steps/Step5';
 
 interface KarmaWizardSession {
   session_id: string;
@@ -143,6 +144,8 @@ export default function WizardStep({
         return <Step3 {...stepProps} />;
       case 4:
         return <Step4 {...stepProps} />;
+      case 5:
+        return <Step5 {...stepProps} />;
       default:
         return (
           <div className="text-center py-8">

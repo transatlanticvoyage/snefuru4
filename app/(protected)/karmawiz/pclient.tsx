@@ -131,6 +131,15 @@ export default function KarmawizClient() {
         return;
       }
 
+      // Force step=1 parameter if no step is present
+      if (!stepParam) {
+        const newUrl = wizsessionParam 
+          ? `/karmawiz?wizsession=${wizsessionParam}&step=1`
+          : '/karmawiz?step=1';
+        router.replace(newUrl);
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
@@ -219,7 +228,7 @@ export default function KarmawizClient() {
         session_status: 'active',
         steps_completed: 0,
         step_left_off_at: 1,
-        total_steps_planned: 4
+        total_steps_planned: 5
       };
 
       // Add either gcon_piece_id or janky_rel_sitespren_id
@@ -346,20 +355,23 @@ export default function KarmawizClient() {
     );
   }
 
-  // Show landing page if no session/step params
-  if (!wizsessionParam && !stepParam) {
+  // Show combined landing page and step 1 content
+  if (currentStep === 1) {
     return (
       <LandingPage 
         onCreateSession={createNewSession}
         loading={loading}
         sourceUrl={sourceUrl}
         matchingGconPieces={matchingGconPieces}
+        currentSession={currentSession}
+        onNavigateToStep={navigateToStep}
+        onUpdateProgress={updateSessionProgress}
       />
     );
   }
 
-  // Show wizard step if we have both session and step
-  if (currentSession && currentStep) {
+  // Show wizard step if we have both session and step (step 2+)
+  if (currentSession && currentStep && currentStep > 1) {
     return (
       <WizardStep
         session={currentSession}

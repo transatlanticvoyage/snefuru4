@@ -17,6 +17,9 @@ interface LandingPageProps {
   loading: boolean;
   sourceUrl?: string | null;
   matchingGconPieces?: GconPiece[];
+  currentSession?: any | null;
+  onNavigateToStep?: (stepNumber: number) => void;
+  onUpdateProgress?: (stepNumber: number, completed?: boolean) => void;
 }
 
 interface DetectionResult {
@@ -35,7 +38,7 @@ interface SitesprenMatch {
   created_at: string;
 }
 
-export default function LandingPage({ onCreateSession, loading, sourceUrl, matchingGconPieces }: LandingPageProps) {
+export default function LandingPage({ onCreateSession, loading, sourceUrl, matchingGconPieces, currentSession, onNavigateToStep, onUpdateProgress }: LandingPageProps) {
   const [gconPieceId, setGconPieceId] = useState('');
   const [sessionName, setSessionName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -267,7 +270,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Karma Wizard
+                Karma Wizard - Step 1
               </h1>
               <p className="text-gray-600">
                 Enhance your content with AI-generated images and automated WordPress integration
@@ -890,19 +893,23 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                 <h3 className="text-lg font-medium text-gray-900 mb-2">What happens next?</h3>
                 <div className="text-sm text-gray-600 space-y-2">
                   <div className="flex items-center justify-center space-x-2">
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">Step 1</span>
-                    <span>Fetch and analyze existing content</span>
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Step 1</span>
+                    <span>Designate Basic Session Info (Current Step)</span>
                   </div>
                   <div className="flex items-center justify-center space-x-2">
                     <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">Step 2</span>
-                    <span>Generate AI images via API</span>
+                    <span>Fetch and analyze existing content</span>
                   </div>
                   <div className="flex items-center justify-center space-x-2">
                     <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">Step 3</span>
-                    <span>Upload images to WordPress</span>
+                    <span>Generate AI images via API</span>
                   </div>
                   <div className="flex items-center justify-center space-x-2">
                     <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">Step 4</span>
+                    <span>Upload images to WordPress</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2">
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">Step 5</span>
                     <span>Update content with image references</span>
                   </div>
                 </div>
@@ -918,6 +925,139 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
               </a>
             </div>
           </div>
+
+          {/* Step 1 Content - Only show when session exists */}
+          {currentSession && (
+            <div className="bg-white rounded-lg shadow-lg p-8 mt-8">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  Step 1: Designate Basic Session Info
+                </h2>
+                <p className="text-gray-600">
+                  Review and confirm your Karma Wizard session details before proceeding to content analysis.
+                </p>
+              </div>
+
+              {/* Session Details */}
+              <div className="bg-white border rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Session Configuration</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Session ID</label>
+                      <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded font-mono">
+                        {currentSession.session_id}
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Session Name</label>
+                      <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+                        {currentSession.session_name}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Session Status</label>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {currentSession.session_status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {currentSession.rel_gcon_piece_id && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Gcon Piece ID</label>
+                        <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded font-mono">
+                          {currentSession.rel_gcon_piece_id}
+                        </p>
+                      </div>
+                    )}
+
+                    {currentSession.janky_rel_sitespren_id && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Sitespren ID</label>
+                        <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded font-mono">
+                          {currentSession.janky_rel_sitespren_id}
+                        </p>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Total Steps Planned</label>
+                      <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+                        {currentSession.total_steps_planned}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Created</label>
+                      <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+                        {new Date(currentSession.created_at).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content Source Verification */}
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-700">
+                      <strong>Content Source:</strong> This session will work with{' '}
+                      {currentSession.rel_gcon_piece_id ? 'the selected gcon piece' : 'the specified sitespren'}.
+                      The wizard will fetch content data, generate images, and update your WordPress site.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Session Steps Overview */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <h3 className="font-medium text-gray-900 mb-3">Wizard Process Overview</h3>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-green-100 text-green-800 flex items-center justify-center text-xs font-medium mr-3">1</div>
+                    <span><strong>Step 1:</strong> Designate Basic Session Info (Current Step)</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-medium mr-3">2</div>
+                    <span><strong>Step 2:</strong> Fetch and analyze existing content</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-medium mr-3">3</div>
+                    <span><strong>Step 3:</strong> Generate AI images via API</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-medium mr-3">4</div>
+                    <span><strong>Step 4:</strong> Upload images to WordPress</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-medium mr-3">5</div>
+                    <span><strong>Step 5:</strong> Update content with image references</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 1 Completion Button */}
+              <div className="text-center pt-6 border-t">
+                <button
+                  onClick={() => onNavigateToStep && onNavigateToStep(2)}
+                  className="px-8 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+                >
+                  Complete Step 1 - Proceed to Content Analysis →
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
