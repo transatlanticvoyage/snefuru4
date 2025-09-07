@@ -1007,6 +1007,24 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                     </div>
                   )}
                   
+                  {/* Navigation Buttons with Dynamic URLs */}
+                  {currentSession && currentSession.sitespren_base && (
+                    <div className="mt-4 flex justify-center gap-2">
+                      <a 
+                        href={`/gconjar1?sitebase=${currentSession.sitespren_base}`}
+                        className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                      >
+                        /gconjar1
+                      </a>
+                      <a 
+                        href={`/nwjar1?sitebase=${currentSession.sitespren_base}`}
+                        className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                      >
+                        /nwjar1
+                      </a>
+                    </div>
+                  )}
+                  
                   {/* Gcon Piece Data Badge with Option Selector */}
                   {currentSession && (
                     <div className="mt-4 flex">
@@ -1074,20 +1092,6 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   <div className="mt-4">
                     <div className="flex items-center gap-4 mb-3">
                       <h3 className="text-lg font-semibold text-gray-800">Chepno Functions Reference</h3>
-                      <div className="flex gap-2">
-                        <a 
-                          href="/gconjar1" 
-                          className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
-                        >
-                          /gconjar1
-                        </a>
-                        <a 
-                          href="/nwjar1" 
-                          className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
-                        >
-                          /nwjar1
-                        </a>
-                      </div>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full border border-gray-300 bg-white text-sm">
