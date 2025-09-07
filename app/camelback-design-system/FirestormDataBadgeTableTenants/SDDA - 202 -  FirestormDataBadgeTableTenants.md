@@ -22,3 +22,21 @@ th.cell_inner_wrapper_div
 
 width of <th> cell
 height of <th> cell
+
+———————————————————————
+every cell in the ui table (whether <th> or <td>) should contain an inner wrapper that occurs immediately inside the beginning of the <td> or <th> element.
+
+this div must have the class of:
+cell_inner_wrapper_div
+
+this way i can style it like:
+th.cell_inner_wrapper_div , td.cell_inner_wrapper_div , etc.
+
+
+———————————————————————
+note to self:
+
+we must make a row like this:
+shenfur_th_cells_db_table_row.css
+
+firestorm_fk_data_badge.css
