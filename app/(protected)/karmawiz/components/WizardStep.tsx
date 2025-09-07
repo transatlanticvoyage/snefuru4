@@ -6,6 +6,7 @@ import Step2 from './steps/Step2';
 import Step3 from './steps/Step3';
 import Step4 from './steps/Step4';
 import Step5 from './steps/Step5';
+import KarmaWizardSidebar from './KarmaWizardSidebar';
 
 interface KarmaWizardSession {
   session_id: string;
@@ -156,74 +157,84 @@ export default function WizardStep({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                Karma Wizard - {stepTitles[currentStep as keyof typeof stepTitles]}
-              </h1>
-              <p className="text-gray-600">
-                {stepDescriptions[currentStep as keyof typeof stepDescriptions]}
-              </p>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <KarmaWizardSidebar 
+        currentStep={currentStep} 
+        session={session}
+        onNavigateToStep={onNavigateToStep}
+      />
+      
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            {/* Header */}
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <div className="text-center mb-6">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  Karma Wizard - {stepTitles[currentStep as keyof typeof stepTitles]}
+                </h1>
+                <p className="text-gray-600">
+                  {stepDescriptions[currentStep as keyof typeof stepDescriptions]}
+                </p>
+              </div>
+
+              {renderProgressBar()}
+              {renderStepIndicators()}
             </div>
 
-            {renderProgressBar()}
-            {renderStepIndicators()}
-          </div>
+            {/* Main Step Content */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              {renderStepContent()}
+            </div>
 
-          {/* Main Step Content */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            {renderStepContent()}
-          </div>
+            {/* Navigation Footer */}
+            <div className="flex justify-between items-center mt-6">
+              <div>
+                {currentStep > 1 && (
+                  <button
+                    onClick={() => onNavigateToStep(currentStep - 1)}
+                    disabled={isProcessing}
+                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    ← Previous Step
+                  </button>
+                )}
+              </div>
 
-          {/* Navigation Footer */}
-          <div className="flex justify-between items-center mt-6">
-            <div>
-              {currentStep > 1 && (
-                <button
-                  onClick={() => onNavigateToStep(currentStep - 1)}
-                  disabled={isProcessing}
-                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              <div className="text-sm text-gray-500">
+                Step {currentStep} of {session.total_steps_planned}
+              </div>
+
+              <div>
+                {currentStep < session.total_steps_planned && (
+                  <button
+                    onClick={() => onNavigateToStep(currentStep + 1)}
+                    disabled={isProcessing}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next Step →
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Session Info */}
+            <div className="mt-6 text-center">
+              <div className="text-sm text-gray-500">
+                Session: {session.session_name} | 
+                Gcon Piece: {session.rel_gcon_piece_id} | 
+                Status: <span className="capitalize">{session.session_status}</span>
+              </div>
+              <div className="mt-2">
+                <a 
+                  href="/karmajar" 
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
-                  ← Previous Step
-                </button>
-              )}
-            </div>
-
-            <div className="text-sm text-gray-500">
-              Step {currentStep} of {session.total_steps_planned}
-            </div>
-
-            <div>
-              {currentStep < session.total_steps_planned && (
-                <button
-                  onClick={() => onNavigateToStep(currentStep + 1)}
-                  disabled={isProcessing}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next Step →
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Session Info */}
-          <div className="mt-6 text-center">
-            <div className="text-sm text-gray-500">
-              Session: {session.session_name} | 
-              Gcon Piece: {session.rel_gcon_piece_id} | 
-              Status: <span className="capitalize">{session.session_status}</span>
-            </div>
-            <div className="mt-2">
-              <a 
-                href="/karmajar" 
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-              >
-                ← Return to Karmajar
-              </a>
+                  ← Return to Karmajar
+                </a>
+              </div>
             </div>
           </div>
         </div>

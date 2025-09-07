@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import KarmaWizardSidebar from './KarmaWizardSidebar';
 
 interface GconPiece {
   id: string;
@@ -264,8 +265,17 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <KarmaWizardSidebar 
+        currentStep={1} 
+        session={currentSession}
+        onNavigateToStep={onNavigateToStep}
+      />
+      
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        <div className="container mx-auto px-4 py-12">
         <div className="mx-auto" style={{ maxWidth: '1200px' }}>
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="text-center mb-8">
@@ -1058,6 +1068,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>

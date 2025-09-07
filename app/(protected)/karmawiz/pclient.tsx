@@ -103,7 +103,11 @@ export default function KarmawizClient() {
     try {
       const { data: sessionData, error: sessionError } = await supabase
         .from('karma_wizard_sessions')
-        .select('*')
+        .select(`
+          *,
+          sitespren:janky_rel_sitespren_id(sitespren_base),
+          gcon_pieces:rel_gcon_piece_id(post_name, meta_title)
+        `)
         .eq('session_id', sessionId)
         .eq('user_id', userId)
         .single();
@@ -114,8 +118,16 @@ export default function KarmawizClient() {
         return null;
       }
 
-      setCurrentSession(sessionData);
-      return sessionData;
+      // Flatten the sitespren and gcon_pieces data for easier access
+      const flattenedSession = {
+        ...sessionData,
+        sitespren_base: sessionData.sitespren?.sitespren_base || null,
+        gcon_post_name: sessionData.gcon_pieces?.post_name || null,
+        gcon_meta_title: sessionData.gcon_pieces?.meta_title || null
+      };
+
+      setCurrentSession(flattenedSession);
+      return flattenedSession;
     } catch (error) {
       console.error('Error fetching session:', error);
       setError('Failed to fetch session data');
