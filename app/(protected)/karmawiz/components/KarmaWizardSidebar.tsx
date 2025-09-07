@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 interface KarmaWizardSidebarProps {
   currentStep: number;
   session?: any;
@@ -7,6 +9,7 @@ interface KarmaWizardSidebarProps {
 }
 
 export default function KarmaWizardSidebar({ currentStep, session, onNavigateToStep }: KarmaWizardSidebarProps) {
+  const [showTooltip, setShowTooltip] = useState(false);
   const steps = [
     { number: 1, title: 'Designate Basic Session Info', description: 'Set up your wizard session' },
     { number: 2, title: 'Fetch and Analyze Content', description: 'Retrieve and examine existing content' },
@@ -209,17 +212,65 @@ export default function KarmaWizardSidebar({ currentStep, session, onNavigateToS
 
                 {/* Step Content */}
                 <div className="flex-1 min-w-0">
-                  <h4 className={`text-sm font-medium mb-1 ${
-                    status === 'current'
-                      ? 'text-blue-900'
-                      : status === 'completed'
-                      ? 'text-green-900'
-                      : status === 'available'
-                      ? 'text-gray-900'
-                      : 'text-gray-500'
-                  }`}>
-                    {step.title}
-                  </h4>
+                  <div className="flex items-center gap-2">
+                    {step.number === 1 && (
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowTooltip(!showTooltip);
+                          }}
+                          className="w-4 h-4 bg-gray-500 text-white rounded-full flex items-center justify-center text-xs font-bold hover:bg-gray-600"
+                        >
+                          ?
+                        </button>
+                        {showTooltip && (
+                          <div className="absolute left-0 top-6 w-80 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50">
+                            <div className="text-sm text-gray-700 mb-3 whitespace-pre-wrap">
+{`Karma Wizard - Step 1
+Enhance your content with AI-generated images and automated WordPress integration
+
+How it works: Enter the ID of a content piece (gcon_pieces) that you want to enhance with images. The wizard will guide you through fetching page info, generating images, and updating your WordPress site.`}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const text = `Karma Wizard - Step 1
+Enhance your content with AI-generated images and automated WordPress integration
+
+How it works: Enter the ID of a content piece (gcon_pieces) that you want to enhance with images. The wizard will guide you through fetching page info, generating images, and updating your WordPress site.`;
+                                try {
+                                  await navigator.clipboard.writeText(text);
+                                } catch (err) {
+                                  const textArea = document.createElement('textarea');
+                                  textArea.value = text;
+                                  document.body.appendChild(textArea);
+                                  textArea.select();
+                                  document.execCommand('copy');
+                                  document.body.removeChild(textArea);
+                                }
+                              }}
+                              className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                            >
+                              Copy to Clipboard
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <h4 className={`text-sm font-medium mb-1 ${
+                      status === 'current'
+                        ? 'text-blue-900'
+                        : status === 'completed'
+                        ? 'text-green-900'
+                        : status === 'available'
+                        ? 'text-gray-900'
+                        : 'text-gray-500'
+                    }`}>
+                      {step.title}
+                    </h4>
+                  </div>
                   <p className={`text-xs ${
                     status === 'current'
                       ? 'text-blue-700'

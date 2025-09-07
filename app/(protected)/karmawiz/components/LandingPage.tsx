@@ -70,6 +70,9 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
   // State to track if component is hydrated
   const [isHydrated, setIsHydrated] = useState(false);
 
+  // State for radio selection between janky and gcon
+  const [selectedFkOption, setSelectedFkOption] = useState<'janky' | 'gcon'>('janky');
+
   // Chepno action feedback state
   const [gadgetFeedback, setGadgetFeedback] = useState<{
     action: string;
@@ -531,10 +534,10 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
       
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        <div className="w-full px-6 py-8">
+        <div className="w-full px-6" style={{ paddingTop: '10px' }}>
           <div className="bg-white rounded-lg shadow-lg p-6">
             {/* Chamber Toggle Buttons */}
-            <div className="mb-6 pb-6 border-b border-gray-200">
+            <div className="pb-6 border-b border-gray-200">
               <div className="flex flex-wrap justify-center gap-2">
                 {chamberVisibility && Object.entries(chamberVisibility).map(([chamber, isVisible]) => (
                   <button
@@ -562,15 +565,6 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
                   </div>
                 )}
               </div>
-            </div>
-
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Karma Wizard - Step 1
-              </h1>
-              <p className="text-gray-600">
-                Enhance your content with AI-generated images and automated WordPress integration
-              </p>
             </div>
 
             {sourceUrl && (
@@ -661,23 +655,6 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
               </div>
             )}
 
-            <div className="mb-8">
-              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-blue-700">
-                      <strong>How it works:</strong> {sourceUrl ? 'Select from matching content above or' : 'Enter the ID of a content piece (gcon_pieces) that you want to enhance with images.'} 
-                      The wizard will guide you through fetching page info, generating images, and updating your WordPress site.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="metalron_chamber_div" style={{ border: '1px solid black', padding: '16px', position: 'relative', display: chamberVisibility?.metalron ? 'block' : 'none' }}>
@@ -974,32 +951,119 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                     nickel_chamber_div
                   </div>
                   
-                  {/* Sitespren Data Badge - Another Duplicate Instance */}
+                  {/* Sitespren Data Badge with Option Selector */}
                   {currentSession && (
-                    <div className="mt-4 border border-black rounded overflow-hidden">
-                      <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
-                        <span style={{ fontSize: '12px', color: '#394990' }}>
-                          fk data badge
-                        </span>
-                      </div>
-                      <div className="p-3">
-                        <label className="block text-xs font-medium text-gray-700 mb-2">
-                          janky_rel_sitespren_id
-                        </label>
-                        <div className="flex space-x-2">
+                    <div className="mt-4 flex">
+                      {/* Option 1 Selector */}
+                      <div 
+                        className="border border-black rounded-l overflow-hidden cursor-pointer"
+                        style={{ width: '50px' }}
+                        onClick={() => setSelectedFkOption('janky')}
+                      >
+                        <div className="w-full h-3.5 bg-blue-200 flex items-center justify-center">
+                          <span style={{ fontSize: '10px', color: '#394990' }}>
+                            option 1
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-center p-1">
                           <input
-                            type="text"
-                            value={currentSession.janky_rel_sitespren_id || ''}
-                            readOnly
-                            className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
-                            placeholder="ID"
+                            type="checkbox"
+                            checked={selectedFkOption === 'janky'}
+                            onChange={() => setSelectedFkOption('janky')}
+                            className="w-5 h-5 cursor-pointer"
+                            style={{ width: '20px', height: '20px' }}
                           />
+                        </div>
+                      </div>
+                      {/* Original Sitespren Badge */}
+                      <div className="flex-1 border border-black border-l-0 rounded-r overflow-hidden">
+                        <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
+                          <span style={{ fontSize: '12px', color: '#394990' }}>
+                            fk data badge
+                          </span>
+                        </div>
+                        <div className="p-3">
+                          <label className="block text-xs font-medium text-gray-700 mb-2">
+                            janky_rel_sitespren_id
+                          </label>
+                          <div className="flex space-x-2">
+                            <input
+                              type="text"
+                              value={currentSession.janky_rel_sitespren_id || ''}
+                              readOnly
+                              className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
+                              placeholder="ID"
+                            />
+                            <input
+                              type="text"
+                              value={currentSession.sitespren_base || ''}
+                              readOnly
+                              className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                              placeholder="Sitespren base URL"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Gcon Piece Data Badge with Option Selector */}
+                  {currentSession && (
+                    <div className="mt-4 flex">
+                      {/* Option 2 Selector */}
+                      <div 
+                        className="border border-black rounded-l overflow-hidden cursor-pointer"
+                        style={{ width: '50px' }}
+                        onClick={() => setSelectedFkOption('gcon')}
+                      >
+                        <div className="w-full h-3.5 bg-blue-200 flex items-center justify-center">
+                          <span style={{ fontSize: '10px', color: '#394990' }}>
+                            option 2
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-center p-1">
+                          <input
+                            type="checkbox"
+                            checked={selectedFkOption === 'gcon'}
+                            onChange={() => setSelectedFkOption('gcon')}
+                            className="w-5 h-5 cursor-pointer"
+                            style={{ width: '20px', height: '20px' }}
+                          />
+                        </div>
+                      </div>
+                      {/* Original Gcon Piece Badge */}
+                      <div className="flex-1 border border-black border-l-0 rounded-r overflow-hidden">
+                        <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
+                          <span style={{ fontSize: '12px', color: '#394990' }}>
+                            fk data badge
+                          </span>
+                        </div>
+                        <div className="p-3">
+                          <label className="block text-xs font-medium text-gray-700 mb-2">
+                            rel_gcon_piece_id
+                          </label>
+                          <div className="flex space-x-2 mb-2">
+                            <input
+                              type="text"
+                              value={currentSession.rel_gcon_piece_id || ''}
+                              readOnly
+                              className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
+                              placeholder="ID"
+                            />
+                            <input
+                              type="text"
+                              value={currentSession.gcon_post_name || ''}
+                              readOnly
+                              className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                              placeholder="Post name"
+                            />
+                          </div>
                           <input
                             type="text"
-                            value={currentSession.sitespren_base || ''}
+                            value={currentSession.gcon_meta_title || ''}
                             readOnly
-                            className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
-                            placeholder="Sitespren base URL"
+                            className="w-full px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                            placeholder="Meta title"
                           />
                         </div>
                       </div>
@@ -1008,7 +1072,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   
                   {/* Chepno Functions Reference Table */}
                   <div className="mt-4">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-4 mb-3">
                       <h3 className="text-lg font-semibold text-gray-800">Chepno Functions Reference</h3>
                       <div className="flex gap-2">
                         <a 
@@ -1028,11 +1092,37 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                     <div className="overflow-x-auto">
                       <table className="w-full border border-gray-300 bg-white text-sm">
                         <thead>
+                          <tr className="bg-gray-50">
+                            <th className="border border-gray-300 px-3 py-2 text-center text-gray-500">-</th>
+                            <th className="border border-gray-300 px-3 py-2 text-center text-gray-500">-</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left text-gray-500">-</th>
+                            <th className="border border-gray-300 px-3 py-2 text-center">
+                              <input
+                                type="checkbox"
+                                checked={selectedFkOption === 'janky'}
+                                onChange={() => setSelectedFkOption('janky')}
+                                className="cursor-pointer"
+                                style={{ width: '20px', height: '20px' }}
+                              />
+                            </th>
+                            <th className="border border-gray-300 px-3 py-2 text-center">
+                              <input
+                                type="checkbox"
+                                checked={selectedFkOption === 'gcon'}
+                                onChange={() => setSelectedFkOption('gcon')}
+                                className="cursor-pointer"
+                                style={{ width: '20px', height: '20px' }}
+                              />
+                            </th>
+                            <th className="border border-gray-300 px-3 py-2 text-left text-gray-500">-</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left text-gray-500">-</th>
+                          </tr>
                           <tr className="bg-gray-100">
                             <th className="border border-gray-300 px-3 py-2 text-center font-medium w-12">Select</th>
                             <th className="border border-gray-300 px-3 py-2 text-center font-medium w-20">submit</th>
                             <th className="border border-gray-300 px-3 py-2 text-left font-medium">Function Name (ID)</th>
-                            <th className="border border-gray-300 px-3 py-2 text-left font-medium w-48">Feedback</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left font-medium w-48">Feedback (janky_rel_sitespren_id)</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left font-medium w-48">Feedback (rel_gcon_piece_id)</th>
                             <th className="border border-gray-300 px-3 py-2 text-left font-medium">Description & DB Tables</th>
                             <th className="border border-gray-300 px-3 py-2 text-left font-medium">Connection Type</th>
                           </tr>
@@ -1067,6 +1157,16 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                                 'bg-gray-50 text-gray-500'
                               }`}>
                                 {getActionFeedback('chep11')?.message || 'No feedback yet'}
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep11', 'gcon')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep11', 'gcon')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep11', 'gcon')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep11', 'gcon')?.message || 'No feedback yet'}
                               </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
@@ -1107,6 +1207,16 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                                 'bg-gray-50 text-gray-500'
                               }`}>
                                 {getActionFeedback('chep15')?.message || 'No feedback yet'}
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep15', 'gcon')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep15', 'gcon')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep15', 'gcon')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep15', 'gcon')?.message || 'No feedback yet'}
                               </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
@@ -1151,6 +1261,16 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                               </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep16', 'gcon')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep16', 'gcon')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep16', 'gcon')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep16', 'gcon')?.message || 'No feedback yet'}
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
                               Generates new <code>gcon_pieces</code> records from <code>nwpi_posts</code> data. 
                               Creates structured content pieces for further processing. 
                               Works with selected items or all items from the nwpi dataset.
@@ -1188,6 +1308,16 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                                 'bg-gray-50 text-gray-500'
                               }`}>
                                 {getActionFeedback('chep21')?.message || 'No feedback yet'}
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep21', 'gcon')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep21', 'gcon')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep21', 'gcon')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep21', 'gcon')?.message || 'No feedback yet'}
                               </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
@@ -1231,6 +1361,16 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                               </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep31', 'gcon')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep31', 'gcon')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep31', 'gcon')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep31', 'gcon')?.message || 'No feedback yet'}
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
                               Tests plugin connectivity by checking: 1) WordPress REST API availability, 
                               2) Snefuru plugin status endpoint, 3) Plugin posts endpoint. 
                               No database writes, only reads from <code>ywp_sites</code>.
@@ -1268,6 +1408,16 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                                 'bg-gray-50 text-gray-500'
                               }`}>
                                 {getActionFeedback('chep41')?.message || 'No feedback yet'}
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep41', 'gcon')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep41', 'gcon')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep41', 'gcon')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep41', 'gcon')?.message || 'No feedback yet'}
                               </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
@@ -1310,6 +1460,16 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                               </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep51', 'gcon')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep51', 'gcon')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep51', 'gcon')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep51', 'gcon')?.message || 'No feedback yet'}
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
                               Updates the Snefuru plugin on WordPress site. 
                               Writes to <code>barkro_update_pushes</code> and <code>barkro_site_status</code> tables 
                               to track update attempts and status.
@@ -1347,6 +1507,16 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                                 'bg-gray-50 text-gray-500'
                               }`}>
                                 {getActionFeedback('chep61')?.message || 'No feedback yet'}
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep61', 'gcon')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep61', 'gcon')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep61', 'gcon')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep61', 'gcon')?.message || 'No feedback yet'}
                               </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
@@ -1391,6 +1561,16 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                               </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('wpsv2_sync_plugin_api', 'gcon')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('wpsv2_sync_plugin_api', 'gcon')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('wpsv2_sync_plugin_api', 'gcon')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('wpsv2_sync_plugin_api', 'gcon')?.message || 'No feedback yet'}
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
                               Extended sync operation that syncs WordPress content to database via Plugin API. 
                               Articles flow: wp → nwpi. Updates <code>nwpi_posts</code> and <code>ywp_sites</code> tables.
                             </td>
@@ -1427,6 +1607,16 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                                 'bg-gray-50 text-gray-500'
                               }`}>
                                 {getActionFeedback('wpsv2_sync', 'rest_api')?.message || 'No feedback yet'}
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('wpsv2_sync_rest_api', 'gcon')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('wpsv2_sync_rest_api', 'gcon')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('wpsv2_sync_rest_api', 'gcon')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('wpsv2_sync_rest_api', 'gcon')?.message || 'No feedback yet'}
                               </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
@@ -1527,26 +1717,6 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                 <p className="mt-1 text-sm text-gray-500">
                   If left blank, will default to "New Karma Wizard Session"
                 </p>
-              </div>
-
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={isCreating || (!gconPieceId.trim() && !jankyRelSitesprenId.trim())}
-                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {isCreating ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Creating Session...
-                    </span>
-                  ) : (
-                    'Create New Karma Wizard Session'
-                  )}
-                </button>
               </div>
             </form>
 
