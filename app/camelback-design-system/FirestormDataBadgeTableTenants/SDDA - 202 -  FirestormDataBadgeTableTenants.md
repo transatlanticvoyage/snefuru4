@@ -1,5 +1,5 @@
 BEGIN FILE
-
+———————————————————————
 
 What is an FK Data Badge Table?
 
@@ -34,9 +34,18 @@ th.cell_inner_wrapper_div , td.cell_inner_wrapper_div , etc.
 
 
 ———————————————————————
-note to self:
+.firestorm_tub_div
+.firestorm_table
+
+———————————————————————
+ADDITIONAL CLASS FOR EACH INSTANCE OF THE PARENT DIV AND TABLE ELEMENT ITSELF
+
+.firestorm_instance_2036
+
+
+———————————————————————
+OTHER RANDOM INFO
 
 we must make a row like this:
 shenfur_th_cells_db_table_row.css
-
 firestorm_fk_data_badge.css

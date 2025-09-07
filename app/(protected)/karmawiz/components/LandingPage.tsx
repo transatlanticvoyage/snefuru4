@@ -1085,6 +1085,144 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                     </div>
                   )}
                   
+                  {/* Tool Buttons Full Section */}
+                  {currentSession && (
+                    <div className="mt-4 p-4 min-w-96" style={{ border: '1px solid black' }}>
+                      <div className="flex items-center mb-3">
+                        <span className="text-sm font-semibold text-gray-800">
+                          tool_buttons_full
+                        </span>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2">
+                        {/* Individual View */}
+                        <button
+                          onClick={() => currentSession.sitespren_base && window.open(`/sitnivid?site=${encodeURIComponent(currentSession.sitespren_base)}`, '_blank')}
+                          disabled={!currentSession.sitespren_base}
+                          className={`inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            currentSession.sitespren_base 
+                              ? 'text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500' 
+                              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                          }`}
+                        >
+                          Individual View
+                        </button>
+
+                        {/* WP Admin */}
+                        <button
+                          onClick={() => currentSession.sitespren_base && window.open(`https://${currentSession.sitespren_base}/wp-admin/`, '_blank')}
+                          disabled={!currentSession.sitespren_base}
+                          className={`inline-flex items-center justify-center p-2 border border-transparent text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            currentSession.sitespren_base
+                              ? 'text-white bg-green-600 hover:bg-green-700 focus:ring-green-500'
+                              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                          }`}
+                          title="Open WP Admin"
+                        >
+                          WP
+                        </button>
+
+                        {/* Open Site */}
+                        <button
+                          onClick={() => currentSession.sitespren_base && window.open(`https://${currentSession.sitespren_base}`, '_blank')}
+                          disabled={!currentSession.sitespren_base}
+                          className={`inline-flex items-center justify-center p-2 border border-transparent text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            currentSession.sitespren_base
+                              ? 'text-white bg-purple-600 hover:bg-purple-700 focus:ring-purple-500'
+                              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                          }`}
+                          title="Open Site"
+                        >
+                          Site
+                        </button>
+
+                        {/* Copy to Clipboard */}
+                        <button
+                          onClick={() => currentSession.sitespren_base && navigator.clipboard.writeText(currentSession.sitespren_base)}
+                          disabled={!currentSession.sitespren_base}
+                          className={`inline-flex items-center justify-center p-2 border border-transparent text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            currentSession.sitespren_base
+                              ? 'text-white bg-gray-600 hover:bg-gray-700 focus:ring-gray-500'
+                              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                          }`}
+                          title="Copy domain to clipboard"
+                        >
+                          📋
+                        </button>
+
+                        {/* Google Search */}
+                        <button
+                          onClick={() => currentSession.sitespren_base && window.open(`https://www.google.com/search?q=site%3A${encodeURIComponent(currentSession.sitespren_base)}`, '_blank')}
+                          disabled={!currentSession.sitespren_base}
+                          className={`inline-flex items-center justify-center p-2 border border-transparent text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            currentSession.sitespren_base
+                              ? 'text-white bg-red-600 hover:bg-red-700 focus:ring-red-500'
+                              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                          }`}
+                          title="Google site: search"
+                        >
+                          G
+                        </button>
+
+                        {/* NW Jar */}
+                        <button
+                          onClick={() => currentSession.sitespren_base && window.open(`/nwjar1?coltemp=option1&sitebase=${encodeURIComponent(currentSession.sitespren_base)}`, '_blank')}
+                          disabled={!currentSession.sitespren_base}
+                          className={`inline-flex items-center justify-center p-2 border border-transparent text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            currentSession.sitespren_base
+                              ? 'text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500'
+                              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                          }`}
+                          title="Open NW Jar"
+                        >
+                          NW
+                        </button>
+
+                        {/* GC Jar */}
+                        <button
+                          onClick={() => currentSession.sitespren_base && window.open(`/gconjar1?coltemp=option1&sitebase=${encodeURIComponent(currentSession.sitespren_base)}`, '_blank')}
+                          disabled={!currentSession.sitespren_base}
+                          className={`inline-flex items-center justify-center p-2 border border-transparent text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            currentSession.sitespren_base
+                              ? 'text-white bg-teal-500 hover:bg-teal-600 focus:ring-teal-500'
+                              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                          }`}
+                          title="Open GC Jar"
+                        >
+                          GC
+                        </button>
+
+                        {/* Driggsman */}
+                        <button
+                          onClick={() => currentSession.sitespren_base && window.open(`/drom?sitesentered=${encodeURIComponent(currentSession.sitespren_base)}&activefilterchamber=daylight&showmainchamberboxes=no&showtundrachamber=yes`, '_blank')}
+                          disabled={!currentSession.sitespren_base}
+                          className={`inline-flex items-center justify-center p-2 border border-transparent text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            currentSession.sitespren_base
+                              ? 'text-white bg-purple-500 hover:bg-purple-600 focus:ring-purple-500'
+                              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                          }`}
+                          title="Open Driggsman"
+                        >
+                          DG
+                        </button>
+
+                        {/* View Only This Site */}
+                        <button
+                          onClick={() => currentSession.sitespren_base && window.open(`/sitejar4?sitesentered=${encodeURIComponent(currentSession.sitespren_base)}`, '_blank')}
+                          disabled={!currentSession.sitespren_base}
+                          className={`inline-flex items-center justify-center p-2 border border-transparent text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            currentSession.sitespren_base
+                              ? 'text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500'
+                              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                          }`}
+                          title="View only this site"
+                        >
+                          Site
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Navigation Buttons with Dynamic URLs */}
                   {currentSession && currentSession.sitespren_base && (
                     <div className="mt-4 flex justify-start gap-2">
