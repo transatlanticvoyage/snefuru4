@@ -73,6 +73,10 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
   // State for radio selection between janky and gcon
   const [selectedFkOption, setSelectedFkOption] = useState<'janky' | 'gcon'>('janky');
 
+  // State for new seed URL fields
+  const [seedUrl1Frontend, setSeedUrl1Frontend] = useState('');
+  const [seedUrl2WpEditor, setSeedUrl2WpEditor] = useState('');
+
   // Chepno action feedback state
   const [gadgetFeedback, setGadgetFeedback] = useState<{
     action: string;
@@ -129,6 +133,14 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
       }
     }
   }, [chamberVisibility, isHydrated]);
+
+  // Load seed URL fields from session when it changes
+  useEffect(() => {
+    if (currentSession) {
+      setSeedUrl1Frontend(currentSession.seed_url_1_frontend_style || '');
+      setSeedUrl2WpEditor(currentSession.seed_url_2_wp_editor_style || '');
+    }
+  }, [currentSession]);
 
   // Toggle chamber visibility
   const toggleChamberVisibility = (chamber: string) => {
@@ -254,6 +266,34 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
     } catch (error) {
       console.error('Error calling sitespren matching API:', error);
       setSitesprenResult('Error occurred');
+    }
+  };
+
+  // Save seed URL fields to database
+  const saveSeedUrls = async () => {
+    if (!currentSession?.session_id) {
+      alert('No active session found');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('karma_wizard_sessions')
+        .update({
+          seed_url_1_frontend_style: seedUrl1Frontend,
+          seed_url_2_wp_editor_style: seedUrl2WpEditor
+        })
+        .eq('session_id', currentSession.session_id);
+
+      if (error) {
+        console.error('Error saving seed URLs:', error);
+        alert('Failed to save seed URLs');
+      } else {
+        alert('Seed URLs saved successfully');
+      }
+    } catch (error) {
+      console.error('Error saving seed URLs:', error);
+      alert('Failed to save seed URLs');
     }
   };
 
@@ -672,6 +712,44 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
                     <div style={{ fontSize: '16px' }}>
                       SilverFunctionDetectGconRowFromRawURLs
                     </div>
+                    
+                    {/* New Seed URL Input Fields */}
+                    <div className="flex gap-2">
+                      <div style={{ border: '1px solid black', padding: '8px' }}>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">
+                          seed_url_1_frontend_style
+                        </label>
+                        <input
+                          type="text"
+                          value={seedUrl1Frontend}
+                          onChange={(e) => setSeedUrl1Frontend(e.target.value)}
+                          className="px-2 py-1 text-sm border border-gray-300 rounded"
+                          style={{ width: '200px' }}
+                        />
+                      </div>
+                      
+                      <div style={{ border: '1px solid black', padding: '8px' }}>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">
+                          seed_url_2_wp_editor_style
+                        </label>
+                        <input
+                          type="text"
+                          value={seedUrl2WpEditor}
+                          onChange={(e) => setSeedUrl2WpEditor(e.target.value)}
+                          className="px-2 py-1 text-sm border border-gray-300 rounded"
+                          style={{ width: '200px' }}
+                        />
+                      </div>
+                      
+                      <button
+                        type="button"
+                        onClick={saveSeedUrls}
+                        className="self-end px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                      >
+                        Save seed_url fields
+                      </button>
+                    </div>
+                    
                     <div className="relative">
                       <button
                         type="button"
@@ -701,6 +779,8 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                       )}
                     </div>
                   </div>
+
+                  <hr className="my-4 border-gray-300" />
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -890,16 +970,21 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             type="text"
                             value={currentSession.janky_rel_sitespren_id || ''}
                             readOnly
-                            className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
+                            className="w-12 px-2 py-2 text-sm border border-gray-300 rounded-md bg-yellow-50 text-gray-600 font-mono"
                             placeholder="ID"
                           />
-                          <input
-                            type="text"
-                            value={currentSession.sitespren_base || ''}
-                            readOnly
-                            className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
-                            placeholder="Sitespren base URL"
-                          />
+                          <div className="flex-1">
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              (from fk)sitespren_base
+                            </label>
+                            <input
+                              type="text"
+                              value={currentSession.sitespren_base || ''}
+                              readOnly
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-green-50 text-gray-600"
+                              placeholder="Sitespren base URL"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -991,16 +1076,21 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                               type="text"
                               value={currentSession.janky_rel_sitespren_id || ''}
                               readOnly
-                              className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
+                              className="w-12 px-2 py-2 text-sm border border-gray-300 rounded-md bg-yellow-50 text-gray-600 font-mono"
                               placeholder="ID"
                             />
-                            <input
-                              type="text"
-                              value={currentSession.sitespren_base || ''}
-                              readOnly
-                              className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
-                              placeholder="Sitespren base URL"
-                            />
+                            <div className="flex-1">
+                              <label className="block text-xs font-medium text-gray-700 mb-1">
+                                (from fk)sitespren_base
+                              </label>
+                              <input
+                                type="text"
+                                value={currentSession.sitespren_base || ''}
+                                readOnly
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-green-50 text-gray-600"
+                                placeholder="Sitespren base URL"
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1009,7 +1099,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   
                   {/* Navigation Buttons with Dynamic URLs */}
                   {currentSession && currentSession.sitespren_base && (
-                    <div className="mt-4 flex justify-center gap-2">
+                    <div className="mt-4 flex justify-start gap-2">
                       <a 
                         href={`/gconjar1?sitebase=${currentSession.sitespren_base}`}
                         className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
