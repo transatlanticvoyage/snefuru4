@@ -46,7 +46,6 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
   const [selectedFromMatch, setSelectedFromMatch] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [jankyRelSitesprenId, setJankyRelSitesprenId] = useState('');
-  const [showApiKeys, setShowApiKeys] = useState(false);
   
   // URL detection states
   const [urlInput, setUrlInput] = useState('');
@@ -940,17 +939,8 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                 </div>
 
               <div className="plutonium_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility?.plutonium ? 'block' : 'none' }}>
-                  <div className="flex justify-between items-center">
-                    <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                      plutonium_chamber_div
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowApiKeys(!showApiKeys)}
-                      className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors"
-                    >
-                      {showApiKeys ? 'Collapse' : 'Expand'}
-                    </button>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                    plutonium_chamber_div
                   </div>
                   
                   {/* Sitespren Data Badge - Duplicate from Sidebar */}
@@ -990,45 +980,43 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                     </div>
                   )}
                   
-                  {showApiKeys && (
-                    <div className="mt-4 space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          ruplin_api_key_site_specific
-                        </label>
-                        <input
-                          type="text"
-                          value=""
-                          readOnly
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          harbor_api_key_site_specific
-                        </label>
-                        <input
-                          type="text"
-                          value=""
-                          readOnly
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          klyra_api_key_site_specific
-                        </label>
-                        <input
-                          type="text"
-                          value=""
-                          readOnly
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
-                        />
-                      </div>
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        ruplin_api_key_site_specific
+                      </label>
+                      <input
+                        type="text"
+                        value=""
+                        readOnly
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                      />
                     </div>
-                  )}
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        harbor_api_key_site_specific
+                      </label>
+                      <input
+                        type="text"
+                        value=""
+                        readOnly
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        klyra_api_key_site_specific
+                      </label>
+                      <input
+                        type="text"
+                        value=""
+                        readOnly
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                      />
+                    </div>
+                  </div>
                 </div>
 
               <div className="nickel_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility?.nickel ? 'block' : 'none' }}>

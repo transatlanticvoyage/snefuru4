@@ -336,6 +336,18 @@ export default function KarmajarTable() {
     }
   };
 
+  // Handle resume session - navigate to karmawiz
+  const handleResumeSession = (sessionId: string, stepLeftOffAt: number, e: React.MouseEvent) => {
+    const url = `/karmawiz?wizsession=${sessionId}&step=${stepLeftOffAt}`;
+    
+    // Check if user wants to open in new tab (Ctrl+click, Cmd+click, or middle click)
+    if (e.ctrlKey || e.metaKey || e.button === 1) {
+      window.open(url, '_blank');
+    } else {
+      window.location.href = url;
+    }
+  };
+
   // Delete selected records
   const deleteSelectedRecords = async () => {
     if (selectedRows.size === 0) return;
@@ -700,6 +712,12 @@ export default function KarmajarTable() {
                   />
                 </div>
               </th>
+              <th
+                className="border border-gray-300 px-2 py-2 text-left"
+                style={{ width: '80px' }}
+              >
+                <span className="font-bold text-sm lowercase">resume</span>
+              </th>
               {columns.map(column => (
                 <th
                   key={column.key}
@@ -733,6 +751,21 @@ export default function KarmajarTable() {
                       className="w-5 h-5"
                       onClick={(e) => e.stopPropagation()}
                     />
+                  </div>
+                </td>
+                <td className="border border-gray-300 px-2 py-1">
+                  <div className="flex items-center justify-center">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleResumeSession(item.session_id, item.step_left_off_at, e);
+                      }}
+                      className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                      style={{ fontSize: '16px' }}
+                      title="Resume session"
+                    >
+                      resume
+                    </button>
                   </div>
                 </td>
                 {columns.map(column => (
