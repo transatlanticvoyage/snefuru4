@@ -58,14 +58,17 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
   const [sitesprenMatches, setSitesprenMatches] = useState<SitesprenMatch[]>([]);
   const [sitesprenResult, setSitesprenResult] = useState('None found');
   
-  // Chamber visibility states
-  const [chamberVisibility, setChamberVisibility] = useState({
-    metalron: true,
-    platinum: true,
-    sulfur: true,
-    plutonium: true,
-    nickel: true
-  });
+  // Chamber visibility states - Initialize with null to avoid SSR hydration mismatch
+  const [chamberVisibility, setChamberVisibility] = useState<{
+    metalron: boolean;
+    platinum: boolean;
+    sulfur: boolean;
+    plutonium: boolean;
+    nickel: boolean;
+  } | null>(null);
+
+  // State to track if component is hydrated
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Chepno action feedback state
   const [gadgetFeedback, setGadgetFeedback] = useState<{
@@ -86,27 +89,55 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
 
   // Load chamber visibility from localStorage on component mount
   useEffect(() => {
-    const savedVisibility = localStorage.getItem('karmawiz-chamber-visibility');
-    if (savedVisibility) {
+    // Ensure we're on the client side
+    if (typeof window !== 'undefined') {
+      const defaultVisibility = {
+        metalron: true,
+        platinum: true,
+        sulfur: true,
+        plutonium: true,
+        nickel: true
+      };
+
       try {
-        setChamberVisibility(JSON.parse(savedVisibility));
+        const savedVisibility = localStorage.getItem('karmawiz-chamber-visibility');
+        if (savedVisibility) {
+          const parsedVisibility = JSON.parse(savedVisibility);
+          setChamberVisibility(parsedVisibility);
+        } else {
+          setChamberVisibility(defaultVisibility);
+        }
       } catch (error) {
         console.error('Error loading chamber visibility from localStorage:', error);
+        setChamberVisibility(defaultVisibility);
       }
+
+      setIsHydrated(true);
     }
   }, []);
 
-  // Save chamber visibility to localStorage whenever it changes
+  // Save chamber visibility to localStorage whenever it changes (but not on initial load)
   useEffect(() => {
-    localStorage.setItem('karmawiz-chamber-visibility', JSON.stringify(chamberVisibility));
-  }, [chamberVisibility]);
+    if (isHydrated && chamberVisibility && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('karmawiz-chamber-visibility', JSON.stringify(chamberVisibility));
+      } catch (error) {
+        console.error('Error saving chamber visibility to localStorage:', error);
+      }
+    }
+  }, [chamberVisibility, isHydrated]);
 
   // Toggle chamber visibility
-  const toggleChamberVisibility = (chamber: keyof typeof chamberVisibility) => {
-    setChamberVisibility(prev => ({
-      ...prev,
-      [chamber]: !prev[chamber]
-    }));
+  const toggleChamberVisibility = (chamber: string) => {
+    if (!chamberVisibility) return;
+    
+    setChamberVisibility(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        [chamber]: !prev[chamber as keyof typeof prev]
+      };
+    });
   };
 
   const handleSelectFromMatch = (piece: GconPiece) => {
@@ -505,10 +536,10 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
             {/* Chamber Toggle Buttons */}
             <div className="mb-6 pb-6 border-b border-gray-200">
               <div className="flex flex-wrap justify-center gap-2">
-                {Object.entries(chamberVisibility).map(([chamber, isVisible]) => (
+                {chamberVisibility && Object.entries(chamberVisibility).map(([chamber, isVisible]) => (
                   <button
                     key={chamber}
-                    onClick={() => toggleChamberVisibility(chamber as keyof typeof chamberVisibility)}
+                    onClick={() => toggleChamberVisibility(chamber)}
                     className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 ${
                       isVisible
                         ? 'bg-blue-600 text-white border-blue-600 shadow-md hover:bg-blue-700'
@@ -518,6 +549,18 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
                     {chamber}
                   </button>
                 ))}
+                {!chamberVisibility && (
+                  <div className="flex gap-2">
+                    {['metalron', 'platinum', 'sulfur', 'plutonium', 'nickel'].map(chamber => (
+                      <div
+                        key={chamber}
+                        className="px-4 py-2 text-sm font-medium rounded-lg border bg-gray-100 text-gray-400 animate-pulse"
+                      >
+                        {chamber}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -637,7 +680,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="metalron_chamber_div" style={{ border: '1px solid black', padding: '16px', position: 'relative', display: chamberVisibility.metalron ? 'block' : 'none' }}>
+              <div className="metalron_chamber_div" style={{ border: '1px solid black', padding: '16px', position: 'relative', display: chamberVisibility?.metalron ? 'block' : 'none' }}>
                   <div className="flex justify-between items-center">
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                     metalron_chamber_div
@@ -733,7 +776,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                 </div>
               </div>
 
-              <div className="platinum_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility.platinum ? 'block' : 'none' }}>
+              <div className="platinum_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility?.platinum ? 'block' : 'none' }}>
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                     platinum_chamber_div
                   </div>
@@ -791,7 +834,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   </div>
                 </div>
 
-              <div className="sulfur_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility.sulfur ? 'block' : 'none' }}>
+              <div className="sulfur_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility?.sulfur ? 'block' : 'none' }}>
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                     sulfur_chamber_div
                   </div>
@@ -839,7 +882,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   </div>
                 </div>
 
-              <div className="plutonium_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility.plutonium ? 'block' : 'none' }}>
+              <div className="plutonium_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility?.plutonium ? 'block' : 'none' }}>
                   <div className="flex justify-between items-center">
                     <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                       plutonium_chamber_div
@@ -926,7 +969,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   )}
                 </div>
 
-              <div className="nickel_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility.nickel ? 'block' : 'none' }}>
+              <div className="nickel_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility?.nickel ? 'block' : 'none' }}>
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                     nickel_chamber_div
                   </div>
@@ -965,7 +1008,23 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   
                   {/* Chepno Functions Reference Table */}
                   <div className="mt-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">Chepno Functions Reference</h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-lg font-semibold text-gray-800">Chepno Functions Reference</h3>
+                      <div className="flex gap-2">
+                        <a 
+                          href="/gconjar1" 
+                          className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                        >
+                          /gconjar1
+                        </a>
+                        <a 
+                          href="/nwjar1" 
+                          className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                        >
+                          /nwjar1
+                        </a>
+                      </div>
+                    </div>
                     <div className="overflow-x-auto">
                       <table className="w-full border border-gray-300 bg-white text-sm">
                         <thead>
