@@ -57,93 +57,114 @@ export default function KarmaWizardSidebar({ currentStep, session, onNavigateToS
         {session && (
           <div className="mb-6 space-y-4">
             {/* Session ID Section */}
-            <div className="border border-black p-3 rounded">
-              <div className="flex items-center space-x-2">
-                <label className="text-xs font-bold text-gray-700">
-                  Session ID
-                </label>
-                <div className="flex">
-                  <input
-                    type="text"
-                    value={session.session_id || ''}
-                    readOnly
-                    className="w-10 px-1 py-1 text-xs border border-gray-300 rounded-l-md bg-gray-50 text-gray-600 font-mono"
-                    title={session.session_id || ''}
-                  />
-                  <button
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(session.session_id || '');
-                      } catch (err) {
-                        // Fallback for older browsers
-                        const textArea = document.createElement('textarea');
-                        textArea.value = session.session_id || '';
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                      }
-                    }}
-                    className="w-3.5 h-6 bg-gray-500 text-white rounded-r-md hover:bg-gray-600 flex items-center justify-center text-xs"
-                    title="Copy Session ID"
-                  >
-                    📋
-                  </button>
+            <div className="border border-black rounded overflow-hidden">
+              <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
+                <span style={{ fontSize: '12px', color: '#394990' }}>
+                  fk data badge
+                </span>
+              </div>
+              <div className="p-3">
+                <div className="flex items-center space-x-2">
+                  <label className="text-xs font-bold text-gray-700">
+                    Session ID
+                  </label>
+                  <div className="flex">
+                    <input
+                      type="text"
+                      value={session.session_id || ''}
+                      readOnly
+                      className="w-10 px-1 py-1 text-xs border border-gray-300 rounded-l-md bg-gray-50 text-gray-600 font-mono"
+                      title={session.session_id || ''}
+                    />
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(session.session_id || '');
+                        } catch (err) {
+                          // Fallback for older browsers
+                          const textArea = document.createElement('textarea');
+                          textArea.value = session.session_id || '';
+                          document.body.appendChild(textArea);
+                          textArea.select();
+                          document.execCommand('copy');
+                          document.body.removeChild(textArea);
+                        }
+                      }}
+                      className="w-3.5 h-6 bg-gray-500 text-white rounded-r-md hover:bg-gray-600 flex items-center justify-center text-xs"
+                      title="Copy Session ID"
+                    >
+                      📋
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
             
             {/* Sitespren Section */}
-            <div className="border border-black p-3 rounded">
-              <label className="block text-xs font-medium text-gray-700 mb-2">
-                janky_rel_sitespren_id
-              </label>
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={session.janky_rel_sitespren_id || ''}
-                  readOnly
-                  className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
-                  placeholder="ID"
-                />
-                <input
-                  type="text"
-                  value={session.sitespren_base || ''}
-                  readOnly
-                  className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
-                  placeholder="Sitespren base URL"
-                />
+            <div className="border border-black rounded overflow-hidden">
+              <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
+                <span style={{ fontSize: '12px', color: '#394990' }}>
+                  fk data badge
+                </span>
+              </div>
+              <div className="p-3">
+                <label className="block text-xs font-medium text-gray-700 mb-2">
+                  janky_rel_sitespren_id
+                </label>
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    value={session.janky_rel_sitespren_id || ''}
+                    readOnly
+                    className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
+                    placeholder="ID"
+                  />
+                  <input
+                    type="text"
+                    value={session.sitespren_base || ''}
+                    readOnly
+                    className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                    placeholder="Sitespren base URL"
+                  />
+                </div>
               </div>
             </div>
             
             {/* Gcon Pieces Section */}
-            <div className="border border-black p-3 rounded">
-              <label className="block text-xs font-medium text-gray-700 mb-2">
-                rel_gcon_piece_id
-              </label>
-              <div className="flex space-x-2 mb-2">
+            <div className="border border-black rounded overflow-hidden">
+              <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
+                <span style={{ fontSize: '12px', color: '#394990' }}>
+                  fk data badge
+                </span>
+              </div>
+              <div className="p-3">
+                <label className="block text-xs font-medium text-gray-700 mb-2">
+                  rel_gcon_piece_id
+                </label>
+                <div className="flex space-x-2 mb-2">
+                  <input
+                    type="text"
+                    value={session.rel_gcon_piece_id || ''}
+                    readOnly
+                    className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
+                    placeholder="ID"
+                  />
+                  <input
+                    type="text"
+                    value={session.gcon_post_name || ''}
+                    readOnly
+                    className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                    placeholder="Post name"
+                  />
+                </div>
                 <input
                   type="text"
-                  value={session.rel_gcon_piece_id || ''}
+                  value={session.gcon_meta_title || ''}
                   readOnly
-                  className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
-                  placeholder="ID"
-                />
-                <input
-                  type="text"
-                  value={session.gcon_post_name || ''}
-                  readOnly
-                  className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
-                  placeholder="Post name"
+                  className="w-full px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                  placeholder="Meta title"
                 />
               </div>
-              <input
-                type="text"
-                value={session.gcon_meta_title || ''}
-                readOnly
-                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
-                placeholder="Meta title"
-              />
             </div>
           </div>
         )}

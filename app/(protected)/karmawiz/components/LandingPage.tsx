@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import KarmaWizardSidebar from './KarmaWizardSidebar';
 
 interface GconPiece {
@@ -57,6 +57,57 @@ export default function LandingPage({ onCreateSession, loading, sourceUrl, match
   const [extractedDomainBase, setExtractedDomainBase] = useState('');
   const [sitesprenMatches, setSitesprenMatches] = useState<SitesprenMatch[]>([]);
   const [sitesprenResult, setSitesprenResult] = useState('None found');
+  
+  // Chamber visibility states
+  const [chamberVisibility, setChamberVisibility] = useState({
+    metalron: true,
+    platinum: true,
+    sulfur: true,
+    plutonium: true,
+    nickel: true
+  });
+
+  // Chepno action feedback state
+  const [gadgetFeedback, setGadgetFeedback] = useState<{
+    action: string;
+    message: string;
+    type: 'info' | 'success' | 'error';
+    timestamp: string;
+  } | null>(null);
+
+  // Individual action feedback state (per action type)
+  const [actionFeedbacks, setActionFeedbacks] = useState<{
+    [actionKey: string]: {
+      message: string;
+      type: 'info' | 'success' | 'error';
+      timestamp: string;
+    }
+  }>({});
+
+  // Load chamber visibility from localStorage on component mount
+  useEffect(() => {
+    const savedVisibility = localStorage.getItem('karmawiz-chamber-visibility');
+    if (savedVisibility) {
+      try {
+        setChamberVisibility(JSON.parse(savedVisibility));
+      } catch (error) {
+        console.error('Error loading chamber visibility from localStorage:', error);
+      }
+    }
+  }, []);
+
+  // Save chamber visibility to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('karmawiz-chamber-visibility', JSON.stringify(chamberVisibility));
+  }, [chamberVisibility]);
+
+  // Toggle chamber visibility
+  const toggleChamberVisibility = (chamber: keyof typeof chamberVisibility) => {
+    setChamberVisibility(prev => ({
+      ...prev,
+      [chamber]: !prev[chamber]
+    }));
+  };
 
   const handleSelectFromMatch = (piece: GconPiece) => {
     setSelectedFromMatch(piece.id);
@@ -254,6 +305,180 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
     }
   };
 
+  // Helper function to get feedback for a specific action
+  const getActionFeedback = (action: string, method?: string) => {
+    const actionKey = `${action}${method ? `_${method}` : ''}`;
+    return actionFeedbacks[actionKey];
+  };
+
+  // Helper function to update both feedback states
+  const updateFeedback = (action: string, method: string | undefined, message: string, type: 'info' | 'success' | 'error') => {
+    const actionKey = `${action}${method ? `_${method}` : ''}`;
+    const timestamp = new Date().toISOString();
+    const actionDisplay = `${action}${method ? ` (${method})` : ''}`;
+    
+    // Update general feedback (most recent action)
+    setGadgetFeedback({
+      action: actionDisplay,
+      message,
+      type,
+      timestamp
+    });
+    
+    // Update individual action feedback
+    setActionFeedbacks(prev => ({
+      ...prev,
+      [actionKey]: {
+        message,
+        type,
+        timestamp
+      }
+    }));
+  };
+
+  // Chepno action handlers (adapted from /sitejar4 functionality)
+  const handleChepnoAction = async (action: string, method?: string) => {
+    if (!currentSession?.janky_rel_sitespren_id) {
+      updateFeedback(action, method, 'No janky_rel_sitespren_id found in current session', 'error');
+      return;
+    }
+
+    updateFeedback(action, method, 'Action started...', 'info');
+
+    try {
+      let endpoint = '';
+      let payload: any = {};
+      
+      // Map chepno actions to their corresponding functionality
+      switch (action) {
+        case 'chep11':
+          // Plugin API sync
+          endpoint = '/api/chepno/sync';
+          payload = { 
+            sitespren_base: currentSession.sitespren_base || '',
+            sitespren_id: currentSession.janky_rel_sitespren_id,
+            method: 'plugin_api'
+          };
+          break;
+        case 'chep15':
+          // f22_nwpi_to_gcon_pusher - actually call the API
+          const f22Response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              pushAll: true,
+              sitespren_id: currentSession.janky_rel_sitespren_id 
+            }),
+          });
+          const f22Data = await f22Response.json();
+          
+          if (!f22Response.ok || !f22Data.success) {
+            throw new Error(f22Data.message || 'F22 API call failed');
+          }
+          
+          updateFeedback('chep15', method, `${f22Data.message} (${f22Data.results?.processed || 0} processed, ${f22Data.results?.succeeded || 0} succeeded)`, 'success');
+          return; // Early return to skip the generic success message
+        case 'chep16':
+          // f47_generate_gcon_pieces (placeholder - API not found)
+          endpoint = '/api/f47-generate-gcon-pieces';
+          payload = { 
+            generateAll: true,
+            sitespren_id: currentSession.janky_rel_sitespren_id,
+            sitespren_base: currentSession.sitespren_base || ''
+          };
+          break;
+        case 'chep21':
+          // REST API sync
+          endpoint = '/api/chepno/sync';
+          payload = { 
+            sitespren_base: currentSession.sitespren_base || '',
+            sitespren_id: currentSession.janky_rel_sitespren_id,
+            method: 'rest_api'
+          };
+          break;
+        case 'chep31':
+          // Test plugin
+          endpoint = '/api/chepno/test-plugin';
+          payload = { 
+            sitespren_base: currentSession.sitespren_base || '',
+            sitespren_id: currentSession.janky_rel_sitespren_id
+          };
+          break;
+        case 'chep41':
+          // Check plugin version
+          endpoint = '/api/chepno/check-version';
+          payload = { 
+            sitespren_base: currentSession.sitespren_base || '',
+            sitespren_id: currentSession.janky_rel_sitespren_id
+          };
+          break;
+        case 'chep51':
+          // Update plugin
+          endpoint = '/api/chepno/update-plugin';
+          payload = { 
+            sitespren_base: currentSession.sitespren_base || '',
+            sitespren_id: currentSession.janky_rel_sitespren_id
+          };
+          break;
+        case 'chep61':
+          // Barkro push
+          endpoint = '/api/chepno/barkro-push';
+          payload = { 
+            sitespren_base: currentSession.sitespren_base || '',
+            sitespren_id: currentSession.janky_rel_sitespren_id
+          };
+          break;
+        case 'wpsv2_sync':
+          // Extended sync
+          endpoint = '/api/chepno/wpsv2-sync';
+          payload = { 
+            sitespren_base: currentSession.sitespren_base || '',
+            sitespren_id: currentSession.janky_rel_sitespren_id,
+            method: method || 'plugin_api'
+          };
+          break;
+        default:
+          throw new Error(`Unknown action: ${action}`);
+      }
+
+      // Simulate API call for now (replace with actual calls when APIs are implemented)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      updateFeedback(action, method, `Action completed successfully for sitespren ID: ${currentSession.janky_rel_sitespren_id} (${currentSession.sitespren_base || 'N/A'})`, 'success');
+    } catch (error) {
+      updateFeedback(action, method, `Action failed: ${error}`, 'error');
+    }
+  };
+
+  // Copy feedback message to clipboard
+  const copyFeedbackMessage = async () => {
+    if (!gadgetFeedback) return;
+    
+    const message = `Action: ${gadgetFeedback.action}\nMessage: ${gadgetFeedback.message}\nTime: ${new Date(gadgetFeedback.timestamp).toLocaleString()}`;
+    
+    try {
+      await navigator.clipboard.writeText(message);
+      // Briefly show success
+      const originalMessage = gadgetFeedback.message;
+      setGadgetFeedback({
+        ...gadgetFeedback,
+        message: 'Message copied to clipboard!'
+      });
+      setTimeout(() => {
+        setGadgetFeedback(prev => prev ? { ...prev, message: originalMessage } : null);
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy message:', error);
+    }
+  };
+
+  // Clear feedback message
+  const clearFeedbackMessage = () => {
+    setGadgetFeedback(null);
+  };
+
   if (loading || isCreating) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -275,9 +500,27 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
       
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        <div className="container mx-auto px-4 py-12">
-        <div className="mx-auto" style={{ maxWidth: '1200px' }}>
-          <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="w-full px-6 py-8">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            {/* Chamber Toggle Buttons */}
+            <div className="mb-6 pb-6 border-b border-gray-200">
+              <div className="flex flex-wrap justify-center gap-2">
+                {Object.entries(chamberVisibility).map(([chamber, isVisible]) => (
+                  <button
+                    key={chamber}
+                    onClick={() => toggleChamberVisibility(chamber as keyof typeof chamberVisibility)}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 ${
+                      isVisible
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-md hover:bg-blue-700'
+                        : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'
+                    }`}
+                  >
+                    {chamber}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Karma Wizard - Step 1
@@ -394,8 +637,8 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="metalron_chamber_div" style={{ border: '1px solid black', padding: '16px', position: 'relative' }}>
-                <div className="flex justify-between items-center">
+              <div className="metalron_chamber_div" style={{ border: '1px solid black', padding: '16px', position: 'relative', display: chamberVisibility.metalron ? 'block' : 'none' }}>
+                  <div className="flex justify-between items-center">
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                     metalron_chamber_div
                   </div>
@@ -488,8 +731,9 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                     />
                   </div>
                 </div>
+              </div>
 
-                <div className="platinum_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
+              <div className="platinum_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility.platinum ? 'block' : 'none' }}>
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                     platinum_chamber_div
                   </div>
@@ -547,7 +791,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   </div>
                 </div>
 
-                <div className="sulfur_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
+              <div className="sulfur_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility.sulfur ? 'block' : 'none' }}>
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                     sulfur_chamber_div
                   </div>
@@ -595,7 +839,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   </div>
                 </div>
 
-                <div className="plutonium_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
+              <div className="plutonium_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility.plutonium ? 'block' : 'none' }}>
                   <div className="flex justify-between items-center">
                     <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                       plutonium_chamber_div
@@ -608,6 +852,38 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                       {showApiKeys ? 'Collapse' : 'Expand'}
                     </button>
                   </div>
+                  
+                  {/* Sitespren Data Badge - Duplicate from Sidebar */}
+                  {currentSession && (
+                    <div className="mt-4 border border-black rounded overflow-hidden">
+                      <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
+                        <span style={{ fontSize: '12px', color: '#394990' }}>
+                          fk data badge
+                        </span>
+                      </div>
+                      <div className="p-3">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          janky_rel_sitespren_id
+                        </label>
+                        <div className="flex space-x-2">
+                          <input
+                            type="text"
+                            value={currentSession.janky_rel_sitespren_id || ''}
+                            readOnly
+                            className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
+                            placeholder="ID"
+                          />
+                          <input
+                            type="text"
+                            value={currentSession.sitespren_base || ''}
+                            readOnly
+                            className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                            placeholder="Sitespren base URL"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
                   {showApiKeys && (
                     <div className="mt-4 space-y-4">
@@ -650,10 +926,42 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   )}
                 </div>
 
-                <div className="nickel_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px' }}>
+              <div className="nickel_chamber_div mt-4" style={{ border: '1px solid black', backgroundColor: '#fff', padding: '16px', display: chamberVisibility.nickel ? 'block' : 'none' }}>
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
                     nickel_chamber_div
                   </div>
+                  
+                  {/* Sitespren Data Badge - Another Duplicate Instance */}
+                  {currentSession && (
+                    <div className="mt-4 border border-black rounded overflow-hidden">
+                      <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
+                        <span style={{ fontSize: '12px', color: '#394990' }}>
+                          fk data badge
+                        </span>
+                      </div>
+                      <div className="p-3">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          janky_rel_sitespren_id
+                        </label>
+                        <div className="flex space-x-2">
+                          <input
+                            type="text"
+                            value={currentSession.janky_rel_sitespren_id || ''}
+                            readOnly
+                            className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
+                            placeholder="ID"
+                          />
+                          <input
+                            type="text"
+                            value={currentSession.sitespren_base || ''}
+                            readOnly
+                            className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                            placeholder="Sitespren base URL"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Chepno Functions Reference Table */}
                   <div className="mt-4">
@@ -663,7 +971,9 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                         <thead>
                           <tr className="bg-gray-100">
                             <th className="border border-gray-300 px-3 py-2 text-center font-medium w-12">Select</th>
+                            <th className="border border-gray-300 px-3 py-2 text-center font-medium w-20">submit</th>
                             <th className="border border-gray-300 px-3 py-2 text-left font-medium">Function Name (ID)</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left font-medium w-48">Feedback</th>
                             <th className="border border-gray-300 px-3 py-2 text-left font-medium">Description & DB Tables</th>
                             <th className="border border-gray-300 px-3 py-2 text-left font-medium">Connection Type</th>
                           </tr>
@@ -673,8 +983,32 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             <td className="border border-gray-300 px-3 py-2 text-center">
                               <input type="checkbox" className="form-checkbox h-4 w-4" />
                             </td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <button 
+                                type="button"
+                                onClick={() => handleChepnoAction('chep11')}
+                                disabled={!currentSession?.janky_rel_sitespren_id}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                  currentSession?.janky_rel_sitespren_id
+                                    ? 'bg-blue-200 text-gray-800 hover:bg-blue-300'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                submit
+                              </button>
+                            </td>
                             <td className="border border-gray-300 px-3 py-2">
                               <strong>chep11 - Plugin API</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep11')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep11')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep11')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep11')?.message || 'No feedback yet'}
+                              </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
                               Calls WordPress site via Plugin API endpoint <code>/wp-json/snefuru/v1/posts</code>. 
@@ -689,8 +1023,32 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             <td className="border border-gray-300 px-3 py-2 text-center">
                               <input type="checkbox" className="form-checkbox h-4 w-4" />
                             </td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <button 
+                                type="button"
+                                onClick={() => handleChepnoAction('chep15')}
+                                disabled={!currentSession?.janky_rel_sitespren_id}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                  currentSession?.janky_rel_sitespren_id
+                                    ? 'bg-blue-200 text-gray-800 hover:bg-blue-300'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                submit
+                              </button>
+                            </td>
                             <td className="border border-gray-300 px-3 py-2 bg-blue-100">
                               <strong>chep15 - f22_nwpi_to_gcon_pusher</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep15')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep15')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep15')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep15')?.message || 'No feedback yet'}
+                              </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
                               Transfers content from <code>nwpi_posts</code> to <code>gcon_pieces</code> table. 
@@ -706,8 +1064,32 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             <td className="border border-gray-300 px-3 py-2 text-center">
                               <input type="checkbox" className="form-checkbox h-4 w-4" />
                             </td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <button 
+                                type="button"
+                                onClick={() => handleChepnoAction('chep16')}
+                                disabled={!currentSession?.janky_rel_sitespren_id}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                  currentSession?.janky_rel_sitespren_id
+                                    ? 'bg-blue-200 text-gray-800 hover:bg-blue-300'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                submit
+                              </button>
+                            </td>
                             <td className="border border-gray-300 px-3 py-2 bg-blue-100">
                               <strong>chep16 - f47_generate_gcon_pieces</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep16')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep16')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep16')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep16')?.message || 'No feedback yet'}
+                              </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
                               Generates new <code>gcon_pieces</code> records from <code>nwpi_posts</code> data. 
@@ -722,8 +1104,32 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             <td className="border border-gray-300 px-3 py-2 text-center">
                               <input type="checkbox" className="form-checkbox h-4 w-4" />
                             </td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <button 
+                                type="button"
+                                onClick={() => handleChepnoAction('chep21')}
+                                disabled={!currentSession?.janky_rel_sitespren_id}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                  currentSession?.janky_rel_sitespren_id
+                                    ? 'bg-blue-200 text-gray-800 hover:bg-blue-300'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                submit
+                              </button>
+                            </td>
                             <td className="border border-gray-300 px-3 py-2">
                               <strong>chep21 - REST API</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep21')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep21')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep21')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep21')?.message || 'No feedback yet'}
+                              </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
                               Calls WordPress site via standard REST API <code>/wp-json/wp/v2/posts</code>. 
@@ -738,8 +1144,32 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             <td className="border border-gray-300 px-3 py-2 text-center">
                               <input type="checkbox" className="form-checkbox h-4 w-4" />
                             </td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <button 
+                                type="button"
+                                onClick={() => handleChepnoAction('chep31')}
+                                disabled={!currentSession?.janky_rel_sitespren_id}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                  currentSession?.janky_rel_sitespren_id
+                                    ? 'bg-blue-200 text-gray-800 hover:bg-blue-300'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                submit
+                              </button>
+                            </td>
                             <td className="border border-gray-300 px-3 py-2">
                               <strong>chep31 - Test Plugin</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep31')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep31')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep31')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep31')?.message || 'No feedback yet'}
+                              </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
                               Tests plugin connectivity by checking: 1) WordPress REST API availability, 
@@ -754,8 +1184,32 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             <td className="border border-gray-300 px-3 py-2 text-center">
                               <input type="checkbox" className="form-checkbox h-4 w-4" />
                             </td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <button 
+                                type="button"
+                                onClick={() => handleChepnoAction('chep41')}
+                                disabled={!currentSession?.janky_rel_sitespren_id}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                  currentSession?.janky_rel_sitespren_id
+                                    ? 'bg-blue-200 text-gray-800 hover:bg-blue-300'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                submit
+                              </button>
+                            </td>
                             <td className="border border-gray-300 px-3 py-2">
                               <strong>chep41 - Check Version</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep41')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep41')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep41')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep41')?.message || 'No feedback yet'}
+                              </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
                               Checks current plugin version installed on WordPress site via plugin API endpoint. 
@@ -769,8 +1223,32 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             <td className="border border-gray-300 px-3 py-2 text-center">
                               <input type="checkbox" className="form-checkbox h-4 w-4" />
                             </td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <button 
+                                type="button"
+                                onClick={() => handleChepnoAction('chep51')}
+                                disabled={!currentSession?.janky_rel_sitespren_id}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                  currentSession?.janky_rel_sitespren_id
+                                    ? 'bg-blue-200 text-gray-800 hover:bg-blue-300'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                submit
+                              </button>
+                            </td>
                             <td className="border border-gray-300 px-3 py-2">
                               <strong>chep51 - Update Plugin</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep51')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep51')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep51')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep51')?.message || 'No feedback yet'}
+                              </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
                               Updates the Snefuru plugin on WordPress site. 
@@ -785,8 +1263,32 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             <td className="border border-gray-300 px-3 py-2 text-center">
                               <input type="checkbox" className="form-checkbox h-4 w-4" />
                             </td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <button 
+                                type="button"
+                                onClick={() => handleChepnoAction('chep61')}
+                                disabled={!currentSession?.janky_rel_sitespren_id}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                  currentSession?.janky_rel_sitespren_id
+                                    ? 'bg-blue-200 text-gray-800 hover:bg-blue-300'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                submit
+                              </button>
+                            </td>
                             <td className="border border-gray-300 px-3 py-2">
                               <strong>chep61 - Barkro Push</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('chep61')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('chep61')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('chep61')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('chep61')?.message || 'No feedback yet'}
+                              </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
                               Pushes plugin updates from local <code>snefuruplin</code> directory to WordPress site. 
@@ -802,8 +1304,32 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             <td className="border border-gray-300 px-3 py-2 text-center">
                               <input type="checkbox" className="form-checkbox h-4 w-4" />
                             </td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <button 
+                                type="button"
+                                onClick={() => handleChepnoAction('wpsv2_sync', 'plugin_api')}
+                                disabled={!currentSession?.janky_rel_sitespren_id}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                  currentSession?.janky_rel_sitespren_id
+                                    ? 'bg-blue-200 text-gray-800 hover:bg-blue-300'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                submit
+                              </button>
+                            </td>
                             <td className="border border-gray-300 px-3 py-2">
                               <strong>wpsv2_sync (Plugin API)</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('wpsv2_sync', 'plugin_api')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('wpsv2_sync', 'plugin_api')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('wpsv2_sync', 'plugin_api')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('wpsv2_sync', 'plugin_api')?.message || 'No feedback yet'}
+                              </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
                               Extended sync operation that syncs WordPress content to database via Plugin API. 
@@ -817,8 +1343,32 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                             <td className="border border-gray-300 px-3 py-2 text-center">
                               <input type="checkbox" className="form-checkbox h-4 w-4" />
                             </td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">
+                              <button 
+                                type="button"
+                                onClick={() => handleChepnoAction('wpsv2_sync', 'rest_api')}
+                                disabled={!currentSession?.janky_rel_sitespren_id}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                  currentSession?.janky_rel_sitespren_id
+                                    ? 'bg-blue-200 text-gray-800 hover:bg-blue-300'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                submit
+                              </button>
+                            </td>
                             <td className="border border-gray-300 px-3 py-2">
                               <strong>wpsv2_sync (REST API)</strong>
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              <div className={`text-xs p-2 rounded min-h-[40px] ${
+                                getActionFeedback('wpsv2_sync', 'rest_api')?.type === 'success' ? 'bg-green-50 text-green-700' :
+                                getActionFeedback('wpsv2_sync', 'rest_api')?.type === 'error' ? 'bg-red-50 text-red-700' :
+                                getActionFeedback('wpsv2_sync', 'rest_api')?.type === 'info' ? 'bg-blue-50 text-blue-700' :
+                                'bg-gray-50 text-gray-500'
+                              }`}>
+                                {getActionFeedback('wpsv2_sync', 'rest_api')?.message || 'No feedback yet'}
+                              </div>
                             </td>
                             <td className="border border-gray-300 px-3 py-2">
                               Extended sync operation that syncs WordPress content to database via REST API. 
@@ -831,9 +1381,52 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                         </tbody>
                       </table>
                     </div>
+                    
+                    {/* Chepno Action Feedback */}
+                    <div className="mt-6 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-medium text-gray-700">Action Feedback (of most recently run action)</h4>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => copyFeedbackMessage()}
+                            disabled={!gadgetFeedback}
+                            className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 rounded border disabled:cursor-not-allowed"
+                          >
+                            Copy Message
+                          </button>
+                          <button
+                            onClick={() => clearFeedbackMessage()}
+                            disabled={!gadgetFeedback}
+                            className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 disabled:bg-gray-50 disabled:text-gray-400 text-red-700 rounded border disabled:cursor-not-allowed"
+                          >
+                            Clear Message
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="min-h-[80px] p-3 bg-gray-50 border rounded-md">
+                        {gadgetFeedback ? (
+                          <div className={`text-sm ${
+                            gadgetFeedback.type === 'success' ? 'text-green-700' : 
+                            gadgetFeedback.type === 'error' ? 'text-red-700' : 'text-gray-700'
+                          }`}>
+                            <div className="font-medium">{gadgetFeedback.action}</div>
+                            <div className="mt-1">{gadgetFeedback.message}</div>
+                            {gadgetFeedback.timestamp && (
+                              <div className="text-xs text-gray-500 mt-2">
+                                {new Date(gadgetFeedback.timestamp).toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-sm text-gray-400 italic">
+                            No feedback messages yet. Click a submit button in the table above to test a chepno function.
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
               <div>
                 <label 
@@ -1068,7 +1661,6 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
               </div>
             </div>
           )}
-        </div>
         </div>
       </div>
     </div>
