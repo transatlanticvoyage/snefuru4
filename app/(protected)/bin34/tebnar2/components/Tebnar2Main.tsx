@@ -1128,6 +1128,15 @@ export default function Tebnar2Main() {
     }
   }, [tbn2_sitesprenOptions]);
 
+  // Fetch discovered_img_cradles_json when gcon piece selection changes
+  useEffect(() => {
+    if (tbn2_selectedGconPieceId) {
+      tbn2_fetchDiscoveredImgCradles(tbn2_selectedGconPieceId);
+    } else {
+      setTbn2DiscoveredImgCradlesJson('');
+    }
+  }, [tbn2_selectedGconPieceId]);
+
   // Fetch custom colors for uelbar37 and uelbar38 - cloned from nwjar1
   useEffect(() => {
     const fetchTbn2UelBarColors = async () => {
@@ -1357,6 +1366,37 @@ export default function Tebnar2Main() {
     } catch (err) {
       console.error('Error fetching gcon pieces:', err);
       setTbn2GconPieceOptions([]);
+    }
+  };
+
+  // Fetch discovered_img_cradles_json for selected gcon piece
+  const tbn2_fetchDiscoveredImgCradles = async (gconPieceId: string) => {
+    if (!user?.id || !gconPieceId) {
+      setTbn2DiscoveredImgCradlesJson('');
+      return;
+    }
+    
+    try {
+      const userValidation = await tbn2_validateUserAccess(user.id);
+      if (!userValidation.success) return;
+      
+      const { data, error } = await supabase
+        .from('gcon_pieces')
+        .select('discovered_img_cradles_json')
+        .eq('fk_users_id', userValidation.internalUserId)
+        .eq('id', gconPieceId)
+        .single();
+        
+      if (!error && data) {
+        // Handle null or empty data gracefully
+        const cradlesData = data.discovered_img_cradles_json || '';
+        setTbn2DiscoveredImgCradlesJson(cradlesData);
+      } else {
+        setTbn2DiscoveredImgCradlesJson('');
+      }
+    } catch (err) {
+      console.error('Error fetching discovered img cradles:', err);
+      setTbn2DiscoveredImgCradlesJson('');
     }
   };
 
@@ -1744,6 +1784,9 @@ export default function Tebnar2Main() {
   
   // Image discovery loading state
   const [tbn2_imageDiscoveryLoading, setTbn2ImageDiscoveryLoading] = useState(false);
+  
+  // Discovered img cradles JSON state
+  const [tbn2_discoveredImgCradlesJson, setTbn2DiscoveredImgCradlesJson] = useState<string>('');
   
   const tbn2_handleSelectedItemsFunction = async (functionName: string) => {
     let itemsToProcess: string[] = [];
@@ -2384,6 +2427,38 @@ export default function Tebnar2Main() {
             >
               {tbn2_imageDiscoveryLoading ? 'Processing...' : 'f327_elementor_image_discovery'}
             </button>
+            
+            {/* Discovered img cradles JSON display */}
+            <div className="mt-3">
+              <div className="font-bold text-gray-700 mb-2" style={{ fontSize: '16px' }}>discovered_img_cradles_json</div>
+              <div 
+                className="bg-gray-50 border border-gray-300 rounded p-3 overflow-auto font-mono text-sm"
+                style={{ 
+                  maxHeight: '200px', 
+                  fontSize: '12px',
+                  lineHeight: '1.4'
+                }}
+              >
+                {tbn2_discoveredImgCradlesJson ? (
+                  <pre className="whitespace-pre-wrap">
+                    {(() => {
+                      try {
+                        // Try to parse and format JSON nicely
+                        const parsed = JSON.parse(tbn2_discoveredImgCradlesJson);
+                        return JSON.stringify(parsed, null, 2);
+                      } catch (e) {
+                        // If it's not valid JSON, display as-is
+                        return tbn2_discoveredImgCradlesJson;
+                      }
+                    })()}
+                  </pre>
+                ) : (
+                  <div className="text-gray-500 italic">
+                    {tbn2_selectedGconPieceId ? 'No cradles data available' : 'Select a gcon piece to view cradles data'}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
