@@ -2131,165 +2131,174 @@ export default function Tebnar2Main() {
           )}
         </div>
 
-        {/* Content Management Section - Wrapper for related content operations */}
-        <div className="space-y-3">
-          {/* Gcon Piece Assignment Widget */}
-          <div 
-            className="bg-white border border-gray-300 rounded-lg p-2"
-          >
-            <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>asn_gcon_piece_id</div>
-            <div className="flex items-center space-x-2">
-              <div className="relative" ref={gconPieceDropdownRef} style={{ width: '400px' }}>
-                <input
-                  type="text"
-                  value={tbn2_gconPieceDropdownOpen ? tbn2_gconPieceSearchTerm : (tbn2_selectedGconPieceId ? tbn2_getSelectedGconPieceDisplay() : '')}
-                  onChange={(e) => setTbn2GconPieceSearchTerm(e.target.value)}
-                  onFocus={() => {
-                    if (!tbn2_selectedBatchId || !tbn2_selectedSitesprenId) return;
-                    setTbn2GconPieceDropdownOpen(true);
-                    setTbn2GconPieceSearchTerm('');
-                  }}
-                  placeholder={!tbn2_selectedBatchId ? 'Select batch first' : 
-                             !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
-                             'Type to search by title or pageslug...'}
-                  disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
-                  className="w-full px-3 py-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  style={{ fontSize: '14px' }}
-                />
-                {tbn2_gconPieceDropdownOpen && tbn2_selectedBatchId && tbn2_selectedSitesprenId && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
-                    {tbn2_getFilteredGconPieceOptions().length > 0 ? (
-                      tbn2_getFilteredGconPieceOptions().map((option) => (
-                        <div
-                          key={option.id}
-                          onClick={() => {
-                            setTbn2SelectedGconPieceId(option.id);
-                            setTbn2GconPieceDropdownOpen(false);
-                            setTbn2GconPieceSearchTerm('');
-                          }}
-                          className={`px-3 py-2 hover:bg-blue-50 cursor-pointer ${
-                            option.id === tbn2_selectedGconPieceId ? 'bg-blue-100' : ''
-                          }`}
-                          style={{ fontSize: '13px' }}
-                        >
-                          <div className="flex flex-col">
-                            <div>
-                              <span className="text-gray-500">{tbn2_truncateUUID(option.id)}</span> - <span className="text-gray-900 font-medium">{option.meta_title}</span>
-                            </div>
-                            {option.post_name && (
-                              <div className="text-sm text-gray-600 mt-1">
-                                pageslug: {option.post_name}
+        {/* Content Management Section and Image Discovery Section - Side by side layout */}
+        <div className="flex space-x-4">
+          {/* Content Management Section - Wrapper for related content operations */}
+          <div className="space-y-3">
+            {/* Gcon Piece Assignment Widget */}
+            <div 
+              className="bg-white border border-gray-300 rounded-lg p-2"
+            >
+              <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>asn_gcon_piece_id</div>
+              <div className="flex items-center space-x-2">
+                <div className="relative" ref={gconPieceDropdownRef} style={{ width: '400px' }}>
+                  <input
+                    type="text"
+                    value={tbn2_gconPieceDropdownOpen ? tbn2_gconPieceSearchTerm : (tbn2_selectedGconPieceId ? tbn2_getSelectedGconPieceDisplay() : '')}
+                    onChange={(e) => setTbn2GconPieceSearchTerm(e.target.value)}
+                    onFocus={() => {
+                      if (!tbn2_selectedBatchId || !tbn2_selectedSitesprenId) return;
+                      setTbn2GconPieceDropdownOpen(true);
+                      setTbn2GconPieceSearchTerm('');
+                    }}
+                    placeholder={!tbn2_selectedBatchId ? 'Select batch first' : 
+                               !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
+                               'Type to search by title or pageslug...'}
+                    disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
+                    className="w-full px-3 py-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    style={{ fontSize: '14px' }}
+                  />
+                  {tbn2_gconPieceDropdownOpen && tbn2_selectedBatchId && tbn2_selectedSitesprenId && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
+                      {tbn2_getFilteredGconPieceOptions().length > 0 ? (
+                        tbn2_getFilteredGconPieceOptions().map((option) => (
+                          <div
+                            key={option.id}
+                            onClick={() => {
+                              setTbn2SelectedGconPieceId(option.id);
+                              setTbn2GconPieceDropdownOpen(false);
+                              setTbn2GconPieceSearchTerm('');
+                            }}
+                            className={`px-3 py-2 hover:bg-blue-50 cursor-pointer ${
+                              option.id === tbn2_selectedGconPieceId ? 'bg-blue-100' : ''
+                            }`}
+                            style={{ fontSize: '13px' }}
+                          >
+                            <div className="flex flex-col">
+                              <div>
+                                <span className="text-gray-500">{tbn2_truncateUUID(option.id)}</span> - <span className="text-gray-900 font-medium">{option.meta_title}</span>
                               </div>
-                            )}
+                              {option.post_name && (
+                                <div className="text-sm text-gray-600 mt-1">
+                                  pageslug: {option.post_name}
+                                </div>
+                              )}
+                            </div>
                           </div>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-gray-500" style={{ fontSize: '13px' }}>
+                          No matches found
                         </div>
-                      ))
-                    ) : (
-                      <div className="px-3 py-2 text-gray-500" style={{ fontSize: '13px' }}>
-                        No matches found
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={tbn2_handleGconPieceSave}
+                  disabled={!tbn2_selectedGconPieceId || !tbn2_selectedBatchId || tbn2_gconPieceSaving}
+                  className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  style={{ fontSize: '16px' }}
+                  title={!tbn2_selectedBatchId ? 'Select a batch first' : 
+                         !tbn2_selectedSitesprenId ? 'Select a sitespren first' :
+                         'Save gcon piece assignment'}
+                >
+                  {tbn2_gconPieceSaving ? '...' : 'save'}
+                </button>
               </div>
-              <button
-                onClick={tbn2_handleGconPieceSave}
-                disabled={!tbn2_selectedGconPieceId || !tbn2_selectedBatchId || tbn2_gconPieceSaving}
-                className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                style={{ fontSize: '16px' }}
-                title={!tbn2_selectedBatchId ? 'Select a batch first' : 
-                       !tbn2_selectedSitesprenId ? 'Select a sitespren first' :
-                       'Save gcon piece assignment'}
-              >
-                {tbn2_gconPieceSaving ? '...' : 'save'}
-              </button>
+
+              {/* Quick Action Buttons */}
+              {tbn2_selectedGconPieceId && (() => {
+                const urls = tbn2_getGconPieceUrls();
+                return urls ? (
+                  <div className="mt-2 flex space-x-1">
+                    <button
+                      onClick={() => urls.pendulum && window.open(urls.pendulum, '_blank')}
+                      disabled={!urls.pendulum}
+                      className="px-2 text-xs font-medium rounded border transition-colors bg-gray-600 text-white border-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      style={{ height: '20px' }}
+                      title="Edit in WordPress admin"
+                    >
+                      pendulum
+                    </button>
+                    <button
+                      onClick={() => urls.elementor && window.open(urls.elementor, '_blank')}
+                      disabled={!urls.elementor}
+                      className="px-2 text-xs font-medium rounded border transition-colors bg-purple-600 text-white border-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      style={{ height: '20px' }}
+                      title="Edit with Elementor"
+                    >
+                      elementor
+                    </button>
+                    <button
+                      onClick={() => urls.frontend && window.open(urls.frontend, '_blank')}
+                      disabled={!urls.frontend}
+                      className="px-2 text-xs font-medium rounded border transition-colors bg-green-600 text-white border-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      style={{ height: '20px' }}
+                      title="View frontend page"
+                    >
+                      frontend
+                    </button>
+                  </div>
+                ) : null;
+              })()}
             </div>
 
-            {/* Quick Action Buttons */}
-            {tbn2_selectedGconPieceId && (() => {
-              const urls = tbn2_getGconPieceUrls();
-              return urls ? (
-                <div className="mt-2 flex space-x-1">
-                  <button
-                    onClick={() => urls.pendulum && window.open(urls.pendulum, '_blank')}
-                    disabled={!urls.pendulum}
-                    className="px-2 text-xs font-medium rounded border transition-colors bg-gray-600 text-white border-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    style={{ height: '20px' }}
-                    title="Edit in WordPress admin"
-                  >
-                    pendulum
-                  </button>
-                  <button
-                    onClick={() => urls.elementor && window.open(urls.elementor, '_blank')}
-                    disabled={!urls.elementor}
-                    className="px-2 text-xs font-medium rounded border transition-colors bg-purple-600 text-white border-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    style={{ height: '20px' }}
-                    title="Edit with Elementor"
-                  >
-                    elementor
-                  </button>
-                  <button
-                    onClick={() => urls.frontend && window.open(urls.frontend, '_blank')}
-                    disabled={!urls.frontend}
-                    className="px-2 text-xs font-medium rounded border transition-colors bg-green-600 text-white border-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    style={{ height: '20px' }}
-                    title="View frontend page"
-                  >
-                    frontend
-                  </button>
+            {/* Narpi Push Button */}
+            <div className="bg-white border border-gray-300 rounded-lg p-2">
+              <div className="text-xs font-semibold text-gray-700 mb-2">WordPress Push</div>
+              <button
+                onClick={tbn2_sfunc63_createNarpiPush}
+                disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId || tbn2_selectedRows.size === 0 || tbn2_narpiPushLoading}
+                className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                  !tbn2_selectedBatchId || !tbn2_selectedSitesprenId || tbn2_selectedRows.size === 0 || tbn2_narpiPushLoading
+                    ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                    : 'bg-green-600 text-white border-green-600 hover:bg-green-700'
+                }`}
+                title={
+                  !tbn2_selectedBatchId ? 'Select a batch first' :
+                  !tbn2_selectedSitesprenId ? 'Select a sitespren site first' :
+                  tbn2_selectedRows.size === 0 ? 'Select at least one image plan from the table' :
+                  'Push selected images to sitespren site'
+                }
+              >
+                {tbn2_narpiPushLoading ? '...' : 'tbn2_sfunc63_createNarpiPush()'}
+              </button>
+              
+              {/* Progress Bar */}
+              {(tbn2_narpiPushLoading || tbn2_narpiPushStatus) && (
+                <div className="mt-2">
+                  <div className="w-36 bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{width: `${tbn2_narpiPushProgress}%`}}
+                    ></div>
+                  </div>
+                  {tbn2_narpiPushStatus && (
+                    <div className="text-xs text-gray-600 mt-1">{tbn2_narpiPushStatus}</div>
+                  )}
                 </div>
-              ) : null;
-            })()}
+              )}
+            </div>
+
+            {/* Custom Push Button */}
+            <div className="bg-white border border-gray-300 rounded-lg p-2">
+              <div className="text-xs font-semibold text-gray-700 mb-2">custom push</div>
+              <button
+                onClick={() => {
+                  // No functionality yet
+                }}
+                className="px-3 py-2 text-sm font-medium rounded border transition-colors bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+              >
+                run
+              </button>
+            </div>
           </div>
 
-          {/* Narpi Push Button */}
+          {/* Image Discovery Section */}
           <div className="bg-white border border-gray-300 rounded-lg p-2">
-            <div className="text-xs font-semibold text-gray-700 mb-2">WordPress Push</div>
-            <button
-              onClick={tbn2_sfunc63_createNarpiPush}
-              disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId || tbn2_selectedRows.size === 0 || tbn2_narpiPushLoading}
-              className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
-                !tbn2_selectedBatchId || !tbn2_selectedSitesprenId || tbn2_selectedRows.size === 0 || tbn2_narpiPushLoading
-                  ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
-                  : 'bg-green-600 text-white border-green-600 hover:bg-green-700'
-              }`}
-              title={
-                !tbn2_selectedBatchId ? 'Select a batch first' :
-                !tbn2_selectedSitesprenId ? 'Select a sitespren site first' :
-                tbn2_selectedRows.size === 0 ? 'Select at least one image plan from the table' :
-                'Push selected images to sitespren site'
-              }
-            >
-              {tbn2_narpiPushLoading ? '...' : 'tbn2_sfunc63_createNarpiPush()'}
-            </button>
-            
-            {/* Progress Bar */}
-            {(tbn2_narpiPushLoading || tbn2_narpiPushStatus) && (
-              <div className="mt-2">
-                <div className="w-36 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{width: `${tbn2_narpiPushProgress}%`}}
-                  ></div>
-                </div>
-                {tbn2_narpiPushStatus && (
-                  <div className="text-xs text-gray-600 mt-1">{tbn2_narpiPushStatus}</div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Custom Push Button */}
-          <div className="bg-white border border-gray-300 rounded-lg p-2">
-            <div className="text-xs font-semibold text-gray-700 mb-2">custom push</div>
-            <button
-              onClick={() => {
-                // No functionality yet
-              }}
-              className="px-3 py-2 text-sm font-medium rounded border transition-colors bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
-            >
-              run
-            </button>
+            <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>image discovery box</div>
+            {/* Content will be added here later */}
           </div>
         </div>
 
