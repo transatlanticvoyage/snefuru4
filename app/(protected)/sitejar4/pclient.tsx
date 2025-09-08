@@ -34,7 +34,7 @@ export default function Sitejar4Client() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [kz101Checked, setKz101Checked] = useState(false);
   const [kz103Checked, setKz103Checked] = useState(false);
-  const [activePopupTab, setActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
+  const [activePopupTab, setActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7' | 'ptab8'>('ptab1');
   const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [currentUrl, setCurrentUrl] = useState<string>('');
@@ -190,6 +190,7 @@ export default function Sitejar4Client() {
     const ptab5 = urlParams.get('ptab5');
     const ptab6 = urlParams.get('ptab6');
     const ptab7 = urlParams.get('ptab7');
+    const ptab8 = urlParams.get('ptab8');
     
     // Auto-open popup if fpop=open is in URL
     if (fpop === 'open') {
@@ -210,6 +211,8 @@ export default function Sitejar4Client() {
         setActivePopupTab('ptab6');
       } else if (ptab7 === 'active') {
         setActivePopupTab('ptab7');
+      } else if (ptab8 === 'active') {
+        setActivePopupTab('ptab8');
       }
     }
   }, []);
@@ -612,7 +615,7 @@ export default function Sitejar4Client() {
       url.searchParams.set('fpop', 'open');
       
       // Clear all tab parameters first
-      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].forEach(tab => {
+      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab8'].forEach(tab => {
         url.searchParams.delete(tab);
       });
       
@@ -626,7 +629,7 @@ export default function Sitejar4Client() {
     } else {
       // Remove popup and all tab parameters when popup is closed
       url.searchParams.delete('fpop');
-      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].forEach(tab => {
+      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab8'].forEach(tab => {
         url.searchParams.delete(tab);
       });
     }
@@ -649,7 +652,7 @@ export default function Sitejar4Client() {
     
     // Check if URL has specific tab parameter
     const urlParams = new URLSearchParams(window.location.search);
-    const hasTabInUrl = ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7']
+    const hasTabInUrl = ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab8']
       .some(tab => urlParams.get(tab) === 'active');
     
     if (!hasTabInUrl) {
@@ -779,6 +782,37 @@ export default function Sitejar4Client() {
             siteId: selectedSiteId,
             method: method || 'plugin_api',
             fallbackEnabled: true
+          };
+          break;
+          
+        // Harbor Plugin Actions
+        case 'harbor_sync':
+          endpoint = '/api/sync/harbor-site';
+          payload = { 
+            siteId: selectedSiteId,
+            method: method || 'plugin_api',
+            fallbackEnabled: true
+          };
+          break;
+          
+        case 'test_harbor_plugin':
+          endpoint = '/api/test/harbor-plugin';
+          payload = { 
+            siteId: selectedSiteId
+          };
+          break;
+          
+        case 'check_harbor_version':
+          endpoint = '/api/check/harbor-version';
+          payload = { 
+            siteId: selectedSiteId
+          };
+          break;
+          
+        case 'update_harbor_plugin':
+          endpoint = '/api/update/harbor-plugin';
+          payload = { 
+            siteId: selectedSiteId
           };
           break;
           
@@ -1477,7 +1511,8 @@ export default function Sitejar4Client() {
                     { id: 'ptab4', label: 'ptab4 - export' },
                     { id: 'ptab5', label: 'ptab5 - chepno' },
                     { id: 'ptab6', label: 'ptab6 - bezel duplicated' },
-                    { id: 'ptab7', label: 'ptab7 - new chepno' }
+                    { id: 'ptab7', label: 'ptab7 - new chepno' },
+                    { id: 'ptab8', label: 'ptab8 - harbor chepno' }
                   ].map(({ id, label }) => (
                     <button
                       key={id}
@@ -2266,6 +2301,147 @@ http://www.drogs.com`}
                           ) : (
                             <div className="text-sm text-gray-400 italic">
                               No feedback messages yet. Select a site and click an action button.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {activePopupTab === 'ptab8' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Harbor Chepno Functions</h3>
+                    
+                    {/* Site Gadgets Section - Harbor Chamber - Extended Version */}
+                    <div className="bg-white p-4 rounded-lg shadow border mb-4">
+                      <div className="text-sm font-semibold text-gray-600 mb-1">box_area_3</div>
+                      <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_harbor</h3>
+                      
+                      {/* Sync Actions Buttons */}
+                      <div className="mb-4">
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            className="px-3 py-2 text-sm font-medium text-white bg-teal-600 rounded hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                            onClick={() => handleSingleSiteAction('harbor_sync', 'plugin_api')}
+                            disabled={selectedSiteIds.length !== 1}
+                            title="Sync site using Harbor Plugin API"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              harbor11<br />
+                              articles<br />
+                              wp → nwpi<br />
+                              xplugin<br />
+                              Harbor API
+                            </div>
+                          </button>
+                          
+                          <button
+                            className="px-3 py-2 text-sm font-medium text-white bg-cyan-600 rounded hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                            onClick={() => handleSingleSiteAction('harbor_sync', 'rest_api')}
+                            disabled={selectedSiteIds.length !== 1}
+                            title="Sync site using Harbor REST API"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              harbor21<br />
+                              articles<br />
+                              wp → nwpi<br />
+                              xrest<br />
+                              Harbor REST
+                            </div>
+                          </button>
+                          
+                          <button
+                            className="px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                            onClick={() => handleSingleSiteAction('test_harbor_plugin')}
+                            disabled={selectedSiteIds.length !== 1}
+                            title="Test Harbor plugin connection"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              harbor31<br />
+                              Test Harbor
+                            </div>
+                          </button>
+                          
+                          <button
+                            className="px-3 py-2 text-sm font-medium text-white bg-violet-600 rounded hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                            onClick={() => handleSingleSiteAction('check_harbor_version')}
+                            disabled={selectedSiteIds.length !== 1}
+                            title="Check Harbor plugin version"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              harbor41<br />
+                              Check Version
+                            </div>
+                          </button>
+                          
+                          <button
+                            className="px-3 py-2 text-sm font-medium text-white bg-pink-600 rounded hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                            onClick={() => handleSingleSiteAction('update_harbor_plugin')}
+                            disabled={selectedSiteIds.length !== 1}
+                            title="Update Harbor plugin"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              harbor51<br />
+                              xrest<br />
+                              Update Harbor
+                            </div>
+                          </button>
+                        </div>
+                        
+                        {selectedSiteIds.length === 0 && (
+                          <p className="text-sm text-gray-500 mt-2">Please select exactly 1 site to use these Harbor actions</p>
+                        )}
+                        {selectedSiteIds.length > 1 && (
+                          <p className="text-sm text-orange-600 mt-2">Please select only 1 site (currently {selectedSiteIds.length} selected)</p>
+                        )}
+                      </div>
+                      
+                      <hr className="border-gray-200 mb-4" />
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-medium text-gray-700">Harbor Action Feedback</h4>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => copyFeedbackMessage()}
+                              disabled={!gadgetFeedback}
+                              className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 rounded border disabled:cursor-not-allowed"
+                            >
+                              Copy Message
+                            </button>
+                            <button
+                              onClick={() => clearFeedbackMessage()}
+                              disabled={!gadgetFeedback}
+                              className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 disabled:bg-gray-50 disabled:text-gray-400 text-red-700 rounded border disabled:cursor-not-allowed"
+                            >
+                              Clear Message
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="min-h-[80px] p-3 bg-gray-50 border rounded-md">
+                          {gadgetFeedback ? (
+                            <div className={`text-sm ${
+                              gadgetFeedback.type === 'success' ? 'text-green-700' : 
+                              gadgetFeedback.type === 'error' ? 'text-red-700' : 'text-gray-700'
+                            }`}>
+                              <div className="font-medium">{gadgetFeedback.action}</div>
+                              <div className="mt-1">{gadgetFeedback.message}</div>
+                              {gadgetFeedback.timestamp && (
+                                <div className="text-xs text-gray-500 mt-2">
+                                  {new Date(gadgetFeedback.timestamp).toLocaleString()}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-sm text-gray-400 italic">
+                              No Harbor feedback messages yet. Select a site and click a Harbor action button.
                             </div>
                           )}
                         </div>
