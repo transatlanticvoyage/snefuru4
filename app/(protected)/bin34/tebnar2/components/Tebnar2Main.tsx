@@ -2506,6 +2506,8 @@ export default function Tebnar2Main() {
                     >
                       {tab === 'ptab1' ? 'Functions' : 
                        tab === 'ptab2' ? 'Create Plans' : 
+                       tab === 'ptab3' ? 'karmawiz nexus' : 
+                       tab === 'ptab4' ? 'force to site' : 
                        tab}
                     </button>
                   ))}
