@@ -1088,6 +1088,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                       </div>
                       
                       {/* Tool Buttons Full Section */}
+                      <div className="flex gap-4">
                       <div className="p-4 min-w-96" style={{ border: '1px solid black' }}>
                       <div className="flex items-center mb-3">
                         <span className="text-sm font-semibold text-gray-800">
@@ -1223,6 +1224,70 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                       </div>
                     </div>
                     </div>
+                      
+                      {/* Option 2 - FK Data Badge positioned to right of tool_buttons_full */}
+                      {currentSession && (
+                        <div className="flex" style={{ marginLeft: '16px' }}>
+                          {/* Option 2 Selector */}
+                          <div 
+                            className="border border-black rounded-l overflow-hidden cursor-pointer"
+                            style={{ width: '50px' }}
+                            onClick={() => setSelectedFkOption('gcon')}
+                          >
+                            <div className="w-full h-3.5 bg-blue-200 flex items-center justify-center">
+                              <span style={{ fontSize: '10px', color: '#394990' }}>
+                                option 2
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-center p-1">
+                              <input
+                                type="checkbox"
+                                checked={selectedFkOption === 'gcon'}
+                                onChange={() => setSelectedFkOption('gcon')}
+                                className="w-5 h-5 cursor-pointer"
+                                style={{ width: '20px', height: '20px' }}
+                              />
+                            </div>
+                          </div>
+                          {/* FK Data Badge */}
+                          <div className="border border-black border-l-0 rounded-r overflow-hidden" style={{ width: '320px' }}>
+                            <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
+                              <span style={{ fontSize: '12px', color: '#394990' }}>
+                                fk data badge
+                              </span>
+                            </div>
+                            <div className="p-3">
+                              <label className="block text-xs font-medium text-gray-700 mb-2">
+                                rel_gcon_piece_id
+                              </label>
+                              <div className="flex space-x-2 mb-2">
+                                <input
+                                  type="text"
+                                  value={currentSession.rel_gcon_piece_id || ''}
+                                  readOnly
+                                  className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
+                                  placeholder="ID"
+                                />
+                                <input
+                                  type="text"
+                                  value={currentSession.gcon_post_name || ''}
+                                  readOnly
+                                  className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                                  placeholder="Post name"
+                                />
+                              </div>
+                              <input
+                                type="text"
+                                value={currentSession.gcon_meta_title || ''}
+                                readOnly
+                                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                                placeholder="Meta title"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      </div>
                   )}
                   
                   {/* Navigation Buttons with Dynamic URLs */}
@@ -1240,69 +1305,6 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                       >
                         /nwjar1
                       </a>
-                    </div>
-                  )}
-                  
-                  {/* Gcon Piece Data Badge with Option Selector */}
-                  {currentSession && (
-                    <div className="mt-4 flex">
-                      {/* Option 2 Selector */}
-                      <div 
-                        className="border border-black rounded-l overflow-hidden cursor-pointer"
-                        style={{ width: '50px' }}
-                        onClick={() => setSelectedFkOption('gcon')}
-                      >
-                        <div className="w-full h-3.5 bg-blue-200 flex items-center justify-center">
-                          <span style={{ fontSize: '10px', color: '#394990' }}>
-                            option 2
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-center p-1">
-                          <input
-                            type="checkbox"
-                            checked={selectedFkOption === 'gcon'}
-                            onChange={() => setSelectedFkOption('gcon')}
-                            className="w-5 h-5 cursor-pointer"
-                            style={{ width: '20px', height: '20px' }}
-                          />
-                        </div>
-                      </div>
-                      {/* Original Gcon Piece Badge */}
-                      <div className="flex-1 border border-black border-l-0 rounded-r overflow-hidden">
-                        <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
-                          <span style={{ fontSize: '12px', color: '#394990' }}>
-                            fk data badge
-                          </span>
-                        </div>
-                        <div className="p-3">
-                          <label className="block text-xs font-medium text-gray-700 mb-2">
-                            rel_gcon_piece_id
-                          </label>
-                          <div className="flex space-x-2 mb-2">
-                            <input
-                              type="text"
-                              value={currentSession.rel_gcon_piece_id || ''}
-                              readOnly
-                              className="w-12 px-2 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600 font-mono"
-                              placeholder="ID"
-                            />
-                            <input
-                              type="text"
-                              value={currentSession.gcon_post_name || ''}
-                              readOnly
-                              className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
-                              placeholder="Post name"
-                            />
-                          </div>
-                          <input
-                            type="text"
-                            value={currentSession.gcon_meta_title || ''}
-                            readOnly
-                            className="w-full px-3 py-2 text-xs border border-gray-300 rounded-md bg-gray-50 text-gray-600"
-                            placeholder="Meta title"
-                          />
-                        </div>
-                      </div>
                     </div>
                   )}
                   
