@@ -13,6 +13,7 @@ const NubraTablefaceKite = dynamic(
 interface KarmaWizardSession {
   session_id: string;
   janky_rel_sitespren_id: string | null;
+  sitespren_base: string | null;
   session_name: string;
   rel_gcon_piece_id: string;
   user_id: string;
@@ -62,6 +63,7 @@ export default function KarmajarTable() {
   const columns = [
     { key: 'session_id', label: 'session_id', type: 'text', readonly: true },
     { key: 'janky_rel_sitespren_id', label: 'janky_rel_sitespren_id', type: 'text' },
+    { key: 'sitespren_base', label: '(from fk)sitespren_base', type: 'text', readonly: true },
     { key: 'session_name', label: 'session_name', type: 'text' },
     { key: 'rel_gcon_piece_id', label: 'rel_gcon_piece_id', type: 'text' },
     { key: 'cached_sitespren_base_note', label: 'cached_sitespren_base_note', type: 'text' },
@@ -113,10 +115,15 @@ export default function KarmajarTable() {
       const userInternalId = userData.id;
       setUserInternalId(userInternalId);
 
-      // Now get user's karma wizard sessions using the internal user ID
+      // Now get user's karma wizard sessions using the internal user ID with sitespren JOIN
       const { data: records, error } = await supabase
         .from('karma_wizard_sessions')
-        .select('*')
+        .select(`
+          *,
+          sitespren:janky_rel_sitespren_id (
+            sitespren_base
+          )
+        `)
         .eq('user_id', userInternalId)
         .order('created_at', { ascending: false });
 
@@ -124,7 +131,13 @@ export default function KarmajarTable() {
         throw error;
       }
 
-      setData(records || []);
+      // Process the records to flatten the sitespren data
+      const processedRecords = (records || []).map(record => ({
+        ...record,
+        sitespren_base: record.sitespren?.sitespren_base || null
+      }));
+
+      setData(processedRecords);
     } catch (error) {
       console.error('Error fetching karma_wizard_sessions:', error);
       setError('Failed to fetch karma wizard sessions');
