@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
 import KarmaWizardSidebar from './KarmaWizardSidebar';
 
 interface GconPiece {
@@ -40,6 +41,7 @@ interface SitesprenMatch {
 }
 
 export default function LandingPage({ onCreateSession, loading, sourceUrl, matchingGconPieces, currentSession, onNavigateToStep, onUpdateProgress }: LandingPageProps) {
+  const { user } = useAuth();
   const [gconPieceId, setGconPieceId] = useState('');
   const [sessionName, setSessionName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -422,19 +424,19 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
       let endpoint = '';
       let payload: any = {};
       
-      // Map chepno actions to their corresponding functionality
+      // Map chepno actions to their corresponding CORRECT API endpoints (same as sitejar4 ptab7)
       switch (action) {
         case 'chep11':
-          // Plugin API sync
-          endpoint = '/api/chepno/sync';
+          // Plugin API sync - using proper sitejar4 endpoint
+          endpoint = '/api/sync/wordpress-site';
           payload = { 
-            sitespren_base: currentSession.sitespren_base || '',
-            sitespren_id: currentSession.janky_rel_sitespren_id,
-            method: 'plugin_api'
+            siteId: currentSession.janky_rel_sitespren_id,
+            method: 'plugin_api',
+            fallbackEnabled: true
           };
           break;
         case 'chep15':
-          // f22_nwpi_to_gcon_pusher - actually call the API
+          // f22_nwpi_to_gcon_pusher - call the correct endpoint from nwjar1
           const f22Response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
             method: 'POST',
             headers: {
@@ -454,74 +456,96 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
           updateFeedback('chep15', method, `${f22Data.message} (${f22Data.results?.processed || 0} processed, ${f22Data.results?.succeeded || 0} succeeded)`, 'success');
           return; // Early return to skip the generic success message
         case 'chep16':
-          // f47_generate_gcon_pieces (placeholder - API not found)
-          endpoint = '/api/f47-generate-gcon-pieces';
-          payload = { 
-            generateAll: true,
-            sitespren_id: currentSession.janky_rel_sitespren_id,
-            sitespren_base: currentSession.sitespren_base || ''
-          };
-          break;
+          // f47_generate_gcon_pieces - call the correct endpoint from nwjar1
+          const f47Response = await fetch('/api/f47_generate_gcon_pieces', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              generateAll: true,
+              sitespren_id: currentSession.janky_rel_sitespren_id,
+              sitespren_base: currentSession.sitespren_base || ''
+            }),
+          });
+          const f47Data = await f47Response.json();
+          
+          if (!f47Response.ok || !f47Data.success) {
+            throw new Error(f47Data.message || 'F47 API call failed');
+          }
+          
+          updateFeedback('chep16', method, `${f47Data.message} (${f47Data.results?.processed || 0} processed, ${f47Data.results?.succeeded || 0} succeeded)`, 'success');
+          return; // Early return to skip the generic success message
         case 'chep21':
-          // REST API sync
-          endpoint = '/api/chepno/sync';
+          // REST API sync - using proper sitejar4 endpoint
+          endpoint = '/api/sync/wordpress-site';
           payload = { 
-            sitespren_base: currentSession.sitespren_base || '',
-            sitespren_id: currentSession.janky_rel_sitespren_id,
-            method: 'rest_api'
+            siteId: currentSession.janky_rel_sitespren_id,
+            method: 'rest_api',
+            fallbackEnabled: true
           };
           break;
         case 'chep31':
-          // Test plugin
-          endpoint = '/api/chepno/test-plugin';
+          // Test plugin - using proper sitejar4 endpoint
+          endpoint = '/api/sync/test-plugin';
           payload = { 
-            sitespren_base: currentSession.sitespren_base || '',
-            sitespren_id: currentSession.janky_rel_sitespren_id
+            siteId: currentSession.janky_rel_sitespren_id
           };
           break;
         case 'chep41':
-          // Check plugin version
-          endpoint = '/api/chepno/check-version';
+          // Check plugin version - using proper sitejar4 endpoint
+          endpoint = '/api/plugin/check-version';
           payload = { 
-            sitespren_base: currentSession.sitespren_base || '',
-            sitespren_id: currentSession.janky_rel_sitespren_id
+            siteId: currentSession.janky_rel_sitespren_id,
+            userId: user?.id
           };
           break;
         case 'chep51':
-          // Update plugin
-          endpoint = '/api/chepno/update-plugin';
+          // Update plugin - using proper sitejar4 endpoint
+          endpoint = '/api/plugin/update';
           payload = { 
-            sitespren_base: currentSession.sitespren_base || '',
-            sitespren_id: currentSession.janky_rel_sitespren_id
+            siteId: currentSession.janky_rel_sitespren_id
           };
           break;
         case 'chep61':
-          // Barkro push
-          endpoint = '/api/chepno/barkro-push';
+          // Barkro push - using proper sitejar4 endpoint
+          endpoint = '/api/barkro/push-update';
           payload = { 
-            sitespren_base: currentSession.sitespren_base || '',
-            sitespren_id: currentSession.janky_rel_sitespren_id
+            siteId: currentSession.janky_rel_sitespren_id
           };
           break;
         case 'wpsv2_sync':
-          // Extended sync
-          endpoint = '/api/chepno/wpsv2-sync';
+          // Extended sync - using proper sitejar4 endpoint
+          endpoint = '/api/wpsv2/sync-site';
           payload = { 
-            sitespren_base: currentSession.sitespren_base || '',
-            sitespren_id: currentSession.janky_rel_sitespren_id,
-            method: method || 'plugin_api'
+            siteId: currentSession.janky_rel_sitespren_id,
+            method: method || 'plugin_api',
+            fallbackEnabled: true
           };
           break;
         default:
           throw new Error(`Unknown action: ${action}`);
       }
 
-      // Simulate API call for now (replace with actual calls when APIs are implemented)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Make the actual API call (no more simulations)
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
       
-      updateFeedback(action, method, `Action completed successfully for sitespren ID: ${currentSession.janky_rel_sitespren_id} (${currentSession.sitespren_base || 'N/A'})`, 'success');
+      updateFeedback(action, method, data.message || `Action completed successfully for sitespren ID: ${currentSession.janky_rel_sitespren_id} (${currentSession.sitespren_base || 'N/A'})`, 'success');
     } catch (error) {
-      updateFeedback(action, method, `Action failed: ${error}`, 'error');
+      updateFeedback(action, method, `Action failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     }
   };
 
