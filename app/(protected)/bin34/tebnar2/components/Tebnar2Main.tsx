@@ -1742,6 +1742,9 @@ export default function Tebnar2Main() {
   // SOPTION1 and SOPTION2 handler - adapted for tebnar2
   const [tbn2_functionLoading, setTbn2FunctionLoading] = useState(false);
   
+  // Image discovery loading state
+  const [tbn2_imageDiscoveryLoading, setTbn2ImageDiscoveryLoading] = useState(false);
+  
   const tbn2_handleSelectedItemsFunction = async (functionName: string) => {
     let itemsToProcess: string[] = [];
     
@@ -1795,6 +1798,76 @@ export default function Tebnar2Main() {
       alert(`An error occurred while executing ${functionName}`);
     } finally {
       setTbn2FunctionLoading(false);
+    }
+  };
+  
+  // Elementor image discovery handler
+  const tbn2_handleElementorImageDiscovery = async () => {
+    if (!tbn2_selectedGconPieceId) {
+      alert('Please select a gcon piece first');
+      return;
+    }
+    
+    // Debug logging for troubleshooting
+    console.log('🔍 Starting elementor image discovery with gconPieceId:', tbn2_selectedGconPieceId);
+    
+    setTbn2ImageDiscoveryLoading(true);
+    setTbn2Error(null);
+    
+    try {
+      const requestBody = {
+        gconPieceId: tbn2_selectedGconPieceId,
+        user_id: user?.id,
+      };
+      
+      // Debug logging for request body
+      console.log('📤 Sending API request body:', requestBody);
+      
+      // API call to process pelementor_cached data
+      const response = await fetch('/api/tbn2-elementor-image-discovery', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+      
+      console.log('📥 API response status:', response.status, response.statusText);
+      
+      // Check if response is ok before trying to parse JSON
+      if (!response.ok) {
+        let errorMessage;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+          console.error('❌ API error response:', errorData);
+        } catch {
+          // If JSON parsing fails, get text response
+          const errorText = await response.text();
+          errorMessage = `HTTP ${response.status}: ${errorText || response.statusText}`;
+          console.error('❌ API error (non-JSON):', errorText);
+        }
+        throw new Error(errorMessage);
+      }
+      
+      const result = await response.json();
+      console.log('📥 API response data:', result);
+      
+      if (result.success) {
+        setTbn2Error(`✅ Elementor image discovery completed: ${result.message || 'Success'}`);
+        // Refresh any relevant data if needed
+        if (user?.id) {
+          await tbn2_fetchPlans();
+        }
+      } else {
+        setTbn2Error(`❌ Elementor image discovery failed: ${result.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error('Elementor image discovery error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setTbn2Error(`❌ Error during elementor image discovery: ${errorMessage}`);
+    } finally {
+      setTbn2ImageDiscoveryLoading(false);
     }
   };
 
@@ -2298,7 +2371,19 @@ export default function Tebnar2Main() {
           {/* Image Discovery Section */}
           <div className="bg-white border border-gray-300 rounded-lg p-2">
             <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>image discovery box</div>
-            {/* Content will be added here later */}
+            <div className="text-gray-600 text-sm mb-2">(for use with elementor pages)</div>
+            <button
+              onClick={tbn2_handleElementorImageDiscovery}
+              disabled={!tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading}
+              className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                !tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading
+                  ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                  : 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+              }`}
+              title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Process elementor images for discovery'}
+            >
+              {tbn2_imageDiscoveryLoading ? 'Processing...' : 'f327_elementor_image_discovery'}
+            </button>
           </div>
         </div>
 
