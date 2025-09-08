@@ -717,70 +717,68 @@ export default function Sitejar4Client() {
       let endpoint = '';
       let payload: any = {};
 
-      // Map actions to their corresponding API endpoints
+      // Map actions to their corresponding CORRECT API endpoints
       switch (action) {
         case 'plugin_api':
         case 'chep11':
-          endpoint = '/api/chepno/sync';
+          endpoint = '/api/sync/wordpress-site';
           payload = { 
-            sitespren_base: selectedSite.sitespren_base || '',
-            sitespren_id: selectedSiteId,
-            method: 'plugin_api'
+            siteId: selectedSiteId,
+            method: 'plugin_api',
+            fallbackEnabled: true
           };
           break;
           
         case 'rest_api':
         case 'chep21':
-          endpoint = '/api/chepno/sync';
+          endpoint = '/api/sync/wordpress-site';
           payload = { 
-            sitespren_base: selectedSite.sitespren_base || '',
-            sitespren_id: selectedSiteId,
-            method: 'rest_api'
+            siteId: selectedSiteId,
+            method: 'rest_api',
+            fallbackEnabled: true
           };
           break;
           
         case 'test_plugin':
         case 'chep31':
-          endpoint = '/api/chepno/test-plugin';
+          endpoint = '/api/sync/test-plugin';
           payload = { 
-            sitespren_base: selectedSite.sitespren_base || '',
-            sitespren_id: selectedSiteId
+            siteId: selectedSiteId
           };
           break;
           
+        case 'check_plugin_version':
         case 'check_version':
         case 'chep41':
-          endpoint = '/api/chepno/check-version';
+          endpoint = '/api/plugin/check-version';
           payload = { 
-            sitespren_base: selectedSite.sitespren_base || '',
-            sitespren_id: selectedSiteId
+            siteId: selectedSiteId,
+            userId: user?.id
           };
           break;
           
         case 'update_plugin':
         case 'chep51':
-          endpoint = '/api/chepno/update-plugin';
+          endpoint = '/api/plugin/update';
           payload = { 
-            sitespren_base: selectedSite.sitespren_base || '',
-            sitespren_id: selectedSiteId
+            siteId: selectedSiteId
           };
           break;
           
         case 'barkro_push':
         case 'chep61':
-          endpoint = '/api/chepno/barkro-push';
+          endpoint = '/api/barkro/push-update';
           payload = { 
-            sitespren_base: selectedSite.sitespren_base || '',
-            sitespren_id: selectedSiteId
+            siteId: selectedSiteId
           };
           break;
           
         case 'wpsv2_sync':
-          endpoint = '/api/chepno/wpsv2-sync';
+          endpoint = '/api/wpsv2/sync-site';
           payload = { 
-            sitespren_base: selectedSite.sitespren_base || '',
-            sitespren_id: selectedSiteId,
-            method: method || 'plugin_api'
+            siteId: selectedSiteId,
+            method: method || 'plugin_api',
+            fallbackEnabled: true
           };
           break;
           
