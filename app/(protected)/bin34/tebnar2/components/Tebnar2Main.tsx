@@ -2293,71 +2293,6 @@ export default function Tebnar2Main() {
           </div>
         </div>
 
-        {/* ReverseRelation Widget - Shows currently assigned gcon_piece */}
-        <div 
-          className="bg-white border border-gray-300 rounded-lg p-2"
-        >
-          <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>ReverseRelation-from-gcon_pieces.asn_image_plan_batch_id (assigned gcon_piece)</div>
-          <div className="flex items-center space-x-2">
-            {/* Text display with copy button */}
-            <div className="flex-1 flex items-center space-x-2">
-              <input
-                type="text"
-                readOnly
-                value={(() => {
-                  if (!tbn2_assignedGconPiece) return '';
-                  // Format: "35a.- 5nezl.ksit.me/services-hub-page/"
-                  const truncatedId = tbn2_assignedGconPiece.id.substring(0, 3) + '.';
-                  const sitesprenBase = tbn2_assignedGconPiece.asn_sitespren_base || '';
-                  const postName = tbn2_assignedGconPiece.post_name || '';
-                  return `${truncatedId}- ${sitesprenBase}/${postName}/`;
-                })()}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded bg-gray-50"
-                style={{ fontSize: '14px' }}
-              />
-              <button
-                onClick={() => {
-                  if (!tbn2_assignedGconPiece) return;
-                  const truncatedId = tbn2_assignedGconPiece.id.substring(0, 3) + '.';
-                  const sitesprenBase = tbn2_assignedGconPiece.asn_sitespren_base || '';
-                  const postName = tbn2_assignedGconPiece.post_name || '';
-                  const textToCopy = `${truncatedId}- ${sitesprenBase}/${postName}/`;
-                  navigator.clipboard.writeText(textToCopy);
-                }}
-                disabled={!tbn2_assignedGconPiece}
-                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                style={{ fontSize: '14px' }}
-              >
-                Copy
-              </button>
-            </div>
-            {/* Open buttons */}
-            <button
-              onClick={() => {
-                if (tbn2_assignedGconPiece) {
-                  window.open(`/torya?gcon_piece_id=${tbn2_assignedGconPiece.id}`, '_blank');
-                }
-              }}
-              disabled={!tbn2_assignedGconPiece}
-              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              style={{ fontSize: '16px' }}
-            >
-              open /torya
-            </button>
-            <button
-              onClick={() => {
-                if (tbn2_assignedGconPiece) {
-                  window.open(`/mesagen/${tbn2_assignedGconPiece.id}`, '_blank');
-                }
-              }}
-              disabled={!tbn2_assignedGconPiece}
-              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              style={{ fontSize: '16px' }}
-            >
-              open /mesagen
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* medieval_chamber - Container for table configuration controls */}
@@ -2673,6 +2608,7 @@ export default function Tebnar2Main() {
                        tab === 'ptab2' ? 'Create Plans' : 
                        tab === 'ptab3' ? 'karmawiz nexus' : 
                        tab === 'ptab4' ? 'force to site' : 
+                       tab === 'ptab7' ? 'random tab' : 
                        tab}
                     </button>
                   ))}
@@ -2827,8 +2763,71 @@ export default function Tebnar2Main() {
                 )}
                 {tbn2_activePopupTab === 'ptab7' && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Content for ptab7</h3>
-                    <p className="text-gray-600">This is the content area for ptab7.</p>
+                    {/* ReverseRelation Widget - Shows currently assigned gcon_piece */}
+                    <div 
+                      className="bg-white border border-gray-300 rounded-lg p-2"
+                    >
+                      <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>ReverseRelation-from-gcon_pieces.asn_image_plan_batch_id (assigned gcon_piece)</div>
+                      <div className="flex items-center space-x-2">
+                        {/* Text display with copy button */}
+                        <div className="flex-1 flex items-center space-x-2">
+                          <input
+                            type="text"
+                            readOnly
+                            value={(() => {
+                              if (!tbn2_assignedGconPiece) return '';
+                              // Format: "35a.- 5nezl.ksit.me/services-hub-page/"
+                              const truncatedId = tbn2_assignedGconPiece.id.substring(0, 3) + '.';
+                              const sitesprenBase = tbn2_assignedGconPiece.asn_sitespren_base || '';
+                              const postName = tbn2_assignedGconPiece.post_name || '';
+                              return `${truncatedId}- ${sitesprenBase}/${postName}/`;
+                            })()}
+                            className="flex-1 px-2 py-1 border border-gray-300 rounded bg-gray-50"
+                            style={{ fontSize: '14px' }}
+                          />
+                          <button
+                            onClick={() => {
+                              if (!tbn2_assignedGconPiece) return;
+                              const truncatedId = tbn2_assignedGconPiece.id.substring(0, 3) + '.';
+                              const sitesprenBase = tbn2_assignedGconPiece.asn_sitespren_base || '';
+                              const postName = tbn2_assignedGconPiece.post_name || '';
+                              const textToCopy = `${truncatedId}- ${sitesprenBase}/${postName}/`;
+                              navigator.clipboard.writeText(textToCopy);
+                            }}
+                            disabled={!tbn2_assignedGconPiece}
+                            className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            style={{ fontSize: '14px' }}
+                          >
+                            Copy
+                          </button>
+                        </div>
+                        {/* Open buttons */}
+                        <button
+                          onClick={() => {
+                            if (tbn2_assignedGconPiece) {
+                              window.open(`/torya?gcon_piece_id=${tbn2_assignedGconPiece.id}`, '_blank');
+                            }
+                          }}
+                          disabled={!tbn2_assignedGconPiece}
+                          className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          style={{ fontSize: '16px' }}
+                        >
+                          open /torya
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (tbn2_assignedGconPiece) {
+                              window.open(`/mesagen/${tbn2_assignedGconPiece.id}`, '_blank');
+                            }
+                          }}
+                          disabled={!tbn2_assignedGconPiece}
+                          className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          style={{ fontSize: '16px' }}
+                        >
+                          open /mesagen
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
