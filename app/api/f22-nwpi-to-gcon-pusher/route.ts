@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
+// Safe substring helper function to handle non-string values
+function safeSubstring(value: any, start: number, length?: number): string {
+  if (value == null) return '';
+  const str = typeof value === 'string' ? value : String(value);
+  return length ? str.substring(start, start + length) : str.substring(start);
+}
+
 // Field mapping configuration
 const NWPI_TO_GCON_MAPPING = {
   // Direct field mappings
@@ -28,7 +35,7 @@ const NWPI_TO_GCON_MAPPING = {
       'mud_title': data.post_title // Add mud_title
     }),
     'post_content': (data: any) => {
-      console.log(`🔍 DEBUG - post_content transform input: "${data.post_content?.substring(0, 100)}..."`);
+      console.log(`🔍 DEBUG - post_content transform input: "${safeSubstring(data.post_content, 0, 100)}..."`);
       const bozoResult = bozoHTMLNormalizationProcess1(data.post_content || '');
       const tontoResult = tontoNormalizationProcess1(data.post_content || '');
       console.log(`🔍 DEBUG - TontoNormalizationProcess1 result: mudContent length=${tontoResult.mudContent?.length || 0}, deplines=${tontoResult.mudDeplines?.length || 0}`);
@@ -295,7 +302,7 @@ function tontoNormalizationProcess1(content: string): { mudContent: string; mudD
     console.log(`  - Input lines: ${lines.length}`);
     console.log(`  - Output mudDeplines: ${mudDeplines.length}`);
     console.log(`  - mudContent length: ${mudContent?.length || 0}`);
-    console.log(`  - mudContent preview: "${mudContent.substring(0, 100)}..."`);
+    console.log(`  - mudContent preview: "${safeSubstring(mudContent, 0, 100)}..."`);
     console.log(`🔍 DEBUG - mudContent length: ${mudContent?.length || 0}, deplines: ${mudDeplines?.length || 0}`);
     
     return { mudContent, mudDeplines };
@@ -473,7 +480,7 @@ export async function POST(request: NextRequest) {
           console.log(`🔄 Updating existing record: post_id=${nwpiRecord.post_id}, sitespren=${nwpiRecord.fk_sitespren_base}`);
           console.log(`🔍 DEBUG - About to update gconData with keys:`, Object.keys(gconData));
           console.log(`🔍 DEBUG - mud_title in gconData:`, gconData.mud_title);
-          console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING');
+          console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${safeSubstring(gconData.mud_content, 0, 100)}...` : 'MISSING');
           
           // Create final update object with explicit mud fields check
           const updateData = {
@@ -483,7 +490,7 @@ export async function POST(request: NextRequest) {
           
           console.log(`🌊 FINAL UPDATE DATA VERIFICATION:`);
           console.log(`  - mud_title: "${updateData.mud_title}"`);
-          console.log(`  - mud_content: ${updateData.mud_content ? `"${updateData.mud_content.substring(0, 50)}..." (length: ${updateData.mud_content.length})` : 'NULL/UNDEFINED'}`);
+          console.log(`  - mud_content: ${updateData.mud_content ? `"${safeSubstring(updateData.mud_content, 0, 50)}..." (length: ${updateData.mud_content.length})` : 'NULL/UNDEFINED'}`);
           console.log(`  - aval_title: "${updateData.aval_title}"`);
           console.log(`  - aval_content: ${updateData.aval_content ? `length: ${updateData.aval_content.length}` : 'NULL/UNDEFINED'}`);
           
@@ -522,7 +529,7 @@ export async function POST(request: NextRequest) {
           // Insert new record
           console.log(`🔍 DEBUG - About to insert gconData with keys:`, Object.keys(gconData));
           console.log(`🔍 DEBUG - mud_title in gconData:`, gconData.mud_title);
-          console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING');
+          console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${safeSubstring(gconData.mud_content, 0, 100)}...` : 'MISSING');
           
           // Create final insert object with explicit mud fields check
           const insertData = {
@@ -533,7 +540,7 @@ export async function POST(request: NextRequest) {
           
           console.log(`🌊 FINAL INSERT DATA VERIFICATION:`);
           console.log(`  - mud_title: "${insertData.mud_title}"`);
-          console.log(`  - mud_content: ${insertData.mud_content ? `"${insertData.mud_content.substring(0, 50)}..." (length: ${insertData.mud_content.length})` : 'NULL/UNDEFINED'}`);
+          console.log(`  - mud_content: ${insertData.mud_content ? `"${safeSubstring(insertData.mud_content, 0, 50)}..." (length: ${insertData.mud_content.length})` : 'NULL/UNDEFINED'}`);
           console.log(`  - aval_title: "${insertData.aval_title}"`);
           console.log(`  - aval_content: ${insertData.aval_content ? `length: ${insertData.aval_content.length}` : 'NULL/UNDEFINED'}`);
           
@@ -634,7 +641,7 @@ function transformNwpiToGcon(nwpiRecord: any, userId: string) {
   // Apply transform mappings
   for (const [nwpiField, transformFn] of Object.entries(NWPI_TO_GCON_MAPPING.transform)) {
     if (nwpiRecord[nwpiField] !== null && nwpiRecord[nwpiField] !== undefined) {
-      console.log(`🔍 DEBUG - Processing transform field: ${nwpiField} = "${nwpiRecord[nwpiField]?.substring(0, 50)}..."`);
+      console.log(`🔍 DEBUG - Processing transform field: ${nwpiField} = "${safeSubstring(nwpiRecord[nwpiField], 0, 50)}..."`);
       const transformed = transformFn(nwpiRecord);
       console.log(`🔍 DEBUG - Transform result for ${nwpiField}:`, Object.keys(transformed));
       
@@ -643,7 +650,7 @@ function transformNwpiToGcon(nwpiRecord: any, userId: string) {
         console.log(`🌊 MUD_TITLE FOUND: "${transformed.mud_title}"`);
       }
       if ('mud_content' in transformed && transformed.mud_content) {
-        console.log(`🌊 MUD_CONTENT FOUND: length=${transformed.mud_content.length}, preview="${transformed.mud_content.substring(0, 100)}..."`);
+        console.log(`🌊 MUD_CONTENT FOUND: length=${transformed.mud_content.length}, preview="${safeSubstring(transformed.mud_content, 0, 100)}..."`);
       }
       
       Object.assign(gconData, transformed);
