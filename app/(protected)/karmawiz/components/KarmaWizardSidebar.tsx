@@ -48,7 +48,25 @@ export default function KarmaWizardSidebar({ currentStep, session, onNavigateToS
     <div className="w-80 bg-white border-r border-gray-200 h-screen overflow-y-auto sticky top-0">
       <div className="p-6">
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Karma Wizard Steps</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold text-gray-900">Karma Wizard Steps</h3>
+            <div className="flex flex-col gap-1">
+              <button
+                onClick={() => window.open('/karmawiz', '_blank')}
+                className="px-2 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded text-xs"
+                style={{ fontSize: '12px' }}
+              >
+                new session
+              </button>
+              <button
+                onClick={() => window.open('/karmajar', '_blank')}
+                className="px-2 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded text-xs"
+                style={{ fontSize: '12px' }}
+              >
+                /karmajar
+              </button>
+            </div>
+          </div>
           {session ? (
             <p className="text-sm text-gray-600">Session: {session.session_name}</p>
           ) : (

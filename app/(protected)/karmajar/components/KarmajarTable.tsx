@@ -12,6 +12,7 @@ const NubraTablefaceKite = dynamic(
 
 interface KarmaWizardSession {
   session_id: string;
+  janky_rel_sitespren_id: string | null;
   session_name: string;
   rel_gcon_piece_id: string;
   user_id: string;
@@ -60,6 +61,7 @@ export default function KarmajarTable() {
   // Column definitions
   const columns = [
     { key: 'session_id', label: 'session_id', type: 'text', readonly: true },
+    { key: 'janky_rel_sitespren_id', label: 'janky_rel_sitespren_id', type: 'text' },
     { key: 'session_name', label: 'session_name', type: 'text' },
     { key: 'rel_gcon_piece_id', label: 'rel_gcon_piece_id', type: 'text' },
     { key: 'cached_sitespren_base_note', label: 'cached_sitespren_base_note', type: 'text' },
