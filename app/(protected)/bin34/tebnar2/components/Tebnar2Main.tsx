@@ -88,7 +88,7 @@ export default function Tebnar2Main() {
   const sitesprenDropdownRef = useRef<HTMLDivElement>(null);
   
   // Gcon piece state for asn_gcon_piece_id widget
-  const [tbn2_gconPieceOptions, setTbn2GconPieceOptions] = useState<Array<{id: string, meta_title: string, asn_sitespren_base: string, post_name: string}>>([]);
+  const [tbn2_gconPieceOptions, setTbn2GconPieceOptions] = useState<Array<{id: string, meta_title: string, asn_sitespren_base: string, post_name: string, g_post_id: string, pageurl: string}>>([]);
   const [tbn2_selectedGconPieceId, setTbn2SelectedGconPieceId] = useState<string>('');
   const [tbn2_gconPieceSaving, setTbn2GconPieceSaving] = useState(false);
   const [tbn2_currentSitesprenBase, setTbn2CurrentSitesprenBase] = useState<string>('');
@@ -688,6 +688,23 @@ export default function Tebnar2Main() {
       option.meta_title.toLowerCase().includes(tbn2_gconPieceSearchTerm.toLowerCase()) ||
       (option.post_name && option.post_name.toLowerCase().includes(tbn2_gconPieceSearchTerm.toLowerCase()))
     );
+  };
+
+  // Generate URLs for gcon piece quick actions
+  const tbn2_getGconPieceUrls = () => {
+    if (!tbn2_selectedGconPieceId) return null;
+    const selectedPiece = tbn2_gconPieceOptions.find(option => option.id === tbn2_selectedGconPieceId);
+    if (!selectedPiece) return null;
+
+    const sitesprenBase = selectedPiece.asn_sitespren_base;
+    const postId = selectedPiece.g_post_id;
+    const pageUrl = selectedPiece.pageurl;
+
+    return {
+      pendulum: sitesprenBase ? `https://${sitesprenBase}/wp-admin/post.php?post=${postId}&action=edit` : null,
+      elementor: sitesprenBase ? `https://${sitesprenBase}/wp-admin/post.php?post=${postId}&action=elementor` : null,
+      frontend: pageUrl || null
+    };
   };
 
   const tbn2_getSelectedGconPieceDisplay = () => {
@@ -1327,7 +1344,7 @@ export default function Tebnar2Main() {
 
       const { data, error } = await supabase
         .from('gcon_pieces')
-        .select('id, meta_title, asn_sitespren_base, post_name')
+        .select('id, meta_title, asn_sitespren_base, post_name, g_post_id, pageurl')
         .eq('fk_users_id', userValidation.internalUserId)
         .eq('asn_sitespren_base', sitesprenBase)
         .order('meta_title', { ascending: true });
@@ -2187,6 +2204,42 @@ export default function Tebnar2Main() {
                 {tbn2_gconPieceSaving ? '...' : 'save'}
               </button>
             </div>
+
+            {/* Quick Action Buttons */}
+            {tbn2_selectedGconPieceId && (() => {
+              const urls = tbn2_getGconPieceUrls();
+              return urls ? (
+                <div className="mt-2 flex space-x-1">
+                  <button
+                    onClick={() => urls.pendulum && window.open(urls.pendulum, '_blank')}
+                    disabled={!urls.pendulum}
+                    className="px-2 text-xs font-medium rounded border transition-colors bg-gray-600 text-white border-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    style={{ height: '20px' }}
+                    title="Edit in WordPress admin"
+                  >
+                    pendulum
+                  </button>
+                  <button
+                    onClick={() => urls.elementor && window.open(urls.elementor, '_blank')}
+                    disabled={!urls.elementor}
+                    className="px-2 text-xs font-medium rounded border transition-colors bg-purple-600 text-white border-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    style={{ height: '20px' }}
+                    title="Edit with Elementor"
+                  >
+                    elementor
+                  </button>
+                  <button
+                    onClick={() => urls.frontend && window.open(urls.frontend, '_blank')}
+                    disabled={!urls.frontend}
+                    className="px-2 text-xs font-medium rounded border transition-colors bg-green-600 text-white border-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    style={{ height: '20px' }}
+                    title="View frontend page"
+                  >
+                    frontend
+                  </button>
+                </div>
+              ) : null;
+            })()}
           </div>
 
           {/* Narpi Push Button */}
@@ -2224,6 +2277,19 @@ export default function Tebnar2Main() {
                 )}
               </div>
             )}
+          </div>
+
+          {/* Custom Push Button */}
+          <div className="bg-white border border-gray-300 rounded-lg p-2">
+            <div className="text-xs font-semibold text-gray-700 mb-2">custom push</div>
+            <button
+              onClick={() => {
+                // No functionality yet
+              }}
+              className="px-3 py-2 text-sm font-medium rounded border transition-colors bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+            >
+              run
+            </button>
           </div>
         </div>
 
@@ -2294,66 +2360,70 @@ export default function Tebnar2Main() {
         </div>
       </div>
 
-      {/* Column Template Controls - positioned just above the main table */}
-      <div className="mb-6 flex items-stretch space-x-4">
-        {/* SQL View Info */}
-        <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 text-xs" style={{maxWidth: '130px', maxHeight: '75px'}}>
-          <div className="font-semibold text-gray-700 mb-1">SQL View Info</div>
-          <div className="text-gray-600">view name: images_plans</div>
-          <div className="text-gray-600"># columns: {tbn2_getAllTableColumns().length}</div>
-        </div>
+      {/* medieval_chamber - Container for table configuration controls */}
+      <div className="mb-6 p-4 border border-black bg-white" style={{ border: '1px solid black', backgroundColor: '#ffffff' }}>
+        <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>medieval_chamber</div>
+        
+        {/* Column Template Controls - positioned just above the main table */}
+        <div className="flex items-stretch space-x-4">
+          {/* SQL View Info */}
+          <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 text-xs" style={{maxWidth: '130px', maxHeight: '75px'}}>
+            <div className="font-semibold text-gray-700 mb-1">SQL View Info</div>
+            <div className="text-gray-600">view name: images_plans</div>
+            <div className="text-gray-600"># columns: {tbn2_getAllTableColumns().length}</div>
+          </div>
 
-        {/* Column Template Options */}
-        <div className="bg-white border border-gray-300 rounded-lg p-2" style={{maxWidth: '600px', maxHeight: '75px'}}>
-          <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
-          <div className="flex space-x-1">
-            {Object.entries(TBN2_COLUMN_TEMPLATES).map(([key, template]) => (
-              <button
-                key={key}
-                onClick={() => tbn2_handleColumnTemplateChange(key)}
-                className={`text-xs leading-tight p-2 rounded border text-center ${
-                  tbn2_selectedColTemplate === key
-                    ? 'bg-blue-900 text-white border-blue-900'
-                    : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
-                }`}
-                style={{width: '120px'}}
-              >
-                <div className="font-semibold">{template.label}</div>
-                <div>{template.description}</div>
-              </button>
-            ))}
+          {/* Column Template Options */}
+          <div className="bg-white border border-gray-300 rounded-lg p-2" style={{maxWidth: '600px', maxHeight: '75px'}}>
+            <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
+            <div className="flex space-x-1">
+              {Object.entries(TBN2_COLUMN_TEMPLATES).map(([key, template]) => (
+                <button
+                  key={key}
+                  onClick={() => tbn2_handleColumnTemplateChange(key)}
+                  className={`text-xs leading-tight p-2 rounded border text-center ${
+                    tbn2_selectedColTemplate === key
+                      ? 'bg-blue-900 text-white border-blue-900'
+                      : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                  }`}
+                  style={{width: '120px'}}
+                >
+                  <div className="font-semibold">{template.label}</div>
+                  <div>{template.description}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sticky Columns Control */}
+          <div className="bg-white border border-gray-300 rounded-lg p-2">
+            <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns At Left Side Of UI Grid Table</div>
+            <div className="flex space-x-1">
+              {[
+                { id: 1, label: 'OPTION 1', subtitle: '1 left-most', range: 'column' },
+                { id: 2, label: 'OPTION 2', subtitle: '2 left-most', range: 'columns' },
+                { id: 3, label: 'OPTION 3', subtitle: '3 left-most', range: 'columns' },
+                { id: 4, label: 'OPTION 4', subtitle: '4 left-most', range: 'columns' },
+                { id: 5, label: 'OPTION 5', subtitle: '5 left-most', range: 'columns' }
+              ].map(option => (
+                <button
+                  key={option.id}
+                  onClick={() => tbn2_handleStickyColChange(option.id)}
+                  className={`text-xs leading-tight p-1 rounded border text-center ${
+                    tbn2_stickyColCount === option.id
+                      ? 'bg-blue-900 text-white border-blue-900'
+                      : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                  }`}
+                  style={{width: '80px'}}
+                >
+                  <div className="font-semibold">{option.label}</div>
+                  <div>{option.subtitle}</div>
+                  <div>{option.range}</div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-
-        {/* Sticky Columns Control */}
-        <div className="bg-white border border-gray-300 rounded-lg p-2">
-          <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns At Left Side Of UI Grid Table</div>
-          <div className="flex space-x-1">
-            {[
-              { id: 1, label: 'OPTION 1', subtitle: '1 left-most', range: 'column' },
-              { id: 2, label: 'OPTION 2', subtitle: '2 left-most', range: 'columns' },
-              { id: 3, label: 'OPTION 3', subtitle: '3 left-most', range: 'columns' },
-              { id: 4, label: 'OPTION 4', subtitle: '4 left-most', range: 'columns' },
-              { id: 5, label: 'OPTION 5', subtitle: '5 left-most', range: 'columns' }
-            ].map(option => (
-              <button
-                key={option.id}
-                onClick={() => tbn2_handleStickyColChange(option.id)}
-                className={`text-xs leading-tight p-1 rounded border text-center ${
-                  tbn2_stickyColCount === option.id
-                    ? 'bg-blue-900 text-white border-blue-900'
-                    : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
-                }`}
-                style={{width: '80px'}}
-              >
-                <div className="font-semibold">{option.label}</div>
-                <div>{option.subtitle}</div>
-                <div>{option.range}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
       </div>
 
       {/* Main Table - enhanced with column template system */}
