@@ -111,6 +111,7 @@ export default function Tebnar2Main() {
   const [tbn2_kz101Checked, setTbn2Kz101Checked] = useState(false);
   const [tbn2_kz103Checked, setTbn2Kz103Checked] = useState(false);
   const [tbn2_activePopupTab, setTbn2ActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
+  const [tbn2_activeImageDiscoveryTab, setTbn2ActiveImageDiscoveryTab] = useState<'utab1' | 'utab2' | 'utab3'>('utab1');
   const [tbn2_uelBarColors, setTbn2UelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [tbn2_uelBar37Colors, setTbn2UelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [tbn2_currentUrl, setTbn2CurrentUrl] = useState<string>('');
@@ -1389,7 +1390,19 @@ export default function Tebnar2Main() {
         
       if (!error && data) {
         // Handle null or empty data gracefully
-        const cradlesData = data.discovered_img_cradles_json || '';
+        const rawCradlesData = data.discovered_img_cradles_json;
+        let cradlesData = '';
+        
+        if (rawCradlesData) {
+          // Check if it's already a string or needs to be converted from object
+          if (typeof rawCradlesData === 'string') {
+            cradlesData = rawCradlesData;
+          } else if (typeof rawCradlesData === 'object') {
+            // Convert object to JSON string
+            cradlesData = JSON.stringify(rawCradlesData);
+          }
+        }
+        
         setTbn2DiscoveredImgCradlesJson(cradlesData);
       } else {
         setTbn2DiscoveredImgCradlesJson('');
@@ -2411,54 +2424,95 @@ export default function Tebnar2Main() {
             </div>
           </div>
 
-          {/* Image Discovery Section */}
+          {/* Image Discovery Section with Tabs */}
           <div className="bg-white border border-gray-300 rounded-lg p-2">
-            <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>image discovery box</div>
-            <div className="text-gray-600 text-sm mb-2">(for use with elementor pages)</div>
-            <button
-              onClick={tbn2_handleElementorImageDiscovery}
-              disabled={!tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading}
-              className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
-                !tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading
-                  ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
-                  : 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
-              }`}
-              title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Process elementor images for discovery'}
-            >
-              {tbn2_imageDiscoveryLoading ? 'Processing...' : 'f327_elementor_image_discovery'}
-            </button>
+            {/* Vesicle Chamber Header - Always visible */}
+            <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>vesicle_chamber</div>
             
-            {/* Discovered img cradles JSON display */}
-            <div className="mt-3">
-              <div className="font-bold text-gray-700 mb-2" style={{ fontSize: '16px' }}>discovered_img_cradles_json</div>
-              <div 
-                className="bg-gray-50 border border-gray-300 rounded p-3 overflow-auto font-mono text-sm"
-                style={{ 
-                  maxHeight: '200px', 
-                  fontSize: '12px',
-                  lineHeight: '1.4'
-                }}
-              >
-                {tbn2_discoveredImgCradlesJson ? (
-                  <pre className="whitespace-pre-wrap">
-                    {(() => {
-                      try {
-                        // Try to parse and format JSON nicely
-                        const parsed = JSON.parse(tbn2_discoveredImgCradlesJson);
-                        return JSON.stringify(parsed, null, 2);
-                      } catch (e) {
-                        // If it's not valid JSON, display as-is
-                        return tbn2_discoveredImgCradlesJson;
-                      }
-                    })()}
-                  </pre>
-                ) : (
-                  <div className="text-gray-500 italic">
-                    {tbn2_selectedGconPieceId ? 'No cradles data available' : 'Select a gcon piece to view cradles data'}
-                  </div>
-                )}
-              </div>
+            {/* Tab Navigation */}
+            <div className="flex border-b border-gray-200 mb-2">
+              {[
+                { id: 'utab1', label: 'el. cradles tab' },
+                { id: 'utab2', label: 'utab2' },
+                { id: 'utab3', label: 'utab3' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setTbn2ActiveImageDiscoveryTab(tab.id as 'utab1' | 'utab2' | 'utab3')}
+                  className={`px-3 py-1 text-sm font-medium border-b-2 transition-colors ${
+                    tbn2_activeImageDiscoveryTab === tab.id
+                      ? 'border-blue-500 text-blue-600 bg-blue-50'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
+            
+            {/* Tab Content */}
+            {tbn2_activeImageDiscoveryTab === 'utab1' && (
+              <div>
+                <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>image cradle discovery box</div>
+                <div className="text-gray-600 text-sm mb-2">(for use with elementor pages)</div>
+                <button
+                  onClick={tbn2_handleElementorImageDiscovery}
+                  disabled={!tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading}
+                  className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                    !tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading
+                      ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                      : 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                  }`}
+                  title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Process elementor images for discovery'}
+                >
+                  {tbn2_imageDiscoveryLoading ? 'Processing...' : 'f327_elementor_image_discovery'}
+                </button>
+                
+                {/* Discovered img cradles JSON display */}
+                <div className="mt-3">
+                  <div className="font-bold text-gray-700 mb-2" style={{ fontSize: '16px' }}>discovered_img_cradles_json</div>
+                  <div 
+                    className="bg-gray-50 border border-gray-300 rounded p-3 overflow-auto font-mono text-sm"
+                    style={{ 
+                      maxHeight: '200px', 
+                      fontSize: '12px',
+                      lineHeight: '1.4'
+                    }}
+                  >
+                    {tbn2_discoveredImgCradlesJson ? (
+                      <pre className="whitespace-pre-wrap">
+                        {(() => {
+                          try {
+                            // Try to parse and format JSON nicely
+                            const parsed = JSON.parse(tbn2_discoveredImgCradlesJson);
+                            return JSON.stringify(parsed, null, 2);
+                          } catch (e) {
+                            // If it's not valid JSON, display as-is
+                            return tbn2_discoveredImgCradlesJson;
+                          }
+                        })()}
+                      </pre>
+                    ) : (
+                      <div className="text-gray-500 italic">
+                        {tbn2_selectedGconPieceId ? 'No cradles data available' : 'Select a gcon piece to view cradles data'}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {tbn2_activeImageDiscoveryTab === 'utab2' && (
+              <div className="py-4">
+                <div className="text-gray-500 italic">utab2 content area - currently empty</div>
+              </div>
+            )}
+            
+            {tbn2_activeImageDiscoveryTab === 'utab3' && (
+              <div className="py-4">
+                <div className="text-gray-500 italic">utab3 content area - currently empty</div>
+              </div>
+            )}
           </div>
         </div>
 
