@@ -1801,6 +1801,10 @@ export default function Tebnar2Main() {
   // Discovered img cradles JSON state
   const [tbn2_discoveredImgCradlesJson, setTbn2DiscoveredImgCradlesJson] = useState<string>('');
   
+  // Discovered images regolith state
+  const [tbn2_discoveredImagesRegolith, setTbn2DiscoveredImagesRegolith] = useState<string>('');
+  const [tbn2_imagesRegolithLoading, setTbn2ImagesRegolithLoading] = useState(false);
+  
   const tbn2_handleSelectedItemsFunction = async (functionName: string) => {
     let itemsToProcess: string[] = [];
     
@@ -1924,6 +1928,69 @@ export default function Tebnar2Main() {
       setTbn2Error(`❌ Error during elementor image discovery: ${errorMessage}`);
     } finally {
       setTbn2ImageDiscoveryLoading(false);
+    }
+  };
+
+  // Elementor images regolith discovery handler
+  const tbn2_handleElementorImagesRegolith = async () => {
+    if (!tbn2_selectedGconPieceId) {
+      alert('Please select a gcon piece first');
+      return;
+    }
+    
+    console.log('🔍 Starting elementor images regolith discovery with gconPieceId:', tbn2_selectedGconPieceId);
+    
+    setTbn2ImagesRegolithLoading(true);
+    setTbn2Error(null);
+    
+    try {
+      const requestBody = {
+        gconPieceId: tbn2_selectedGconPieceId,
+        user_id: user?.id,
+      };
+      
+      console.log('📤 Sending API request body:', requestBody);
+      
+      // API call to analyze pelementor_cached for actual images
+      const response = await fetch('/api/f331-discover-elementor-images-regolith', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+      
+      console.log('📥 API response status:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        let errorMessage;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+          console.error('❌ API error response:', errorData);
+        } catch {
+          const errorText = await response.text();
+          errorMessage = `HTTP ${response.status}: ${errorText || response.statusText}`;
+          console.error('❌ API error (non-JSON):', errorText);
+        }
+        throw new Error(errorMessage);
+      }
+      
+      const result = await response.json();
+      console.log('📥 API response data:', result);
+      
+      if (result.success && result.data && result.data.discovered_images_regolith) {
+        setTbn2DiscoveredImagesRegolith(JSON.stringify(result.data.discovered_images_regolith));
+        setTbn2Error(`✅ Elementor images regolith discovery completed: ${result.message || 'Success'}`);
+      } else {
+        setTbn2Error(`❌ Elementor images regolith discovery failed: ${result.error || 'No regolith data returned'}`);
+      }
+    } catch (err) {
+      console.error('Elementor images regolith discovery error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setTbn2Error(`❌ Error during elementor images regolith discovery: ${errorMessage}`);
+    } finally {
+      setTbn2ImagesRegolithLoading(false);
     }
   };
 
@@ -2465,7 +2532,7 @@ export default function Tebnar2Main() {
                   }`}
                   title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Process elementor images for discovery'}
                 >
-                  {tbn2_imageDiscoveryLoading ? 'Processing...' : 'f327_elementor_image_discovery'}
+                  {tbn2_imageDiscoveryLoading ? 'Processing...' : 'f327_discover_elementor_image_cradles'}
                 </button>
                 
                 {/* Discovered img cradles JSON display */}
@@ -2503,8 +2570,51 @@ export default function Tebnar2Main() {
             )}
             
             {tbn2_activeImageDiscoveryTab === 'utab2' && (
-              <div className="py-4">
-                <div className="text-gray-500 italic">utab2 content area - currently empty</div>
+              <div>
+                <button
+                  onClick={tbn2_handleElementorImagesRegolith}
+                  disabled={!tbn2_selectedGconPieceId || tbn2_imagesRegolithLoading}
+                  className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                    !tbn2_selectedGconPieceId || tbn2_imagesRegolithLoading
+                      ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                      : 'bg-green-600 text-white border-green-600 hover:bg-green-700'
+                  }`}
+                  title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Discover actual images from elementor pages'}
+                >
+                  {tbn2_imagesRegolithLoading ? 'Processing...' : 'f331_discover_elementor_images_regolith'}
+                </button>
+                
+                {/* Discovered images regolith display */}
+                <div className="mt-3">
+                  <div className="font-bold text-gray-700 mb-2" style={{ fontSize: '16px' }}>discovered_images_regolith</div>
+                  <div 
+                    className="bg-gray-50 border border-gray-300 rounded p-3 overflow-auto font-mono text-sm"
+                    style={{ 
+                      maxHeight: '200px', 
+                      fontSize: '12px',
+                      lineHeight: '1.4'
+                    }}
+                  >
+                    {tbn2_discoveredImagesRegolith ? (
+                      <pre className="whitespace-pre-wrap">
+                        {(() => {
+                          try {
+                            // Try to parse and format JSON nicely
+                            const parsed = JSON.parse(tbn2_discoveredImagesRegolith);
+                            return JSON.stringify(parsed, null, 2);
+                          } catch (e) {
+                            // If it's not valid JSON, display as-is
+                            return tbn2_discoveredImagesRegolith;
+                          }
+                        })()}
+                      </pre>
+                    ) : (
+                      <div className="text-gray-500 italic">
+                        {tbn2_selectedGconPieceId ? 'No regolith data available' : 'Select a gcon piece to view regolith data'}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
             
