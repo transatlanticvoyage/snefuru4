@@ -693,6 +693,18 @@ export default function Sitejar4Client() {
     const selectedSiteId = selectedSiteIds[0];
     if (!selectedSiteId) return;
 
+    // Get the selected site data
+    const selectedSite = sitesprenData.find(site => site.id === selectedSiteId);
+    if (!selectedSite) {
+      setGadgetFeedback({
+        action: `${action}${method ? ` (${method})` : ''}`,
+        message: 'Selected site not found',
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
+      return;
+    }
+
     const timestamp = new Date().toISOString();
     setGadgetFeedback({
       action: `${action}${method ? ` (${method})` : ''}`,
@@ -702,19 +714,106 @@ export default function Sitejar4Client() {
     });
 
     try {
-      // Simulate API call - replace with actual implementation
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      let endpoint = '';
+      let payload: any = {};
+
+      // Map actions to their corresponding API endpoints
+      switch (action) {
+        case 'plugin_api':
+        case 'chep11':
+          endpoint = '/api/chepno/sync';
+          payload = { 
+            sitespren_base: selectedSite.sitespren_base || '',
+            sitespren_id: selectedSiteId,
+            method: 'plugin_api'
+          };
+          break;
+          
+        case 'rest_api':
+        case 'chep21':
+          endpoint = '/api/chepno/sync';
+          payload = { 
+            sitespren_base: selectedSite.sitespren_base || '',
+            sitespren_id: selectedSiteId,
+            method: 'rest_api'
+          };
+          break;
+          
+        case 'test_plugin':
+        case 'chep31':
+          endpoint = '/api/chepno/test-plugin';
+          payload = { 
+            sitespren_base: selectedSite.sitespren_base || '',
+            sitespren_id: selectedSiteId
+          };
+          break;
+          
+        case 'check_version':
+        case 'chep41':
+          endpoint = '/api/chepno/check-version';
+          payload = { 
+            sitespren_base: selectedSite.sitespren_base || '',
+            sitespren_id: selectedSiteId
+          };
+          break;
+          
+        case 'update_plugin':
+        case 'chep51':
+          endpoint = '/api/chepno/update-plugin';
+          payload = { 
+            sitespren_base: selectedSite.sitespren_base || '',
+            sitespren_id: selectedSiteId
+          };
+          break;
+          
+        case 'barkro_push':
+        case 'chep61':
+          endpoint = '/api/chepno/barkro-push';
+          payload = { 
+            sitespren_base: selectedSite.sitespren_base || '',
+            sitespren_id: selectedSiteId
+          };
+          break;
+          
+        case 'wpsv2_sync':
+          endpoint = '/api/chepno/wpsv2-sync';
+          payload = { 
+            sitespren_base: selectedSite.sitespren_base || '',
+            sitespren_id: selectedSiteId,
+            method: method || 'plugin_api'
+          };
+          break;
+          
+        default:
+          throw new Error(`Unknown action: ${action}`);
+      }
+
+      // Make the actual API call
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
       
       setGadgetFeedback({
         action: `${action}${method ? ` (${method})` : ''}`,
-        message: `Action completed successfully for site ${selectedSiteId}`,
+        message: data.message || `Action completed successfully for site ${selectedSite.sitespren_base}`,
         type: 'success',
         timestamp: new Date().toISOString()
       });
     } catch (error) {
       setGadgetFeedback({
         action: `${action}${method ? ` (${method})` : ''}`,
-        message: `Action failed: ${error}`,
+        message: `Action failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         type: 'error',
         timestamp: new Date().toISOString()
       });

@@ -529,7 +529,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
   const copyFeedbackMessage = async () => {
     if (!gadgetFeedback) return;
     
-    const message = `Action: ${gadgetFeedback.action}\nMessage: ${gadgetFeedback.message}\nTime: ${new Date(gadgetFeedback.timestamp).toLocaleString()}`;
+    const message = `Action: ${gadgetFeedback.action}\\nMessage: ${gadgetFeedback.message}\\nTime: ${new Date(gadgetFeedback.timestamp).toLocaleString()}`;
     
     try {
       await navigator.clipboard.writeText(message);
@@ -573,10 +573,10 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor`;
       
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        <div className="w-full px-6" style={{ paddingTop: '10px' }}>
-          <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="w-full px-6" style={{ paddingTop: '2px' }}>
+          <div className="bg-white rounded-lg shadow-lg" style={{ padding: '8px 24px 24px 24px' }}>
             {/* Chamber Toggle Buttons */}
-            <div className="pb-6 border-b border-gray-200">
+            <div className="pb-2 border-b border-gray-200">
               <div className="flex flex-wrap justify-center gap-2">
                 {chamberVisibility && Object.entries(chamberVisibility).map(([chamber, isVisible]) => (
                   <button
@@ -1024,10 +1024,12 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                     nickel_chamber_div
                   </div>
                   
-                  {/* Sitespren Data Badge with Option Selector */}
+                  {/* Sitespren Data Badge with Option Selector and Tool Buttons */}
                   {currentSession && (
-                    <div className="mt-4 flex">
-                      {/* Option 1 Selector */}
+                    <div className="mt-4 flex gap-4">
+                      <div>
+                        <div className="flex">
+                          {/* Option 1 Selector */}
                       <div 
                         className="border border-black rounded-l overflow-hidden cursor-pointer"
                         style={{ width: '50px' }}
@@ -1049,7 +1051,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                         </div>
                       </div>
                       {/* Original Sitespren Badge */}
-                      <div className="flex-1 border border-black border-l-0 rounded-r overflow-hidden">
+                      <div className="border border-black border-l-0 rounded-r overflow-hidden" style={{ width: '320px' }}>
                         <div className="w-full h-3.5 bg-blue-200 flex items-center px-2">
                           <span style={{ fontSize: '12px', color: '#394990' }}>
                             fk data badge
@@ -1083,11 +1085,10 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                         </div>
                       </div>
                     </div>
-                  )}
-                  
-                  {/* Tool Buttons Full Section */}
-                  {currentSession && (
-                    <div className="mt-4 p-4 min-w-96" style={{ border: '1px solid black' }}>
+                      </div>
+                      
+                      {/* Tool Buttons Full Section */}
+                      <div className="p-4 min-w-96" style={{ border: '1px solid black' }}>
                       <div className="flex items-center mb-3">
                         <span className="text-sm font-semibold text-gray-800">
                           tool_buttons_full
@@ -1221,6 +1222,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                         </button>
                       </div>
                     </div>
+                    </div>
                   )}
                   
                   {/* Navigation Buttons with Dynamic URLs */}
@@ -1307,8 +1309,9 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   {/* Chepno Functions Reference Table */}
                   <div className="mt-4">
                     <div className="flex items-center gap-4 mb-3">
-                      <h3 className="text-lg font-semibold text-gray-800">Chepno Functions Reference</h3>
+                      <h3 className="text-lg font-semibold text-gray-800">Chepno Functions Reference UI Table Grid</h3>
                     </div>
+
                     <div className="overflow-x-auto">
                       <table className="w-full border border-gray-300 bg-white text-sm">
                         <thead>
