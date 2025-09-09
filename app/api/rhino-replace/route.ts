@@ -609,12 +609,39 @@ async function performCliffArrangement(
     let pageUpdated = false;
     if (replacementsMade > 0 && gconPiece.g_post_id) {
       console.log(`🚀 Sending updated Elementor data to WordPress (${replacementsMade} replacements made)`);
+      
+      // Debug: Log what we're sending to WordPress
+      const dataPreview = typeof updatedElementorData === 'string' 
+        ? updatedElementorData.substring(0, 500)
+        : JSON.stringify(updatedElementorData).substring(0, 500);
+      console.log(`🔍 WordPress Update Preview: ${dataPreview}...`);
+      
+      // Check if the replaced URLs are actually in the data we're sending
+      const dataString = typeof updatedElementorData === 'string' 
+        ? updatedElementorData 
+        : JSON.stringify(updatedElementorData);
+        
+      const newImageUrls = uploaded_images.map(img => img.img_url_returned);
+      const foundNewUrls = newImageUrls.filter(url => dataString.includes(url));
+      console.log(`🔍 New image URLs in updated data: ${foundNewUrls.length}/${newImageUrls.length}`);
+      foundNewUrls.forEach(url => console.log(`  ✅ Found: ${url}`));
+      
+      const missingUrls = newImageUrls.filter(url => !dataString.includes(url));
+      missingUrls.forEach(url => console.log(`  ❌ Missing: ${url}`));
+      
       pageUpdated = await updateWordPressPage(
         gconPiece.asn_sitespren_base,
         gconPiece.g_post_id,
         updatedElementorData,
         userData.ruplin_api_key_1
       );
+      
+      if (pageUpdated) {
+        console.log(`✅ WordPress update completed - changes should be visible on frontend`);
+        console.log(`🌐 Check page at: https://${gconPiece.asn_sitespren_base}/?p=${gconPiece.g_post_id}`);
+      } else {
+        console.log(`❌ WordPress update failed - changes will not be visible`);
+      }
     } else if (replacementsMade === 0) {
       console.log(`⚠️ Skipping WordPress update - no image replacements were made to avoid corrupting page`);
     } else {
