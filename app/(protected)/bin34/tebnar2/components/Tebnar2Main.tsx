@@ -141,6 +141,9 @@ export default function Tebnar2Main() {
   const [tbn2_uelBarColors, setTbn2UelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [tbn2_uelBar37Colors, setTbn2UelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [tbn2_currentUrl, setTbn2CurrentUrl] = useState<string>('');
+  
+  // State for arrangement method selection (Cliff vs Mason)
+  const [tbn2_arrangementMethod, setTbn2ArrangementMethod] = useState<'cliff' | 'mason'>('cliff');
 
   // Inject CSS styles for main element styling (cloned from tebnar1)
   useEffect(() => {
@@ -3609,6 +3612,44 @@ export default function Tebnar2Main() {
                       : `${tbn2_selectedRows.size} images currently selected`
                     }
                   </div>
+                  
+                  {/* First HR */}
+                  <hr className="my-4 border-gray-300" />
+                  
+                  {/* Arrangement Method Selection */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-center space-x-4 bg-gray-50 p-3 rounded-lg">
+                      <button
+                        onClick={() => setTbn2ArrangementMethod('cliff')}
+                        className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                          tbn2_arrangementMethod === 'cliff'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                        } border-2`}
+                      >
+                        Cliff Arrange
+                      </button>
+                      <button
+                        onClick={() => setTbn2ArrangementMethod('mason')}
+                        className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                          tbn2_arrangementMethod === 'mason'
+                            ? 'bg-green-600 text-white border-green-600'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                        } border-2`}
+                      >
+                        Mason Arrange
+                      </button>
+                    </div>
+                    <div className="text-center text-sm text-gray-600 mt-2">
+                      {tbn2_arrangementMethod === 'cliff' 
+                        ? 'Cliff: Traditional image replacement method' 
+                        : 'Mason: Enhanced image arrangement method (coming soon)'}
+                    </div>
+                  </div>
+                  
+                  {/* Second HR */}
+                  <hr className="my-4 border-gray-300" />
+                  
                   <button
                     onClick={tbn2_handleRhinoReplace}
                     disabled={
