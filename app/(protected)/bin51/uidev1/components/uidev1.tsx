@@ -1452,6 +1452,8 @@ export default function Uidev1() {
     <div className="w-full mx-auto">
       {/* Black bar with batch dropdown, only on tebnar1 */}
       <div className="sticky top-0 w-full h-10 bg-black z-30 flex items-center px-4 text-white space-x-4">
+        {/* BLUE TEST ELEMENT - uidev1 */}
+        <div style={{ width: '20px', height: '20px', backgroundColor: 'blue', marginRight: '10px' }}></div>
         <span>rel_images_plans_batches_id</span>
         <select
           value={selectedBatchId}

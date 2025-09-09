@@ -17,10 +17,16 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   
   // Copper chamber visibility state for /sitejar4 (default to true/show)
   const [copperChamberVisible, setCopperChamberVisible] = useState(true);
+  
+  // Medieval chamber visibility state for /bin34/tebnar2 (default to false/hide)
+  const [medievalChamberVisible, setMedievalChamberVisible] = useState(false);
+  
+  // Folate chamber visibility state for /bin34/tebnar2 (default to false/hide)
+  const [folateChamberVisible, setFolateChamberVisible] = useState(false);
 
   useEffect(() => {
     // Check if current page has bezel configuration
-    const pagesWithConfig = ['/sitejar4'];
+    const pagesWithConfig = ['/sitejar4', '/bin34/tebnar2'];
     setHasConfig(pagesWithConfig.includes(pathname));
   }, [pathname]);
 
@@ -67,6 +73,56 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     
     // Dispatch custom event to notify other components
     window.dispatchEvent(new CustomEvent('copperChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Initialize medieval chamber visibility from localStorage for /bin34/tebnar2
+  useEffect(() => {
+    if (pathname === '/bin34/tebnar2') {
+      const savedVisibility = localStorage.getItem('tebnar2_medievalChamberVisible');
+      if (savedVisibility !== null) {
+        setMedievalChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to false (hidden) and save it
+        setMedievalChamberVisible(false);
+        localStorage.setItem('tebnar2_medievalChamberVisible', JSON.stringify(false));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize folate chamber visibility from localStorage for /bin34/tebnar2
+  useEffect(() => {
+    if (pathname === '/bin34/tebnar2') {
+      const savedVisibility = localStorage.getItem('tebnar2_folateChamberVisible');
+      if (savedVisibility !== null) {
+        setFolateChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to false (hidden) and save it
+        setFolateChamberVisible(false);
+        localStorage.setItem('tebnar2_folateChamberVisible', JSON.stringify(false));
+      }
+    }
+  }, [pathname]);
+
+  // Handle medieval chamber toggle
+  const handleMedievalChamberToggle = (checked: boolean) => {
+    setMedievalChamberVisible(checked);
+    localStorage.setItem('tebnar2_medievalChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('medievalChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Handle folate chamber toggle
+  const handleFolateChamberToggle = (checked: boolean) => {
+    setFolateChamberVisible(checked);
+    localStorage.setItem('tebnar2_folateChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('folateChamberVisibilityChange', { 
       detail: { visible: checked } 
     }));
   };
@@ -154,6 +210,65 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
                       <p>Toggle visibility of the copper chamber div on the main page.</p>
                       <p>This controls the search and filter controls section.</p>
                       <p>Current state: <strong>{copperChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* /bin34/tebnar2 page specific controls */}
+              {pathname === '/bin34/tebnar2' && (
+                <div className="space-y-6">
+                  <div className="bg-gray-50 p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Page Visibility Controls</h3>
+                    
+                    {/* Medieval Chamber Toggle */}
+                    <div className="flex items-center space-x-4">
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={medievalChamberVisible}
+                          onChange={(e) => handleMedievalChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      {/* Label Text */}
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        medieval_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the medieval chamber on the tebnar2 page.</p>
+                      <p>Current state: <strong>{medievalChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Folate Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={folateChamberVisible}
+                          onChange={(e) => handleFolateChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      {/* Label Text */}
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        folate_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the folate chamber on the tebnar2 page.</p>
+                      <p>Current state: <strong>{folateChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
                       <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
                     </div>
                   </div>
