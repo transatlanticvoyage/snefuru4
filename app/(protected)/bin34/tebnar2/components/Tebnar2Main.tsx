@@ -2259,6 +2259,108 @@ export default function Tebnar2Main() {
     }
   };
 
+  // State for gadget feedback (chepno functions)
+  const [tbn2_gadgetFeedback, setTbn2GadgetFeedback] = useState<{
+    action: string;
+    message: string;
+    type: 'info' | 'success' | 'error' | 'warning';
+    timestamp: string;
+  } | null>(null);
+
+  // Handler for single site actions (chepno functions)
+  const tbn2_handleSingleSiteAction = async (action: string, method?: string) => {
+    if (!tbn2_selectedSitesprenId) {
+      setTbn2GadgetFeedback({
+        action: `${action}${method ? ` (${method})` : ''}`,
+        message: 'No site selected. Please select a site from the dropdown first.',
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
+      return;
+    }
+
+    const timestamp = new Date().toISOString();
+    setTbn2GadgetFeedback({
+      action: `${action}${method ? ` (${method})` : ''}`,
+      message: 'Action started...',
+      type: 'info',
+      timestamp
+    });
+
+    try {
+      let endpoint = '';
+      let payload: any = {};
+
+      // Map actions to their corresponding API endpoints
+      switch (action) {
+        case 'wpsv2_sync':
+          endpoint = '/api/wpsv2/sync-site';
+          payload = { 
+            siteId: tbn2_selectedSitesprenId,
+            method: method || 'plugin_api',
+            fallbackEnabled: true
+          };
+          break;
+          
+        case 'test_plugin':
+          endpoint = '/api/wpsv2/test-plugin';
+          payload = { siteId: tbn2_selectedSitesprenId };
+          break;
+          
+        case 'check_plugin_version':
+          endpoint = '/api/wpsv2/check-plugin-version';
+          payload = { siteId: tbn2_selectedSitesprenId };
+          break;
+          
+        case 'update_plugin':
+          endpoint = '/api/wpsv2/update-plugin';
+          payload = { siteId: tbn2_selectedSitesprenId };
+          break;
+          
+        case 'barkro_push':
+          endpoint = '/api/wpsv2/barkro-push';
+          payload = { siteId: tbn2_selectedSitesprenId };
+          break;
+          
+        default:
+          throw new Error(`Unknown action: ${action}`);
+      }
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setTbn2GadgetFeedback({
+          action: `${action}${method ? ` (${method})` : ''}`,
+          message: data.message || 'Action completed successfully',
+          type: 'success',
+          timestamp
+        });
+      } else {
+        setTbn2GadgetFeedback({
+          action: `${action}${method ? ` (${method})` : ''}`,
+          message: data.error || data.message || 'Action failed',
+          type: 'error',
+          timestamp
+        });
+      }
+    } catch (error) {
+      setTbn2GadgetFeedback({
+        action: `${action}${method ? ` (${method})` : ''}`,
+        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        type: 'error',
+        timestamp
+      });
+    }
+  };
+
   // Rhino Replace handler
   const tbn2_handleRhinoReplace = async () => {
     if (!tbn2_selectedGconPieceId) {
@@ -3719,8 +3821,158 @@ export default function Tebnar2Main() {
                 )}
                 {tbn2_activePopupTab === 'ptab6' && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Content for ptab6</h3>
-                    <p className="text-gray-600">This is the content area for ptab6.</p>
+                    <h3 className="text-lg font-semibold mb-4">New Chepno Functions</h3>
+                    
+                    {/* Site Gadgets Section - Chepno Chamber - Extended Version */}
+                    <div className="bg-white p-4 rounded-lg shadow border mb-4">
+                      <div className="text-sm font-semibold text-gray-600 mb-1">box_area_6_tebnar2</div>
+                      <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
+                      
+                      {/* Sync Actions Buttons */}
+                      <div className="mb-4">
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            className={`px-3 py-2 text-sm font-medium text-white rounded focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center gap-1 ${
+                              !tbn2_selectedSitesprenId 
+                                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                                : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
+                            }`}
+                            onClick={() => tbn2_handleSingleSiteAction('wpsv2_sync', 'plugin_api')}
+                            disabled={!tbn2_selectedSitesprenId}
+                            title="Sync site using Plugin API"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              chep11<br />
+                              articles<br />
+                              wp → nwpi<br />
+                              xplugin<br />
+                              Plugin API
+                            </div>
+                          </button>
+                          
+                          <button
+                            className={`px-3 py-2 text-sm font-medium text-white rounded focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center gap-1 ${
+                              !tbn2_selectedSitesprenId 
+                                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                                : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                            }`}
+                            onClick={() => tbn2_handleSingleSiteAction('wpsv2_sync', 'rest_api')}
+                            disabled={!tbn2_selectedSitesprenId}
+                            title="Sync site using REST API"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              chep21<br />
+                              articles<br />
+                              wp → nwpi<br />
+                              xrest<br />
+                              REST API
+                            </div>
+                          </button>
+                          
+                          <button
+                            className={`px-3 py-2 text-sm font-medium text-white rounded focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center gap-1 ${
+                              !tbn2_selectedSitesprenId 
+                                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                                : 'bg-purple-600 hover:bg-purple-700 focus:ring-purple-500'
+                            }`}
+                            onClick={() => tbn2_handleSingleSiteAction('test_plugin')}
+                            disabled={!tbn2_selectedSitesprenId}
+                            title="Test plugin connection"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              chep31<br />
+                              Test Plugin
+                            </div>
+                          </button>
+                          
+                          <button
+                            className={`px-3 py-2 text-sm font-medium text-white rounded focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center gap-1 ${
+                              !tbn2_selectedSitesprenId 
+                                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                                : 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500'
+                            }`}
+                            onClick={() => tbn2_handleSingleSiteAction('check_plugin_version')}
+                            disabled={!tbn2_selectedSitesprenId}
+                            title="Check plugin version"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              chep41<br />
+                              Check Version
+                            </div>
+                          </button>
+                          
+                          <button
+                            className={`px-3 py-2 text-sm font-medium text-white rounded focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center gap-1 ${
+                              !tbn2_selectedSitesprenId 
+                                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                                : 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
+                            }`}
+                            onClick={() => tbn2_handleSingleSiteAction('update_plugin')}
+                            disabled={!tbn2_selectedSitesprenId}
+                            title="Update plugin"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              chep51<br />
+                              xrest<br />
+                              Update Plugin
+                            </div>
+                          </button>
+                          
+                          <button
+                            className={`px-3 py-2 text-sm font-medium text-white rounded focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center gap-1 ${
+                              !tbn2_selectedSitesprenId 
+                                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                                : 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500'
+                            }`}
+                            onClick={() => tbn2_handleSingleSiteAction('barkro_push')}
+                            disabled={!tbn2_selectedSitesprenId}
+                            title="Push Barkro update"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              chep61<br />
+                              xplugin<br />
+                              Barkro Push
+                            </div>
+                          </button>
+                        </div>
+                        
+                        {!tbn2_selectedSitesprenId && (
+                          <p className="text-sm text-gray-500 mt-2">Please select a site from the asn_sitespren_id dropdown to use these actions</p>
+                        )}
+                      </div>
+                      
+                      {/* Feedback Display */}
+                      {tbn2_gadgetFeedback && (
+                        <div className={`mt-4 p-3 rounded-md ${
+                          tbn2_gadgetFeedback.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
+                          tbn2_gadgetFeedback.type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
+                          tbn2_gadgetFeedback.type === 'warning' ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' :
+                          'bg-blue-50 text-blue-800 border border-blue-200'
+                        }`}>
+                          <div className="flex items-start">
+                            <div className="flex-1">
+                              <p className="font-semibold">{tbn2_gadgetFeedback.action}</p>
+                              <p className="text-sm mt-1">{tbn2_gadgetFeedback.message}</p>
+                              <p className="text-xs mt-1 opacity-75">
+                                {new Date(tbn2_gadgetFeedback.timestamp).toLocaleTimeString()}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => setTbn2GadgetFeedback(null)}
+                              className="ml-3 text-gray-400 hover:text-gray-600"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
                 {tbn2_activePopupTab === 'ptab7' && (
