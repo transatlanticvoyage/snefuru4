@@ -428,43 +428,48 @@ export default function Tebnar2Main() {
       }
 
       console.log(`🔍 Narpi Debug: Database user ID: ${dbUser.id}`);
+      console.log(`🔍 Narpi Debug: Selected sitespren ID: ${tbn2_selectedSitesprenId}`);
 
-      // Use similar approach to narpo1 - get narpi_pushes with batch join
-      const { data: narpiPushes, error: narpiError } = await supabase
-        .from('narpi_pushes')
-        .select(`
-          id, push_name, push_desc, created_at, push_status1, kareench1, fk_batch_id,
-          images_plans_batches!fk_batch_id(
-            id, batch_name, rel_users_id, asn_sitespren_id
-          )
-        `)
-        .order('created_at', { ascending: false });
+      // First, get all batches for this user and sitespren
+      const { data: batchesData, error: batchesError } = await supabase
+        .from('images_plans_batches')
+        .select('id, batch_name, rel_users_id, asn_sitespren_id')
+        .eq('rel_users_id', dbUser.id)
+        .eq('asn_sitespren_id', tbn2_selectedSitesprenId);
 
-      if (narpiError) throw narpiError;
+      if (batchesError) {
+        console.error('🔍 Narpi Debug: Error fetching batches:', batchesError);
+        throw batchesError;
+      }
 
-      console.log(`🔍 Narpi Debug: Found ${narpiPushes?.length || 0} total narpi pushes before filtering`);
-
-      // Filter for user's batches with the selected sitespren
-      const userSitesprenPushes = (narpiPushes || []).filter(push => {
-        const batch = push.images_plans_batches;
-        const isUserBatch = batch && batch.rel_users_id === dbUser.id;
-        const isSitesprenMatch = batch && batch.asn_sitespren_id === tbn2_selectedSitesprenId;
-        
-        console.log(`🔍 Narpi Debug: Push ${push.id} - User match: ${isUserBatch}, Sitespren match: ${isSitesprenMatch}`);
-        if (batch) {
-          console.log(`  -> Batch: ${batch.id} (${batch.batch_name}), User: ${batch.rel_users_id}, Sitespren: ${batch.asn_sitespren_id}`);
-        }
-        
-        return isUserBatch && isSitesprenMatch;
+      console.log(`🔍 Narpi Debug: Found ${batchesData?.length || 0} batches for user ${dbUser.id} and sitespren ${tbn2_selectedSitesprenId}`);
+      batchesData?.forEach(batch => {
+        console.log(`  -> Batch: ${batch.id} (${batch.batch_name})`);
       });
 
-      console.log(`🔍 Narpi Debug: After user/sitespren filtering: ${userSitesprenPushes.length} pushes`);
-
-      if (userSitesprenPushes.length === 0) {
-        console.log('🔍 Narpi Debug: No pushes found for this user and sitespren combination');
+      if (!batchesData || batchesData.length === 0) {
+        console.log('🔍 Narpi Debug: No batches found for this user and sitespren combination');
         setTbn2AvailableNarpiPushes([]);
         return;
       }
+
+      const batchIds = batchesData.map(b => b.id);
+
+      // Now get narpi_pushes for these batches
+      const { data: narpiPushes, error: narpiError } = await supabase
+        .from('narpi_pushes')
+        .select('id, push_name, push_desc, created_at, push_status1, kareench1, fk_batch_id')
+        .in('fk_batch_id', batchIds)
+        .order('created_at', { ascending: false });
+
+      if (narpiError) {
+        console.error('🔍 Narpi Debug: Error fetching narpi pushes:', narpiError);
+        throw narpiError;
+      }
+
+      console.log(`🔍 Narpi Debug: Found ${narpiPushes?.length || 0} narpi pushes for these batches`);
+
+      const userSitesprenPushes = narpiPushes || [];
 
       // Log details of found pushes
       userSitesprenPushes.forEach(push => {
@@ -496,17 +501,18 @@ export default function Tebnar2Main() {
 
       console.log(`🔍 Narpi Debug: After filtering - ${errorFreePushes.length} error-free completed pushes`);
       
-      // Debug alert for visibility
-      if (typeof window !== 'undefined') {
-        alert(`Debug: Found ${errorFreePushes.length} eligible narpi pushes for sitespren ${tbn2_selectedSitesprenId}. Check console for details.`);
-      }
+      // Log summary
+      console.log(`🔍 Narpi Debug Summary:
+        - Sitespren ID: ${tbn2_selectedSitesprenId}
+        - User DB ID: ${dbUser.id}
+        - Batches found: ${batchesData?.length || 0}
+        - Total pushes: ${narpiPushes?.length || 0}
+        - Eligible pushes: ${errorFreePushes.length}
+      `);
       
       setTbn2AvailableNarpiPushes(errorFreePushes);
     } catch (err) {
-      console.error('Error fetching narpi pushes:', err);
-      if (typeof window !== 'undefined') {
-        alert(`Debug Error: ${err instanceof Error ? err.message : 'Unknown error'}. Check console for details.`);
-      }
+      console.error('🔍 Narpi Debug: Error fetching narpi pushes:', err);
       setTbn2AvailableNarpiPushes([]);
     } finally {
       setTbn2NarpiPushesLoading(false);
