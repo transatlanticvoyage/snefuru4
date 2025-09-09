@@ -22,6 +22,7 @@ export default function Narpo1Client() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedUuidId, setCopiedUuidId] = useState<string | null>(null);
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState('option1');
   const [selectedStickyColumns, setSelectedStickyColumns] = useState('option1');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
@@ -269,6 +270,18 @@ export default function Narpo1Client() {
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
       console.error('Failed to copy kareench1 value:', err);
+    }
+  };
+
+  const copyUuid = async (pushId: string) => {
+    try {
+      await navigator.clipboard.writeText(pushId);
+      setCopiedUuidId(pushId);
+      
+      // Clear the copied indicator after 2 seconds
+      setTimeout(() => setCopiedUuidId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy UUID:', err);
     }
   };
 
@@ -807,8 +820,17 @@ export default function Narpo1Client() {
                                   <div className="text-sm font-medium text-gray-900">
                                     {push.push_name}
                                   </div>
-                                  <div className="text-xs text-gray-500 font-mono">
-                                    ID: {push.id.substring(0, 8)}...
+                                  <div 
+                                    className="text-xs text-gray-500 font-mono cursor-pointer hover:text-blue-600 hover:underline transition-colors"
+                                    onClick={() => copyUuid(push.id)}
+                                    title="Click to copy full UUID"
+                                  >
+                                    ID: {push.id}
+                                    {copiedUuidId === push.id && (
+                                      <span className="ml-2 text-green-600 font-normal">
+                                        ✓ Copied!
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
                               </div>
