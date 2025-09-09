@@ -476,8 +476,9 @@ async function performCliffArrangement(
       throw new Error('Gcon piece not found');
     }
 
+    // Check if regolith data exists
     if (!gconPiece.discovered_images_regolith) {
-      throw new Error('No regolith data found - run f331 first');
+      throw new Error('No regolith data found - please run f331 discovery first');
     }
 
     console.log(`📄 Processing page: ${gconPiece.meta_title} (${gconPiece.asn_sitespren_base})`);
@@ -494,7 +495,12 @@ async function performCliffArrangement(
     }
 
     const imagesToReplace = regolithData.discovered_images || [];
-    console.log(`🔄 Found ${imagesToReplace.length} images to replace`);
+    console.log(`🔄 Found ${imagesToReplace.length} images to replace from regolith discovery:`);
+    
+    // Debug: Show what regolith discovered
+    imagesToReplace.forEach((img: any, index: number) => {
+      console.log(`🔍 Regolith image ${index + 1}: ${img.url}`);
+    });
 
     if (imagesToReplace.length === 0) {
       return {
@@ -524,6 +530,79 @@ async function performCliffArrangement(
       replacementsMade = updateResult.replacements_made;
 
       console.log(`🔧 Made ${replacementsMade} image replacements in Elementor data`);
+      
+      // Handle stale regolith detection
+      if ((updateResult as any).stale_regolith) {
+        console.log(`🔄 Stale regolith detected! Auto-refreshing and retrying...`);
+        
+        try {
+          // Auto-refresh by rediscovering images from current elementor data
+          console.log(`🔍 Extracting current images from live Elementor data...`);
+          
+          const currentUrls = (updateResult as any).current_urls || [];
+          const freshRegolithData = {
+            discovered_images: currentUrls.map((url: string, index: number) => ({
+              url: url,
+              position: index + 1,
+              image_metadata: {
+                // Extract basic info from URL
+                filename: url.split('/').pop() || `image-${index + 1}`,
+                discovered_at: new Date().toISOString()
+              }
+            })),
+            discovery_metadata: {
+              discovered_at: new Date().toISOString(),
+              method: 'auto_refresh_from_stale_detection',
+              total_images: currentUrls.length
+            }
+          };
+          
+          // Update the regolith data in the database
+          const { error: updateError } = await supabase
+            .from('gcon_pieces')
+            .update({ 
+              discovered_images_regolith: freshRegolithData,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', gcon_piece_id);
+          
+          if (updateError) {
+            throw new Error(`Failed to update regolith data: ${updateError.message}`);
+          }
+          
+          console.log(`✅ Regolith refreshed with ${currentUrls.length} current images`);
+          
+          // Now retry the replacement with fresh data
+          const newReplacementMap = createImageReplacementMap(
+            freshRegolithData.discovered_images, 
+            uploaded_images
+          );
+          
+          const retryResult = replaceImagesInElementorData(
+            updatedElementorData,
+            newReplacementMap,
+            freshRegolithData.discovered_images
+          );
+          
+          replacementsMade = retryResult.replacements_made;
+          updatedElementorData = retryResult.data;
+          
+          console.log(`🔧 Retry with fresh regolith: ${replacementsMade} image replacements made`);
+          
+        } catch (refreshError) {
+          console.error('Auto-refresh failed:', refreshError);
+          return {
+            success: false,
+            message: `Stale regolith detected but auto-refresh failed. Please run f331 discovery manually first.`,
+            error: `Auto-refresh error: ${refreshError}`,
+            stale_regolith_urls: (updateResult as any).regolith_urls,
+            current_urls: (updateResult as any).current_urls,
+            replacements_made: 0,
+            page_updated: false,
+            elementor_updated: false
+          };
+        }
+      }
     }
 
     // Update the WordPress page via Snefuruplin API - ONLY if actual replacements were made
@@ -616,10 +695,42 @@ function replaceImagesInElementorData(
 
   console.log(`🔍 Enhanced Debug: Processing ${wasString ? 'string' : 'object'} elementor data with ${Object.keys(replacementMap).length} replacements`);
   
+  // Debug: Show what URLs we're looking for vs what's in the data
+  const dataString = JSON.stringify(parsedData);
+  console.log(`🔍 URLs to replace: ${Object.keys(replacementMap).join(', ')}`);
+  
+  // Extract some sample URLs from the Elementor data to see what's actually there
+  const urlMatches = dataString.match(/https?:\/\/[^\s"',}]+\.(jpg|jpeg|png|gif|webp)/gi);
+  if (urlMatches && urlMatches.length > 0) {
+    const uniqueUrls = [...new Set(urlMatches)].slice(0, 10); // First 10 unique URLs
+    console.log(`🔍 Sample URLs found in Elementor data: ${uniqueUrls.join(', ')}`);
+  } else {
+    console.log(`🔍 No image URLs found in Elementor data`);
+  }
+  
   // Validate structure
   if (!Array.isArray(parsedData)) {
     console.error('🚨 Invalid Elementor data structure: expected array');
     return { data: elementorData, replacements_made: 0 };
+  }
+
+  // Check if regolith data seems stale (no URLs match current data)
+  const regolithUrls = Object.keys(replacementMap);
+  const hasAnyMatches = regolithUrls.some(url => dataString.includes(url));
+  
+  if (!hasAnyMatches && regolithUrls.length > 0) {
+    console.log(`⚠️ STALE REGOLITH DETECTED: None of the regolith URLs match current Elementor data`);
+    console.log(`🔄 Regolith URLs: ${regolithUrls.join(', ')}`);
+    console.log(`🔄 Current URLs sample: ${(urlMatches || []).slice(0, 3).join(', ')}`);
+    
+    // Return early with suggestion to refresh regolith
+    return {
+      data: elementorData,
+      replacements_made: 0,
+      stale_regolith: true,
+      regolith_urls: regolithUrls,
+      current_urls: urlMatches || []
+    };
   }
 
   // Process each replacement with structured approach
@@ -640,6 +751,14 @@ function replaceImagesInElementorData(
     replacementsMade += count;
     
     console.log(`✅ Made ${count} replacements for ${oldUrl}`);
+    
+    // If no exact matches found, try fuzzy matching
+    if (count === 0) {
+      console.log(`🔍 No exact matches found for ${oldUrl}, trying fuzzy matching...`);
+      const fuzzyCount = tryFuzzyImageReplacement(parsedData, oldUrl, newImage, oldAttachmentId);
+      replacementsMade += fuzzyCount;
+      console.log(`🔍 Fuzzy matching made ${fuzzyCount} additional replacements`);
+    }
   });
 
   // Return in original format
@@ -801,6 +920,58 @@ function replaceAttachmentIds(obj: any, oldId: number, newId: number): number {
       count += replaceAttachmentIds(obj[key], oldId, newId);
     }
   });
+  
+  return count;
+}
+
+// Fuzzy matching function for when exact URL matches fail
+function tryFuzzyImageReplacement(
+  parsedData: any,
+  oldUrl: string,
+  newImage: ImageUploadResult,
+  oldAttachmentId?: number
+): number {
+  let count = 0;
+  
+  // Create variations of the URL to try
+  const urlVariations = [
+    oldUrl.replace('http://', 'https://'),
+    oldUrl.replace('https://', 'http://'),
+    oldUrl.replace(/^https?:\/\/[^\/]+/, ''), // Just the path part
+    oldUrl.replace(/\/$/, ''), // Remove trailing slash
+    oldUrl + '/', // Add trailing slash
+    oldUrl.replace(/-\d+x\d+\.(jpg|jpeg|png|gif|webp)/, '.$1'), // Remove size suffix
+    oldUrl.replace(/\.(jpg|jpeg|png|gif|webp)$/, '-150x150.$1'), // Try with size suffix
+  ];
+  
+  // Try filename matching (last part of URL)
+  const filename = oldUrl.split('/').pop()?.split('.')[0];
+  if (filename) {
+    const dataString = JSON.stringify(parsedData);
+    const filenameRegex = new RegExp(`[^/]*${escapeRegExp(filename)}[^/]*\\.(jpg|jpeg|png|gif|webp)`, 'gi');
+    const matches = dataString.match(filenameRegex);
+    if (matches) {
+      console.log(`🔍 Found potential filename matches: ${matches.join(', ')}`);
+      // Try replacing with the first match found
+      if (matches[0]) {
+        const potentialUrl = matches[0];
+        if (potentialUrl.includes('http')) {
+          urlVariations.push(potentialUrl);
+        }
+      }
+    }
+  }
+  
+  // Try each variation
+  for (const variation of urlVariations) {
+    if (variation !== oldUrl) { // Don't retry the exact same URL
+      const fuzzyCount = replaceImagesInElements(parsedData, variation, newImage, oldAttachmentId);
+      if (fuzzyCount > 0) {
+        console.log(`🎯 Fuzzy match successful: ${variation} -> ${newImage.img_url_returned} (${fuzzyCount} replacements)`);
+        count += fuzzyCount;
+      }
+    }
+  }
   
   return count;
 }

@@ -295,6 +295,19 @@ function replaceImagesInElementorData(
 
   console.log(`🔍 Enhanced Debug: Processing ${wasString ? 'string' : 'object'} elementor data with ${Object.keys(replacementMap).length} replacements`);
   
+  // Debug: Show what URLs we're looking for vs what's in the data
+  const dataString = JSON.stringify(parsedData);
+  console.log(`🔍 URLs to replace: ${Object.keys(replacementMap).join(', ')}`);
+  
+  // Extract some sample URLs from the Elementor data to see what's actually there
+  const urlMatches = dataString.match(/https?:\/\/[^\s"',}]+\.(jpg|jpeg|png|gif|webp)/gi);
+  if (urlMatches && urlMatches.length > 0) {
+    const uniqueUrls = [...new Set(urlMatches)].slice(0, 10); // First 10 unique URLs
+    console.log(`🔍 Sample URLs found in Elementor data: ${uniqueUrls.join(', ')}`);
+  } else {
+    console.log(`🔍 No image URLs found in Elementor data`);
+  }
+  
   // Validate structure
   if (!Array.isArray(parsedData)) {
     console.error('🚨 Invalid Elementor data structure: expected array');
