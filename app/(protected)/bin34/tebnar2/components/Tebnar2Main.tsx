@@ -2371,26 +2371,49 @@ export default function Tebnar2Main() {
   // f22_nwpi_to_gcon_pusher handler - modified for tebnar2 to work with NWPI content
   const tbn2_handleF22NwpiToGconPusher = async () => {
     if (!tbn2_selectedSitesprenId) {
-      alert('Please select a site from the asn_sitespren_id dropdown first');
+      setTbn2GadgetFeedback({
+        action: 'F22 NWPI to GCon Pusher',
+        message: 'No site selected. Please select a site from the dropdown first.',
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
       return;
     }
 
     // Check if either SOPTION1 or SOPTION2 is selected
     if (!tbn2_kz101Checked && !tbn2_kz103Checked) {
-      alert('Please select either SOPTION1 (Use Your Current Selection) or SOPTION2 (Select All Items) first');
+      setTbn2GadgetFeedback({
+        action: 'F22 NWPI to GCon Pusher',
+        message: 'Please select either SOPTION1 (Use Your Current Selection) or SOPTION2 (Select All Items) first.',
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
       return;
     }
 
     // Find the sitespren_base for the selected site
     const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === tbn2_selectedSitesprenId);
     if (!selectedSitespren) {
-      alert('Unable to find sitespren_base for selected site. Please refresh and try again.');
+      setTbn2GadgetFeedback({
+        action: 'F22 NWPI to GCon Pusher',
+        message: 'Unable to find sitespren_base for selected site. Please refresh and try again.',
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
       return;
     }
 
     // Both SOPTION1 and SOPTION2 will process all NWPI content for the selected site
     // This is because f22 works with NWPI content (WordPress articles), not image plans
     console.log(`🔄 f22: Processing all NWPI content for site: ${selectedSitespren.sitespren_base}`);
+
+    const timestamp = new Date().toISOString();
+    setTbn2GadgetFeedback({
+      action: 'F22 NWPI to GCon Pusher',
+      message: `Action started for site: ${selectedSitespren.sitespren_base}...`,
+      type: 'info',
+      timestamp
+    });
 
     setTbn2F22Loading(true);
     setTbn2F22Error(null); // Clear previous errors
@@ -2421,7 +2444,12 @@ export default function Tebnar2Main() {
       const nwpiRecordIds = nwpiData.record_ids || [];
       
       if (nwpiRecordIds.length === 0) {
-        alert(`No NWPI content found for site: ${selectedSitespren.sitespren_base}\n\nPlease sync WordPress content first using the chep11 or chep21 buttons.`);
+        setTbn2GadgetFeedback({
+          action: 'F22 NWPI to GCon Pusher',
+          message: `No NWPI content found for site: ${selectedSitespren.sitespren_base}. Please sync WordPress content first using the chep11 or chep21 buttons.`,
+          type: 'warning',
+          timestamp
+        });
         setTbn2F22Loading(false);
         return;
       }
@@ -2468,73 +2496,30 @@ export default function Tebnar2Main() {
       console.log('🔍 F22 API Response:', result);
       
       if (result.success) {
-        // Create comprehensive success report for popup display
-        const successReport = `✅ F22 PROCESSING COMPLETED SUCCESSFULLY
-
-Execution Summary:
-- Processed: ${result.results?.processed || 0} records
-- Succeeded: ${result.results?.succeeded || 0} records  
-- Failed: ${result.results?.failed || 0} records
-- Message: ${result.message}
-
-API Results:
-- Endpoint: /api/f22-nwpi-to-gcon-pusher
-- Response Time: ${new Date().toISOString()}
-- Selected Items: ${tbn2_kz101Checked ? tbn2_selectedRows.size : (tbn2_kz103Checked ? tbn2_plans.length : 0)}
-
-Processing Results:
-✓ BozoHTMLNormalizationProcess1: HTML content normalized to plaintext
-✓ TontoNormalizationProcess1: Text split by linebreaks (\\n)
-✓ mud_content: Reconstructed and updated in gcon_pieces
-✓ mud_title: Title field updated in gcon_pieces
-✓ mud_deplines: Line-by-line entries created with HTML tag detection
-✓ aval_dorlis: Complex HTML blocks extracted and stored with placeholders
-
-Database Operations:
-- gcon_pieces table: mud_content, mud_title, and aval_content updated
-- mud_deplines table: Previous entries deleted, new entries inserted
-- aval_dorlis table: Previous dorli blocks cleared, new blocks stored
-
-Debug Information:
-- Check browser console (F12) for 🔍 DEBUG messages about mud_title and mud_content
-- Full Response: ${JSON.stringify(result, null, 2)}
-- Errors: ${result.results?.errors?.length || 0} errors logged
-
-System Status: All operations completed successfully`;
-
-        setTbn2F22Report(successReport); // Store in popup instead of alert
+        const successMessage = `Successfully processed ${result.results?.processed || 0} records (${result.results?.succeeded || 0} succeeded, ${result.results?.failed || 0} failed). ${result.message}`;
+        
+        setTbn2GadgetFeedback({
+          action: 'F22 NWPI to GCon Pusher',
+          message: successMessage,
+          type: 'success',
+          timestamp
+        });
+        
         setTbn2F22Error(null); // Clear any previous errors on success
       } else {
         const errorMessage = result.message || 'Failed to push to GCon pieces';
         console.error('🚨 F22 API returned error:', result);
         
-        // Create comprehensive error report
-        const errorReport = `❌ F22 PROCESSING FAILED
-
-Error Details:
-- Message: ${errorMessage}
-- Processed: ${result.results?.processed || 0} records
-- Succeeded: ${result.results?.succeeded || 0} records
-- Failed: ${result.results?.failed || 0} records
-
-API Information:
-- Endpoint: /api/f22-nwpi-to-gcon-pusher
-- Timestamp: ${new Date().toISOString()}
-- Selected Items: ${tbn2_kz101Checked ? tbn2_selectedRows.size : (tbn2_kz103Checked ? tbn2_plans.length : 0)}
-
-${result.results?.errors?.length > 0 ? `
-Specific Errors (${result.results.errors.length}):
-${result.results.errors.map((error: string, i: number) => `${i + 1}. ${error}`).join('\n')}
-` : ''}
-
-Debug Information:
-- Check browser console (F12) for 🔍 DEBUG messages
-- Full API Response: ${JSON.stringify(result, null, 2)}
-
-System Status: Processing halted due to errors
-Recommendation: Check logs and retry operation`;
-
-        alert(errorReport);
+        const errorDetails = result.results?.errors?.length > 0 
+          ? ` Errors: ${result.results.errors.slice(0, 3).join('; ')}${result.results.errors.length > 3 ? '...' : ''}`
+          : '';
+        
+        setTbn2GadgetFeedback({
+          action: 'F22 NWPI to GCon Pusher',
+          message: `${errorMessage}. Processed: ${result.results?.processed || 0}, Succeeded: ${result.results?.succeeded || 0}, Failed: ${result.results?.failed || 0}.${errorDetails}`,
+          type: 'error',
+          timestamp
+        });
         setTbn2F22Error({
           message: errorMessage,
           details: {
@@ -2549,33 +2534,13 @@ Recommendation: Check logs and retry operation`;
       }
     } catch (error) {
       console.error('🚨 Error calling f22_nwpi_to_gcon_pusher:', error);
-      const errorMessage = 'An error occurred while pushing to GCon pieces';
       
-      // Create comprehensive client error report
-      const clientErrorReport = `❌ F22 CLIENT ERROR
-
-Error Details:
-- Type: Network/Client Error
-- Message: ${error instanceof Error ? error.message : 'Unknown error occurred'}
-- Timestamp: ${new Date().toISOString()}
-
-Request Information:
-- Endpoint: POST /api/f22-nwpi-to-gcon-pusher
-- Selected Items: ${tbn2_kz101Checked ? tbn2_selectedRows.size : (tbn2_kz103Checked ? tbn2_plans.length : 0)}
-- Request Mode: ${tbn2_kz101Checked ? 'SOPTION1 (Selected)' : 'SOPTION2 (All)'}
-
-Error Stack:
-${error instanceof Error && error.stack ? error.stack : 'No stack trace available'}
-
-Debug Information:
-- Check browser console (F12) for detailed error logs
-- Check network tab for failed requests
-- Verify API endpoint is accessible
-
-System Status: Request failed before reaching server
-Recommendation: Check network connection and API availability`;
-
-      alert(clientErrorReport);
+      setTbn2GadgetFeedback({
+        action: 'F22 NWPI to GCon Pusher',
+        message: `Network/Client error: ${error instanceof Error ? error.message : 'Unknown error occurred'}. Check console for details.`,
+        type: 'error',
+        timestamp
+      });
       setTbn2F22Error({
         message: errorMessage,
         details: {
@@ -2599,26 +2564,49 @@ Recommendation: Check network connection and API availability`;
   // f47_generate_gcon_pieces handler - modified for tebnar2 to work with NWPI content
   const tbn2_handleF47GenerateGconPieces = async () => {
     if (!tbn2_selectedSitesprenId) {
-      alert('Please select a site from the asn_sitespren_id dropdown first');
+      setTbn2GadgetFeedback({
+        action: 'F47 Generate GCon Pieces',
+        message: 'No site selected. Please select a site from the dropdown first.',
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
       return;
     }
 
     // Check if either SOPTION1 or SOPTION2 is selected
     if (!tbn2_kz101Checked && !tbn2_kz103Checked) {
-      alert('Please select either SOPTION1 (Use Your Current Selection) or SOPTION2 (Select All Items) first');
+      setTbn2GadgetFeedback({
+        action: 'F47 Generate GCon Pieces',
+        message: 'Please select either SOPTION1 (Use Your Current Selection) or SOPTION2 (Select All Items) first.',
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
       return;
     }
 
     // Find the sitespren_base for the selected site
     const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === tbn2_selectedSitesprenId);
     if (!selectedSitespren) {
-      alert('Unable to find sitespren_base for selected site. Please refresh and try again.');
+      setTbn2GadgetFeedback({
+        action: 'F47 Generate GCon Pieces',
+        message: 'Unable to find sitespren_base for selected site. Please refresh and try again.',
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
       return;
     }
 
     // Both SOPTION1 and SOPTION2 will process all NWPI content for the selected site
     // This is because f47 works with NWPI content (WordPress articles), not image plans
     console.log(`🔄 f47: Processing all NWPI content for site: ${selectedSitespren.sitespren_base}`);
+
+    const timestamp = new Date().toISOString();
+    setTbn2GadgetFeedback({
+      action: 'F47 Generate GCon Pieces',
+      message: `Action started for site: ${selectedSitespren.sitespren_base}...`,
+      type: 'info',
+      timestamp
+    });
 
     setTbn2F47Loading(true);
     setTbn2F47Error(null); // Clear previous errors
@@ -2648,7 +2636,12 @@ Recommendation: Check network connection and API availability`;
       const nwpiRecordIds = nwpiData.record_ids || [];
       
       if (nwpiRecordIds.length === 0) {
-        alert(`No NWPI content found for site: ${selectedSitespren.sitespren_base}\n\nPlease sync WordPress content first using the chep11 or chep21 buttons.`);
+        setTbn2GadgetFeedback({
+          action: 'F47 Generate GCon Pieces',
+          message: `No NWPI content found for site: ${selectedSitespren.sitespren_base}. Please sync WordPress content first using the chep11 or chep21 buttons.`,
+          type: 'warning',
+          timestamp
+        });
         setTbn2F47Loading(false);
         return;
       }
@@ -2669,12 +2662,21 @@ Recommendation: Check network connection and API availability`;
       const result = await response.json();
 
       if (result.success) {
-        alert(`Successfully generated ${result.data.created_count} GCon pieces from ${nwpiRecordIds.length} NWPI records`);
+        setTbn2GadgetFeedback({
+          action: 'F47 Generate GCon Pieces',
+          message: `Successfully generated ${result.data.created_count} GCon pieces from ${nwpiRecordIds.length} NWPI records.`,
+          type: 'success',
+          timestamp
+        });
         setTbn2F47Error(null); // Clear any previous errors on success
-        // Could refresh data or show more detailed results here
       } else {
         const errorMessage = result.error || 'Failed to generate GCon pieces';
-        alert(`Error: ${errorMessage}`);
+        setTbn2GadgetFeedback({
+          action: 'F47 Generate GCon Pieces',
+          message: `Error: ${errorMessage}`,
+          type: 'error',
+          timestamp
+        });
         setTbn2F47Error({
           message: errorMessage,
           details: result.data || result
@@ -2682,8 +2684,13 @@ Recommendation: Check network connection and API availability`;
       }
     } catch (error) {
       console.error('Error calling f47_generate_gcon_pieces:', error);
-      const errorMessage = 'An error occurred while generating GCon pieces';
-      alert(errorMessage);
+      
+      setTbn2GadgetFeedback({
+        action: 'F47 Generate GCon Pieces',
+        message: `Network/Client error: ${error instanceof Error ? error.message : 'An error occurred while generating GCon pieces'}. Check console for details.`,
+        type: 'error',
+        timestamp
+      });
       setTbn2F47Error({
         message: errorMessage,
         details: error instanceof Error ? {
