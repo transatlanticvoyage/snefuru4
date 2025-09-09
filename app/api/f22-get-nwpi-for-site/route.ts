@@ -17,7 +17,8 @@ export async function POST(request: NextRequest) {
     console.log(`🔄 f22-get-nwpi-for-site: Fetching NWPI content for site: ${sitespren_base}`);
 
     // Initialize Supabase client
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     // Get current user
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
       .select('internal_post_id, post_title, post_id, fk_sitespren_base')
       .eq('fk_users_id', userData.id)
       .eq('fk_sitespren_base', sitespren_base)
-      .order('created_at', { ascending: false });
+      .order('i_created_at', { ascending: false });
 
     if (fetchError) {
       console.error('Error fetching nwpi_content records:', fetchError);

@@ -2388,19 +2388,9 @@ export default function Tebnar2Main() {
       return;
     }
 
-    let pushAll = false;
-    let recordIds: string[] = [];
-    
-    if (tbn2_kz103Checked) {
-      // SOPTION2: Process all NWPI content for this site
-      pushAll = false; // We'll use site filtering instead
-      alert(`Processing all NWPI content for site: ${selectedSitespren.sitespren_base}\n\nThis will find and process all articles that were previously synced from WordPress for this site.`);
-    } else if (tbn2_kz101Checked) {
-      // SOPTION1: This doesn't make sense for NWPI content since we're working with image plans table
-      // Instead, we'll process all NWPI content for the site
-      alert('SOPTION1 (selected items) is not applicable for f22 function.\n\nProcessing ALL NWPI content for the selected site instead.\n\nTo use specific NWPI records, please use the /nwjar1 page.');
-      pushAll = false; // We'll use site filtering
-    }
+    // Both SOPTION1 and SOPTION2 will process all NWPI content for the selected site
+    // This is because f22 works with NWPI content (WordPress articles), not image plans
+    console.log(`🔄 f22: Processing all NWPI content for site: ${selectedSitespren.sitespren_base}`);
 
     setTbn2F22Loading(true);
     setTbn2F22Error(null); // Clear previous errors
@@ -2626,13 +2616,9 @@ Recommendation: Check network connection and API availability`;
       return;
     }
 
-    if (tbn2_kz103Checked) {
-      // SOPTION2: Process all NWPI content for this site
-      alert(`Processing all NWPI content for site: ${selectedSitespren.sitespren_base}\n\nThis will find and generate GCon pieces from all articles that were previously synced from WordPress for this site.`);
-    } else if (tbn2_kz101Checked) {
-      // SOPTION1: This doesn't make sense for NWPI content since we're working with image plans table
-      alert('SOPTION1 (selected items) is not applicable for f47 function.\n\nProcessing ALL NWPI content for the selected site instead.\n\nTo use specific NWPI records, please use the /nwjar1 page.');
-    }
+    // Both SOPTION1 and SOPTION2 will process all NWPI content for the selected site
+    // This is because f47 works with NWPI content (WordPress articles), not image plans
+    console.log(`🔄 f47: Processing all NWPI content for site: ${selectedSitespren.sitespren_base}`);
 
     setTbn2F47Loading(true);
     setTbn2F47Error(null); // Clear previous errors
