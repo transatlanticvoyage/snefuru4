@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     // Get user record
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('id')
+      .select('id, ruplin_api_key_1')
       .eq('auth_id', session.user.id)
       .single();
 
@@ -38,6 +38,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, message: 'User record not found' },
         { status: 404 }
+      );
+    }
+
+    if (!userData.ruplin_api_key_1) {
+      return NextResponse.json(
+        { success: false, message: 'API key not configured for user' },
+        { status: 400 }
       );
     }
 
@@ -61,7 +68,7 @@ export async function POST(request: NextRequest) {
     // Try Harbor Plugin API first
     if (method === 'plugin_api' || fallbackEnabled) {
       console.log(`🏠 Attempting Harbor Plugin API sync for ${siteData.site_url}`);
-      syncResult = await syncViaHarborPluginApi(siteData.site_url, siteData.api_key);
+      syncResult = await syncViaHarborPluginApi(siteData.site_url, userData.ruplin_api_key_1);
       
       if (syncResult.success) {
         console.log(`✅ Harbor Plugin API sync successful`);
