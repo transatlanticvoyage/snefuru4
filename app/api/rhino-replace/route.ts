@@ -58,7 +58,8 @@ export async function POST(request: NextRequest) {
       batch_id, 
       sitespren_id, 
       selected_plan_ids, 
-      user.id
+      user.id,
+      request.headers.get('cookie') || undefined
     );
 
     if (!narpiResult.success) {
@@ -99,8 +100,9 @@ export async function POST(request: NextRequest) {
       message: 'Rhino Replace completed successfully',
       results: {
         narpi_push: {
-          images_uploaded: narpiResult.uploaded_images.length,
-          upload_details: narpiResult.uploaded_images
+          images_uploaded: narpiResult.successful_uploads || 0,
+          total_uploads: narpiResult.total_uploads || 0,
+          upload_details: narpiResult.uploaded_images || []
         },
         cliff_arrangement: {
           images_replaced: cliffResult.replacements_made,
@@ -123,48 +125,315 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Phase 1: Perform Narpi Push (reusing existing logic)
+// Phase 1: Perform Narpi Push (direct implementation to avoid auth issues)
 async function performNarpiPush(
   supabase: any, 
   batch_id: string, 
   sitespren_id: string, 
   selected_plan_ids: string[], 
-  user_id: string
+  user_id: string,
+  cookieHeader?: string
 ) {
   try {
-    // Call the existing sfunc_63_push_images logic
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/bin45/sfunc_63_push_images`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${user_id}` // Pass user context
-      },
-      body: JSON.stringify({
-        batch_id,
-        sitespren_id,
-        selected_plan_ids,
-        push_method: 'rhino_replace_push'
-      })
-    });
+    console.log('🔍 Direct Narpi Push: Getting database user');
+    
+    // Get the database user ID and API key for authentication  
+    const { data: dbUser, error: dbUserError } = await supabase
+      .from('users')
+      .select('id, ruplin_api_key_1')
+      .eq('auth_id', user_id)
+      .single();
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Narpi Push failed: ${errorData.error || response.statusText}`);
+    if (dbUserError || !dbUser || !dbUser.ruplin_api_key_1) {
+      throw new Error('Database user record not found or API key missing');
     }
 
-    const result = await response.json();
+    console.log('🔍 Direct Narpi Push: Getting sitespren data');
+    
+    // Get sitespren data for the target site
+    const { data: sitesprenData, error: sitesprenError } = await supabase
+      .from('sitespren')
+      .select('id, sitespren_base, true_root_domain')
+      .eq('id', sitespren_id)
+      .single();
+
+    if (sitesprenError || !sitesprenData) {
+      throw new Error(`Sitespren site not found: ${sitesprenError?.message || 'Unknown error'}`);
+    }
+
+    console.log('🔍 Direct Narpi Push: Getting plans and images');
+    
+    // Get selected images_plans (image 1 only)
+    const { data: plansData, error: plansError } = await supabase
+      .from('images_plans')
+      .select('id, fk_image1_id, e_file_name1')
+      .eq('rel_images_plans_batches_id', batch_id)
+      .in('id', selected_plan_ids)
+      .not('fk_image1_id', 'is', null);
+
+    if (plansError) {
+      throw new Error(`Failed to fetch plans data: ${plansError.message}`);
+    }
+
+    if (!plansData || plansData.length === 0) {
+      throw new Error('No images found for the selected plans');
+    }
+
+    // Get the image details for each plan
+    const imageIds = plansData.map(plan => plan.fk_image1_id);
+    const { data: imagesData, error: imagesError } = await supabase
+      .from('images')
+      .select('id, img_file_url1')
+      .in('id', imageIds);
+
+    if (imagesError) {
+      throw new Error(`Failed to fetch images data: ${imagesError.message}`);
+    }
+
+    // Combine plans with their images
+    const plansWithImages = plansData.map(plan => {
+      const image = imagesData?.find(img => img.id === plan.fk_image1_id);
+      return {
+        ...plan,
+        images1: image ? {
+          id: image.id,
+          image_url: image.img_file_url1,
+          file_name: plan.e_file_name1 || null
+        } : null
+      };
+    });
+
+    console.log('🔍 Direct Narpi Push: Creating narpi_pushes record');
+    
+    // Create narpi_pushes record
+    const { data: newPush, error: pushError } = await supabase
+      .from('narpi_pushes')
+      .insert({
+        push_name: `Rhino Replace Push ${new Date().toISOString().split('T')[0]} - ${sitesprenData.sitespren_base}`,
+        push_desc: `Rhino Replace automated image push to ${sitesprenData.sitespren_base} (${selected_plan_ids.length} selected images)`,
+        push_status1: 'processing',
+        fk_batch_id: batch_id,
+        kareench1: []
+      })
+      .select()
+      .single();
+
+    if (pushError || !newPush) {
+      throw new Error(`Failed to create push record: ${pushError?.message}`);
+    }
+
+    console.log('🔍 Direct Narpi Push: Starting image uploads');
+    
+    // Upload images to WordPress
+    const uploadResults: ImageUploadResult[] = [];
+    let successCount = 0;
+    let failureCount = 0;
+
+    for (let i = 0; i < plansWithImages.length; i++) {
+      const plan = plansWithImages[i];
+      const image = plan.images1;
+
+      if (!image || !image.image_url) {
+        uploadResults.push({
+          nupload_id: i + 1,
+          nupload_status1: 'failed',
+          img_url_returned: '',
+          wp_img_id_returned: null
+        });
+        failureCount++;
+        continue;
+      }
+
+      try {
+        // Upload image to WordPress using direct logic
+        const uploadResult = await uploadImageToWordPress(
+          image.image_url,
+          image.file_name || `rhino-image-${i + 1}.jpg`,
+          sitesprenData,
+          dbUser.ruplin_api_key_1,
+          'rhino_replace_push'
+        );
+
+        const result: ImageUploadResult = {
+          nupload_id: i + 1,
+          nupload_status1: uploadResult.success ? 'success' : 'failed',
+          img_url_returned: uploadResult.wp_url || image.image_url,
+          wp_img_id_returned: uploadResult.wp_image_id || null
+        };
+
+        uploadResults.push(result);
+
+        if (uploadResult.success) {
+          successCount++;
+        } else {
+          failureCount++;
+          console.error(`🔴 Upload ${i + 1} failed:`, uploadResult.error);
+        }
+
+      } catch (error) {
+        uploadResults.push({
+          nupload_id: i + 1,
+          nupload_status1: 'failed',
+          img_url_returned: image.image_url,
+          wp_img_id_returned: null
+        });
+        failureCount++;
+        console.error(`🔴 Upload ${i + 1} exception:`, error);
+      }
+    }
+
+    // Update narpi_pushes record with results
+    const finalStatus = failureCount === 0 ? 'completed' : (successCount === 0 ? 'failed' : 'partial');
+    
+    await supabase
+      .from('narpi_pushes')
+      .update({
+        push_status1: finalStatus,
+        kareench1: uploadResults
+      })
+      .eq('id', newPush.id);
+
+    console.log(`✅ Direct Narpi Push completed: ${successCount} successful, ${failureCount} failed`);
     
     return {
       success: true,
-      uploaded_images: result.successful_uploads || [],
-      narpi_record_id: result.nupload_record_id
+      uploaded_images: uploadResults.filter(r => r.nupload_status1 === 'success'),
+      narpi_record_id: newPush.id,
+      total_uploads: uploadResults.length,
+      successful_uploads: successCount,
+      failed_uploads: failureCount
     };
 
   } catch (error) {
-    console.error('💥 Narpi Push error:', error);
+    console.error('💥 Direct Narpi Push error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Narpi push failed'
+    };
+  }
+}
+
+// Helper function to upload image to WordPress (copied from sfunc_63_push_images)
+async function uploadImageToWordPress(
+  imageUrl: string,
+  fileName: string,
+  sitesprenData: any,
+  apiKey: string,
+  pushMethod: string
+): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
+  try {
+    if (!sitesprenData || !sitesprenData.sitespren_base) {
+      return { success: false, error: 'No sitespren site configured' };
+    }
+
+    const siteUrl = sitesprenData.sitespren_base.startsWith('http') 
+      ? sitesprenData.sitespren_base 
+      : `https://${sitesprenData.sitespren_base}`;
+
+    // Use WordPress plugin connection with user API key
+    return await uploadViaWordPressPlugin(imageUrl, fileName, siteUrl, apiKey);
+
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown upload error' 
+    };
+  }
+}
+
+// Upload via WordPress plugin connection (copied from sfunc_63_push_images)
+async function uploadViaWordPressPlugin(
+  imageUrl: string,
+  fileName: string,
+  siteUrl: string,
+  apiKey: string
+): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
+  try {
+    console.log(`🔄 WordPress Plugin upload: ${fileName} to ${siteUrl}`);
+
+    // Download the image from the URL
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      return { 
+        success: false, 
+        error: `Failed to download image: ${imageResponse.status} ${imageResponse.statusText}` 
+      };
+    }
+
+    const imageBuffer = await imageResponse.arrayBuffer();
+    console.log(`✅ Downloaded image: ${imageBuffer.byteLength} bytes`);
+
+    // Prepare WordPress plugin upload endpoint
+    const wpPluginUrl = `${siteUrl}/wp-json/snefuru/v1/upload-image`;
+    
+    // Create FormData for multipart upload
+    const formData = new FormData();
+    const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
+    formData.append('file', blob, fileName);
+    formData.append('filename', fileName);
+    formData.append('api_key', apiKey);
+
+    console.log(`🔄 Uploading to WordPress Plugin: ${wpPluginUrl}`);
+
+    // Upload to WordPress via plugin
+    const uploadResponse = await fetch(wpPluginUrl, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'User-Agent': 'Snefuru-RhinoReplace/1.0'
+      }
+    });
+
+    const responseText = await uploadResponse.text();
+    console.log(`📝 WordPress Plugin Response Status: ${uploadResponse.status}`);
+
+    if (!uploadResponse.ok) {
+      let errorMessage = `WordPress Plugin API error: ${uploadResponse.status}`;
+      
+      try {
+        const errorData = JSON.parse(responseText);
+        errorMessage = errorData.message || errorData.code || errorMessage;
+      } catch (e) {
+        errorMessage = `${errorMessage} - ${responseText.substring(0, 200)}`;
+      }
+
+      return { 
+        success: false, 
+        error: errorMessage
+      };
+    }
+
+    // Parse successful response
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (e) {
+      return { 
+        success: false, 
+        error: 'Invalid JSON response from WordPress Plugin API' 
+      };
+    }
+
+    if (!responseData.success) {
+      return {
+        success: false,
+        error: responseData.message || 'Plugin upload failed for unknown reason'
+      };
+    }
+
+    console.log(`✅ WordPress Plugin upload successful: ID ${responseData.data.attachment_id}`);
+
+    return {
+      success: true,
+      wp_url: responseData.data.url,
+      wp_image_id: responseData.data.attachment_id
+    };
+
+  } catch (error) {
+    console.error('WordPress Plugin upload error:', error);
+    return {
+      success: false,
+      error: `Plugin upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     };
   }
 }
