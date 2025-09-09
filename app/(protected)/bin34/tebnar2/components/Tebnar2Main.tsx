@@ -2267,6 +2267,13 @@ export default function Tebnar2Main() {
     timestamp: string;
   } | null>(null);
 
+  // State for f22 and f47 functionality (cloned from nwjar1)
+  const [tbn2_f47Loading, setTbn2F47Loading] = useState(false);
+  const [tbn2_f22Loading, setTbn2F22Loading] = useState(false);
+  const [tbn2_f22Error, setTbn2F22Error] = useState<{message: string, details?: any} | null>(null);
+  const [tbn2_f22Report, setTbn2F22Report] = useState<string>('');
+  const [tbn2_f47Error, setTbn2F47Error] = useState<{message: string, details?: any} | null>(null);
+
   // Handler for single site actions (chepno functions)
   const tbn2_handleSingleSiteAction = async (action: string, method?: string) => {
     if (!tbn2_selectedSitesprenId) {
@@ -2358,6 +2365,274 @@ export default function Tebnar2Main() {
         type: 'error',
         timestamp
       });
+    }
+  };
+
+  // f22_nwpi_to_gcon_pusher handler - cloned from nwjar1
+  const tbn2_handleF22NwpiToGconPusher = async () => {
+    if (!tbn2_selectedSitesprenId) {
+      alert('Please select a site from the asn_sitespren_id dropdown first');
+      return;
+    }
+
+    let itemsToProcess: string[] = [];
+    
+    if (tbn2_kz101Checked) {
+      // SOPTION1: Use selected items
+      if (tbn2_selectedRows.size === 0) {
+        alert('Please select at least one item from the table');
+        return;
+      }
+      itemsToProcess = Array.from(tbn2_selectedRows);
+    } else if (tbn2_kz103Checked) {
+      // SOPTION2: Push all items in current view
+      itemsToProcess = tbn2_plans.map(plan => plan.id);
+    } else {
+      alert('Please select SOPTION1 or SOPTION2 first');
+      return;
+    }
+
+    setTbn2F22Loading(true);
+    setTbn2F22Error(null); // Clear previous errors
+    setTbn2F22Report(''); // Clear previous reports
+    try {
+      const response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recordIds: itemsToProcess
+        }),
+      });
+
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+
+      // Get response text first to check if it's empty
+      const responseText = await response.text();
+      if (!responseText.trim()) {
+        throw new Error('Empty response from server');
+      }
+
+      // Try to parse JSON
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (jsonError) {
+        const debugInfo = {
+          jsonError: jsonError instanceof Error ? jsonError.message : 'Unknown JSON error',
+          responseStatus: response.status,
+          responseText: responseText.substring(0, 500)
+        };
+        console.error('JSON parsing error:', debugInfo);
+        throw new Error(`Invalid JSON response from server.\n\nDebug Info:\n- Status: ${response.status}\n- JSON Error: ${debugInfo.jsonError}\n- Response: "${responseText.substring(0, 200)}..."`);
+      }
+
+      // Add debug logging
+      console.log('🔍 F22 API Response:', result);
+      
+      if (result.success) {
+        // Create comprehensive success report for popup display
+        const successReport = `✅ F22 PROCESSING COMPLETED SUCCESSFULLY
+
+Execution Summary:
+- Processed: ${result.results?.processed || 0} records
+- Succeeded: ${result.results?.succeeded || 0} records  
+- Failed: ${result.results?.failed || 0} records
+- Message: ${result.message}
+
+API Results:
+- Endpoint: /api/f22-nwpi-to-gcon-pusher
+- Response Time: ${new Date().toISOString()}
+- Selected Items: ${tbn2_kz101Checked ? tbn2_selectedRows.size : (tbn2_kz103Checked ? tbn2_plans.length : 0)}
+
+Processing Results:
+✓ BozoHTMLNormalizationProcess1: HTML content normalized to plaintext
+✓ TontoNormalizationProcess1: Text split by linebreaks (\\n)
+✓ mud_content: Reconstructed and updated in gcon_pieces
+✓ mud_title: Title field updated in gcon_pieces
+✓ mud_deplines: Line-by-line entries created with HTML tag detection
+✓ aval_dorlis: Complex HTML blocks extracted and stored with placeholders
+
+Database Operations:
+- gcon_pieces table: mud_content, mud_title, and aval_content updated
+- mud_deplines table: Previous entries deleted, new entries inserted
+- aval_dorlis table: Previous dorli blocks cleared, new blocks stored
+
+Debug Information:
+- Check browser console (F12) for 🔍 DEBUG messages about mud_title and mud_content
+- Full Response: ${JSON.stringify(result, null, 2)}
+- Errors: ${result.results?.errors?.length || 0} errors logged
+
+System Status: All operations completed successfully`;
+
+        setTbn2F22Report(successReport); // Store in popup instead of alert
+        setTbn2F22Error(null); // Clear any previous errors on success
+      } else {
+        const errorMessage = result.message || 'Failed to push to GCon pieces';
+        console.error('🚨 F22 API returned error:', result);
+        
+        // Create comprehensive error report
+        const errorReport = `❌ F22 PROCESSING FAILED
+
+Error Details:
+- Message: ${errorMessage}
+- Processed: ${result.results?.processed || 0} records
+- Succeeded: ${result.results?.succeeded || 0} records
+- Failed: ${result.results?.failed || 0} records
+
+API Information:
+- Endpoint: /api/f22-nwpi-to-gcon-pusher
+- Timestamp: ${new Date().toISOString()}
+- Selected Items: ${tbn2_kz101Checked ? tbn2_selectedRows.size : (tbn2_kz103Checked ? tbn2_plans.length : 0)}
+
+${result.results?.errors?.length > 0 ? `
+Specific Errors (${result.results.errors.length}):
+${result.results.errors.map((error: string, i: number) => `${i + 1}. ${error}`).join('\n')}
+` : ''}
+
+Debug Information:
+- Check browser console (F12) for 🔍 DEBUG messages
+- Full API Response: ${JSON.stringify(result, null, 2)}
+
+System Status: Processing halted due to errors
+Recommendation: Check logs and retry operation`;
+
+        alert(errorReport);
+        setTbn2F22Error({
+          message: errorMessage,
+          details: {
+            apiResponse: result,
+            debugInfo: result.debugInfo,
+            results: result.results,
+            timestamp: new Date().toISOString(),
+            endpoint: '/api/f22-nwpi-to-gcon-pusher',
+            selectedItems: tbn2_kz101Checked ? tbn2_selectedRows.size : (tbn2_kz103Checked ? tbn2_plans.length : 0)
+          }
+        });
+      }
+    } catch (error) {
+      console.error('🚨 Error calling f22_nwpi_to_gcon_pusher:', error);
+      const errorMessage = 'An error occurred while pushing to GCon pieces';
+      
+      // Create comprehensive client error report
+      const clientErrorReport = `❌ F22 CLIENT ERROR
+
+Error Details:
+- Type: Network/Client Error
+- Message: ${error instanceof Error ? error.message : 'Unknown error occurred'}
+- Timestamp: ${new Date().toISOString()}
+
+Request Information:
+- Endpoint: POST /api/f22-nwpi-to-gcon-pusher
+- Selected Items: ${tbn2_kz101Checked ? tbn2_selectedRows.size : (tbn2_kz103Checked ? tbn2_plans.length : 0)}
+- Request Mode: ${tbn2_kz101Checked ? 'SOPTION1 (Selected)' : 'SOPTION2 (All)'}
+
+Error Stack:
+${error instanceof Error && error.stack ? error.stack : 'No stack trace available'}
+
+Debug Information:
+- Check browser console (F12) for detailed error logs
+- Check network tab for failed requests
+- Verify API endpoint is accessible
+
+System Status: Request failed before reaching server
+Recommendation: Check network connection and API availability`;
+
+      alert(clientErrorReport);
+      setTbn2F22Error({
+        message: errorMessage,
+        details: {
+          clientError: error instanceof Error ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+          } : error,
+          timestamp: new Date().toISOString(),
+          endpoint: '/api/f22-nwpi-to-gcon-pusher',
+          selectedItems: tbn2_kz101Checked ? tbn2_selectedRows.size : (tbn2_kz103Checked ? tbn2_plans.length : 0),
+          userAgent: navigator.userAgent,
+          url: window.location.href
+        }
+      });
+    } finally {
+      setTbn2F22Loading(false);
+    }
+  };
+
+  // f47_generate_gcon_pieces handler - cloned from nwjar1
+  const tbn2_handleF47GenerateGconPieces = async () => {
+    if (!tbn2_selectedSitesprenId) {
+      alert('Please select a site from the asn_sitespren_id dropdown first');
+      return;
+    }
+
+    let itemsToProcess: string[] = [];
+    
+    if (tbn2_kz101Checked) {
+      // SOPTION1: Use selected items
+      if (tbn2_selectedRows.size === 0) {
+        alert('Please select at least one item from the table');
+        return;
+      }
+      itemsToProcess = Array.from(tbn2_selectedRows);
+    } else if (tbn2_kz103Checked) {
+      // SOPTION2: Use all items in current filtered data
+      itemsToProcess = tbn2_plans.map(plan => plan.id);
+    } else {
+      alert('Please select either SOPTION1 or SOPTION2');
+      return;
+    }
+
+    if (itemsToProcess.length === 0) {
+      alert('No items to process');
+      return;
+    }
+
+    setTbn2F47Loading(true);
+    setTbn2F47Error(null); // Clear previous errors
+    try {
+      const response = await fetch('/api/f47_generate_gcon_pieces', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          internal_post_ids: itemsToProcess
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(`Successfully generated ${result.data.created_count} GCon pieces from ${itemsToProcess.length} items`);
+        setTbn2F47Error(null); // Clear any previous errors on success
+        // Could refresh data or show more detailed results here
+      } else {
+        const errorMessage = result.error || 'Failed to generate GCon pieces';
+        alert(`Error: ${errorMessage}`);
+        setTbn2F47Error({
+          message: errorMessage,
+          details: result.data || result
+        });
+      }
+    } catch (error) {
+      console.error('Error calling f47_generate_gcon_pieces:', error);
+      const errorMessage = 'An error occurred while generating GCon pieces';
+      alert(errorMessage);
+      setTbn2F47Error({
+        message: errorMessage,
+        details: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        } : error
+      });
+    } finally {
+      setTbn2F47Loading(false);
     }
   };
 
@@ -3938,6 +4213,43 @@ export default function Tebnar2Main() {
                               chep61<br />
                               xplugin<br />
                               Barkro Push
+                            </div>
+                          </button>
+                          
+                          {/* Black vertical separator */}
+                          <div className="w-1.5 bg-black self-stretch"></div>
+                          
+                          <button
+                            className={`px-3 py-2 text-sm font-medium text-white rounded focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center gap-1 ${
+                              !tbn2_selectedSitesprenId 
+                                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                                : 'bg-gray-600 hover:bg-gray-700 focus:ring-gray-500'
+                            }`}
+                            onClick={() => tbn2_handleF22NwpiToGconPusher()}
+                            disabled={!tbn2_selectedSitesprenId}
+                            title="Chep 385 function"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              chep 385<br />
+                              f22_nwpi_to_gcon_pusher
+                            </div>
+                          </button>
+                          
+                          <button
+                            className={`px-3 py-2 text-sm font-medium text-white rounded focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center gap-1 ${
+                              !tbn2_selectedSitesprenId 
+                                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                                : 'bg-teal-600 hover:bg-teal-700 focus:ring-teal-500'
+                            }`}
+                            onClick={() => tbn2_handleF47GenerateGconPieces()}
+                            disabled={!tbn2_selectedSitesprenId}
+                            title="Chep 390 function"
+                          >
+                            <span className="info-icon group">ℹ</span>
+                            <div className="text-center leading-tight">
+                              chep 390<br />
+                              f47_generate_gcon_pieces
                             </div>
                           </button>
                         </div>
