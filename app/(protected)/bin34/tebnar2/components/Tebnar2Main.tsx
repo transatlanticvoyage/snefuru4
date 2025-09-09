@@ -115,6 +115,14 @@ export default function Tebnar2Main() {
   
   // State for pelementor_cached data
   const [tbn2_pelementorCached, setTbn2PelementorCached] = useState<string>('');
+  
+  // State for rhino_replace process
+  const [tbn2_rhinoReplaceLoading, setTbn2RhinoReplaceLoading] = useState<boolean>(false);
+  const [tbn2_rhinoProgress, setTbn2RhinoProgress] = useState({
+    narpiRecord: 0,
+    narpiUpload: 0,
+    cliffArrangement: 0
+  });
   const [tbn2_uelBarColors, setTbn2UelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [tbn2_uelBar37Colors, setTbn2UelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [tbn2_currentUrl, setTbn2CurrentUrl] = useState<string>('');
@@ -2087,6 +2095,87 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Rhino Replace handler
+  const tbn2_handleRhinoReplace = async () => {
+    if (!tbn2_selectedGconPieceId) {
+      setTbn2Error('❌ Please select a gcon piece first');
+      return;
+    }
+
+    const selectedImages = Array.from(tbn2_selectedRows);
+    if (selectedImages.length === 0) {
+      setTbn2Error('❌ Please select at least one image to replace');
+      return;
+    }
+
+    if (!tbn2_selectedBatchId || !tbn2_selectedSitesprenId) {
+      setTbn2Error('❌ Missing batch or sitespren selection');
+      return;
+    }
+
+    try {
+      setTbn2RhinoReplaceLoading(true);
+      setTbn2Error(null);
+
+      // Reset progress
+      setTbn2RhinoProgress({
+        narpiRecord: 0,
+        narpiUpload: 0,
+        cliffArrangement: 0
+      });
+
+      // Phase 1: Start Narpi Push
+      setTbn2RhinoProgress(prev => ({ ...prev, narpiRecord: 50 }));
+
+      const response = await fetch('/api/rhino-replace', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gcon_piece_id: tbn2_selectedGconPieceId,
+          selected_plan_ids: selectedImages,
+          batch_id: tbn2_selectedBatchId,
+          sitespren_id: tbn2_selectedSitesprenId
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Rhino replace failed');
+      }
+
+      if (result.success) {
+        // Mark all phases as complete
+        setTbn2RhinoProgress({
+          narpiRecord: 100,
+          narpiUpload: 100,
+          cliffArrangement: 100
+        });
+
+        setTbn2Error(
+          `✅ Rhino Replace completed! ${result.results.narpi_push.images_uploaded} images uploaded, ` +
+          `${result.results.cliff_arrangement.images_replaced} images replaced in page.`
+        );
+
+        // Refresh regolith data to show updated results
+        if (tbn2_selectedGconPieceId) {
+          tbn2_fetchDiscoveredImagesRegolith(tbn2_selectedGconPieceId);
+        }
+      } else {
+        throw new Error(result.message || 'Rhino replace failed');
+      }
+
+    } catch (error) {
+      // Mark as failed but show partial progress for debugging
+      setTbn2RhinoProgress(prev => ({ ...prev, narpiRecord: 0 }));
+      
+      setTbn2Error(`❌ Rhino Replace error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Rhino Replace error:', error);
+    } finally {
+      setTbn2RhinoReplaceLoading(false);
+    }
+  };
+
   // Filter plans by selected batch using centralized function
   const tbn2_filteredPlans = tbn2_filterPlansByBatch(tbn2_plans, tbn2_selectedBatchId || null);
 
@@ -2756,12 +2845,15 @@ export default function Tebnar2Main() {
                     {tbn2_selectedRows.size} images currently selected
                   </div>
                   <button
-                    onClick={() => {
-                      // No functionality yet - placeholder
-                    }}
-                    className="px-3 py-2 text-sm font-medium rounded border transition-colors bg-purple-600 text-white border-purple-600 hover:bg-purple-700"
+                    onClick={tbn2_handleRhinoReplace}
+                    disabled={tbn2_rhinoReplaceLoading || tbn2_selectedRows.size === 0 || !tbn2_selectedGconPieceId || !tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
+                    className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                      tbn2_rhinoReplaceLoading || tbn2_selectedRows.size === 0 || !tbn2_selectedGconPieceId || !tbn2_selectedBatchId || !tbn2_selectedSitesprenId
+                        ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                        : 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
+                    }`}
                   >
-                    run rhino_replace
+                    {tbn2_rhinoReplaceLoading ? '...' : 'run rhino_replace'}
                   </button>
                   
                   {/* Progress tracking table */}
@@ -2772,7 +2864,7 @@ export default function Tebnar2Main() {
                           <td style={{ border: '1px solid black', padding: '8px' }}>Narpi Push Record</td>
                           <td style={{ border: '1px solid black', padding: '8px' }}>
                             <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
-                              <div style={{ width: '0%', height: '100%', backgroundColor: '#d0d0d0' }}></div>
+                              <div style={{ width: `${tbn2_rhinoProgress.narpiRecord}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.narpiRecord > 0 ? '#4ade80' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
                             </div>
                           </td>
                         </tr>
@@ -2780,7 +2872,7 @@ export default function Tebnar2Main() {
                           <td style={{ border: '1px solid black', padding: '8px' }}>Narpi Push Upload</td>
                           <td style={{ border: '1px solid black', padding: '8px' }}>
                             <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
-                              <div style={{ width: '0%', height: '100%', backgroundColor: '#d0d0d0' }}></div>
+                              <div style={{ width: `${tbn2_rhinoProgress.narpiUpload}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.narpiUpload > 0 ? '#3b82f6' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
                             </div>
                           </td>
                         </tr>
@@ -2788,7 +2880,7 @@ export default function Tebnar2Main() {
                           <td style={{ border: '1px solid black', padding: '8px' }}>Cliff Arrangement</td>
                           <td style={{ border: '1px solid black', padding: '8px' }}>
                             <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
-                              <div style={{ width: '0%', height: '100%', backgroundColor: '#d0d0d0' }}></div>
+                              <div style={{ width: `${tbn2_rhinoProgress.cliffArrangement}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.cliffArrangement > 0 ? '#8b5cf6' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
                             </div>
                           </td>
                         </tr>
