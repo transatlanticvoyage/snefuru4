@@ -2368,7 +2368,7 @@ export default function Tebnar2Main() {
     }
   };
 
-  // f22_nwpi_to_gcon_pusher handler - cloned from nwjar1
+  // f22_nwpi_to_gcon_pusher handler - modified for tebnar2 to work with NWPI content
   const tbn2_handleF22NwpiToGconPusher = async () => {
     if (!tbn2_selectedSitesprenId) {
       alert('Please select a site from the asn_sitespren_id dropdown first');
@@ -2381,35 +2381,71 @@ export default function Tebnar2Main() {
       return;
     }
 
-    let itemsToProcess: string[] = [];
+    // Find the sitespren_base for the selected site
+    const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === tbn2_selectedSitesprenId);
+    if (!selectedSitespren) {
+      alert('Unable to find sitespren_base for selected site. Please refresh and try again.');
+      return;
+    }
+
+    let pushAll = false;
+    let recordIds: string[] = [];
     
-    if (tbn2_kz101Checked) {
-      // SOPTION1: Use selected items
-      if (tbn2_selectedRows.size === 0) {
-        alert('Please select at least one item from the table using the checkboxes');
-        return;
-      }
-      itemsToProcess = Array.from(tbn2_selectedRows);
-    } else if (tbn2_kz103Checked) {
-      // SOPTION2: Push all items in current view
-      if (tbn2_plans.length === 0) {
-        alert('No image plans available to process');
-        return;
-      }
-      itemsToProcess = tbn2_plans.map(plan => plan.id);
+    if (tbn2_kz103Checked) {
+      // SOPTION2: Process all NWPI content for this site
+      pushAll = false; // We'll use site filtering instead
+      alert(`Processing all NWPI content for site: ${selectedSitespren.sitespren_base}\n\nThis will find and process all articles that were previously synced from WordPress for this site.`);
+    } else if (tbn2_kz101Checked) {
+      // SOPTION1: This doesn't make sense for NWPI content since we're working with image plans table
+      // Instead, we'll process all NWPI content for the site
+      alert('SOPTION1 (selected items) is not applicable for f22 function.\n\nProcessing ALL NWPI content for the selected site instead.\n\nTo use specific NWPI records, please use the /nwjar1 page.');
+      pushAll = false; // We'll use site filtering
     }
 
     setTbn2F22Loading(true);
     setTbn2F22Error(null); // Clear previous errors
     setTbn2F22Report(''); // Clear previous reports
+    
     try {
+      // First, query the database to get NWPI content for this specific site
+      const nwpiResponse = await fetch('/api/f22-get-nwpi-for-site', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sitespren_base: selectedSitespren.sitespren_base
+        }),
+      });
+
+      if (!nwpiResponse.ok) {
+        throw new Error(`Failed to fetch NWPI content: ${nwpiResponse.status} ${nwpiResponse.statusText}`);
+      }
+
+      const nwpiData = await nwpiResponse.json();
+      
+      if (!nwpiData.success) {
+        throw new Error(nwpiData.message || 'Failed to fetch NWPI content for site');
+      }
+
+      const nwpiRecordIds = nwpiData.record_ids || [];
+      
+      if (nwpiRecordIds.length === 0) {
+        alert(`No NWPI content found for site: ${selectedSitespren.sitespren_base}\n\nPlease sync WordPress content first using the chep11 or chep21 buttons.`);
+        setTbn2F22Loading(false);
+        return;
+      }
+
+      console.log(`🔍 Found ${nwpiRecordIds.length} NWPI records for site ${selectedSitespren.sitespren_base}`);
+
+      // Now call the f22 API with the NWPI record IDs
       const response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          recordIds: itemsToProcess
+          recordIds: nwpiRecordIds
         }),
       });
 
@@ -2570,7 +2606,7 @@ Recommendation: Check network connection and API availability`;
     }
   };
 
-  // f47_generate_gcon_pieces handler - cloned from nwjar1
+  // f47_generate_gcon_pieces handler - modified for tebnar2 to work with NWPI content
   const tbn2_handleF47GenerateGconPieces = async () => {
     if (!tbn2_selectedSitesprenId) {
       alert('Please select a site from the asn_sitespren_id dropdown first');
@@ -2583,46 +2619,71 @@ Recommendation: Check network connection and API availability`;
       return;
     }
 
-    let itemsToProcess: string[] = [];
-    
-    if (tbn2_kz101Checked) {
-      // SOPTION1: Use selected items
-      if (tbn2_selectedRows.size === 0) {
-        alert('Please select at least one item from the table using the checkboxes');
-        return;
-      }
-      itemsToProcess = Array.from(tbn2_selectedRows);
-    } else if (tbn2_kz103Checked) {
-      // SOPTION2: Use all items in current filtered data
-      if (tbn2_plans.length === 0) {
-        alert('No image plans available to process');
-        return;
-      }
-      itemsToProcess = tbn2_plans.map(plan => plan.id);
+    // Find the sitespren_base for the selected site
+    const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === tbn2_selectedSitesprenId);
+    if (!selectedSitespren) {
+      alert('Unable to find sitespren_base for selected site. Please refresh and try again.');
+      return;
     }
 
-    if (itemsToProcess.length === 0) {
-      alert('No items to process');
-      return;
+    if (tbn2_kz103Checked) {
+      // SOPTION2: Process all NWPI content for this site
+      alert(`Processing all NWPI content for site: ${selectedSitespren.sitespren_base}\n\nThis will find and generate GCon pieces from all articles that were previously synced from WordPress for this site.`);
+    } else if (tbn2_kz101Checked) {
+      // SOPTION1: This doesn't make sense for NWPI content since we're working with image plans table
+      alert('SOPTION1 (selected items) is not applicable for f47 function.\n\nProcessing ALL NWPI content for the selected site instead.\n\nTo use specific NWPI records, please use the /nwjar1 page.');
     }
 
     setTbn2F47Loading(true);
     setTbn2F47Error(null); // Clear previous errors
+    
     try {
+      // First, query the database to get NWPI content for this specific site
+      const nwpiResponse = await fetch('/api/f22-get-nwpi-for-site', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sitespren_base: selectedSitespren.sitespren_base
+        }),
+      });
+
+      if (!nwpiResponse.ok) {
+        throw new Error(`Failed to fetch NWPI content: ${nwpiResponse.status} ${nwpiResponse.statusText}`);
+      }
+
+      const nwpiData = await nwpiResponse.json();
+      
+      if (!nwpiData.success) {
+        throw new Error(nwpiData.message || 'Failed to fetch NWPI content for site');
+      }
+
+      const nwpiRecordIds = nwpiData.record_ids || [];
+      
+      if (nwpiRecordIds.length === 0) {
+        alert(`No NWPI content found for site: ${selectedSitespren.sitespren_base}\n\nPlease sync WordPress content first using the chep11 or chep21 buttons.`);
+        setTbn2F47Loading(false);
+        return;
+      }
+
+      console.log(`🔍 Found ${nwpiRecordIds.length} NWPI records for site ${selectedSitespren.sitespren_base}`);
+
+      // Now call the f47 API with the NWPI record IDs
       const response = await fetch('/api/f47_generate_gcon_pieces', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          internal_post_ids: itemsToProcess
+          internal_post_ids: nwpiRecordIds
         }),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        alert(`Successfully generated ${result.data.created_count} GCon pieces from ${itemsToProcess.length} items`);
+        alert(`Successfully generated ${result.data.created_count} GCon pieces from ${nwpiRecordIds.length} NWPI records`);
         setTbn2F47Error(null); // Clear any previous errors on success
         // Could refresh data or show more detailed results here
       } else {
