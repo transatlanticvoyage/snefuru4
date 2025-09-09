@@ -136,6 +136,8 @@ export default function Tebnar2Main() {
     kareench1: any;
   }>>([]);
   const [tbn2_narpiPushesLoading, setTbn2NarpiPushesLoading] = useState<boolean>(false);
+  const [tbn2_narpiInputMethod, setTbn2NarpiInputMethod] = useState<'dropdown' | 'manual'>('dropdown');
+  const [tbn2_manualNarpiPushId, setTbn2ManualNarpiPushId] = useState<string>('');
   const [tbn2_uelBarColors, setTbn2UelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [tbn2_uelBar37Colors, setTbn2UelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [tbn2_currentUrl, setTbn2CurrentUrl] = useState<string>('');
@@ -2271,8 +2273,12 @@ export default function Tebnar2Main() {
 
     // Validation for pre-existing narpi push mode
     if (tbn2_usePreExistingNarpi) {
-      if (!tbn2_selectedNarpiPushId) {
-        setTbn2Error('❌ Please select a pre-existing narpi push');
+      const effectiveNarpiPushId = tbn2_narpiInputMethod === 'dropdown' 
+        ? tbn2_selectedNarpiPushId 
+        : tbn2_manualNarpiPushId;
+      
+      if (!effectiveNarpiPushId) {
+        setTbn2Error(`❌ Please ${tbn2_narpiInputMethod === 'dropdown' ? 'select' : 'enter'} a narpi push ID`);
         return;
       }
     } else {
@@ -2301,12 +2307,16 @@ export default function Tebnar2Main() {
         // Use cliff-only mode with pre-existing narpi push
         setTbn2RhinoProgress(prev => ({ ...prev, narpiRecord: 100, narpiUpload: 100 }));
         
+        const effectiveNarpiPushId = tbn2_narpiInputMethod === 'dropdown' 
+          ? tbn2_selectedNarpiPushId 
+          : tbn2_manualNarpiPushId;
+          
         response = await fetch('/api/rhino-cliff-only', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             gcon_piece_id: tbn2_selectedGconPieceId,
-            narpi_push_id: tbn2_selectedNarpiPushId
+            narpi_push_id: effectiveNarpiPushId
           })
         });
       } else {
@@ -3046,40 +3056,119 @@ export default function Tebnar2Main() {
                       </span>
                     </div>
                     
-                    {/* Narpi push dropdown */}
+                    {/* Narpi push selection methods */}
                     {tbn2_usePreExistingNarpi && (
                       <div className="mt-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Select narpi push:
-                        </label>
-                        {tbn2_narpiPushesLoading ? (
-                          <div className="text-sm text-gray-500">Loading narpi pushes...</div>
-                        ) : (
-                          <select
-                            value={tbn2_selectedNarpiPushId}
-                            onChange={(e) => setTbn2SelectedNarpiPushId(e.target.value)}
-                            className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                              !tbn2_usePreExistingNarpi || tbn2_availableNarpiPushes.length === 0 
-                                ? 'bg-gray-100 text-gray-400' 
-                                : 'bg-white'
-                            }`}
-                            disabled={!tbn2_usePreExistingNarpi || tbn2_availableNarpiPushes.length === 0}
-                          >
-                            <option value="">
-                              {tbn2_availableNarpiPushes.length === 0 
-                                ? 'No error-free narpi pushes available for this site' 
-                                : 'Select a narpi push...'}
-                            </option>
-                            {tbn2_availableNarpiPushes.map((push) => (
-                              <option key={push.id} value={push.id}>
-                                {push.push_name} - {push.push_desc} - {push.push_status1} - {new Date(push.created_at).toLocaleDateString()}
-                              </option>
-                            ))}
-                          </select>
+                        {/* Radio buttons for input method selection */}
+                        <div className="mb-4">
+                          <div className="flex items-center gap-6">
+                            {/* Dropdown option */}
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="radio"
+                                id="dropdown-method"
+                                name="narpiInputMethod"
+                                value="dropdown"
+                                checked={tbn2_narpiInputMethod === 'dropdown'}
+                                onChange={(e) => {
+                                  setTbn2NarpiInputMethod(e.target.value as 'dropdown' | 'manual');
+                                  // Clear the other input when switching
+                                  if (e.target.value === 'dropdown') {
+                                    setTbn2ManualNarpiPushId('');
+                                  } else {
+                                    setTbn2SelectedNarpiPushId('');
+                                  }
+                                }}
+                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                              />
+                              <label htmlFor="dropdown-method" className="text-sm font-medium text-gray-700">
+                                Dropdown Selection
+                              </label>
+                            </div>
+
+                            {/* Manual input option */}
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="radio"
+                                id="manual-method"
+                                name="narpiInputMethod"
+                                value="manual"
+                                checked={tbn2_narpiInputMethod === 'manual'}
+                                onChange={(e) => {
+                                  setTbn2NarpiInputMethod(e.target.value as 'dropdown' | 'manual');
+                                  // Clear the other input when switching
+                                  if (e.target.value === 'dropdown') {
+                                    setTbn2ManualNarpiPushId('');
+                                  } else {
+                                    setTbn2SelectedNarpiPushId('');
+                                  }
+                                }}
+                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                              />
+                              <label htmlFor="manual-method" className="text-sm font-medium text-gray-700">
+                                Manual UUID Entry
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Dropdown method */}
+                        {tbn2_narpiInputMethod === 'dropdown' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Select narpi push:
+                            </label>
+                            {tbn2_narpiPushesLoading ? (
+                              <div className="text-sm text-gray-500">Loading narpi pushes...</div>
+                            ) : (
+                              <select
+                                value={tbn2_selectedNarpiPushId}
+                                onChange={(e) => setTbn2SelectedNarpiPushId(e.target.value)}
+                                className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                  tbn2_availableNarpiPushes.length === 0 
+                                    ? 'bg-gray-100 text-gray-400' 
+                                    : 'bg-white'
+                                }`}
+                                disabled={tbn2_availableNarpiPushes.length === 0}
+                              >
+                                <option value="">
+                                  {tbn2_availableNarpiPushes.length === 0 
+                                    ? 'No error-free narpi pushes available for this site' 
+                                    : 'Select a narpi push...'}
+                                </option>
+                                {tbn2_availableNarpiPushes.map((push) => (
+                                  <option key={push.id} value={push.id}>
+                                    {push.push_name} - {push.push_desc} - {push.push_status1} - {new Date(push.created_at).toLocaleDateString()}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
+                            {tbn2_availableNarpiPushes.length === 0 && !tbn2_narpiPushesLoading && tbn2_selectedSitesprenId && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                No error-free completed narpi pushes found for the selected site
+                              </div>
+                            )}
+                          </div>
                         )}
-                        {tbn2_availableNarpiPushes.length === 0 && !tbn2_narpiPushesLoading && tbn2_selectedSitesprenId && (
-                          <div className="text-xs text-gray-500 mt-1">
-                            No error-free completed narpi pushes found for the selected site
+
+                        {/* OR text */}
+                        <div className="flex items-center justify-center my-4">
+                          <span className="text-sm font-medium text-gray-500">OR</span>
+                        </div>
+
+                        {/* Manual UUID input method */}
+                        {tbn2_narpiInputMethod === 'manual' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Enter Narpi Push UUID:
+                            </label>
+                            <input
+                              type="text"
+                              value={tbn2_manualNarpiPushId}
+                              onChange={(e) => setTbn2ManualNarpiPushId(e.target.value)}
+                              placeholder="Enter UUID of Narpi Push"
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                            />
                           </div>
                         )}
                       </div>
@@ -3088,7 +3177,12 @@ export default function Tebnar2Main() {
                   
                   <div className="text-gray-700 mb-3">
                     {tbn2_usePreExistingNarpi 
-                      ? `Using pre-existing narpi push${tbn2_selectedNarpiPushId ? ' (selected)' : ' (not selected)'}` 
+                      ? (() => {
+                          const effectiveId = tbn2_narpiInputMethod === 'dropdown' 
+                            ? tbn2_selectedNarpiPushId 
+                            : tbn2_manualNarpiPushId;
+                          return `Using pre-existing narpi push (${tbn2_narpiInputMethod})${effectiveId ? ' - selected' : ' - not selected'}`;
+                        })()
                       : `${tbn2_selectedRows.size} images currently selected`
                     }
                   </div>
