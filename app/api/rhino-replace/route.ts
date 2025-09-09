@@ -572,10 +572,15 @@ async function performCliffArrangement(
     let replacementsMade = 0;
 
     if (updatedElementorData) {
-      const updateResult = replaceImagesInElementorData(
+      const updateResult = await replaceImagesInElementorData(
         updatedElementorData, 
         replacementMap,
-        imagesToReplace
+        imagesToReplace,
+        supabase,
+        gcon_piece_id,
+        sitesprenData,
+        gconPiece,
+        uploadedImages
       );
       updatedElementorData = updateResult.data;
       replacementsMade = updateResult.replacements_made;
@@ -629,10 +634,15 @@ async function performCliffArrangement(
             uploaded_images
           );
           
-          const retryResult = replaceImagesInElementorData(
+          const retryResult = await replaceImagesInElementorData(
             updatedElementorData,
             newReplacementMap,
-            freshRegolithData.discovered_images
+            freshRegolithData.discovered_images,
+            supabase,
+            gcon_piece_id,
+            sitesprenData,
+            gconPiece,
+            uploaded_images
           );
           
           replacementsMade = retryResult.replacements_made;
@@ -750,11 +760,16 @@ function createImageReplacementMap(
 }
 
 // Helper: Replace images in Elementor data with proper JSON traversal
-function replaceImagesInElementorData(
+async function replaceImagesInElementorData(
   elementorData: any,
   replacementMap: Record<string, ImageUploadResult>,
-  regolithImages: any[] = []
-): { data: any, replacements_made: number } {
+  regolithImages: any[] = [],
+  supabase?: any,
+  gcon_piece_id?: string,
+  sitesprenData?: any,
+  gconPieceData?: any,
+  uploadedImages?: ImageUploadResult[]
+): Promise<{ data: any, replacements_made: number }> {
   let replacementsMade = 0;
   const wasString = typeof elementorData === 'string';
   
@@ -806,100 +821,7 @@ function replaceImagesInElementorData(
     console.log(`🔄 Current URLs sample: ${(urlMatches || []).slice(0, 3).join(', ')}`);
     console.log(`🔄 Matching URLs: ${matchingUrls.join(', ')}`);
     
-    // Try to refresh regolith data automatically
-    console.log(`🔄 Attempting automatic regolith refresh...`);
-    try {
-      // Call the regolith refresh API internally - import and call directly to avoid fetch issues
-      const regolithModule = await import('../f331-discover-elementor-images-regolith/route');
-      const mockRequest = {
-        json: async () => ({ gcon_piece_id: gcon_piece_id })
-      } as any;
-      
-      const refreshResponse = await regolithModule.POST(mockRequest);
-      
-      if (refreshResponse.status === 200) {
-        console.log(`✅ Regolith refresh successful, retrying with fresh data...`);
-        
-        // Re-fetch the updated gcon piece data
-        const { data: refreshedGconPiece, error: refreshedGconError } = await supabase
-          .from('gcon_pieces')
-          .select('discovered_images_regolith')
-          .eq('id', gcon_piece_id)
-          .single();
-          
-        if (!refreshedGconError && refreshedGconPiece?.discovered_images_regolith) {
-          // Parse the refreshed regolith data
-          const refreshedRegolithData = typeof refreshedGconPiece.discovered_images_regolith === 'string' 
-            ? JSON.parse(refreshedGconPiece.discovered_images_regolith)
-            : refreshedGconPiece.discovered_images_regolith;
-          const refreshedRegolithImages = refreshedRegolithData.discovered_images || [];
-          
-          // Create new replacement map with fresh data
-          const refreshedReplacementMap: { [key: string]: ImageUploadResult } = {};
-          refreshedRegolithImages.forEach((regolithImage: any, index: number) => {
-            if (index < uploadedImages.length && regolithImage.url) {
-              refreshedReplacementMap[regolithImage.url] = uploadedImages[index];
-            }
-          });
-          
-          console.log(`🔄 Using refreshed regolith data with ${Object.keys(refreshedReplacementMap).length} mappings`);
-          
-          // Continue with the refreshed replacement map
-          const refreshedRegolithUrls = Object.keys(refreshedReplacementMap);
-          const refreshedMatchingUrls = refreshedRegolithUrls.filter(url => dataString.includes(url));
-          const refreshedMatchPercentage = refreshedRegolithUrls.length > 0 ? (refreshedMatchingUrls.length / refreshedRegolithUrls.length) * 100 : 0;
-          
-          console.log(`🔄 After refresh: ${refreshedMatchingUrls.length}/${refreshedRegolithUrls.length} URLs match (${refreshedMatchPercentage.toFixed(1)}%)`);
-          
-          if (refreshedMatchPercentage >= 30) {
-            // Use the refreshed data
-            Object.keys(refreshedReplacementMap).forEach(oldUrl => {
-              const newImage = refreshedReplacementMap[oldUrl];
-              if (!newImage.img_url_returned || !newImage.wp_img_id_returned) {
-                console.log(`⚠️ Skipping incomplete replacement for ${oldUrl}`);
-                return;
-              }
-
-              console.log(`🔄 Processing replacement: ${oldUrl} -> ${newImage.img_url_returned}`);
-              
-              // Find and update attachment ID from regolith data
-              const matchingImage = refreshedRegolithImages.find((img: any) => img.url === oldUrl);
-              const oldAttachmentId = matchingImage?.image_metadata?.attachment_id;
-              
-              const count = replaceImagesInElements(parsedData, oldUrl, newImage, oldAttachmentId);
-              replacementsMade += count;
-              
-              console.log(`✅ Made ${count} replacements for ${oldUrl}`);
-              
-              // If no exact matches found, try fuzzy matching
-              if (count === 0) {
-                console.log(`🔍 No exact matches found for ${oldUrl}, trying fuzzy matching...`);
-                const fuzzyCount = tryFuzzyImageReplacement(parsedData, oldUrl, newImage, oldAttachmentId);
-                replacementsMade += fuzzyCount;
-                console.log(`🔍 Fuzzy matching made ${fuzzyCount} additional replacements`);
-              }
-            });
-
-            // Return with processed data
-            try {
-              return {
-                data: Array.isArray(parsedData) ? parsedData : [parsedData],
-                replacements_made: replacementsMade
-              };
-            } catch (error) {
-              console.error('🚨 Error stringifying processed data:', error);
-              return { data: elementorData, replacements_made: 0 };
-            }
-          }
-        }
-      } else {
-        console.log(`❌ Regolith refresh failed: ${refreshResponse.status || 'Unknown error'}`);
-      }
-    } catch (refreshError) {
-      console.error(`❌ Error refreshing regolith:`, refreshError);
-    }
-    
-    // If refresh failed or still low match rate, return early
+    // Return early with suggestion to refresh regolith (the live data fetch approach will handle this)
     return {
       data: elementorData,
       replacements_made: 0,
@@ -914,7 +836,7 @@ function replaceImagesInElementorData(
     console.log(`⚠️ LOW MATCH RATE DETECTED: Only ${matchPercentage.toFixed(1)}% match - trying live Elementor data fetch`);
     try {
       // Fetch current live Elementor data directly from WordPress
-      const liveElementorData = await fetchLiveElementorData(sitesprenData.sitespren_base, gconPieceData.g_post_id);
+      const liveElementorData = await fetchLiveElementorData(sitesprenData?.sitespren_base || '', gconPieceData?.g_post_id || 0);
       if (liveElementorData) {
         console.log(`✅ Successfully fetched live Elementor data`);
         
