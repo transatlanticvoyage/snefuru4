@@ -429,8 +429,20 @@ export default function Tebnar2Main() {
 
       console.log(`🔍 Narpi Debug: Database user ID: ${dbUser.id}`);
       console.log(`🔍 Narpi Debug: Selected sitespren ID: ${tbn2_selectedSitesprenId}`);
+      
+      // DEBUG: First check ALL batches for this user (without sitespren filter)
+      const { data: allUserBatches, error: allBatchError } = await supabase
+        .from('images_plans_batches')
+        .select('id, batch_name, asn_sitespren_id')
+        .eq('rel_users_id', dbUser.id);
+      
+      console.log(`🔍 Narpi Debug: ALL batches for user ${dbUser.id}:`, allUserBatches?.map(b => ({
+        id: b.id,
+        name: b.batch_name,
+        sitespren: b.asn_sitespren_id || 'NOT SET'
+      })));
 
-      // First, get all batches for this user and sitespren
+      // Now get batches for this specific sitespren
       const { data: batchesData, error: batchesError } = await supabase
         .from('images_plans_batches')
         .select('id, batch_name, rel_users_id, asn_sitespren_id')
@@ -449,6 +461,21 @@ export default function Tebnar2Main() {
 
       if (!batchesData || batchesData.length === 0) {
         console.log('🔍 Narpi Debug: No batches found for this user and sitespren combination');
+        
+        // DEBUG: Try without sitespren filter to see if that's the issue
+        console.log('🔍 Narpi Debug: Testing without sitespren filter...');
+        
+        if (allUserBatches && allUserBatches.length > 0) {
+          console.log(`🔍 Narpi Debug: Found ${allUserBatches.length} batches when ignoring sitespren filter`);
+          console.log('🔍 Narpi Debug: This suggests batches exist but have different or missing asn_sitespren_id values');
+          
+          // Check if the current batch is in the list
+          const currentBatch = allUserBatches.find(b => b.id === tbn2_selectedBatchId);
+          if (currentBatch) {
+            console.log(`🔍 Narpi Debug: Current batch ${tbn2_selectedBatchId} has asn_sitespren_id: ${currentBatch.asn_sitespren_id || 'NOT SET'}`);
+          }
+        }
+        
         setTbn2AvailableNarpiPushes([]);
         return;
       }
@@ -480,23 +507,20 @@ export default function Tebnar2Main() {
         }
       });
 
-      // Filter out pushes with errors in kareench1
+      // TEMPORARILY DISABLED: No filtering for errors - show ALL pushes
       const errorFreePushes = userSitesprenPushes.filter(push => {
-        if (!push.kareench1 || !Array.isArray(push.kareench1)) {
-          console.log(`🔍 Narpi Debug: Push ${push.id} - No kareench1 data`);
-          return false;
-        }
-        
-        // Check if any item in kareench1 has status 'failed'
-        const hasErrors = push.kareench1.some((item: any) => 
+        // Log what we would have filtered before
+        const hasKareench1 = push.kareench1 && Array.isArray(push.kareench1);
+        const hasErrors = hasKareench1 && push.kareench1.some((item: any) => 
           item.nupload_status1 === 'failed'
         );
-        
         const isCompleted = push.push_status1 === 'completed';
         
-        console.log(`🔍 Narpi Debug: Push ${push.id} - Has errors: ${hasErrors}, Is completed: ${isCompleted}`);
+        console.log(`🔍 Narpi Debug: Push ${push.id} - Status: ${push.push_status1}, Has kareench1: ${hasKareench1}, Has errors: ${hasErrors}, Is completed: ${isCompleted}`);
+        console.log(`  -> ALLOWING ALL PUSHES (no filtering applied)`);
         
-        return !hasErrors && isCompleted;
+        // Return true for ALL pushes to test the rest of the logic
+        return true;
       });
 
       console.log(`🔍 Narpi Debug: After filtering - ${errorFreePushes.length} error-free completed pushes`);
