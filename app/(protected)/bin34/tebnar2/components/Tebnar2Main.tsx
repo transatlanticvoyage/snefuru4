@@ -110,8 +110,8 @@ export default function Tebnar2Main() {
   const [tbn2_isPopupOpen, setTbn2IsPopupOpen] = useState(false);
   const [tbn2_kz101Checked, setTbn2Kz101Checked] = useState(false);
   const [tbn2_kz103Checked, setTbn2Kz103Checked] = useState(false);
-  const [tbn2_activePopupTab, setTbn2ActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
-  const [tbn2_activeImageDiscoveryTab, setTbn2ActiveImageDiscoveryTab] = useState<'utab1' | 'utab2' | 'utab3' | 'utab4'>('utab1');
+  const [tbn2_activePopupTab, setTbn2ActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab6');
+  const [tbn2_activeImageDiscoveryTab, setTbn2ActiveImageDiscoveryTab] = useState<'utab1' | 'utab2' | 'utab3' | 'utab4'>('utab4');
   
   // State for pelementor_cached data
   const [tbn2_pelementorCached, setTbn2PelementorCached] = useState<string>('');
@@ -121,11 +121,12 @@ export default function Tebnar2Main() {
   const [tbn2_rhinoProgress, setTbn2RhinoProgress] = useState({
     narpiRecord: 0,
     narpiUpload: 0,
-    cliffArrangement: 0
+    cliffArrangement: 0,
+    masonArrangement: 0
   });
   
   // State for pre-existing narpi push toggle
-  const [tbn2_usePreExistingNarpi, setTbn2UsePreExistingNarpi] = useState<boolean>(false);
+  const [tbn2_usePreExistingNarpi, setTbn2UsePreExistingNarpi] = useState<boolean>(true);
   const [tbn2_selectedNarpiPushId, setTbn2SelectedNarpiPushId] = useState<string>('');
   const [tbn2_availableNarpiPushes, setTbn2AvailableNarpiPushes] = useState<Array<{
     id: string;
@@ -136,8 +137,23 @@ export default function Tebnar2Main() {
     kareench1: any;
   }>>([]);
   const [tbn2_narpiPushesLoading, setTbn2NarpiPushesLoading] = useState<boolean>(false);
-  const [tbn2_narpiInputMethod, setTbn2NarpiInputMethod] = useState<'dropdown' | 'manual'>('dropdown');
+  const [tbn2_narpiInputMethod, setTbn2NarpiInputMethod] = useState<'dropdown' | 'manual'>('manual');
   const [tbn2_manualNarpiPushId, setTbn2ManualNarpiPushId] = useState<string>('');
+  
+  // Local storage functions for UUID
+  const saveUuidToLocalStorage = () => {
+    if (tbn2_manualNarpiPushId.trim()) {
+      localStorage.setItem('tbn2_saved_narpi_uuid', tbn2_manualNarpiPushId.trim());
+      setTbn2GadgetFeedback('UUID saved to local storage');
+    }
+  };
+  
+  const loadUuidFromLocalStorage = () => {
+    const savedUuid = localStorage.getItem('tbn2_saved_narpi_uuid');
+    if (savedUuid) {
+      setTbn2ManualNarpiPushId(savedUuid);
+    }
+  };
   const [tbn2_uelBarColors, setTbn2UelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [tbn2_uelBar37Colors, setTbn2UelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [tbn2_currentUrl, setTbn2CurrentUrl] = useState<string>('');
@@ -325,6 +341,11 @@ export default function Tebnar2Main() {
         styleToRemove.remove();
       }
     };
+  }, []);
+  
+  // Load saved UUID from localStorage on component mount
+  useEffect(() => {
+    loadUuidFromLocalStorage();
   }, []);
 
   // Fetch all images for the user using centralized data layer
@@ -2724,19 +2745,53 @@ export default function Tebnar2Main() {
       setTbn2RhinoProgress({
         narpiRecord: 0,
         narpiUpload: 0,
-        cliffArrangement: 0
+        cliffArrangement: 0,
+        masonArrangement: 0
       });
 
       let response;
       
-      if (tbn2_usePreExistingNarpi) {
-        // Use cliff-only mode with pre-existing narpi push
-        setTbn2RhinoProgress(prev => ({ ...prev, narpiRecord: 100, narpiUpload: 100 }));
+      // Check arrangement method selection
+      if (tbn2_arrangementMethod === 'mason') {
+        // Mason arrangement requires pre-existing narpi push
+        if (!tbn2_usePreExistingNarpi) {
+          setTbn2Error('❌ Mason Arrange requires a pre-existing narpi push. Please enable "use pre-existing narpi push" option.');
+          return;
+        }
+        
+        const effectiveNarpiPushId = tbn2_narpiInputMethod === 'dropdown' 
+          ? tbn2_selectedNarpiPushId 
+          : tbn2_manualNarpiPushId;
+        
+        if (!effectiveNarpiPushId) {
+          setTbn2Error(`❌ Please ${tbn2_narpiInputMethod === 'dropdown' ? 'select' : 'enter'} a narpi push ID for Mason Arrange`);
+          return;
+        }
+        
+        // Mason: No narpi progress since using pre-existing
+        // Don't set narpiRecord/narpiUpload progress for pre-existing narpi
+        
+        console.log(`🏗️ Using Mason Arrange method for enhanced image arrangement`);
+        
+        response = await fetch('/api/mason-arrange', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gcon_piece_id: tbn2_selectedGconPieceId,
+            narpi_push_id: effectiveNarpiPushId
+          })
+        });
+        
+      } else if (tbn2_usePreExistingNarpi) {
+        // Cliff with pre-existing narpi: No narpi progress bars
+        // Don't set narpiRecord/narpiUpload progress for pre-existing narpi
         
         const effectiveNarpiPushId = tbn2_narpiInputMethod === 'dropdown' 
           ? tbn2_selectedNarpiPushId 
           : tbn2_manualNarpiPushId;
           
+        console.log(`🏔️ Using Cliff Arrange method (cliff-only)`);
+        
         response = await fetch('/api/rhino-cliff-only', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2746,8 +2801,11 @@ export default function Tebnar2Main() {
           })
         });
       } else {
-        // Phase 1: Start Narpi Push
+        // Phase 1: Start Narpi Push (Cliff with new uploads)
+        // This is the only case where we show narpi progress
         setTbn2RhinoProgress(prev => ({ ...prev, narpiRecord: 50 }));
+        
+        console.log(`🏔️ Using Cliff Arrange method (full rhino-replace)`);
         
         const selectedImages = Array.from(tbn2_selectedRows);
         response = await fetch('/api/rhino-replace', {
@@ -2769,17 +2827,54 @@ export default function Tebnar2Main() {
       }
 
       if (result.success) {
-        // Mark all phases as complete
-        setTbn2RhinoProgress({
-          narpiRecord: 100,
-          narpiUpload: 100,
-          cliffArrangement: 100
-        });
+        // Mark phases as complete based on what actually ran
+        if (result.method === 'mason') {
+          // Mason only: mark Mason arrangement complete, no narpi activity
+          setTbn2RhinoProgress({
+            narpiRecord: 0,
+            narpiUpload: 0,
+            cliffArrangement: 0,
+            masonArrangement: 100
+          });
+        } else if (tbn2_usePreExistingNarpi) {
+          // Cliff with pre-existing: only cliff arrangement, no narpi activity  
+          setTbn2RhinoProgress({
+            narpiRecord: 0,
+            narpiUpload: 0,
+            cliffArrangement: 100,
+            masonArrangement: 0
+          });
+        } else {
+          // Full rhino-replace: all narpi and cliff phases
+          setTbn2RhinoProgress({
+            narpiRecord: 100,
+            narpiUpload: 100,
+            cliffArrangement: 100,
+            masonArrangement: 0
+          });
+        }
 
-        setTbn2Error(
-          `✅ Rhino Replace completed! ${result.results.narpi_push.images_uploaded} images uploaded, ` +
-          `${result.results.cliff_arrangement.images_replaced} images replaced in page.`
-        );
+        // Different success messages based on method used
+        if (result.method === 'mason') {
+          // Mason arrange result structure
+          const masonResults = result.results.mason_arrangement;
+          const regolithResults = result.results.regolith_refresh;
+          
+          setTbn2Error(
+            `✅ Mason Arrange completed! Enhanced method used (${masonResults.method_used}). ` +
+            `${regolithResults.images_discovered} images discovered, ${masonResults.images_replaced} images replaced in page. ` +
+            `Cache cleared: ${masonResults.cache_cleared ? 'Yes' : 'No'}`
+          );
+        } else {
+          // Cliff arrange result structure (existing)
+          const narpiResults = result.results?.narpi_push;
+          const cliffResults = result.results?.cliff_arrangement;
+          
+          setTbn2Error(
+            `✅ Cliff Arrange completed! ${narpiResults?.images_uploaded || 0} images uploaded, ` +
+            `${cliffResults?.images_replaced || 0} images replaced in page.`
+          );
+        }
 
         // Refresh regolith data to show updated results
         if (tbn2_selectedGconPieceId) {
@@ -3588,13 +3683,27 @@ export default function Tebnar2Main() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               Enter Narpi Push UUID:
                             </label>
-                            <input
-                              type="text"
-                              value={tbn2_manualNarpiPushId}
-                              onChange={(e) => setTbn2ManualNarpiPushId(e.target.value)}
-                              placeholder="Enter UUID of Narpi Push"
-                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                            />
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={tbn2_manualNarpiPushId}
+                                onChange={(e) => setTbn2ManualNarpiPushId(e.target.value)}
+                                placeholder="Enter UUID of Narpi Push"
+                                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                              />
+                              <button
+                                type="button"
+                                onClick={saveUuidToLocalStorage}
+                                disabled={!tbn2_manualNarpiPushId.trim()}
+                                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                  tbn2_manualNarpiPushId.trim()
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                }`}
+                              >
+                                Save
+                              </button>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -3642,8 +3751,8 @@ export default function Tebnar2Main() {
                     </div>
                     <div className="text-center text-sm text-gray-600 mt-2">
                       {tbn2_arrangementMethod === 'cliff' 
-                        ? 'Cliff: Traditional image replacement method' 
-                        : 'Mason: Enhanced image arrangement method (coming soon)'}
+                        ? 'Cliff: Traditional image replacement method (works with new uploads or pre-existing narpi push)' 
+                        : 'Mason: Enhanced arrangement method (requires pre-existing narpi push, refreshes regolith data, uses native WordPress API)'}
                     </div>
                   </div>
                   
@@ -3707,6 +3816,14 @@ export default function Tebnar2Main() {
                           <td style={{ border: '1px solid black', padding: '8px' }}>
                             <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
                               <div style={{ width: `${tbn2_rhinoProgress.cliffArrangement}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.cliffArrangement > 0 ? '#8b5cf6' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ border: '1px solid black', padding: '8px' }}>Mason Arrangement</td>
+                          <td style={{ border: '1px solid black', padding: '8px' }}>
+                            <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
+                              <div style={{ width: `${tbn2_rhinoProgress.masonArrangement}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.masonArrangement > 0 ? '#10b981' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
                             </div>
                           </td>
                         </tr>
@@ -3837,6 +3954,14 @@ export default function Tebnar2Main() {
                   marginRight: '30px'
                 }}
               />
+              
+              {/* Navy blue spacer div */}
+              <div style={{ 
+                width: '20px', 
+                height: '100%', 
+                backgroundColor: 'navy', 
+                marginLeft: '70px' 
+              }}></div>
               
               <span className="font-mono text-sm overflow-hidden whitespace-nowrap text-ellipsis flex-1">
                 {(() => {
