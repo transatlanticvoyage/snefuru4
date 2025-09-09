@@ -123,6 +123,19 @@ export default function Tebnar2Main() {
     narpiUpload: 0,
     cliffArrangement: 0
   });
+  
+  // State for pre-existing narpi push toggle
+  const [tbn2_usePreExistingNarpi, setTbn2UsePreExistingNarpi] = useState<boolean>(false);
+  const [tbn2_selectedNarpiPushId, setTbn2SelectedNarpiPushId] = useState<string>('');
+  const [tbn2_availableNarpiPushes, setTbn2AvailableNarpiPushes] = useState<Array<{
+    id: string;
+    push_name: string;
+    push_desc: string;
+    created_at: string;
+    push_status1: string;
+    kareench1: any;
+  }>>([]);
+  const [tbn2_narpiPushesLoading, setTbn2NarpiPushesLoading] = useState<boolean>(false);
   const [tbn2_uelBarColors, setTbn2UelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [tbn2_uelBar37Colors, setTbn2UelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [tbn2_currentUrl, setTbn2CurrentUrl] = useState<string>('');
@@ -388,6 +401,115 @@ export default function Tebnar2Main() {
       setTbn2Error(`❌ Failed to load dummy data: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setTbn2LoadingPreset(false);
+    }
+  };
+
+  // Function to fetch available narpi pushes for the current sitespren
+  const tbn2_fetchAvailableNarpiPushes = async () => {
+    if (!tbn2_selectedSitesprenId) {
+      console.log('🔍 Narpi Debug: No sitespren selected');
+      setTbn2AvailableNarpiPushes([]);
+      return;
+    }
+
+    console.log(`🔍 Narpi Debug: Fetching for sitespren ${tbn2_selectedSitesprenId}, user ${user.id}`);
+    setTbn2NarpiPushesLoading(true);
+    try {
+      // First, get database user ID
+      const { data: dbUser, error: dbUserError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (dbUserError || !dbUser) {
+        console.error('🔍 Narpi Debug: Database user not found:', dbUserError);
+        throw new Error('Database user not found');
+      }
+
+      console.log(`🔍 Narpi Debug: Database user ID: ${dbUser.id}`);
+
+      // Use similar approach to narpo1 - get narpi_pushes with batch join
+      const { data: narpiPushes, error: narpiError } = await supabase
+        .from('narpi_pushes')
+        .select(`
+          id, push_name, push_desc, created_at, push_status1, kareench1, fk_batch_id,
+          images_plans_batches!fk_batch_id(
+            id, batch_name, rel_users_id, asn_sitespren_id
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (narpiError) throw narpiError;
+
+      console.log(`🔍 Narpi Debug: Found ${narpiPushes?.length || 0} total narpi pushes before filtering`);
+
+      // Filter for user's batches with the selected sitespren
+      const userSitesprenPushes = (narpiPushes || []).filter(push => {
+        const batch = push.images_plans_batches;
+        const isUserBatch = batch && batch.rel_users_id === dbUser.id;
+        const isSitesprenMatch = batch && batch.asn_sitespren_id === tbn2_selectedSitesprenId;
+        
+        console.log(`🔍 Narpi Debug: Push ${push.id} - User match: ${isUserBatch}, Sitespren match: ${isSitesprenMatch}`);
+        if (batch) {
+          console.log(`  -> Batch: ${batch.id} (${batch.batch_name}), User: ${batch.rel_users_id}, Sitespren: ${batch.asn_sitespren_id}`);
+        }
+        
+        return isUserBatch && isSitesprenMatch;
+      });
+
+      console.log(`🔍 Narpi Debug: After user/sitespren filtering: ${userSitesprenPushes.length} pushes`);
+
+      if (userSitesprenPushes.length === 0) {
+        console.log('🔍 Narpi Debug: No pushes found for this user and sitespren combination');
+        setTbn2AvailableNarpiPushes([]);
+        return;
+      }
+
+      // Log details of found pushes
+      userSitesprenPushes.forEach(push => {
+        console.log(`🔍 Narpi Debug: Push ${push.id} - Status: ${push.push_status1}, Kareench1 length: ${push.kareench1?.length || 0}`);
+        if (push.kareench1?.length > 0) {
+          const statuses = push.kareench1.map((item: any) => item.nupload_status1);
+          console.log(`  -> Upload statuses:`, statuses);
+        }
+      });
+
+      // Filter out pushes with errors in kareench1
+      const errorFreePushes = userSitesprenPushes.filter(push => {
+        if (!push.kareench1 || !Array.isArray(push.kareench1)) {
+          console.log(`🔍 Narpi Debug: Push ${push.id} - No kareench1 data`);
+          return false;
+        }
+        
+        // Check if any item in kareench1 has status 'failed'
+        const hasErrors = push.kareench1.some((item: any) => 
+          item.nupload_status1 === 'failed'
+        );
+        
+        const isCompleted = push.push_status1 === 'completed';
+        
+        console.log(`🔍 Narpi Debug: Push ${push.id} - Has errors: ${hasErrors}, Is completed: ${isCompleted}`);
+        
+        return !hasErrors && isCompleted;
+      });
+
+      console.log(`🔍 Narpi Debug: After filtering - ${errorFreePushes.length} error-free completed pushes`);
+      
+      // Debug alert for visibility
+      if (typeof window !== 'undefined') {
+        alert(`Debug: Found ${errorFreePushes.length} eligible narpi pushes for sitespren ${tbn2_selectedSitesprenId}. Check console for details.`);
+      }
+      
+      setTbn2AvailableNarpiPushes(errorFreePushes);
+    } catch (err) {
+      console.error('Error fetching narpi pushes:', err);
+      if (typeof window !== 'undefined') {
+        alert(`Debug Error: ${err instanceof Error ? err.message : 'Unknown error'}. Check console for details.`);
+      }
+      setTbn2AvailableNarpiPushes([]);
+    } finally {
+      setTbn2NarpiPushesLoading(false);
     }
   };
 
@@ -1129,6 +1251,16 @@ export default function Tebnar2Main() {
     tbn2_fetchPlans();
     tbn2_fetchSitesprenOptions();
   }, [user]);
+
+  // Fetch narpi pushes when sitespren changes
+  useEffect(() => {
+    if (tbn2_usePreExistingNarpi && tbn2_selectedSitesprenId) {
+      tbn2_fetchAvailableNarpiPushes();
+    } else {
+      setTbn2AvailableNarpiPushes([]);
+      setTbn2SelectedNarpiPushId('');
+    }
+  }, [tbn2_selectedSitesprenId, tbn2_usePreExistingNarpi]);
 
   // Re-fetch gcon pieces when sitespren options are loaded and batch has sitespren
   useEffect(() => {
@@ -2102,15 +2234,24 @@ export default function Tebnar2Main() {
       return;
     }
 
-    const selectedImages = Array.from(tbn2_selectedRows);
-    if (selectedImages.length === 0) {
-      setTbn2Error('❌ Please select at least one image to replace');
-      return;
-    }
-
     if (!tbn2_selectedBatchId || !tbn2_selectedSitesprenId) {
       setTbn2Error('❌ Missing batch or sitespren selection');
       return;
+    }
+
+    // Validation for pre-existing narpi push mode
+    if (tbn2_usePreExistingNarpi) {
+      if (!tbn2_selectedNarpiPushId) {
+        setTbn2Error('❌ Please select a pre-existing narpi push');
+        return;
+      }
+    } else {
+      // Normal mode - need selected images
+      const selectedImages = Array.from(tbn2_selectedRows);
+      if (selectedImages.length === 0) {
+        setTbn2Error('❌ Please select at least one image to replace');
+        return;
+      }
     }
 
     try {
@@ -2124,19 +2265,36 @@ export default function Tebnar2Main() {
         cliffArrangement: 0
       });
 
-      // Phase 1: Start Narpi Push
-      setTbn2RhinoProgress(prev => ({ ...prev, narpiRecord: 50 }));
-
-      const response = await fetch('/api/rhino-replace', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          gcon_piece_id: tbn2_selectedGconPieceId,
-          selected_plan_ids: selectedImages,
-          batch_id: tbn2_selectedBatchId,
-          sitespren_id: tbn2_selectedSitesprenId
-        })
-      });
+      let response;
+      
+      if (tbn2_usePreExistingNarpi) {
+        // Use cliff-only mode with pre-existing narpi push
+        setTbn2RhinoProgress(prev => ({ ...prev, narpiRecord: 100, narpiUpload: 100 }));
+        
+        response = await fetch('/api/rhino-cliff-only', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gcon_piece_id: tbn2_selectedGconPieceId,
+            narpi_push_id: tbn2_selectedNarpiPushId
+          })
+        });
+      } else {
+        // Phase 1: Start Narpi Push
+        setTbn2RhinoProgress(prev => ({ ...prev, narpiRecord: 50 }));
+        
+        const selectedImages = Array.from(tbn2_selectedRows);
+        response = await fetch('/api/rhino-replace', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gcon_piece_id: tbn2_selectedGconPieceId,
+            selected_plan_ids: selectedImages,
+            batch_id: tbn2_selectedBatchId,
+            sitespren_id: tbn2_selectedSitesprenId
+          })
+        });
+      }
 
       const result = await response.json();
 
@@ -2841,14 +2999,90 @@ export default function Tebnar2Main() {
               <div>
                 {/* Rhino Replace interface */}
                 <div className="mt-3">
+                  {/* Pre-existing narpi push toggle */}
+                  <div className="mb-4 p-3 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="flex items-center gap-3 mb-3">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={tbn2_usePreExistingNarpi}
+                          onChange={(e) => setTbn2UsePreExistingNarpi(e.target.checked)}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      <span className="text-sm font-medium text-gray-700">
+                        use pre-existing narpi push
+                      </span>
+                    </div>
+                    
+                    {/* Narpi push dropdown */}
+                    {tbn2_usePreExistingNarpi && (
+                      <div className="mt-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Select narpi push:
+                        </label>
+                        {tbn2_narpiPushesLoading ? (
+                          <div className="text-sm text-gray-500">Loading narpi pushes...</div>
+                        ) : (
+                          <select
+                            value={tbn2_selectedNarpiPushId}
+                            onChange={(e) => setTbn2SelectedNarpiPushId(e.target.value)}
+                            className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                              !tbn2_usePreExistingNarpi || tbn2_availableNarpiPushes.length === 0 
+                                ? 'bg-gray-100 text-gray-400' 
+                                : 'bg-white'
+                            }`}
+                            disabled={!tbn2_usePreExistingNarpi || tbn2_availableNarpiPushes.length === 0}
+                          >
+                            <option value="">
+                              {tbn2_availableNarpiPushes.length === 0 
+                                ? 'No error-free narpi pushes available for this site' 
+                                : 'Select a narpi push...'}
+                            </option>
+                            {tbn2_availableNarpiPushes.map((push) => (
+                              <option key={push.id} value={push.id}>
+                                {push.push_name} - {push.push_desc} - {push.push_status1} - {new Date(push.created_at).toLocaleDateString()}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                        {tbn2_availableNarpiPushes.length === 0 && !tbn2_narpiPushesLoading && tbn2_selectedSitesprenId && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            No error-free completed narpi pushes found for the selected site
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
                   <div className="text-gray-700 mb-3">
-                    {tbn2_selectedRows.size} images currently selected
+                    {tbn2_usePreExistingNarpi 
+                      ? `Using pre-existing narpi push${tbn2_selectedNarpiPushId ? ' (selected)' : ' (not selected)'}` 
+                      : `${tbn2_selectedRows.size} images currently selected`
+                    }
                   </div>
                   <button
                     onClick={tbn2_handleRhinoReplace}
-                    disabled={tbn2_rhinoReplaceLoading || tbn2_selectedRows.size === 0 || !tbn2_selectedGconPieceId || !tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
+                    disabled={
+                      tbn2_rhinoReplaceLoading || 
+                      !tbn2_selectedGconPieceId || 
+                      !tbn2_selectedBatchId || 
+                      !tbn2_selectedSitesprenId ||
+                      (tbn2_usePreExistingNarpi 
+                        ? !tbn2_selectedNarpiPushId 
+                        : tbn2_selectedRows.size === 0
+                      )
+                    }
                     className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
-                      tbn2_rhinoReplaceLoading || tbn2_selectedRows.size === 0 || !tbn2_selectedGconPieceId || !tbn2_selectedBatchId || !tbn2_selectedSitesprenId
+                      tbn2_rhinoReplaceLoading || 
+                      !tbn2_selectedGconPieceId || 
+                      !tbn2_selectedBatchId || 
+                      !tbn2_selectedSitesprenId ||
+                      (tbn2_usePreExistingNarpi 
+                        ? !tbn2_selectedNarpiPushId 
+                        : tbn2_selectedRows.size === 0
+                      )
                         ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
                         : 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
                     }`}

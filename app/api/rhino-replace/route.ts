@@ -517,7 +517,8 @@ async function performCliffArrangement(
     if (updatedElementorData) {
       const updateResult = replaceImagesInElementorData(
         updatedElementorData, 
-        replacementMap
+        replacementMap,
+        imagesToReplace
       );
       updatedElementorData = updateResult.data;
       replacementsMade = updateResult.replacements_made;
@@ -525,15 +526,20 @@ async function performCliffArrangement(
       console.log(`🔧 Made ${replacementsMade} image replacements in Elementor data`);
     }
 
-    // Update the WordPress page via Snefuruplin API
+    // Update the WordPress page via Snefuruplin API - ONLY if actual replacements were made
     let pageUpdated = false;
     if (replacementsMade > 0 && gconPiece.g_post_id) {
+      console.log(`🚀 Sending updated Elementor data to WordPress (${replacementsMade} replacements made)`);
       pageUpdated = await updateWordPressPage(
         gconPiece.asn_sitespren_base,
         gconPiece.g_post_id,
         updatedElementorData,
         userData.ruplin_api_key_1
       );
+    } else if (replacementsMade === 0) {
+      console.log(`⚠️ Skipping WordPress update - no image replacements were made to avoid corrupting page`);
+    } else {
+      console.log(`⚠️ Skipping WordPress update - missing post ID (${gconPiece.g_post_id})`);
     }
 
     // Update gcon_pieces with new pelementor_cached data
@@ -589,43 +595,99 @@ function createImageReplacementMap(
 // Helper: Replace images in Elementor data
 function replaceImagesInElementorData(
   elementorData: any,
-  replacementMap: Record<string, ImageUploadResult>
+  replacementMap: Record<string, ImageUploadResult>,
+  regolithImages: any[] = []
 ): { data: any, replacements_made: number } {
   let replacementsMade = 0;
-  const dataString = JSON.stringify(elementorData);
+  
+  // Handle different data formats - could be string or object
+  let dataString: string;
+  let parsedData: any;
+  
+  if (typeof elementorData === 'string') {
+    // Data is already a JSON string
+    dataString = elementorData;
+    try {
+      parsedData = JSON.parse(elementorData);
+    } catch (e) {
+      console.error('🚨 Failed to parse elementor data string:', e);
+      return { data: elementorData, replacements_made: 0 };
+    }
+  } else {
+    // Data is an object, need to stringify for URL replacement
+    parsedData = elementorData;
+    dataString = JSON.stringify(elementorData);
+  }
+  
   let updatedDataString = dataString;
+
+  console.log(`🔍 Debug: elementorData type: ${typeof elementorData}`);
+  console.log(`🔍 Debug: dataString length: ${dataString.length}`);
+  console.log(`🔍 Debug: First 500 chars of dataString: ${dataString.substring(0, 500)}`);
 
   // Replace URLs in the serialized data
   Object.keys(replacementMap).forEach(oldUrl => {
     const newImage = replacementMap[oldUrl];
     if (newImage.img_url_returned && newImage.wp_img_id_returned) {
-      // Replace URL
+      console.log(`🔍 Searching for URL: "${oldUrl}"`);
+      console.log(`🔍 Replacing with: "${newImage.img_url_returned}"`);
+      
+      // Replace URL instances - this is the actual image replacement
       const urlRegex = new RegExp(escapeRegExp(oldUrl), 'g');
       const urlMatches = (updatedDataString.match(urlRegex) || []).length;
-      updatedDataString = updatedDataString.replace(urlRegex, newImage.img_url_returned);
       
-      // Replace attachment ID if present
-      const idMatches = elementorData.toString().includes(String(newImage.wp_img_id_returned));
-      if (!idMatches) {
-        // Find and replace old attachment IDs
-        const idRegex = /"id":\s*\d+/g;
-        updatedDataString = updatedDataString.replace(idRegex, (match) => {
-          replacementsMade++;
-          return `"id": ${newImage.wp_img_id_returned}`;
+      console.log(`🔍 Found ${urlMatches} matches for URL: ${oldUrl}`);
+      
+      if (urlMatches > 0) {
+        updatedDataString = updatedDataString.replace(urlRegex, newImage.img_url_returned);
+        console.log(`✅ Successfully replaced ${urlMatches} instances of ${oldUrl}`);
+      } else {
+        console.log(`❌ No matches found for ${oldUrl} in elementor data`);
+        // Let's check for URL variations
+        const variations = [
+          oldUrl.replace('http://', 'https://'),
+          oldUrl.replace('https://', 'http://'),
+          oldUrl.replace(/^https?:\/\/[^\/]+/, ''), // Just the path
+          oldUrl.replace(/\//g, '\\/'), // Escaped slashes for JSON
+        ];
+        
+        variations.forEach((variation, index) => {
+          const varMatches = (updatedDataString.match(new RegExp(escapeRegExp(variation), 'g')) || []).length;
+          console.log(`🔍 Variation ${index + 1} "${variation}": ${varMatches} matches`);
         });
       }
       
+      // Count only URL replacements (each URL replacement = 1 image replaced)
       replacementsMade += urlMatches;
-      console.log(`🔄 Replaced ${urlMatches} instances of ${oldUrl}`);
+      
+      // Also update specific attachment IDs from regolith data but don't count them separately
+      // We need to be more targeted here - only replace the specific old attachment ID
+      const matchingImage = regolithImages.find((img: any) => img.url === oldUrl);
+      
+      if (matchingImage && matchingImage.image_metadata?.attachment_id) {
+        const oldAttachmentId = matchingImage.image_metadata.attachment_id;
+        const attachmentIdRegex = new RegExp(`"id":\\s*${oldAttachmentId}\\b`, 'g');
+        const idMatches = (updatedDataString.match(attachmentIdRegex) || []).length;
+        updatedDataString = updatedDataString.replace(attachmentIdRegex, `"id": ${newImage.wp_img_id_returned}`);
+        console.log(`🔧 Updated ${idMatches} attachment ID references from ${oldAttachmentId} to ${newImage.wp_img_id_returned}`);
+      }
     }
   });
 
   try {
+    // Parse the updated data string back to object
+    const updatedParsedData = JSON.parse(updatedDataString);
+    
+    // Return the data in the same format it was received
+    // If original was a string, return string; if object, return object
+    const returnData = typeof elementorData === 'string' ? updatedDataString : updatedParsedData;
+    
     return {
-      data: JSON.parse(updatedDataString),
+      data: returnData,
       replacements_made: replacementsMade
     };
   } catch (e) {
+    console.error('🚨 Failed to parse updated data string:', e);
     // Fallback to original data if parsing fails
     return {
       data: elementorData,
@@ -642,7 +704,7 @@ async function updateWordPressPage(
   apiKey: string
 ): Promise<boolean> {
   try {
-    const endpoint = `https://${siteUrl}/wp-json/snefuru/v1/update-elementor`;
+    const endpoint = `https://${siteUrl}/wp-json/snefuru/v1/posts/${postId}/elementor`;
     
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -652,8 +714,7 @@ async function updateWordPressPage(
         'User-Agent': 'Snefuru-RhinoReplace/1.0'
       },
       body: JSON.stringify({
-        post_id: postId,
-        elementor_data: elementorData
+        elementor_data: JSON.stringify(elementorData)
       })
     });
 
