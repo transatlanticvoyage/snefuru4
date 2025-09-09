@@ -313,6 +313,57 @@ async function performNarpiPush(
   }
 }
 
+// Helper function to fetch live Elementor data from WordPress 
+async function fetchLiveElementorData(siteUrl: string, postId: number): Promise<any> {
+  try {
+    const baseUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
+    
+    // First, try to fetch the current _elementor_data meta key using WordPress REST API
+    const wpApiUrl = `${baseUrl}/wp-json/wp/v2/posts/${postId}?context=edit`;
+    
+    console.log(`🔄 Fetching live Elementor data from: ${wpApiUrl}`);
+    
+    const response = await fetch(wpApiUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+    
+    if (!response.ok) {
+      console.log(`❌ WordPress API failed: ${response.status}`);
+      return null;
+    }
+    
+    const postData = await response.json();
+    
+    // Check if the post has Elementor meta data
+    if (postData.meta && postData.meta._elementor_data) {
+      console.log(`✅ Found live _elementor_data with ${postData.meta._elementor_data.length} characters`);
+      
+      // Parse the Elementor data
+      let elementorData;
+      try {
+        elementorData = typeof postData.meta._elementor_data === 'string' 
+          ? JSON.parse(postData.meta._elementor_data) 
+          : postData.meta._elementor_data;
+      } catch (parseError) {
+        console.log(`❌ Failed to parse live Elementor data:`, parseError);
+        return null;
+      }
+      
+      return elementorData;
+    } else {
+      console.log(`❌ No _elementor_data found in post meta`);
+      return null;
+    }
+    
+  } catch (error) {
+    console.error('❌ Error fetching live Elementor data:', error);
+    return null;
+  }
+}
+
 // Helper function to upload image to WordPress (copied from sfunc_63_push_images)
 async function uploadImageToWordPress(
   imageUrl: string,
@@ -858,7 +909,72 @@ function replaceImagesInElementorData(
     };
   }
 
-  // Process each replacement with structured approach
+  // Alternative approach: If low match rate, try fetching live Elementor data instead of regolith refresh
+  if (matchPercentage < 50 && regolithUrls.length > 0) {
+    console.log(`⚠️ LOW MATCH RATE DETECTED: Only ${matchPercentage.toFixed(1)}% match - trying live Elementor data fetch`);
+    try {
+      // Fetch current live Elementor data directly from WordPress
+      const liveElementorData = await fetchLiveElementorData(sitesprenData.sitespren_base, gconPieceData.g_post_id);
+      if (liveElementorData) {
+        console.log(`✅ Successfully fetched live Elementor data`);
+        
+        // Extract current image URLs from live data  
+        const liveDataString = JSON.stringify(liveElementorData);
+        const liveUrlMatches = liveDataString.match(/https?:\/\/[^\\s"',}]+\.(jpg|jpeg|png|gif|webp)/gi);
+        
+        console.log(`🔍 Live page URLs: ${(liveUrlMatches || []).slice(0, 5).join(', ')}`);
+        
+        if (liveUrlMatches && liveUrlMatches.length >= uploadedImages.length) {
+          // Create new replacement map using live URLs (in order)
+          const liveReplacementMap: { [key: string]: ImageUploadResult } = {};
+          uploadedImages.forEach((uploadedImage, index) => {
+            if (liveUrlMatches[index]) {
+              liveReplacementMap[liveUrlMatches[index]] = uploadedImage;
+            }
+          });
+          
+          console.log(`🔄 Created live replacement map with ${Object.keys(liveReplacementMap).length} mappings`);
+          console.log(`🔄 Live URLs to replace: ${Object.keys(liveReplacementMap).join(', ')}`);
+          
+          // Use live replacement map instead
+          let liveReplacementsMade = 0;
+          Object.keys(liveReplacementMap).forEach(oldUrl => {
+            const newImage = liveReplacementMap[oldUrl];
+            if (!newImage.img_url_returned || !newImage.wp_img_id_returned) {
+              console.log(`⚠️ Skipping incomplete replacement for ${oldUrl}`);
+              return;
+            }
+
+            console.log(`🔄 Processing live replacement: ${oldUrl} -> ${newImage.img_url_returned}`);
+            
+            const count = replaceImagesInElements(parsedData, oldUrl, newImage, newImage.wp_img_id_returned);
+            liveReplacementsMade += count;
+            
+            console.log(`✅ Made ${count} replacements for ${oldUrl}`);
+            
+            if (count === 0) {
+              console.log(`🔍 No exact matches found for ${oldUrl}, trying fuzzy matching...`);
+              const fuzzyCount = tryFuzzyImageReplacement(parsedData, oldUrl, newImage, newImage.wp_img_id_returned);
+              liveReplacementsMade += fuzzyCount;
+              console.log(`🔍 Fuzzy matching made ${fuzzyCount} additional replacements`);
+            }
+          });
+          
+          if (liveReplacementsMade > 0) {
+            console.log(`✅ Live data approach successful: ${liveReplacementsMade} replacements made`);
+            return {
+              data: Array.isArray(parsedData) ? parsedData : [parsedData],
+              replacements_made: liveReplacementsMade
+            };
+          }
+        }
+      }
+    } catch (error) {
+      console.error(`❌ Failed to fetch live Elementor data:`, error);
+    }
+  }
+
+  // Process each replacement with structured approach (original regolith data)
   Object.keys(replacementMap).forEach(oldUrl => {
     const newImage = replacementMap[oldUrl];
     if (!newImage.img_url_returned || !newImage.wp_img_id_returned) {
