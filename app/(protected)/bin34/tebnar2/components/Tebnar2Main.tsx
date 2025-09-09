@@ -111,7 +111,7 @@ export default function Tebnar2Main() {
   const [tbn2_kz101Checked, setTbn2Kz101Checked] = useState(false);
   const [tbn2_kz103Checked, setTbn2Kz103Checked] = useState(false);
   const [tbn2_activePopupTab, setTbn2ActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
-  const [tbn2_activeImageDiscoveryTab, setTbn2ActiveImageDiscoveryTab] = useState<'utab1' | 'utab2' | 'utab3'>('utab1');
+  const [tbn2_activeImageDiscoveryTab, setTbn2ActiveImageDiscoveryTab] = useState<'utab1' | 'utab2' | 'utab3' | 'utab4'>('utab1');
   
   // State for pelementor_cached data
   const [tbn2_pelementorCached, setTbn2PelementorCached] = useState<string>('');
@@ -1137,9 +1137,11 @@ export default function Tebnar2Main() {
     if (tbn2_selectedGconPieceId) {
       tbn2_fetchDiscoveredImgCradles(tbn2_selectedGconPieceId);
       tbn2_fetchPelementorCached(tbn2_selectedGconPieceId);
+      tbn2_fetchDiscoveredImagesRegolith(tbn2_selectedGconPieceId);
     } else {
       setTbn2DiscoveredImgCradlesJson('');
       setTbn2PelementorCached('');
+      setTbn2DiscoveredImagesRegolith('');
     }
   }, [tbn2_selectedGconPieceId]);
 
@@ -1458,6 +1460,49 @@ export default function Tebnar2Main() {
     } catch (err) {
       console.error('Error fetching pelementor cached:', err);
       setTbn2PelementorCached('');
+    }
+  };
+
+  // Fetch discovered_images_regolith for selected gcon piece
+  const tbn2_fetchDiscoveredImagesRegolith = async (gconPieceId: string) => {
+    if (!user?.id || !gconPieceId) {
+      setTbn2DiscoveredImagesRegolith('');
+      return;
+    }
+    
+    try {
+      const userValidation = await tbn2_validateUserAccess(user.id);
+      if (!userValidation.success) return;
+      
+      const { data, error } = await supabase
+        .from('gcon_pieces')
+        .select('discovered_images_regolith')
+        .eq('fk_users_id', userValidation.internalUserId)
+        .eq('id', gconPieceId)
+        .single();
+        
+      if (!error && data) {
+        // Handle null or empty data gracefully
+        const rawRegolithData = data.discovered_images_regolith;
+        let regolithData = '';
+        
+        if (rawRegolithData) {
+          // Check if it's already a string or needs to be converted from object
+          if (typeof rawRegolithData === 'string') {
+            regolithData = rawRegolithData;
+          } else if (typeof rawRegolithData === 'object') {
+            // Convert object to JSON string
+            regolithData = JSON.stringify(rawRegolithData);
+          }
+        }
+        
+        setTbn2DiscoveredImagesRegolith(regolithData);
+      } else {
+        setTbn2DiscoveredImagesRegolith('');
+      }
+    } catch (err) {
+      console.error('Error fetching discovered images regolith:', err);
+      setTbn2DiscoveredImagesRegolith('');
     }
   };
 
@@ -2548,12 +2593,13 @@ export default function Tebnar2Main() {
             <div className="flex border-b border-gray-200 mb-2">
               {[
                 { id: 'utab1', label: 'el. cradles tab' },
-                { id: 'utab2', label: 'utab2' },
-                { id: 'utab3', label: 'pelementor' }
+                { id: 'utab2', label: 'regolith' },
+                { id: 'utab3', label: 'pelementor' },
+                { id: 'utab4', label: 'rhino_replace' }
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setTbn2ActiveImageDiscoveryTab(tab.id as 'utab1' | 'utab2' | 'utab3')}
+                  onClick={() => setTbn2ActiveImageDiscoveryTab(tab.id as 'utab1' | 'utab2' | 'utab3' | 'utab4')}
                   className={`px-3 py-1 text-sm font-medium border-b-2 transition-colors ${
                     tbn2_activeImageDiscoveryTab === tab.id
                       ? 'border-blue-500 text-blue-600 bg-blue-50'
@@ -2697,6 +2743,57 @@ export default function Tebnar2Main() {
                         {tbn2_selectedGconPieceId ? 'No pelementor cached data available' : 'Select a gcon piece to view pelementor cached data'}
                       </div>
                     )}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {tbn2_activeImageDiscoveryTab === 'utab4' && (
+              <div>
+                {/* Rhino Replace interface */}
+                <div className="mt-3">
+                  <div className="text-gray-700 mb-3">
+                    {tbn2_selectedRows.size} images currently selected
+                  </div>
+                  <button
+                    onClick={() => {
+                      // No functionality yet - placeholder
+                    }}
+                    className="px-3 py-2 text-sm font-medium rounded border transition-colors bg-purple-600 text-white border-purple-600 hover:bg-purple-700"
+                  >
+                    run rhino_replace
+                  </button>
+                  
+                  {/* Progress tracking table */}
+                  <div className="mt-4">
+                    <table style={{ border: '1px solid black', borderCollapse: 'collapse', width: '100%' }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ border: '1px solid black', padding: '8px' }}>Narpi Push Record</td>
+                          <td style={{ border: '1px solid black', padding: '8px' }}>
+                            <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
+                              <div style={{ width: '0%', height: '100%', backgroundColor: '#d0d0d0' }}></div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ border: '1px solid black', padding: '8px' }}>Narpi Push Upload</td>
+                          <td style={{ border: '1px solid black', padding: '8px' }}>
+                            <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
+                              <div style={{ width: '0%', height: '100%', backgroundColor: '#d0d0d0' }}></div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ border: '1px solid black', padding: '8px' }}>Cliff Arrangement</td>
+                          <td style={{ border: '1px solid black', padding: '8px' }}>
+                            <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
+                              <div style={{ width: '0%', height: '100%', backgroundColor: '#d0d0d0' }}></div>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>

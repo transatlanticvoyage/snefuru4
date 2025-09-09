@@ -100,15 +100,15 @@ function discoverActualImages(data: any, path: string = '', level: number = 0): 
   // Look for actual images in common image fields
   const imageFields = [
     'image', 'background_image', 'bg_image', 'icon_image', 'logo',
-    'gallery', 'slider_images', 'carousel_images', 'hero_image',
+    'gallery', 'slider_images', 'carousel_images', 'carousel', 'hero_image',
     'featured_image', 'thumbnail', 'banner_image', 'media'
   ];
 
   // Check direct fields
   for (const field of imageFields) {
     if (data[field] !== undefined) {
-      if (field === 'gallery' && Array.isArray(data[field])) {
-        // Handle gallery arrays
+      if ((field === 'gallery' || field === 'carousel') && Array.isArray(data[field])) {
+        // Handle gallery and carousel arrays
         data[field].forEach((galleryItem: any, index: number) => {
           const image = processImageValue(galleryItem, `${field}[${index}]`, data);
           if (image) images.push(image);
@@ -124,8 +124,8 @@ function discoverActualImages(data: any, path: string = '', level: number = 0): 
   if (data.settings && typeof data.settings === 'object') {
     for (const field of imageFields) {
       if (data.settings[field] !== undefined) {
-        if (field === 'gallery' && Array.isArray(data.settings[field])) {
-          // Handle gallery arrays in settings
+        if ((field === 'gallery' || field === 'carousel') && Array.isArray(data.settings[field])) {
+          // Handle gallery and carousel arrays in settings
           data.settings[field].forEach((galleryItem: any, index: number) => {
             const image = processImageValue(galleryItem, `settings.${field}[${index}]`, data);
             if (image) images.push(image);
