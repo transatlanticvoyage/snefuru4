@@ -23,6 +23,8 @@ export default function Tebnar2Filters({
     <>
       {/* Black bar with batch dropdown, only on tebnar2 - exact clone from tebnar1 */}
       <div className="sticky top-0 w-full h-10 bg-black z-30 flex items-center px-4 text-white space-x-4">
+        {/* GREEN TEST ELEMENT - Tebnar2Filters */}
+        <div style={{ width: '20px', height: '20px', backgroundColor: 'green', marginLeft: '200px', marginRight: '10px' }}></div>
         <span>rel_images_plans_batches_id</span>
         <select
           value={selectedBatchId}

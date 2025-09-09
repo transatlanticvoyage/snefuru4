@@ -113,6 +113,9 @@ export default function Tebnar2Main() {
   const [tbn2_activePopupTab, setTbn2ActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab6');
   const [tbn2_activeImageDiscoveryTab, setTbn2ActiveImageDiscoveryTab] = useState<'utab1' | 'utab2' | 'utab3' | 'utab4'>('utab4');
   
+  // Bezel chamber visibility state
+  const [tbn2_medievalChamberVisible, setTbn2MedievalChamberVisible] = useState(false);
+  
   // State for pelementor_cached data
   const [tbn2_pelementorCached, setTbn2PelementorCached] = useState<string>('');
   
@@ -1340,6 +1343,31 @@ export default function Tebnar2Main() {
       setTbn2DiscoveredImagesRegolith('');
     }
   }, [tbn2_selectedGconPieceId]);
+
+  // Initialize medieval chamber visibility from localStorage and listen for bezel events
+  useEffect(() => {
+    // Initialize from localStorage
+    const savedVisibility = localStorage.getItem('tebnar2_medievalChamberVisible');
+    if (savedVisibility !== null) {
+      setTbn2MedievalChamberVisible(JSON.parse(savedVisibility));
+    } else {
+      // Default to false (hidden) and save it
+      setTbn2MedievalChamberVisible(false);
+      localStorage.setItem('tebnar2_medievalChamberVisible', JSON.stringify(false));
+    }
+
+    // Listen for bezel visibility change events
+    const handleMedievalChamberVisibilityChange = (event: CustomEvent) => {
+      const { visible } = event.detail;
+      setTbn2MedievalChamberVisible(visible);
+    };
+
+    window.addEventListener('medievalChamberVisibilityChange', handleMedievalChamberVisibilityChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('medievalChamberVisibilityChange', handleMedievalChamberVisibilityChange as EventListener);
+    };
+  }, []);
 
   // Fetch custom colors for uelbar37 and uelbar38 - cloned from nwjar1
   useEffect(() => {
@@ -3839,7 +3867,7 @@ export default function Tebnar2Main() {
       </div>
 
       {/* medieval_chamber - Container for table configuration controls */}
-      <div className="mb-6 p-4 border border-black bg-white" style={{ border: '1px solid black', backgroundColor: '#ffffff' }}>
+      <div className={`mb-6 p-4 border border-black bg-white medieval_chamber_div ${tbn2_medievalChamberVisible ? '' : 'hidden'}`} style={{ border: '1px solid black', backgroundColor: '#ffffff' }}>
         <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>medieval_chamber</div>
         
         {/* Column Template Controls - positioned just above the main table */}
