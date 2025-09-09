@@ -271,147 +271,277 @@ function createImageReplacementMapFromNarpi(
   return map;
 }
 
-// Helper: Replace images in Elementor data (copied from rhino-replace)
+// Helper: Replace images in Elementor data with proper JSON traversal
 function replaceImagesInElementorData(
   elementorData: any,
   replacementMap: Record<string, ImageUploadResult>,
   regolithImages: any[] = []
 ): { data: any, replacements_made: number } {
   let replacementsMade = 0;
+  const wasString = typeof elementorData === 'string';
   
-  // Handle different data formats - could be string or object
-  let dataString: string;
+  // Parse data into workable format
   let parsedData: any;
-  
-  if (typeof elementorData === 'string') {
-    // Data is already a JSON string
-    dataString = elementorData;
-    try {
+  try {
+    if (wasString) {
       parsedData = JSON.parse(elementorData);
-    } catch (e) {
-      console.error('🚨 Failed to parse elementor data string:', e);
-      return { data: elementorData, replacements_made: 0 };
+    } else {
+      parsedData = JSON.parse(JSON.stringify(elementorData)); // Deep clone
     }
-  } else {
-    // Data is an object, need to stringify for URL replacement
-    parsedData = elementorData;
-    dataString = JSON.stringify(elementorData);
+  } catch (e) {
+    console.error('🚨 Failed to parse elementor data:', e);
+    return { data: elementorData, replacements_made: 0 };
   }
+
+  console.log(`🔍 Enhanced Debug: Processing ${wasString ? 'string' : 'object'} elementor data with ${Object.keys(replacementMap).length} replacements`);
   
-  let updatedDataString = dataString;
+  // Validate structure
+  if (!Array.isArray(parsedData)) {
+    console.error('🚨 Invalid Elementor data structure: expected array');
+    return { data: elementorData, replacements_made: 0 };
+  }
 
-  console.log(`🔍 Debug: elementorData type: ${typeof elementorData}`);
-  console.log(`🔍 Debug: dataString length: ${dataString.length}`);
-  console.log(`🔍 Debug: First 500 chars of dataString: ${dataString.substring(0, 500)}`);
-
-  // Replace URLs in the serialized data
+  // Process each replacement with structured approach
   Object.keys(replacementMap).forEach(oldUrl => {
     const newImage = replacementMap[oldUrl];
-    if (newImage.img_url_returned && newImage.wp_img_id_returned) {
-      console.log(`🔍 Searching for URL: "${oldUrl}"`);
-      console.log(`🔍 Replacing with: "${newImage.img_url_returned}"`);
-      
-      // Replace URL instances - this is the actual image replacement
-      const urlRegex = new RegExp(escapeRegExp(oldUrl), 'g');
-      const urlMatches = (updatedDataString.match(urlRegex) || []).length;
-      
-      console.log(`🔍 Found ${urlMatches} matches for URL: ${oldUrl}`);
-      
-      if (urlMatches > 0) {
-        updatedDataString = updatedDataString.replace(urlRegex, newImage.img_url_returned);
-        console.log(`✅ Successfully replaced ${urlMatches} instances of ${oldUrl}`);
-      } else {
-        console.log(`❌ No matches found for ${oldUrl} in elementor data`);
-        // Let's check for URL variations
-        const variations = [
-          oldUrl.replace('http://', 'https://'),
-          oldUrl.replace('https://', 'http://'),
-          oldUrl.replace(/^https?:\/\/[^\/]+/, ''), // Just the path
-          oldUrl.replace(/\//g, '\\/'), // Escaped slashes for JSON
-        ];
-        
-        variations.forEach((variation, index) => {
-          const varMatches = (updatedDataString.match(new RegExp(escapeRegExp(variation), 'g')) || []).length;
-          console.log(`🔍 Variation ${index + 1} "${variation}": ${varMatches} matches`);
-        });
-      }
-      
-      // Count only URL replacements (each URL replacement = 1 image replaced)
-      replacementsMade += urlMatches;
-      
-      // Also update specific attachment IDs from regolith data but don't count them separately
-      // We need to be more targeted here - only replace the specific old attachment ID
-      const matchingImage = regolithImages.find((img: any) => img.url === oldUrl);
-      
-      if (matchingImage && matchingImage.image_metadata?.attachment_id) {
-        const oldAttachmentId = matchingImage.image_metadata.attachment_id;
-        const attachmentIdRegex = new RegExp(`"id":\\s*${oldAttachmentId}\\b`, 'g');
-        const idMatches = (updatedDataString.match(attachmentIdRegex) || []).length;
-        updatedDataString = updatedDataString.replace(attachmentIdRegex, `"id": ${newImage.wp_img_id_returned}`);
-        console.log(`🔧 Updated ${idMatches} attachment ID references from ${oldAttachmentId} to ${newImage.wp_img_id_returned}`);
-      }
+    if (!newImage.img_url_returned || !newImage.wp_img_id_returned) {
+      console.log(`⚠️ Skipping incomplete replacement for ${oldUrl}`);
+      return;
     }
+
+    console.log(`🔄 Processing replacement: ${oldUrl} -> ${newImage.img_url_returned}`);
+    
+    // Find and update attachment ID from regolith data
+    const matchingImage = regolithImages.find((img: any) => img.url === oldUrl);
+    const oldAttachmentId = matchingImage?.image_metadata?.attachment_id;
+    
+    const count = replaceImagesInElements(parsedData, oldUrl, newImage, oldAttachmentId);
+    replacementsMade += count;
+    
+    console.log(`✅ Made ${count} replacements for ${oldUrl}`);
   });
 
+  // Return in original format
   try {
-    // Parse the updated data string back to object
-    const updatedParsedData = JSON.parse(updatedDataString);
+    const returnData = wasString ? JSON.stringify(parsedData) : parsedData;
     
-    // Return the data in the same format it was received
-    // If original was a string, return string; if object, return object
-    const returnData = typeof elementorData === 'string' ? updatedDataString : updatedParsedData;
+    console.log(`🎯 Enhanced replacement completed: ${replacementsMade} total replacements made`);
     
     return {
       data: returnData,
       replacements_made: replacementsMade
     };
   } catch (e) {
-    console.error('🚨 Failed to parse updated data string:', e);
-    // Fallback to original data if parsing fails
-    return {
-      data: elementorData,
-      replacements_made: 0
-    };
+    console.error('🚨 Failed to serialize updated data:', e);
+    return { data: elementorData, replacements_made: 0 };
   }
 }
 
-// Helper: Update WordPress page via Snefuruplin API (copied from rhino-replace)
+// Recursive function to replace images in Elementor elements
+function replaceImagesInElements(
+  elements: any, 
+  oldUrl: string, 
+  newImage: ImageUploadResult,
+  oldAttachmentId?: number
+): number {
+  if (!Array.isArray(elements) && typeof elements !== 'object') {
+    return 0;
+  }
+  
+  let count = 0;
+  
+  if (Array.isArray(elements)) {
+    // Process array of elements
+    elements.forEach(element => {
+      count += replaceImagesInElements(element, oldUrl, newImage, oldAttachmentId);
+    });
+  } else if (typeof elements === 'object' && elements !== null) {
+    // Process individual element
+    
+    // Check for image widget
+    if (elements.widgetType === 'image' && elements.settings?.image) {
+      if (elements.settings.image.url === oldUrl) {
+        elements.settings.image.url = newImage.img_url_returned;
+        elements.settings.image.id = newImage.wp_img_id_returned;
+        count++;
+        console.log(`🖼️ Updated image widget: ${oldUrl} -> ${newImage.img_url_returned}`);
+      }
+    }
+    
+    // Check for background images in any element settings
+    if (elements.settings) {
+      count += replaceBackgroundImages(elements.settings, oldUrl, newImage, oldAttachmentId);
+    }
+    
+    // Check for gallery widget
+    if (elements.widgetType === 'image-gallery' && elements.settings?.gallery) {
+      if (Array.isArray(elements.settings.gallery)) {
+        elements.settings.gallery.forEach((galleryItem: any) => {
+          if (galleryItem.url === oldUrl) {
+            galleryItem.url = newImage.img_url_returned;
+            galleryItem.id = newImage.wp_img_id_returned;
+            count++;
+            console.log(`🖼️ Updated gallery image: ${oldUrl} -> ${newImage.img_url_returned}`);
+          }
+        });
+      }
+    }
+    
+    // Check for carousel and other complex widgets
+    if (elements.settings?.slides && Array.isArray(elements.settings.slides)) {
+      elements.settings.slides.forEach((slide: any) => {
+        count += replaceImagesInElements(slide, oldUrl, newImage, oldAttachmentId);
+      });
+    }
+    
+    // Update specific attachment ID references if we have the old ID
+    if (oldAttachmentId && typeof elements === 'object') {
+      count += replaceAttachmentIds(elements, oldAttachmentId, newImage.wp_img_id_returned);
+    }
+    
+    // Recursively process nested elements
+    if (elements.elements && Array.isArray(elements.elements)) {
+      count += replaceImagesInElements(elements.elements, oldUrl, newImage, oldAttachmentId);
+    }
+    
+    // Process other nested structures
+    Object.keys(elements).forEach(key => {
+      if (key !== 'elements' && key !== 'settings') {
+        if (typeof elements[key] === 'object') {
+          count += replaceImagesInElements(elements[key], oldUrl, newImage, oldAttachmentId);
+        }
+      }
+    });
+  }
+  
+  return count;
+}
+
+// Helper to replace background images in settings
+function replaceBackgroundImages(
+  settings: any, 
+  oldUrl: string, 
+  newImage: ImageUploadResult,
+  oldAttachmentId?: number
+): number {
+  let count = 0;
+  
+  // Standard background image
+  if (settings.background_image?.url === oldUrl) {
+    settings.background_image.url = newImage.img_url_returned;
+    settings.background_image.id = newImage.wp_img_id_returned;
+    count++;
+    console.log(`🎨 Updated background image: ${oldUrl} -> ${newImage.img_url_returned}`);
+  }
+  
+  // Section background
+  if (settings.background_background === 'classic' && settings.background_image?.url === oldUrl) {
+    settings.background_image.url = newImage.img_url_returned;
+    settings.background_image.id = newImage.wp_img_id_returned;
+    count++;
+  }
+  
+  // Overlay background
+  if (settings.background_overlay_image?.url === oldUrl) {
+    settings.background_overlay_image.url = newImage.img_url_returned;
+    settings.background_overlay_image.id = newImage.wp_img_id_returned;
+    count++;
+  }
+  
+  // Check all settings for any image references
+  Object.keys(settings).forEach(key => {
+    if (typeof settings[key] === 'object' && settings[key]?.url === oldUrl) {
+      settings[key].url = newImage.img_url_returned;
+      if (settings[key].hasOwnProperty('id')) {
+        settings[key].id = newImage.wp_img_id_returned;
+        count++;
+        console.log(`🔧 Updated setting ${key}: ${oldUrl} -> ${newImage.img_url_returned}`);
+      }
+    }
+  });
+  
+  return count;
+}
+
+// Helper to replace attachment ID references
+function replaceAttachmentIds(obj: any, oldId: number, newId: number): number {
+  let count = 0;
+  
+  if (typeof obj !== 'object' || obj === null) {
+    return count;
+  }
+  
+  Object.keys(obj).forEach(key => {
+    if (key === 'id' && obj[key] === oldId) {
+      obj[key] = newId;
+      count++;
+      console.log(`🔢 Updated attachment ID: ${oldId} -> ${newId}`);
+    } else if (typeof obj[key] === 'object') {
+      count += replaceAttachmentIds(obj[key], oldId, newId);
+    }
+  });
+  
+  return count;
+}
+
+// Helper: Update WordPress page via Enhanced Snefuruplin API
 async function updateWordPressPage(
   siteUrl: string,
   postId: number,
   elementorData: any,
   apiKey: string
 ): Promise<boolean> {
-  try {
-    const endpoint = `https://${siteUrl}/wp-json/snefuru/v1/posts/${postId}/elementor`;
-    
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'User-Agent': 'Snefuru-RhinoCliffOnly/1.0'
-      },
-      body: JSON.stringify({
-        elementor_data: JSON.stringify(elementorData)
-      })
-    });
+  // Try native method first (most robust), fall back to enhanced method
+  const endpoints = [
+    { name: 'native', url: `https://${siteUrl}/wp-json/snefuru/v1/posts/${postId}/elementor-native` },
+    { name: 'enhanced', url: `https://${siteUrl}/wp-json/snefuru/v1/posts/${postId}/elementor` },
+    { name: 'legacy', url: `https://${siteUrl}/wp-json/snefuru/v1/posts/${postId}/elementor-legacy` }
+  ];
+  
+  for (const endpoint of endpoints) {
+    try {
+      console.log(`🔄 Attempting ${endpoint.name} WordPress update for post ${postId}`);
+      
+      const response = await fetch(endpoint.url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'User-Agent': 'Snefuru-RhinoCliffOnly/2.0'
+        },
+        body: JSON.stringify({
+          elementor_data: JSON.stringify(elementorData)
+        })
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ WordPress update failed: ${response.status} ${response.statusText}`);
-      console.error(`Response: ${errorText}`);
-      return false;
+      if (response.ok) {
+        const result = await response.json();
+        console.log(`✅ WordPress page updated successfully using ${endpoint.name} method:`, result);
+        return true;
+      } else {
+        const errorText = await response.text();
+        console.warn(`⚠️ ${endpoint.name} method failed: ${response.status} ${response.statusText}`);
+        console.warn(`Response: ${errorText.substring(0, 500)}`);
+        
+        // If it's the last endpoint, this will be treated as the final error
+        if (endpoint === endpoints[endpoints.length - 1]) {
+          console.error(`❌ All WordPress update methods failed. Last error: ${errorText}`);
+          return false;
+        }
+      }
+
+    } catch (error) {
+      console.warn(`⚠️ ${endpoint.name} method exception:`, error);
+      
+      // If it's the last endpoint, this will be treated as the final error
+      if (endpoint === endpoints[endpoints.length - 1]) {
+        console.error('💥 All WordPress update methods failed with exceptions');
+        return false;
+      }
     }
-
-    const result = await response.json();
-    console.log(`✅ WordPress page updated successfully:`, result);
-    return true;
-
-  } catch (error) {
-    console.error('💥 WordPress update error:', error);
-    return false;
   }
+  
+  return false;
 }
 
 // Helper: Escape string for regex (copied from rhino-replace)
