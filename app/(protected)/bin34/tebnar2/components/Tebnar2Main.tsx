@@ -3194,7 +3194,9 @@ export default function Tebnar2Main() {
                       !tbn2_selectedBatchId || 
                       !tbn2_selectedSitesprenId ||
                       (tbn2_usePreExistingNarpi 
-                        ? !tbn2_selectedNarpiPushId 
+                        ? (tbn2_narpiInputMethod === 'dropdown' 
+                            ? !tbn2_selectedNarpiPushId 
+                            : !tbn2_manualNarpiPushId)
                         : tbn2_selectedRows.size === 0
                       )
                     }
@@ -3204,7 +3206,9 @@ export default function Tebnar2Main() {
                       !tbn2_selectedBatchId || 
                       !tbn2_selectedSitesprenId ||
                       (tbn2_usePreExistingNarpi 
-                        ? !tbn2_selectedNarpiPushId 
+                        ? (tbn2_narpiInputMethod === 'dropdown' 
+                            ? !tbn2_selectedNarpiPushId 
+                            : !tbn2_manualNarpiPushId)
                         : tbn2_selectedRows.size === 0
                       )
                         ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'

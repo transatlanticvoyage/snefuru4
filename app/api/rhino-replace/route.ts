@@ -578,9 +578,9 @@ async function performCliffArrangement(
         imagesToReplace,
         supabase,
         gcon_piece_id,
-        sitesprenData,
+        gconPiece,  // sitespren data is in gconPiece.asn_sitespren_base
         gconPiece,
-        uploadedImages
+        uploaded_images
       );
       updatedElementorData = updateResult.data;
       replacementsMade = updateResult.replacements_made;
@@ -640,7 +640,7 @@ async function performCliffArrangement(
             freshRegolithData.discovered_images,
             supabase,
             gcon_piece_id,
-            sitesprenData,
+            gconPiece,  // sitespren data is in gconPiece.asn_sitespren_base
             gconPiece,
             uploaded_images
           );
@@ -836,7 +836,7 @@ async function replaceImagesInElementorData(
     console.log(`⚠️ LOW MATCH RATE DETECTED: Only ${matchPercentage.toFixed(1)}% match - trying live Elementor data fetch`);
     try {
       // Fetch current live Elementor data directly from WordPress
-      const liveElementorData = await fetchLiveElementorData(sitesprenData?.sitespren_base || '', gconPieceData?.g_post_id || 0);
+      const liveElementorData = await fetchLiveElementorData(sitesprenData?.asn_sitespren_base || '', gconPieceData?.g_post_id || 0);
       if (liveElementorData) {
         console.log(`✅ Successfully fetched live Elementor data`);
         
