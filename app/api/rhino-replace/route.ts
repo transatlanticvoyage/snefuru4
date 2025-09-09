@@ -940,7 +940,11 @@ async function replaceImagesInElementorData(
   }
 }
 
-// Recursive function to replace images in Elementor elements
+// CLIFF ENHANCED: Recursive function to replace images in Elementor elements
+// FIXES APPLIED:
+// 1. Fixed image-carousel detection (carousel vs slides)
+// 2. Added complete property preservation for all image objects
+// 3. Enhanced logging for troubleshooting
 function replaceImagesInElements(
   elements: any, 
   oldUrl: string, 
@@ -990,7 +994,21 @@ function replaceImagesInElements(
       }
     }
     
-    // Check for carousel and other complex widgets
+    // FIXED: Check for image carousel widget (was looking for 'slides' instead of 'carousel')
+    if (elements.widgetType === 'image-carousel' && elements.settings?.carousel) {
+      if (Array.isArray(elements.settings.carousel)) {
+        elements.settings.carousel.forEach((carouselItem: any) => {
+          if (carouselItem.url === oldUrl) {
+            carouselItem.url = newImage.img_url_returned;
+            carouselItem.id = newImage.wp_img_id_returned;
+            count++;
+            console.log(`🖼️ CLIFF FIXED: Updated carousel image: ${oldUrl} -> ${newImage.img_url_returned}`);
+          }
+        });
+      }
+    }
+    
+    // Check for other slide-based widgets (keeping original logic for non-carousel widgets)
     if (elements.settings?.slides && Array.isArray(elements.settings.slides)) {
       elements.settings.slides.forEach((slide: any) => {
         count += replaceImagesInElements(slide, oldUrl, newImage, oldAttachmentId);
@@ -1020,7 +1038,11 @@ function replaceImagesInElements(
   return count;
 }
 
-// Helper to replace background images in settings
+// CLIFF ENHANCED: Helper to replace background images in settings
+// FIXES APPLIED:
+// 1. Complete property preservation (alt, source, size, etc.)
+// 2. Enhanced logging for debugging
+// 3. Handles all background image variants
 function replaceBackgroundImages(
   settings: any, 
   oldUrl: string, 
@@ -1029,37 +1051,54 @@ function replaceBackgroundImages(
 ): number {
   let count = 0;
   
-  // Standard background image
+  // FIXED: Standard background image with property preservation
   if (settings.background_image?.url === oldUrl) {
-    settings.background_image.url = newImage.img_url_returned;
-    settings.background_image.id = newImage.wp_img_id_returned;
+    const preservedProps = { ...settings.background_image };
+    settings.background_image = {
+      ...preservedProps,
+      url: newImage.img_url_returned,
+      id: newImage.wp_img_id_returned
+    };
     count++;
-    console.log(`🎨 Updated background image: ${oldUrl} -> ${newImage.img_url_returned}`);
+    console.log(`🎨 CLIFF FIXED: Updated background image with preserved properties: ${oldUrl} -> ${newImage.img_url_returned}`);
+    console.log(`🎨 Preserved properties: ${Object.keys(preservedProps).join(', ')}`);
   }
   
-  // Section background
+  // FIXED: Section background with property preservation
   if (settings.background_background === 'classic' && settings.background_image?.url === oldUrl) {
-    settings.background_image.url = newImage.img_url_returned;
-    settings.background_image.id = newImage.wp_img_id_returned;
+    const preservedProps = { ...settings.background_image };
+    settings.background_image = {
+      ...preservedProps,
+      url: newImage.img_url_returned,
+      id: newImage.wp_img_id_returned
+    };
     count++;
+    console.log(`🎨 CLIFF FIXED: Updated section background with preserved properties`);
   }
   
-  // Overlay background
+  // FIXED: Overlay background with property preservation
   if (settings.background_overlay_image?.url === oldUrl) {
-    settings.background_overlay_image.url = newImage.img_url_returned;
-    settings.background_overlay_image.id = newImage.wp_img_id_returned;
+    const preservedProps = { ...settings.background_overlay_image };
+    settings.background_overlay_image = {
+      ...preservedProps,
+      url: newImage.img_url_returned,
+      id: newImage.wp_img_id_returned
+    };
     count++;
+    console.log(`🎨 CLIFF FIXED: Updated overlay background with preserved properties`);
   }
   
-  // Check all settings for any image references
+  // FIXED: Check all settings for any image references with property preservation
   Object.keys(settings).forEach(key => {
     if (typeof settings[key] === 'object' && settings[key]?.url === oldUrl) {
-      settings[key].url = newImage.img_url_returned;
-      if (settings[key].hasOwnProperty('id')) {
-        settings[key].id = newImage.wp_img_id_returned;
-        count++;
-        console.log(`🔧 Updated setting ${key}: ${oldUrl} -> ${newImage.img_url_returned}`);
-      }
+      const preservedProps = { ...settings[key] };
+      settings[key] = {
+        ...preservedProps,
+        url: newImage.img_url_returned,
+        id: newImage.wp_img_id_returned
+      };
+      count++;
+      console.log(`🔧 CLIFF FIXED: Updated setting ${key} with preserved properties: ${oldUrl} -> ${newImage.img_url_returned}`);
     }
   });
   
