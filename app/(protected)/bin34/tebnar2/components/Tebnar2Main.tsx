@@ -2375,21 +2375,28 @@ export default function Tebnar2Main() {
       return;
     }
 
+    // Check if either SOPTION1 or SOPTION2 is selected
+    if (!tbn2_kz101Checked && !tbn2_kz103Checked) {
+      alert('Please select either SOPTION1 (Use Your Current Selection) or SOPTION2 (Select All Items) first');
+      return;
+    }
+
     let itemsToProcess: string[] = [];
     
     if (tbn2_kz101Checked) {
       // SOPTION1: Use selected items
       if (tbn2_selectedRows.size === 0) {
-        alert('Please select at least one item from the table');
+        alert('Please select at least one item from the table using the checkboxes');
         return;
       }
       itemsToProcess = Array.from(tbn2_selectedRows);
     } else if (tbn2_kz103Checked) {
       // SOPTION2: Push all items in current view
+      if (tbn2_plans.length === 0) {
+        alert('No image plans available to process');
+        return;
+      }
       itemsToProcess = tbn2_plans.map(plan => plan.id);
-    } else {
-      alert('Please select SOPTION1 or SOPTION2 first');
-      return;
     }
 
     setTbn2F22Loading(true);
@@ -2570,21 +2577,28 @@ Recommendation: Check network connection and API availability`;
       return;
     }
 
+    // Check if either SOPTION1 or SOPTION2 is selected
+    if (!tbn2_kz101Checked && !tbn2_kz103Checked) {
+      alert('Please select either SOPTION1 (Use Your Current Selection) or SOPTION2 (Select All Items) first');
+      return;
+    }
+
     let itemsToProcess: string[] = [];
     
     if (tbn2_kz101Checked) {
       // SOPTION1: Use selected items
       if (tbn2_selectedRows.size === 0) {
-        alert('Please select at least one item from the table');
+        alert('Please select at least one item from the table using the checkboxes');
         return;
       }
       itemsToProcess = Array.from(tbn2_selectedRows);
     } else if (tbn2_kz103Checked) {
       // SOPTION2: Use all items in current filtered data
+      if (tbn2_plans.length === 0) {
+        alert('No image plans available to process');
+        return;
+      }
       itemsToProcess = tbn2_plans.map(plan => plan.id);
-    } else {
-      alert('Please select either SOPTION1 or SOPTION2');
-      return;
     }
 
     if (itemsToProcess.length === 0) {
@@ -4096,6 +4110,79 @@ Recommendation: Check network connection and API availability`;
                 )}
                 {tbn2_activePopupTab === 'ptab6' && (
                   <div>
+                    {/* Site Selection Widget for Popup - mirrors main page structure */}
+                    <div className="bg-white border border-gray-300 rounded-lg p-4 mb-4">
+                      <div className="text-gray-700 mb-2 font-semibold" style={{ fontSize: '16px' }}>
+                        images_plans_batches.asn_sitespren_id
+                      </div>
+                      <div className="text-gray-600 mb-3" style={{ fontSize: '14px' }}>
+                        Currently selected site: {tbn2_selectedSitesprenId ? tbn2_getSelectedSitesprenDisplay() : 'No site selected'}
+                      </div>
+                      
+                      {/* Site Selection Dropdown */}
+                      <div className="flex items-center space-x-2">
+                        <div className="relative" style={{ width: '300px' }}>
+                          <input
+                            type="text"
+                            value={tbn2_sitesprenDropdownOpen ? tbn2_sitesprenSearchTerm : (tbn2_selectedSitesprenId ? tbn2_getSelectedSitesprenDisplay() : '')}
+                            onChange={(e) => setTbn2SitesprenSearchTerm(e.target.value)}
+                            onFocus={() => {
+                              setTbn2SitesprenDropdownOpen(true);
+                              setTbn2SitesprenSearchTerm('');
+                            }}
+                            placeholder={!tbn2_selectedBatchId ? 'Select batch first' : 'Type to search by sitespren_base...'}
+                            disabled={!tbn2_selectedBatchId}
+                            className="w-full px-3 py-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            style={{ fontSize: '14px' }}
+                          />
+                          
+                          {tbn2_sitesprenDropdownOpen && tbn2_selectedBatchId && (
+                            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                              {tbn2_getFilteredSitesprenOptions().map((option) => (
+                                <div
+                                  key={option.id}
+                                  className="px-3 py-2 cursor-pointer hover:bg-gray-100"
+                                  onClick={() => {
+                                    setTbn2SelectedSitesprenId(option.id);
+                                    setTbn2SitesprenDropdownOpen(false);
+                                    setTbn2SitesprenSearchTerm('');
+                                    
+                                    // Find the sitespren_base for this ID
+                                    const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === option.id);
+                                    if (selectedSitespren) {
+                                      setTbn2CurrentSitesprenBase(selectedSitespren.sitespren_base);
+                                      tbn2_fetchGconPieces(selectedSitespren.sitespren_base);
+                                    }
+                                  }}
+                                  style={{ fontSize: '14px' }}
+                                >
+                                  <div className="font-medium">{tbn2_truncateUUID(option.id)} - {option.sitespren_base}</div>
+                                </div>
+                              ))}
+                              {tbn2_getFilteredSitesprenOptions().length === 0 && (
+                                <div className="px-3 py-2 text-gray-500" style={{ fontSize: '14px' }}>
+                                  No matching sites found
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <button
+                          onClick={tbn2_handleSitesprenSave}
+                          disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId || tbn2_sitesprenSaving}
+                          className={`px-3 py-1 text-white font-medium rounded ${
+                            !tbn2_selectedBatchId || !tbn2_selectedSitesprenId || tbn2_sitesprenSaving
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-blue-600 hover:bg-blue-700'
+                          }`}
+                          style={{ fontSize: '14px' }}
+                        >
+                          {tbn2_sitesprenSaving ? 'Saving...' : 'Save'}
+                        </button>
+                      </div>
+                    </div>
+
                     <h3 className="text-lg font-semibold mb-4">New Chepno Functions</h3>
                     
                     {/* Site Gadgets Section - Chepno Chamber - Extended Version */}
