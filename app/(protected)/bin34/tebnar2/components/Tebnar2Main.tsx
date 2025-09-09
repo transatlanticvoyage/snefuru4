@@ -112,6 +112,9 @@ export default function Tebnar2Main() {
   const [tbn2_kz103Checked, setTbn2Kz103Checked] = useState(false);
   const [tbn2_activePopupTab, setTbn2ActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
   const [tbn2_activeImageDiscoveryTab, setTbn2ActiveImageDiscoveryTab] = useState<'utab1' | 'utab2' | 'utab3'>('utab1');
+  
+  // State for pelementor_cached data
+  const [tbn2_pelementorCached, setTbn2PelementorCached] = useState<string>('');
   const [tbn2_uelBarColors, setTbn2UelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [tbn2_uelBar37Colors, setTbn2UelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [tbn2_currentUrl, setTbn2CurrentUrl] = useState<string>('');
@@ -1133,8 +1136,10 @@ export default function Tebnar2Main() {
   useEffect(() => {
     if (tbn2_selectedGconPieceId) {
       tbn2_fetchDiscoveredImgCradles(tbn2_selectedGconPieceId);
+      tbn2_fetchPelementorCached(tbn2_selectedGconPieceId);
     } else {
       setTbn2DiscoveredImgCradlesJson('');
+      setTbn2PelementorCached('');
     }
   }, [tbn2_selectedGconPieceId]);
 
@@ -1410,6 +1415,49 @@ export default function Tebnar2Main() {
     } catch (err) {
       console.error('Error fetching discovered img cradles:', err);
       setTbn2DiscoveredImgCradlesJson('');
+    }
+  };
+
+  // Fetch pelementor_cached for selected gcon piece
+  const tbn2_fetchPelementorCached = async (gconPieceId: string) => {
+    if (!user?.id || !gconPieceId) {
+      setTbn2PelementorCached('');
+      return;
+    }
+    
+    try {
+      const userValidation = await tbn2_validateUserAccess(user.id);
+      if (!userValidation.success) return;
+      
+      const { data, error } = await supabase
+        .from('gcon_pieces')
+        .select('pelementor_cached')
+        .eq('fk_users_id', userValidation.internalUserId)
+        .eq('id', gconPieceId)
+        .single();
+        
+      if (!error && data) {
+        // Handle null or empty data gracefully
+        const rawPelementorData = data.pelementor_cached;
+        let pelementorData = '';
+        
+        if (rawPelementorData) {
+          // Check if it's already a string or needs to be converted from object
+          if (typeof rawPelementorData === 'string') {
+            pelementorData = rawPelementorData;
+          } else if (typeof rawPelementorData === 'object') {
+            // Convert object to JSON string
+            pelementorData = JSON.stringify(rawPelementorData);
+          }
+        }
+        
+        setTbn2PelementorCached(pelementorData);
+      } else {
+        setTbn2PelementorCached('');
+      }
+    } catch (err) {
+      console.error('Error fetching pelementor cached:', err);
+      setTbn2PelementorCached('');
     }
   };
 
@@ -2501,7 +2549,7 @@ export default function Tebnar2Main() {
               {[
                 { id: 'utab1', label: 'el. cradles tab' },
                 { id: 'utab2', label: 'utab2' },
-                { id: 'utab3', label: 'utab3' }
+                { id: 'utab3', label: 'pelementor' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -2619,8 +2667,38 @@ export default function Tebnar2Main() {
             )}
             
             {tbn2_activeImageDiscoveryTab === 'utab3' && (
-              <div className="py-4">
-                <div className="text-gray-500 italic">utab3 content area - currently empty</div>
+              <div>
+                {/* Pelementor cached display */}
+                <div className="mt-3">
+                  <div className="font-bold text-gray-700 mb-2" style={{ fontSize: '16px' }}>pelementor_cached</div>
+                  <div 
+                    className="bg-gray-50 border border-gray-300 rounded p-3 overflow-auto font-mono text-sm"
+                    style={{ 
+                      maxHeight: '200px', 
+                      fontSize: '12px',
+                      lineHeight: '1.4'
+                    }}
+                  >
+                    {tbn2_pelementorCached ? (
+                      <pre className="whitespace-pre-wrap">
+                        {(() => {
+                          try {
+                            // Try to parse and format JSON nicely
+                            const parsed = JSON.parse(tbn2_pelementorCached);
+                            return JSON.stringify(parsed, null, 2);
+                          } catch (e) {
+                            // If it's not valid JSON, display as-is
+                            return tbn2_pelementorCached;
+                          }
+                        })()}
+                      </pre>
+                    ) : (
+                      <div className="text-gray-500 italic">
+                        {tbn2_selectedGconPieceId ? 'No pelementor cached data available' : 'Select a gcon piece to view pelementor cached data'}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
