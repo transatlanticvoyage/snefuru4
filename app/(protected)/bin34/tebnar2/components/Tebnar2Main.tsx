@@ -2380,17 +2380,6 @@ export default function Tebnar2Main() {
       return;
     }
 
-    // Check if either SOPTION1 or SOPTION2 is selected
-    if (!tbn2_kz101Checked && !tbn2_kz103Checked) {
-      setTbn2GadgetFeedback({
-        action: 'F22 NWPI to GCon Pusher',
-        message: 'Please select either SOPTION1 (Use Your Current Selection) or SOPTION2 (Select All Items) first.',
-        type: 'error',
-        timestamp: new Date().toISOString()
-      });
-      return;
-    }
-
     // Find the sitespren_base for the selected site
     const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === tbn2_selectedSitesprenId);
     if (!selectedSitespren) {
@@ -2403,7 +2392,7 @@ export default function Tebnar2Main() {
       return;
     }
 
-    // Both SOPTION1 and SOPTION2 will process all NWPI content for the selected site
+    // f22 processes ALL NWPI content for the selected site (regardless of SOPTION selection)
     // This is because f22 works with NWPI content (WordPress articles), not image plans
     console.log(`🔄 f22: Processing all NWPI content for site: ${selectedSitespren.sitespren_base}`);
 
@@ -2573,17 +2562,6 @@ export default function Tebnar2Main() {
       return;
     }
 
-    // Check if either SOPTION1 or SOPTION2 is selected
-    if (!tbn2_kz101Checked && !tbn2_kz103Checked) {
-      setTbn2GadgetFeedback({
-        action: 'F47 Generate GCon Pieces',
-        message: 'Please select either SOPTION1 (Use Your Current Selection) or SOPTION2 (Select All Items) first.',
-        type: 'error',
-        timestamp: new Date().toISOString()
-      });
-      return;
-    }
-
     // Find the sitespren_base for the selected site
     const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === tbn2_selectedSitesprenId);
     if (!selectedSitespren) {
@@ -2596,7 +2574,7 @@ export default function Tebnar2Main() {
       return;
     }
 
-    // Both SOPTION1 and SOPTION2 will process all NWPI content for the selected site
+    // f47 processes ALL NWPI content for the selected site (regardless of SOPTION selection)
     // This is because f47 works with NWPI content (WordPress articles), not image plans
     console.log(`🔄 f47: Processing all NWPI content for site: ${selectedSitespren.sitespren_base}`);
 
