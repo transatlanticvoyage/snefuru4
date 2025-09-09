@@ -29,7 +29,7 @@ export default function BezelButton({ showButton = true }: BezelButtonProps) {
         style={{ 
           top: '43px', // Position below hamburger (hamburger is at top: 1px with padding)
           left: '1px', 
-          backgroundColor: '#cecece',
+          backgroundColor: '#c5bf7a',
           width: '41px', // Match hamburger width (p-2 = 8px padding * 2 + icon width)
           padding: '2px',
           fontSize: '12px',

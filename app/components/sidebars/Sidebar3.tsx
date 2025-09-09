@@ -454,7 +454,7 @@ export default function Sidebar3({ isOpen, onToggle, showToggleButton = true, on
           style={{ top: '1px', left: '1px', backgroundColor: '#cecece' }}
           title="Toggle Navigation Menu"
         >
-          <svg className="h-5 w-5 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#7d7d79">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
