@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import {
+  validateImageUrls,
+  createElementorBackup,
+  validateElementorDataStructure,
+  replaceImagesInElementsFixed,
+  restoreFromBackup,
+  updateWordPressSafe,
+  type ImageUploadResult,
+  type ReplacementMap,
+  type ValidationResult,
+  type UpdateResult
+} from '../shared/rhino-safety-lib';
 
 interface RhinoReplaceRequest {
   gcon_piece_id: string;
@@ -489,13 +501,15 @@ async function uploadViaWordPressPlugin(
   }
 }
 
-// Phase 2: Perform Cliff Arrangement
+// Phase 2: ENHANCED CLIFF ARRANGEMENT with Safety Features
 async function performCliffArrangement(
   supabase: any,
   gcon_piece_id: string,
   uploaded_images: ImageUploadResult[],
   user_id: string
-) {
+): Promise<UpdateResult> {
+  console.log(`🏔️ CLIFF ENHANCED: Starting safe arrangement for gcon_piece: ${gcon_piece_id}`);
+  
   try {
     // Get user internal ID
     const { data: userData, error: userError } = await supabase
@@ -506,6 +520,17 @@ async function performCliffArrangement(
 
     if (userError || !userData || !userData.ruplin_api_key_1) {
       throw new Error('User not found or API key missing');
+    }
+
+    // ✅ SAFETY CHECK 1: Validate all image URLs before proceeding
+    console.log(`🔍 CLIFF ENHANCED: Validating ${uploaded_images.length} image URLs...`);
+    const urlsValid = await validateImageUrls(uploaded_images);
+    if (!urlsValid) {
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'Image URL validation failed - aborting to prevent broken images'
+      };
     }
 
     // Get gcon piece with regolith data and site info
@@ -524,16 +549,33 @@ async function performCliffArrangement(
       .single();
 
     if (gconError || !gconPiece) {
-      throw new Error('Gcon piece not found');
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'Gcon piece not found'
+      };
     }
 
     // Check if regolith data exists
     if (!gconPiece.discovered_images_regolith) {
-      throw new Error('No regolith data found - please run f331 discovery first');
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'No regolith data found - please run f331 discovery first'
+      };
     }
 
-    console.log(`📄 Processing page: ${gconPiece.meta_title} (${gconPiece.asn_sitespren_base})`);
+    console.log(`📄 CLIFF ENHANCED: Processing page: ${gconPiece.meta_title} (${gconPiece.asn_sitespren_base})`);
     console.log(`🎯 WordPress Post ID: ${gconPiece.g_post_id}`);
+
+    // ✅ SAFETY CHECK 2: Create backup before any changes
+    console.log(`💾 CLIFF ENHANCED: Creating backup of current Elementor data...`);
+    const backup_id = await createElementorBackup(
+      supabase,
+      gcon_piece_id,
+      gconPiece.pelementor_cached,
+      'cliff_pre_update'
+    );
 
     // Parse regolith data to find images to replace
     let regolithData;
@@ -542,11 +584,16 @@ async function performCliffArrangement(
         ? JSON.parse(gconPiece.discovered_images_regolith)
         : gconPiece.discovered_images_regolith;
     } catch (e) {
-      throw new Error('Invalid regolith data format');
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'Invalid regolith data format',
+        backup_id
+      };
     }
 
     const imagesToReplace = regolithData.discovered_images || [];
-    console.log(`🔄 Found ${imagesToReplace.length} images to replace from regolith discovery:`);
+    console.log(`🔄 CLIFF ENHANCED: Found ${imagesToReplace.length} images to replace from regolith discovery`);
     
     // Debug: Show what regolith discovered
     imagesToReplace.forEach((img: any, index: number) => {
@@ -557,39 +604,136 @@ async function performCliffArrangement(
       return {
         success: true,
         replacements_made: 0,
-        page_updated: false,
-        elementor_updated: false,
-        message: 'No images found to replace'
+        backup_id,
+        error: 'No images found to replace'
       };
     }
 
     // Create replacement mapping
     const replacementMap = createImageReplacementMap(imagesToReplace, uploaded_images);
-    console.log(`🗺️ Created replacement map for ${Object.keys(replacementMap).length} images`);
+    console.log(`🗺️ CLIFF ENHANCED: Created replacement map for ${Object.keys(replacementMap).length} images`);
 
-    // Update Elementor data with new images
+    // ✅ SAFETY CHECK 3: Validate Elementor data structure before processing
+    if (!validateElementorDataStructure(gconPiece.pelementor_cached)) {
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'Invalid Elementor data structure',
+        backup_id
+      };
+    }
+
+    // ✅ ENHANCED IMAGE REPLACEMENT with Fixed Widget Detection
     let updatedElementorData = gconPiece.pelementor_cached;
     let replacementsMade = 0;
 
     if (updatedElementorData) {
-      const updateResult = await replaceImagesInElementorData(
-        updatedElementorData, 
-        replacementMap,
-        imagesToReplace,
-        supabase,
-        gcon_piece_id,
-        gconPiece,  // sitespren data is in gconPiece.asn_sitespren_base
-        gconPiece,
-        uploaded_images
-      );
-      updatedElementorData = updateResult.data;
-      replacementsMade = updateResult.replacements_made;
-
-      console.log(`🔧 Made ${replacementsMade} image replacements in Elementor data`);
+      console.log(`🔧 CLIFF ENHANCED: Starting safe image replacement with fixed widget detection...`);
       
-      // Handle stale regolith detection
-      if ((updateResult as any).stale_regolith) {
-        console.log(`🔄 Stale regolith detected! Auto-refreshing and retrying...`);
+      // Parse Elementor data for processing
+      let parsedData;
+      try {
+        parsedData = typeof updatedElementorData === 'string' 
+          ? JSON.parse(updatedElementorData) 
+          : JSON.parse(JSON.stringify(updatedElementorData));
+      } catch (e) {
+        return {
+          success: false,
+          replacements_made: 0,
+          error: 'Failed to parse Elementor data for processing',
+          backup_id
+        };
+      }
+
+      // Use enhanced replacement function with all fixes
+      replacementsMade = replaceImagesInElementsFixed(parsedData, replacementMap);
+      
+      // Convert back to original format
+      updatedElementorData = typeof gconPiece.pelementor_cached === 'string' 
+        ? JSON.stringify(parsedData) 
+        : parsedData;
+
+      console.log(`🔧 CLIFF ENHANCED: Made ${replacementsMade} image replacements with property preservation`);
+    }
+
+    // ✅ SAFE WORDPRESS UPDATE with Rollback Protection
+    let pageUpdated = false;
+    if (replacementsMade > 0 && gconPiece.g_post_id) {
+      console.log(`🚀 CLIFF ENHANCED: Performing safe WordPress update (${replacementsMade} replacements made)...`);
+      
+      pageUpdated = await updateWordPressSafe(
+        gconPiece.asn_sitespren_base,
+        gconPiece.g_post_id,
+        updatedElementorData,
+        userData.ruplin_api_key_1
+      );
+      
+      if (!pageUpdated) {
+        console.log(`❌ WordPress update failed - performing automatic rollback...`);
+        const rollbackSuccess = await restoreFromBackup(
+          supabase,
+          backup_id,
+          gconPiece.asn_sitespren_base,
+          gconPiece.g_post_id,
+          userData.ruplin_api_key_1
+        );
+        
+        return {
+          success: false,
+          replacements_made: 0,
+          error: 'WordPress update failed',
+          backup_id,
+          rollback_performed: rollbackSuccess
+        };
+      }
+      
+      console.log(`✅ CLIFF ENHANCED: WordPress update completed successfully`);
+      console.log(`🌐 Check page at: https://${gconPiece.asn_sitespren_base}/?p=${gconPiece.g_post_id}`);
+      
+    } else if (replacementsMade === 0) {
+      console.log(`⚠️ CLIFF ENHANCED: No image replacements made - no WordPress update needed`);
+    } else {
+      console.log(`⚠️ CLIFF ENHANCED: Missing post ID (${gconPiece.g_post_id}) - cannot update WordPress`);
+    }
+
+    // Update gcon_pieces with new elementor data (only if successful)
+    if (replacementsMade > 0 && pageUpdated) {
+      await supabase
+        .from('gcon_pieces')
+        .update({ 
+          pelementor_cached: updatedElementorData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', gcon_piece_id);
+    }
+
+    return {
+      success: true,
+      replacements_made: replacementsMade,
+      backup_id,
+      replacement_details: Object.keys(replacementMap).map(oldUrl => ({
+        old_url: oldUrl,
+        new_wp_id: replacementMap[oldUrl].wp_img_id_returned,
+        new_url: replacementMap[oldUrl].img_url_returned
+      }))
+    };
+
+  } catch (error) {
+    console.error('🏔️ CLIFF ENHANCED: Critical error:', error);
+    
+    // Attempt rollback if we have a backup
+    if (backup_id) {
+      console.log(`🔄 Attempting emergency rollback...`);
+      await restoreFromBackup(supabase, backup_id, '', 0, '');
+    }
+    
+    return {
+      success: false,
+      replacements_made: 0,
+      error: error instanceof Error ? error.message : 'Cliff arrangement failed'
+    };
+  }
+}
         
         try {
           // Auto-refresh by rediscovering images from current elementor data

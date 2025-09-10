@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import {
+  validateImageUrls,
+  createElementorBackup,
+  validateElementorDataStructure,
+  replaceImagesInElementsFixed,
+  restoreFromBackup,
+  updateWordPressSafe,
+  type ImageUploadResult,
+  type ReplacementMap,
+  type ValidationResult,
+  type UpdateResult
+} from '../shared/rhino-safety-lib';
 
 interface MasonArrangeRequest {
   gcon_piece_id: string;
@@ -176,14 +188,16 @@ async function refreshRegolithData(
   }
 }
 
-// Phase 2: Enhanced Mason Arrangement using native WordPress methods
+// Phase 2: ENHANCED MASON ARRANGEMENT with Safety Features
 async function performMasonArrangement(
   supabase: any,
   gcon_piece_id: string,
   narpi_push_id: string,
   user_internal_id: string,
   ruplin_api_key: string
-) {
+): Promise<UpdateResult> {
+  console.log(`🏗️ MASON ENHANCED: Starting safe arrangement for gcon_piece: ${gcon_piece_id}`);
+  
   try {
     // Get gcon piece with fresh regolith data and site info
     const { data: gconPiece, error: gconError } = await supabase
@@ -201,7 +215,11 @@ async function performMasonArrangement(
       .single();
 
     if (gconError || !gconPiece) {
-      throw new Error('Gcon piece not found');
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'Gcon piece not found'
+      };
     }
 
     // Get narpi push data
@@ -212,11 +230,19 @@ async function performMasonArrangement(
       .single();
 
     if (narpiError || !narpiPushData) {
-      throw new Error('Narpi push not found');
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'Narpi push not found'
+      };
     }
 
     if (!narpiPushData.kareench1 || !Array.isArray(narpiPushData.kareench1)) {
-      throw new Error('Narpi push has no upload data');
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'Narpi push has no upload data'
+      };
     }
 
     // Filter successful uploads only
@@ -225,15 +251,43 @@ async function performMasonArrangement(
     );
 
     if (successfulUploads.length === 0) {
-      throw new Error('No successful uploads found in narpi push');
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'No successful uploads found in narpi push'
+      };
+    }
+
+    // ✅ SAFETY CHECK 1: Validate all image URLs before proceeding
+    console.log(`🔍 MASON ENHANCED: Validating ${successfulUploads.length} image URLs...`);
+    const urlsValid = await validateImageUrls(successfulUploads);
+    if (!urlsValid) {
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'Image URL validation failed - aborting to prevent broken images'
+      };
     }
 
     if (!gconPiece.discovered_images_regolith) {
-      throw new Error('No regolith data found - refresh was unsuccessful');
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'No regolith data found - refresh was unsuccessful'
+      };
     }
 
-    console.log(`🏗️ Mason: Processing page: ${gconPiece.meta_title} (${gconPiece.asn_sitespren_base})`);
+    console.log(`🏗️ MASON ENHANCED: Processing page: ${gconPiece.meta_title} (${gconPiece.asn_sitespren_base})`);
     console.log(`🎯 WordPress Post ID: ${gconPiece.g_post_id}`);
+
+    // ✅ SAFETY CHECK 2: Create backup before any changes
+    console.log(`💾 MASON ENHANCED: Creating backup of current Elementor data...`);
+    const backup_id = await createElementorBackup(
+      supabase,
+      gcon_piece_id,
+      gconPiece.pelementor_cached,
+      'mason_pre_update'
+    );
 
     // Parse fresh regolith data
     let regolithData;
@@ -242,70 +296,115 @@ async function performMasonArrangement(
         ? JSON.parse(gconPiece.discovered_images_regolith)
         : gconPiece.discovered_images_regolith;
     } catch (e) {
-      throw new Error('Invalid regolith data format');
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'Invalid regolith data format',
+        backup_id
+      };
     }
 
     const imagesToReplace = regolithData.discovered_images || [];
-    console.log(`🔄 Mason: Found ${imagesToReplace.length} images to replace`);
+    console.log(`🔄 MASON ENHANCED: Found ${imagesToReplace.length} images to replace`);
 
     if (imagesToReplace.length === 0) {
       return {
         success: true,
         replacements_made: 0,
-        page_updated: false,
-        cache_cleared: false,
-        update_method: 'none',
-        message: 'No images found to replace'
+        backup_id,
+        error: 'No images found to replace'
       };
     }
 
     // Create enhanced replacement mapping
     const replacementMap = createEnhancedReplacementMapping(imagesToReplace, successfulUploads);
-    console.log(`🗺️ Mason: Created enhanced replacement map for ${Object.keys(replacementMap).length} images`);
+    console.log(`🗺️ MASON ENHANCED: Created replacement map for ${Object.keys(replacementMap).length} images`);
 
-    // Update Elementor data with enhanced validation
+    // ✅ SAFETY CHECK 3: Validate Elementor data structure before processing
+    if (!validateElementorDataStructure(gconPiece.pelementor_cached)) {
+      return {
+        success: false,
+        replacements_made: 0,
+        error: 'Invalid Elementor data structure',
+        backup_id
+      };
+    }
+
+    // ✅ ENHANCED IMAGE REPLACEMENT with Fixed Widget Detection
     let updatedElementorData = gconPiece.pelementor_cached;
     let replacementsMade = 0;
 
     if (updatedElementorData) {
-      const updateResult = performEnhancedImageReplacement(
-        updatedElementorData, 
-        replacementMap,
-        imagesToReplace
-      );
-      updatedElementorData = updateResult.data;
-      replacementsMade = updateResult.replacements_made;
+      console.log(`🔧 MASON ENHANCED: Starting safe image replacement with fixed widget detection...`);
+      
+      // Parse Elementor data for processing
+      let parsedData;
+      try {
+        parsedData = typeof updatedElementorData === 'string' 
+          ? JSON.parse(updatedElementorData) 
+          : JSON.parse(JSON.stringify(updatedElementorData));
+      } catch (e) {
+        return {
+          success: false,
+          replacements_made: 0,
+          error: 'Failed to parse Elementor data for processing',
+          backup_id
+        };
+      }
 
-      console.log(`🔧 Mason: Made ${replacementsMade} enhanced image replacements`);
+      // Use enhanced replacement function with all fixes
+      replacementsMade = replaceImagesInElementsFixed(parsedData, replacementMap);
+      
+      // Convert back to original format
+      updatedElementorData = typeof gconPiece.pelementor_cached === 'string' 
+        ? JSON.stringify(parsedData) 
+        : parsedData;
+
+      console.log(`🔧 MASON ENHANCED: Made ${replacementsMade} image replacements with property preservation`);
     }
 
-    // Use enhanced WordPress update method - ONLY if actual replacements were made
+    // ✅ SAFE WORDPRESS UPDATE with Rollback Protection
     let pageUpdated = false;
-    let cacheCleared = false;
-    let updateMethod = 'none';
-    
     if (replacementsMade > 0 && gconPiece.g_post_id) {
-      console.log(`🚀 Mason: Sending updated data via enhanced WordPress API (${replacementsMade} replacements made)`);
+      console.log(`🚀 MASON ENHANCED: Performing safe WordPress update (${replacementsMade} replacements made)...`);
       
-      const updateResult = await updateWordPressPageEnhanced(
+      pageUpdated = await updateWordPressSafe(
         gconPiece.asn_sitespren_base,
         gconPiece.g_post_id,
         updatedElementorData,
         ruplin_api_key
       );
       
-      pageUpdated = updateResult.success;
-      cacheCleared = updateResult.cache_cleared;
-      updateMethod = updateResult.method_used;
+      if (!pageUpdated) {
+        console.log(`❌ WordPress update failed - performing automatic rollback...`);
+        const rollbackSuccess = await restoreFromBackup(
+          supabase,
+          backup_id,
+          gconPiece.asn_sitespren_base,
+          gconPiece.g_post_id,
+          ruplin_api_key
+        );
+        
+        return {
+          success: false,
+          replacements_made: 0,
+          error: 'WordPress update failed',
+          backup_id,
+          rollback_performed: rollbackSuccess
+        };
+      }
+      
+      console.log(`✅ MASON ENHANCED: WordPress update completed successfully`);
+      console.log(`🌐 Check page at: https://${gconPiece.asn_sitespren_base}/?p=${gconPiece.g_post_id}`);
       
     } else if (replacementsMade === 0) {
-      console.log(`⚠️ Mason: Skipping WordPress update - no image replacements were made`);
+      console.log(`⚠️ MASON ENHANCED: No image replacements made - no WordPress update needed`);
     } else {
-      console.log(`⚠️ Mason: Skipping WordPress update - missing post ID (${gconPiece.g_post_id})`);
+      console.log(`⚠️ MASON ENHANCED: Missing post ID (${gconPiece.g_post_id}) - cannot update WordPress`);
     }
 
-    // Update gcon_pieces with new pelementor_cached data
-    if (replacementsMade > 0) {
+    // Update gcon_pieces with new elementor data (only if successful)
+    if (replacementsMade > 0 && pageUpdated) {
       await supabase
         .from('gcon_pieces')
         .update({ 
@@ -318,9 +417,7 @@ async function performMasonArrangement(
     return {
       success: true,
       replacements_made: replacementsMade,
-      page_updated: pageUpdated,
-      cache_cleared: cacheCleared,
-      update_method: updateMethod,
+      backup_id,
       replacement_details: Object.keys(replacementMap).map(oldUrl => ({
         old_url: oldUrl,
         new_wp_id: replacementMap[oldUrl].wp_img_id_returned,
@@ -329,9 +426,17 @@ async function performMasonArrangement(
     };
 
   } catch (error) {
-    console.error('🏗️ Mason Arrangement error:', error);
+    console.error('🏗️ MASON ENHANCED: Critical error:', error);
+    
+    // Attempt rollback if we have a backup
+    if (backup_id) {
+      console.log(`🔄 Attempting emergency rollback...`);
+      await restoreFromBackup(supabase, backup_id, '', 0, '');
+    }
+    
     return {
       success: false,
+      replacements_made: 0,
       error: error instanceof Error ? error.message : 'Mason arrangement failed'
     };
   }
