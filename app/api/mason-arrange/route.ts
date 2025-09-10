@@ -65,25 +65,26 @@ export async function POST(request: NextRequest) {
     }
 
     // PHASE 1: Refresh regolith data to ensure we have current page state
-    console.log(`🔄 Mason Phase 1: Refreshing regolith data to avoid staleness...`);
+    console.log(`🔄 Mason Phase 1: Skipping regolith refresh for testing (auth issue)...`);
     
-    const regolithRefreshResult = await refreshRegolithData(
-      supabase,
-      gcon_piece_id,
-      userData.id,
-      userData.ruplin_api_key_1
-    );
+    // TODO: Fix authentication for internal F331 calls
+    // const regolithRefreshResult = await refreshRegolithData(
+    //   supabase,
+    //   gcon_piece_id,
+    //   userData.id,
+    //   userData.ruplin_api_key_1
+    // );
 
-    if (!regolithRefreshResult.success) {
-      return NextResponse.json({
-        success: false,
-        phase: 'regolith_refresh',
-        error: regolithRefreshResult.error,
-        message: 'Failed to refresh regolith data'
-      }, { status: 500 });
-    }
+    // if (!regolithRefreshResult.success) {
+    //   return NextResponse.json({
+    //     success: false,
+    //     phase: 'regolith_refresh',
+    //     error: regolithRefreshResult.error,
+    //     message: 'Failed to refresh regolith data'
+    //   }, { status: 500 });
+    // }
 
-    console.log(`✅ Mason Phase 1 Complete: Regolith data refreshed`);
+    console.log(`✅ Mason Phase 1 Complete: Skipping regolith refresh for core testing`);
 
     // PHASE 2: Enhanced Mason Arrangement using native WordPress methods
     console.log(`🏗️ Mason Phase 2: Starting enhanced arrangement...`);
@@ -113,8 +114,8 @@ export async function POST(request: NextRequest) {
       method: 'mason',
       results: {
         regolith_refresh: {
-          images_discovered: regolithRefreshResult.images_count,
-          data_refreshed: true
+          images_discovered: 0, // Skipped for testing
+          data_refreshed: false // Skipped for testing
         },
         mason_arrangement: {
           images_replaced: masonResult.replacements_made,
@@ -150,7 +151,7 @@ async function refreshRegolithData(
     console.log(`🔍 Mason: Refreshing regolith data for current page state`);
 
     // Call f331 API to refresh regolith data
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3002';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     const response = await fetch(`${baseUrl}/api/f331-discover-elementor-images-regolith`, {
       method: 'POST',
       headers: {
