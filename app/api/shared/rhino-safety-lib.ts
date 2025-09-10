@@ -138,34 +138,26 @@ export function replaceWithPropertyPreservation(
     return false;
   }
   
-  console.log(`🔄 Replacing image with property preservation: ${oldUrl}`);
+  console.log(`🔄 Replacing image object completely: ${oldUrl}`);
   
-  // Get list of properties before modification for logging
-  const originalProperties = Object.keys(imageObject);
+  // CRITICAL: Remove ALL old properties that might reference old image
+  const keysToDelete = ['sizes', 'width', 'height', 'thumbnail', 'medium', 'large'];
+  keysToDelete.forEach(key => {
+    if (key in imageObject) {
+      delete imageObject[key];
+    }
+  });
   
-  // CRITICAL FIX: Reset size and source for new images
+  // Set new image data with minimal required properties
   imageObject.url = newImage.img_url_returned;
+  imageObject.id = newImage.wp_img_id_returned || '';
   
-  if (newImage.wp_img_id_returned) {
-    imageObject.id = newImage.wp_img_id_returned;
-  }
+  // Reset to minimal valid state - Elementor will rebuild the rest
+  imageObject.size = 'full';
+  imageObject.source = 'library';
+  imageObject.alt = '';
   
-  // Clear size if it exists - let Elementor recalculate
-  if ('size' in imageObject) {
-    imageObject.size = ''; // Or could be 'full'
-  }
-  
-  // Ensure source is set to library for WordPress media
-  if ('source' in imageObject) {
-    imageObject.source = 'library';
-  }
-  
-  // Clear alt text to match new image
-  if ('alt' in imageObject) {
-    imageObject.alt = '';
-  }
-  
-  console.log(`✅ Replaced ${oldUrl} - modified properties: url, id${imageObject.size !== undefined ? ', size' : ''}${imageObject.source !== undefined ? ', source' : ''}${imageObject.alt !== undefined ? ', alt' : ''}`);
+  console.log(`✅ Replaced image object with minimal valid structure for: ${newImage.img_url_returned}`);
   return true;
 }
 
