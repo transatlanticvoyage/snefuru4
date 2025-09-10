@@ -179,10 +179,20 @@ async function performBoulderArrangement(
     );
 
     // REGOLITH-FREE: Extract images directly from current Elementor data
-    const currentElementorData = gconPiece.pelementor_cached;
+    let currentElementorData = gconPiece.pelementor_cached;
     
     if (!currentElementorData) {
       throw new Error('No Elementor data found in pelementor_cached');
+    }
+
+    // CRITICAL: Parse if string, work with object
+    if (typeof currentElementorData === 'string') {
+      try {
+        currentElementorData = JSON.parse(currentElementorData);
+        console.log(`📄 BOULDER: Parsed Elementor data from string`);
+      } catch (e) {
+        throw new Error('Failed to parse Elementor data from pelementor_cached');
+      }
     }
 
     // Extract ALL images from current Elementor data
@@ -210,10 +220,16 @@ async function performBoulderArrangement(
       throw new Error('Invalid Elementor data structure');
     }
 
+    // CRITICAL: Create a deep copy to avoid reference issues
+    const elementorDataCopy = JSON.parse(JSON.stringify(currentElementorData));
+    
     // Enhanced image replacement with fixed widget detection
     console.log(`🔧 BOULDER ENHANCED: Starting regolith-free image replacement with fixed widget detection...`);
-    const replacementsMade = replaceImagesInElementsFixed(currentElementorData, replacementMap);
+    const replacementsMade = replaceImagesInElementsFixed(elementorDataCopy, replacementMap);
     console.log(`🔧 BOULDER ENHANCED: Made ${replacementsMade} image replacements with property preservation`);
+    
+    // Use the modified copy for the update
+    currentElementorData = elementorDataCopy;
 
     if (replacementsMade === 0) {
       console.log(`⚠️ BOULDER ENHANCED: No image replacements made - no WordPress update needed`);
