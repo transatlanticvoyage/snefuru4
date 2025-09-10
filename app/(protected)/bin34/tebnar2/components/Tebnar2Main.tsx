@@ -164,6 +164,9 @@ export default function Tebnar2Main() {
   
   // State for arrangement method selection (Cliff vs Mason)
   const [tbn2_arrangementMethod, setTbn2ArrangementMethod] = useState<'cliff' | 'mason' | 'boulder'>('cliff');
+  
+  // State for Aranya image removal
+  const [tbn2_aranyaLoading, setTbn2AranyaLoading] = useState<boolean>(false);
 
   // Inject CSS styles for main element styling (cloned from tebnar1)
   useEffect(() => {
@@ -2975,6 +2978,55 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Aranya: Remove all images from Elementor page
+  const tbn2_handleAranyaRemove = async (gcon_piece_id: string) => {
+    if (!gcon_piece_id) {
+      setTbn2Error('❌ No gcon_piece_id provided for Aranya');
+      return;
+    }
+
+    setTbn2AranyaLoading(true);
+    setTbn2Error(null);
+
+    try {
+      console.log(`🗑️ ARANYA: Starting image removal for gcon_piece: ${gcon_piece_id}`);
+      
+      const response = await fetch('/api/aranya-remove', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          gcon_piece_id
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        console.log(`✅ ARANYA: Image removal completed successfully`);
+        console.log(`📊 Images removed: ${result.results?.image_removal?.images_removed || 0}`);
+        console.log(`🔄 Page updated: ${result.results?.image_removal?.page_updated ? 'Yes' : 'No'}`);
+        console.log(`💾 Backup created: ${result.results?.image_removal?.backup_created || 'None'}`);
+        
+        setTbn2Error(`✅ Aranya completed! Removed ${result.results?.image_removal?.images_removed || 0} images from page.`);
+        
+        // Refresh plans to show updated status
+        tbn2_fetchPlans();
+      } else {
+        const errorMsg = result.error || 'Aranya removal failed';
+        console.error(`❌ ARANYA ERROR: ${errorMsg}`);
+        setTbn2Error(`❌ Aranya failed: ${errorMsg}`);
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown Aranya error';
+      console.error('🗑️ Aranya network error:', error);
+      setTbn2Error(`❌ Aranya error: ${errorMsg}`);
+    } finally {
+      setTbn2AranyaLoading(false);
+    }
+  };
+
   // Filter plans by selected batch using centralized function
   const tbn2_filteredPlans = tbn2_filterPlansByBatch(tbn2_plans, tbn2_selectedBatchId || null);
 
@@ -3470,6 +3522,30 @@ export default function Tebnar2Main() {
                 run
               </button>
             </div>
+          </div>
+
+          {/* Entrench Chamber - Aranya Image Removal */}
+          <div className="bg-white border border-gray-300 rounded-lg p-2">
+            <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>entrench_chamber</div>
+            <div className="text-gray-600 text-sm mb-2">Remove all images from Elementor page</div>
+            <button
+              onClick={() => {
+                if (!tbn2_selectedGconPieceId) {
+                  setTbn2Error('❌ Please select a gcon piece first');
+                  return;
+                }
+                tbn2_handleAranyaRemove(tbn2_selectedGconPieceId);
+              }}
+              disabled={!tbn2_selectedGconPieceId || tbn2_aranyaLoading}
+              className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                !tbn2_selectedGconPieceId || tbn2_aranyaLoading
+                  ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                  : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
+              }`}
+              title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Remove all images from the selected Elementor page'}
+            >
+              {tbn2_aranyaLoading ? 'Removing...' : 'run aranya'}
+            </button>
           </div>
 
           {/* Image Discovery Section with Tabs */}
