@@ -140,17 +140,16 @@ export function replaceWithPropertyPreservation(
   
   console.log(`🔄 Replacing image with property preservation: ${oldUrl}`);
   
-  // Preserve ALL existing properties
-  const preservedProperties = { ...imageObject };
+  // Get list of properties before modification for logging
+  const originalProperties = Object.keys(imageObject);
   
-  // Apply new URL and ID while keeping everything else
-  Object.assign(imageObject, {
-    ...preservedProperties,
-    url: newImage.img_url_returned,
-    id: newImage.wp_img_id_returned
-  });
+  // SAFE REPLACEMENT: Only modify the specific properties we need to change
+  imageObject.url = newImage.img_url_returned;
+  if (newImage.wp_img_id_returned) {
+    imageObject.id = newImage.wp_img_id_returned;
+  }
   
-  console.log(`✅ Replaced ${oldUrl} while preserving: ${Object.keys(preservedProperties).join(', ')}`);
+  console.log(`✅ Replaced ${oldUrl} while preserving: ${originalProperties.join(', ')}`);
   return true;
 }
 
