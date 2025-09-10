@@ -125,7 +125,8 @@ export default function Tebnar2Main() {
     narpiRecord: 0,
     narpiUpload: 0,
     cliffArrangement: 0,
-    masonArrangement: 0
+    masonArrangement: 0,
+    boulderArrangement: 0
   });
   
   // State for pre-existing narpi push toggle
@@ -162,7 +163,7 @@ export default function Tebnar2Main() {
   const [tbn2_currentUrl, setTbn2CurrentUrl] = useState<string>('');
   
   // State for arrangement method selection (Cliff vs Mason)
-  const [tbn2_arrangementMethod, setTbn2ArrangementMethod] = useState<'cliff' | 'mason'>('cliff');
+  const [tbn2_arrangementMethod, setTbn2ArrangementMethod] = useState<'cliff' | 'mason' | 'boulder'>('cliff');
 
   // Inject CSS styles for main element styling (cloned from tebnar1)
   useEffect(() => {
@@ -2774,7 +2775,8 @@ export default function Tebnar2Main() {
         narpiRecord: 0,
         narpiUpload: 0,
         cliffArrangement: 0,
-        masonArrangement: 0
+        masonArrangement: 0,
+        boulderArrangement: 0
       });
 
       let response;
@@ -2802,6 +2804,34 @@ export default function Tebnar2Main() {
         console.log(`🏗️ Using Mason Arrange method for enhanced image arrangement`);
         
         response = await fetch('/api/mason-arrange', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gcon_piece_id: tbn2_selectedGconPieceId,
+            narpi_push_id: effectiveNarpiPushId
+          })
+        });
+        
+      } else if (tbn2_arrangementMethod === 'boulder') {
+        // Boulder arrangement requires pre-existing narpi push
+        if (!tbn2_usePreExistingNarpi) {
+          setTbn2Error('❌ Boulder Arrange requires a pre-existing narpi push. Please enable "use pre-existing narpi push" option.');
+          return;
+        }
+        
+        const effectiveNarpiPushId = tbn2_narpiInputMethod === 'dropdown' 
+          ? tbn2_selectedNarpiPushId 
+          : tbn2_manualNarpiPushId;
+        
+        if (!effectiveNarpiPushId) {
+          setTbn2Error(`❌ Please ${tbn2_narpiInputMethod === 'dropdown' ? 'select' : 'enter'} a narpi push ID for Boulder Arrange`);
+          return;
+        }
+        
+        // Boulder: No narpi progress since using pre-existing, no regolith refresh
+        console.log(`🪨 Using Boulder Arrange method for regolith-free image arrangement`);
+        
+        response = await fetch('/api/boulder-arrange', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -2862,7 +2892,17 @@ export default function Tebnar2Main() {
             narpiRecord: 0,
             narpiUpload: 0,
             cliffArrangement: 0,
-            masonArrangement: 100
+            masonArrangement: 100,
+            boulderArrangement: 0
+          });
+        } else if (result.method === 'boulder') {
+          // Boulder only: mark Boulder arrangement complete, no narpi activity
+          setTbn2RhinoProgress({
+            narpiRecord: 0,
+            narpiUpload: 0,
+            cliffArrangement: 0,
+            masonArrangement: 0,
+            boulderArrangement: 100
           });
         } else if (tbn2_usePreExistingNarpi) {
           // Cliff with pre-existing: only cliff arrangement, no narpi activity  
@@ -2870,7 +2910,8 @@ export default function Tebnar2Main() {
             narpiRecord: 0,
             narpiUpload: 0,
             cliffArrangement: 100,
-            masonArrangement: 0
+            masonArrangement: 0,
+            boulderArrangement: 0
           });
         } else {
           // Full rhino-replace: all narpi and cliff phases
@@ -2878,7 +2919,8 @@ export default function Tebnar2Main() {
             narpiRecord: 100,
             narpiUpload: 100,
             cliffArrangement: 100,
-            masonArrangement: 0
+            masonArrangement: 0,
+            boulderArrangement: 0
           });
         }
 
@@ -2892,6 +2934,15 @@ export default function Tebnar2Main() {
             `✅ Mason Arrange completed! Enhanced method used (${masonResults.method_used}). ` +
             `${regolithResults.images_discovered} images discovered, ${masonResults.images_replaced} images replaced in page. ` +
             `Cache cleared: ${masonResults.cache_cleared ? 'Yes' : 'No'}`
+          );
+        } else if (result.method === 'boulder') {
+          // Boulder arrange result structure
+          const boulderResults = result.results.boulder_arrangement;
+          
+          setTbn2Error(
+            `✅ Boulder Arrange completed! Regolith-free method used (${boulderResults.method_used}). ` +
+            `${boulderResults.images_replaced} images replaced in page. ` +
+            `Cache cleared: ${boulderResults.cache_cleared ? 'Yes' : 'No'}`
           );
         } else {
           // Cliff arrange result structure (existing)
@@ -3776,11 +3827,23 @@ export default function Tebnar2Main() {
                       >
                         Mason Arrange
                       </button>
+                      <button
+                        onClick={() => setTbn2ArrangementMethod('boulder')}
+                        className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                          tbn2_arrangementMethod === 'boulder'
+                            ? 'bg-orange-600 text-white border-orange-600'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                        } border-2`}
+                      >
+                        Boulder Arrange
+                      </button>
                     </div>
                     <div className="text-center text-sm text-gray-600 mt-2">
                       {tbn2_arrangementMethod === 'cliff' 
                         ? 'Cliff: Traditional image replacement method (works with new uploads or pre-existing narpi push)' 
-                        : 'Mason: Enhanced arrangement method (requires pre-existing narpi push, refreshes regolith data, uses native WordPress API)'}
+                        : tbn2_arrangementMethod === 'mason'
+                        ? 'Mason: Enhanced arrangement method (requires pre-existing narpi push, refreshes regolith data, uses native WordPress API)'
+                        : 'Boulder: Regolith-free arrangement method (requires pre-existing narpi push, replaces ALL images found in current page)'}
                     </div>
                   </div>
                   
@@ -3852,6 +3915,14 @@ export default function Tebnar2Main() {
                           <td style={{ border: '1px solid black', padding: '8px' }}>
                             <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
                               <div style={{ width: `${tbn2_rhinoProgress.masonArrangement}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.masonArrangement > 0 ? '#10b981' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ border: '1px solid black', padding: '8px' }}>Boulder Arrangement</td>
+                          <td style={{ border: '1px solid black', padding: '8px' }}>
+                            <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
+                              <div style={{ width: `${tbn2_rhinoProgress.boulderArrangement}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.boulderArrangement > 0 ? '#f97316' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
                             </div>
                           </td>
                         </tr>
