@@ -3574,155 +3574,160 @@ export default function Tebnar2Main() {
               </button>
             </div>
           </div>
+        </div>
 
-          {/* Chambers Row - Entrench & Missile */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            {/* Entrench Chamber - Aranya Image Removal */}
-            <div className="bg-white border border-gray-300 rounded-lg p-2">
-              <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>entrench_chamber</div>
-              <div className="text-gray-600 text-sm mb-2">Remove all images from Elementor page</div>
+      </div>
+
+      {/* Chambers Section - Entrench, Missile & Vesicle full width below main content */}
+      <div className="space-y-4 mb-6">
+        {/* First Row - Entrench & Missile Chambers */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Entrench Chamber - Aranya Image Removal */}
+          <div className="bg-white border border-gray-300 rounded-lg p-4">
+            <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>entrench_chamber</div>
+            <div className="text-gray-600 text-sm mb-2">Remove all images from Elementor page</div>
+            <button
+              onClick={() => {
+                if (!tbn2_selectedGconPieceId) {
+                  setTbn2Error('❌ Please select a gcon piece first');
+                  return;
+                }
+                tbn2_handleAranyaRemove(tbn2_selectedGconPieceId);
+              }}
+              disabled={!tbn2_selectedGconPieceId || tbn2_aranyaLoading}
+              className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                !tbn2_selectedGconPieceId || tbn2_aranyaLoading
+                  ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                  : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
+              }`}
+              title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Remove all images from the selected Elementor page'}
+            >
+              {tbn2_aranyaLoading ? 'Removing...' : 'run aranya'}
+            </button>
+          </div>
+
+          {/* Missile Chamber - Hippo Gutenberg Updates */}
+          <div className="bg-white border border-gray-300 rounded-lg p-4">
+            <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>missile_chamber</div>
+            
+            {/* Tab Navigation */}
+            <div className="flex border-b border-gray-200 mb-2">
+              <button
+                className="px-3 py-1 text-sm font-medium border-b-2 border-blue-500 text-blue-600 bg-blue-50"
+              >
+                hippo_replace
+              </button>
+            </div>
+            
+            {/* Hippo Replace Tab Content */}
+            <div>
+              <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '14px' }}>gutenberg page image replacement</div>
+              <div className="text-gray-600 text-sm mb-3">(for use with gutenberg pages)</div>
+              
+              {/* Mini Table */}
+              <div className="bg-gray-50 border border-gray-200 rounded p-2 mb-3">
+                <div className="text-xs font-semibold text-gray-700 mb-2">Process Status:</div>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center text-xs">
+                    <span>narpi push record</span>
+                    <div className="w-16 bg-gray-200 rounded-full h-1">
+                      <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span>narpi push upload</span>
+                    <div className="w-16 bg-gray-200 rounded-full h-1">
+                      <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span>swale arrangement</span>
+                    <div className="w-16 bg-gray-200 rounded-full h-1">
+                      <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Button Bar */}
+              <div className="flex gap-2 mb-3">
+                <button
+                  disabled
+                  className="px-2 py-1 text-xs font-medium text-white bg-gray-400 rounded cursor-not-allowed"
+                >
+                  swale arrange
+                </button>
+              </div>
+
+              {/* Run Hippo Button */}
               <button
                 onClick={() => {
                   if (!tbn2_selectedGconPieceId) {
                     setTbn2Error('❌ Please select a gcon piece first');
                     return;
                   }
-                  tbn2_handleAranyaRemove(tbn2_selectedGconPieceId);
+                  tbn2_handleHippoUpdatePageWithImages(tbn2_selectedGconPieceId);
                 }}
-                disabled={!tbn2_selectedGconPieceId || tbn2_aranyaLoading}
+                disabled={!tbn2_selectedGconPieceId || tbn2_hippoLoading}
                 className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
-                  !tbn2_selectedGconPieceId || tbn2_aranyaLoading
+                  !tbn2_selectedGconPieceId || tbn2_hippoLoading
                     ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
-                    : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
+                    : 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
                 }`}
-                title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Remove all images from the selected Elementor page'}
+                title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Update Gutenberg page with images via Hippo'}
               >
-                {tbn2_aranyaLoading ? 'Removing...' : 'run aranya'}
+                {tbn2_hippoLoading ? 'Processing...' : 'run hippo'}
               </button>
             </div>
-
-            {/* Missile Chamber - Hippo Gutenberg Updates */}
-            <div className="bg-white border border-gray-300 rounded-lg p-2">
-              <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>missile_chamber</div>
-              
-              {/* Tab Navigation */}
-              <div className="flex border-b border-gray-200 mb-2">
-                <button
-                  className="px-3 py-1 text-sm font-medium border-b-2 border-blue-500 text-blue-600 bg-blue-50"
-                >
-                  hippo_replace
-                </button>
-              </div>
-              
-              {/* Hippo Replace Tab Content */}
-              <div>
-                <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '14px' }}>gutenberg page image replacement</div>
-                <div className="text-gray-600 text-sm mb-3">(for use with gutenberg pages)</div>
-                
-                {/* Mini Table */}
-                <div className="bg-gray-50 border border-gray-200 rounded p-2 mb-3">
-                  <div className="text-xs font-semibold text-gray-700 mb-2">Process Status:</div>
-                  <div className="space-y-1">
-                    <div className="flex justify-between items-center text-xs">
-                      <span>narpi push record</span>
-                      <div className="w-16 bg-gray-200 rounded-full h-1">
-                        <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center text-xs">
-                      <span>narpi push upload</span>
-                      <div className="w-16 bg-gray-200 rounded-full h-1">
-                        <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center text-xs">
-                      <span>swale arrangement</span>
-                      <div className="w-16 bg-gray-200 rounded-full h-1">
-                        <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Button Bar */}
-                <div className="flex gap-2 mb-3">
-                  <button
-                    disabled
-                    className="px-2 py-1 text-xs font-medium text-white bg-gray-400 rounded cursor-not-allowed"
-                  >
-                    swale arrange
-                  </button>
-                </div>
-
-                {/* Run Hippo Button */}
-                <button
-                  onClick={() => {
-                    if (!tbn2_selectedGconPieceId) {
-                      setTbn2Error('❌ Please select a gcon piece first');
-                      return;
-                    }
-                    tbn2_handleHippoUpdatePageWithImages(tbn2_selectedGconPieceId);
-                  }}
-                  disabled={!tbn2_selectedGconPieceId || tbn2_hippoLoading}
-                  className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
-                    !tbn2_selectedGconPieceId || tbn2_hippoLoading
-                      ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
-                      : 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
-                  }`}
-                  title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Update Gutenberg page with images via Hippo'}
-                >
-                  {tbn2_hippoLoading ? 'Processing...' : 'run hippo'}
-                </button>
-              </div>
-            </div>
           </div>
+        </div>
 
-          {/* Vesicle Chamber - Image Discovery Section with Tabs */}
-          <div className="bg-white border border-gray-300 rounded-lg p-2">
-            {/* Vesicle Chamber Header - Always visible */}
-            <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>vesicle_chamber</div>
-            
-            {/* Tab Navigation */}
-            <div className="flex border-b border-gray-200 mb-2">
-              {[
-                { id: 'utab1', label: 'el. cradles tab' },
-                { id: 'utab2', label: 'regolith' },
-                { id: 'utab3', label: 'pelementor' },
-                { id: 'utab4', label: 'rhino_replace' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setTbn2ActiveImageDiscoveryTab(tab.id as 'utab1' | 'utab2' | 'utab3' | 'utab4')}
-                  className={`px-3 py-1 text-sm font-medium border-b-2 transition-colors ${
-                    tbn2_activeImageDiscoveryTab === tab.id
-                      ? 'border-blue-500 text-blue-600 bg-blue-50'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-            
-            {/* Tab Content */}
-            {tbn2_activeImageDiscoveryTab === 'utab1' && (
-              <div>
-                <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>image cradle discovery box</div>
-                <div className="text-gray-600 text-sm mb-2">(for use with elementor pages)</div>
-                <button
-                  onClick={tbn2_handleElementorImageDiscovery}
-                  disabled={!tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading}
-                  className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
-                    !tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading
-                      ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
-                      : 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
-                  }`}
-                  title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Process elementor images for discovery'}
-                >
-                  {tbn2_imageDiscoveryLoading ? 'Processing...' : 'f327_discover_elementor_image_cradles'}
-                </button>
-                
-                {/* Discovered img cradles JSON display */}
+        {/* Second Row - Vesicle Chamber full width */}
+        <div className="bg-white border border-gray-300 rounded-lg p-4">
+          {/* Vesicle Chamber Header - Always visible */}
+          <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>vesicle_chamber</div>
+          
+          {/* Tab Navigation */}
+          <div className="flex border-b border-gray-200 mb-2">
+            {[
+              { id: 'utab1', label: 'el. cradles tab' },
+              { id: 'utab2', label: 'regolith' },
+              { id: 'utab3', label: 'pelementor' },
+              { id: 'utab4', label: 'rhino_replace' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setTbn2ActiveImageDiscoveryTab(tab.id as 'utab1' | 'utab2' | 'utab3' | 'utab4')}
+                className={`px-3 py-1 text-sm font-medium border-b-2 transition-colors ${
+                  tbn2_activeImageDiscoveryTab === tab.id
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          
+          {/* Tab Content */}
+          {tbn2_activeImageDiscoveryTab === 'utab1' && (
+            <div>
+              <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>image cradle discovery box</div>
+              <div className="text-gray-600 text-sm mb-2">(for use with elementor pages)</div>
+              <button
+                onClick={tbn2_handleElementorImageDiscovery}
+                disabled={!tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading}
+                className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                  !tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading
+                    ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                    : 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                }`}
+                title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Process elementor images for discovery'}
+              >
+                {tbn2_imageDiscoveryLoading ? 'Processing...' : 'f327_discover_elementor_image_cradles'}
+              </button>
+              
+              {/* Discovered img cradles JSON display */}
                 <div className="mt-3">
                   <div className="font-bold text-gray-700 mb-2" style={{ fontSize: '16px' }}>discovered_img_cradles_json</div>
                   <div 
@@ -4141,6 +4146,277 @@ export default function Tebnar2Main() {
           </div>
         </div>
 
+      </div>
+
+      {/* medieval_chamber - Container for table configuration controls */}
+      <div className={`mb-6 p-4 border border-black bg-white medieval_chamber_div ${tbn2_medievalChamberVisible ? '' : 'hidden'}`} style={{ border: '1px solid black', backgroundColor: '#ffffff' }}>
+        <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>medieval_chamber</div>
+        
+        {/* Column Template Controls - positioned just above the main table */}
+        <div className="flex items-stretch space-x-4">
+          {/* SQL View Info */}
+          <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 text-xs" style={{maxWidth: '130px', maxHeight: '75px'}}>
+            <div className="font-semibold text-gray-700 mb-1">SQL View Info</div>
+            <div className="text-gray-600">view name: images_plans</div>
+            <div className="text-gray-600"># columns: {tbn2_getAllTableColumns().length}</div>
+          </div>
+
+          {/* Column Template Options */}
+          <div className="bg-white border border-gray-300 rounded-lg p-2" style={{maxWidth: '600px', maxHeight: '75px'}}>
+            <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
+            <div className="flex space-x-1">
+              {Object.entries(TBN2_COLUMN_TEMPLATES).map(([key, template]) => (
+                <button
+              onClick={() => {
+                if (!tbn2_selectedGconPieceId) {
+                  setTbn2Error('❌ Please select a gcon piece first');
+                  return;
+                }
+                tbn2_handleAranyaRemove(tbn2_selectedGconPieceId);
+              }}
+              disabled={!tbn2_selectedGconPieceId || tbn2_aranyaLoading}
+              className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                !tbn2_selectedGconPieceId || tbn2_aranyaLoading
+                  ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                  : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
+              }`}
+              title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Remove all images from the selected Elementor page'}
+            >
+              {tbn2_aranyaLoading ? 'Removing...' : 'run aranya'}
+            </button>
+          </div>
+
+          {/* Missile Chamber - Hippo Gutenberg Updates */}
+          <div className="bg-white border border-gray-300 rounded-lg p-4">
+            <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>missile_chamber</div>
+            
+            {/* Tab Navigation */}
+            <div className="flex border-b border-gray-200 mb-2">
+              <button
+                className="px-3 py-1 text-sm font-medium border-b-2 border-blue-500 text-blue-600 bg-blue-50"
+              >
+                hippo_replace
+              </button>
+            </div>
+            
+            {/* Hippo Replace Tab Content */}
+            <div>
+              <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '14px' }}>gutenberg page image replacement</div>
+              <div className="text-gray-600 text-sm mb-3">(for use with gutenberg pages)</div>
+              
+              {/* Mini Table */}
+              <div className="bg-gray-50 border border-gray-200 rounded p-2 mb-3">
+                <div className="text-xs font-semibold text-gray-700 mb-2">Process Status:</div>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center text-xs">
+                    <span>narpi push record</span>
+                    <div className="w-16 bg-gray-200 rounded-full h-1">
+                      <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span>narpi push upload</span>
+                    <div className="w-16 bg-gray-200 rounded-full h-1">
+                      <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span>swale arrangement</span>
+                    <div className="w-16 bg-gray-200 rounded-full h-1">
+                      <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Button Bar */}
+              <div className="flex gap-2 mb-3">
+                <button
+                  disabled
+                  className="px-2 py-1 text-xs font-medium text-white bg-gray-400 rounded cursor-not-allowed"
+                >
+                  swale arrange
+                </button>
+              </div>
+
+              {/* Run Hippo Button */}
+              <button
+                onClick={() => {
+                  if (!tbn2_selectedGconPieceId) {
+                    setTbn2Error('❌ Please select a gcon piece first');
+                    return;
+                  }
+                  tbn2_handleHippoUpdatePageWithImages(tbn2_selectedGconPieceId);
+                }}
+                disabled={!tbn2_selectedGconPieceId || tbn2_hippoLoading}
+                className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                  !tbn2_selectedGconPieceId || tbn2_hippoLoading
+                    ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                    : 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
+                }`}
+                title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Update Gutenberg page with images via Hippo'}
+              >
+                {tbn2_hippoLoading ? 'Processing...' : 'run hippo'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Second Row - Vesicle Chamber full width */}
+        <div className="bg-white border border-gray-300 rounded-lg p-4">
+          {/* Vesicle Chamber Header - Always visible */}
+          <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>vesicle_chamber</div>
+          
+          {/* Tab Navigation */}
+          <div className="flex border-b border-gray-200 mb-2">
+            {[
+              { id: 'utab1', label: 'el. cradles tab' },
+              { id: 'utab2', label: 'regolith' },
+              { id: 'utab3', label: 'pelementor' },
+              { id: 'utab4', label: 'rhino_replace' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setTbn2ActiveImageDiscoveryTab(tab.id as 'utab1' | 'utab2' | 'utab3' | 'utab4')}
+                className={`px-3 py-1 text-sm font-medium border-b-2 transition-colors ${
+                  tbn2_activeImageDiscoveryTab === tab.id
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          
+          {/* Tab Content */}
+          {tbn2_activeImageDiscoveryTab === 'utab1' && (
+            <div>
+              <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>image cradle discovery box</div>
+              <div className="text-gray-600 text-sm mb-2">(for use with elementor pages)</div>
+              <button
+                onClick={tbn2_handleElementorImageDiscovery}
+                disabled={!tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading}
+                className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                  !tbn2_selectedGconPieceId || tbn2_imageDiscoveryLoading
+                    ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                    : 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                }`}
+                title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Process elementor images for discovery'}
+              >
+                {tbn2_imageDiscoveryLoading ? 'Processing...' : 'f327_discover_elementor_image_cradles'}
+              </button>
+              
+              {/* Discovered img cradles JSON display */}
+              <div className="mt-3">
+                <div className="font-bold text-gray-700 mb-2" style={{ fontSize: '16px' }}>discovered_img_cradles_json</div>
+                <div 
+                  className="bg-gray-50 border border-gray-300 rounded p-3 overflow-auto font-mono text-sm"
+                  style={{ 
+                    maxHeight: '200px', 
+                    fontSize: '12px',
+                    lineHeight: '1.4'
+                  }}
+                >
+                  {tbn2_discoveredImgCradlesJson ? (
+                    <pre className="whitespace-pre-wrap">
+                      {(() => {
+                        try {
+                          // Try to parse and format JSON nicely
+                          const parsed = JSON.parse(tbn2_discoveredImgCradlesJson);
+                          return JSON.stringify(parsed, null, 2);
+                        } catch (e) {
+                          // If it's not valid JSON, display as-is
+                          return tbn2_discoveredImgCradlesJson;
+                        }
+                      })()}
+                    </pre>
+                  ) : (
+                    <div className="text-gray-500 italic">
+                      {tbn2_selectedGconPieceId ? 'No cradles data available' : 'Select a gcon piece to view cradles data'}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Regolith Tab */}
+          {tbn2_activeImageDiscoveryTab === 'utab2' && (
+            <div className="text-center text-gray-500 py-4">
+              Regolith tab content (placeholder)
+            </div>
+          )}
+
+          {/* Pelementor Tab */}
+          {tbn2_activeImageDiscoveryTab === 'utab3' && (
+            <div className="text-center text-gray-500 py-4">
+              Pelementor tab content (placeholder)
+            </div>
+          )}
+
+          {/* Rhino Replace Tab */}
+          {tbn2_activeImageDiscoveryTab === 'utab4' && (
+            <div>
+              <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>rhino replace progress monitoring</div>
+              <div className="text-gray-600 text-sm mb-2">(tracks cliff/mason/boulder progress)</div>
+              
+              {/* Progress Table */}
+              <div className="bg-gray-50 border border-gray-200 rounded p-3">
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ border: '1px solid black', padding: '8px', backgroundColor: '#f0f0f0' }}>Process</th>
+                      <th style={{ border: '1px solid black', padding: '8px', backgroundColor: '#f0f0f0' }}>Progress</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>Narpi Push Record</td>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>
+                        <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
+                          <div style={{ width: `${tbn2_rhinoProgress.narpiRecord}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.narpiRecord > 0 ? '#10b981' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>Narpi Push Upload</td>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>
+                        <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
+                          <div style={{ width: `${tbn2_rhinoProgress.narpiUpload}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.narpiUpload > 0 ? '#3b82f6' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>Cliff Arrangement</td>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>
+                        <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
+                          <div style={{ width: `${tbn2_rhinoProgress.cliffArrangement}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.cliffArrangement > 0 ? '#8b5cf6' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>Mason Arrangement</td>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>
+                        <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
+                          <div style={{ width: `${tbn2_rhinoProgress.masonArrangement}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.masonArrangement > 0 ? '#10b981' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>Boulder Arrangement</td>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>
+                        <div style={{ width: '100%', height: '20px', backgroundColor: '#e0e0e0', border: '1px solid #ccc' }}>
+                          <div style={{ width: `${tbn2_rhinoProgress.boulderArrangement}%`, height: '100%', backgroundColor: tbn2_rhinoProgress.boulderArrangement > 0 ? '#f97316' : '#d0d0d0', transition: 'width 0.3s ease' }}></div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* medieval_chamber - Container for table configuration controls */}
