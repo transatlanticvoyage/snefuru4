@@ -143,13 +143,29 @@ export function replaceWithPropertyPreservation(
   // Get list of properties before modification for logging
   const originalProperties = Object.keys(imageObject);
   
-  // SAFE REPLACEMENT: Only modify the specific properties we need to change
+  // CRITICAL FIX: Reset size and source for new images
   imageObject.url = newImage.img_url_returned;
+  
   if (newImage.wp_img_id_returned) {
     imageObject.id = newImage.wp_img_id_returned;
   }
   
-  console.log(`✅ Replaced ${oldUrl} while preserving: ${originalProperties.join(', ')}`);
+  // Clear size if it exists - let Elementor recalculate
+  if ('size' in imageObject) {
+    imageObject.size = ''; // Or could be 'full'
+  }
+  
+  // Ensure source is set to library for WordPress media
+  if ('source' in imageObject) {
+    imageObject.source = 'library';
+  }
+  
+  // Clear alt text to match new image
+  if ('alt' in imageObject) {
+    imageObject.alt = '';
+  }
+  
+  console.log(`✅ Replaced ${oldUrl} - modified properties: url, id${imageObject.size !== undefined ? ', size' : ''}${imageObject.source !== undefined ? ', source' : ''}${imageObject.alt !== undefined ? ', alt' : ''}`);
   return true;
 }
 

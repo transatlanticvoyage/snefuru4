@@ -170,30 +170,68 @@ async function performBoulderArrangement(
     console.log(`🪨 BOULDER ENHANCED: Processing page: ${gconPiece.meta_title} (${gconPiece.asn_sitespren_base})`);
     console.log(`🎯 WordPress Post ID: ${gconPiece.g_post_id}`);
 
-    // Create backup of current Elementor data
-    backup_id = await createElementorBackup(
-      supabase,
-      gcon_piece_id,
-      gconPiece.pelementor_cached,
-      'boulder_pre_update'
+    // BOULDER IS REGOLITH-FREE: Fetch FRESH post data directly from WordPress
+    console.log(`🔄 BOULDER: Fetching fresh post data from WordPress (NOT using cached data)`);
+    
+    const freshPostResponse = await fetch(
+      `https://${gconPiece.asn_sitespren_base}/wp-json/wp/v2/pages/${gconPiece.g_post_id}`,
+      {
+        headers: {
+          'User-Agent': 'Boulder-RegolithFree/1.0'
+        }
+      }
     );
 
-    // REGOLITH-FREE: Extract images directly from current Elementor data
-    let currentElementorData = gconPiece.pelementor_cached;
-    
-    if (!currentElementorData) {
-      throw new Error('No Elementor data found in pelementor_cached');
+    if (!freshPostResponse.ok) {
+      throw new Error(`Failed to fetch fresh post data: ${freshPostResponse.status}`);
     }
 
-    // CRITICAL: Parse if string, work with object
+    const freshPost = await freshPostResponse.json();
+    
+    // Get Elementor data from post meta
+    let currentElementorData = freshPost.meta?._elementor_data;
+    
+    if (!currentElementorData) {
+      // Try alternate approach - use the posts endpoint with auth
+      console.log(`🔄 BOULDER: Trying authenticated posts endpoint for Elementor data`);
+      const postsResponse = await fetch(
+        `https://${gconPiece.asn_sitespren_base}/wp-json/snefuru/v1/posts`,
+        {
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'User-Agent': 'Boulder-RegolithFree/1.0'
+          }
+        }
+      );
+      
+      if (postsResponse.ok) {
+        const allPosts = await postsResponse.json();
+        const targetPost = allPosts.data?.find((p: any) => p.ID === parseInt(gconPiece.g_post_id));
+        currentElementorData = targetPost?.elementor_data;
+      }
+    }
+    
+    if (!currentElementorData) {
+      throw new Error('No Elementor data found from WordPress API');
+    }
+
+    // Parse if string
     if (typeof currentElementorData === 'string') {
       try {
         currentElementorData = JSON.parse(currentElementorData);
-        console.log(`📄 BOULDER: Parsed Elementor data from string`);
+        console.log(`📄 BOULDER: Parsed fresh Elementor data from WordPress`);
       } catch (e) {
-        throw new Error('Failed to parse Elementor data from pelementor_cached');
+        throw new Error('Failed to parse fresh Elementor data from WordPress');
       }
     }
+
+    // Create backup of the FRESH data before modification
+    backup_id = await createElementorBackup(
+      supabase,
+      gcon_piece_id,
+      currentElementorData,
+      'boulder_pre_update'
+    );
 
     // Extract ALL images from current Elementor data
     const currentImages = extractAllImagesFromElementorData(currentElementorData);
@@ -267,14 +305,8 @@ async function performBoulderArrangement(
     console.log(`✅ BOULDER ENHANCED: WordPress update completed successfully`);
     console.log(`🌐 Check page at: https://${gconPiece.asn_sitespren_base}/?p=${gconPiece.g_post_id}`);
 
-    // Update gcon_pieces with new elementor data (only if successful)
-    await supabase
-      .from('gcon_pieces')
-      .update({ 
-        pelementor_cached: currentElementorData,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', gcon_piece_id);
+    // BOULDER DOES NOT UPDATE pelementor_cached - it's regolith-free!
+    // Only cliff/mason should update cached data
 
     return {
       success: true,
