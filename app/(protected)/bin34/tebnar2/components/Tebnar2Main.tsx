@@ -167,6 +167,7 @@ export default function Tebnar2Main() {
   
   // State for Aranya image removal
   const [tbn2_aranyaLoading, setTbn2AranyaLoading] = useState<boolean>(false);
+  const [tbn2_hippoLoading, setTbn2HippoLoading] = useState<boolean>(false);
 
   // Inject CSS styles for main element styling (cloned from tebnar1)
   useEffect(() => {
@@ -3027,6 +3028,56 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Hippo: Update Gutenberg page with images (like Cliff/Mason but for Gutenberg)
+  const tbn2_handleHippoUpdatePageWithImages = async (gcon_piece_id: string) => {
+    if (!gcon_piece_id) {
+      setTbn2Error('❌ No gcon_piece_id provided for Hippo');
+      return;
+    }
+
+    setTbn2HippoLoading(true);
+    setTbn2Error(null);
+
+    try {
+      console.log(`🦛 HIPPO: Starting Gutenberg image update for gcon_piece: ${gcon_piece_id}`);
+      
+      // TODO: Create the Hippo API endpoint for Gutenberg pages
+      // This would be similar to boulder-arrange but specifically for Gutenberg
+      const response = await fetch('/api/hippo-replace', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          gcon_piece_id
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        console.log(`✅ HIPPO: Gutenberg image update completed successfully`);
+        console.log(`📊 Images replaced: ${result.results?.image_replacement?.images_replaced || 0}`);
+        console.log(`🔄 Page updated: ${result.results?.image_replacement?.page_updated ? 'Yes' : 'No'}`);
+        
+        setTbn2Error(`✅ Hippo completed! Replaced ${result.results?.image_replacement?.images_replaced || 0} images in Gutenberg page.`);
+        
+        // Refresh plans to show updated status
+        tbn2_fetchPlans();
+      } else {
+        const errorMsg = result.error || 'Hippo update failed';
+        console.error(`❌ HIPPO ERROR: ${errorMsg}`);
+        setTbn2Error(`❌ Hippo failed: ${errorMsg}`);
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown Hippo error';
+      console.error('🦛 Hippo network error:', error);
+      setTbn2Error(`❌ Hippo error: ${errorMsg}`);
+    } finally {
+      setTbn2HippoLoading(false);
+    }
+  };
+
   // Filter plans by selected batch using centralized function
   const tbn2_filteredPlans = tbn2_filterPlansByBatch(tbn2_plans, tbn2_selectedBatchId || null);
 
@@ -3524,31 +3575,109 @@ export default function Tebnar2Main() {
             </div>
           </div>
 
-          {/* Entrench Chamber - Aranya Image Removal */}
-          <div className="bg-white border border-gray-300 rounded-lg p-2">
-            <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>entrench_chamber</div>
-            <div className="text-gray-600 text-sm mb-2">Remove all images from Elementor page</div>
-            <button
-              onClick={() => {
-                if (!tbn2_selectedGconPieceId) {
-                  setTbn2Error('❌ Please select a gcon piece first');
-                  return;
-                }
-                tbn2_handleAranyaRemove(tbn2_selectedGconPieceId);
-              }}
-              disabled={!tbn2_selectedGconPieceId || tbn2_aranyaLoading}
-              className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
-                !tbn2_selectedGconPieceId || tbn2_aranyaLoading
-                  ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
-                  : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
-              }`}
-              title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Remove all images from the selected Elementor page'}
-            >
-              {tbn2_aranyaLoading ? 'Removing...' : 'run aranya'}
-            </button>
+          {/* Chambers Row - Entrench & Missile */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {/* Entrench Chamber - Aranya Image Removal */}
+            <div className="bg-white border border-gray-300 rounded-lg p-2">
+              <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>entrench_chamber</div>
+              <div className="text-gray-600 text-sm mb-2">Remove all images from Elementor page</div>
+              <button
+                onClick={() => {
+                  if (!tbn2_selectedGconPieceId) {
+                    setTbn2Error('❌ Please select a gcon piece first');
+                    return;
+                  }
+                  tbn2_handleAranyaRemove(tbn2_selectedGconPieceId);
+                }}
+                disabled={!tbn2_selectedGconPieceId || tbn2_aranyaLoading}
+                className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                  !tbn2_selectedGconPieceId || tbn2_aranyaLoading
+                    ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                    : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
+                }`}
+                title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Remove all images from the selected Elementor page'}
+              >
+                {tbn2_aranyaLoading ? 'Removing...' : 'run aranya'}
+              </button>
+            </div>
+
+            {/* Missile Chamber - Hippo Gutenberg Updates */}
+            <div className="bg-white border border-gray-300 rounded-lg p-2">
+              <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>missile_chamber</div>
+              
+              {/* Tab Navigation */}
+              <div className="flex border-b border-gray-200 mb-2">
+                <button
+                  className="px-3 py-1 text-sm font-medium border-b-2 border-blue-500 text-blue-600 bg-blue-50"
+                >
+                  hippo_replace
+                </button>
+              </div>
+              
+              {/* Hippo Replace Tab Content */}
+              <div>
+                <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '14px' }}>gutenberg page image replacement</div>
+                <div className="text-gray-600 text-sm mb-3">(for use with gutenberg pages)</div>
+                
+                {/* Mini Table */}
+                <div className="bg-gray-50 border border-gray-200 rounded p-2 mb-3">
+                  <div className="text-xs font-semibold text-gray-700 mb-2">Process Status:</div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-xs">
+                      <span>narpi push record</span>
+                      <div className="w-16 bg-gray-200 rounded-full h-1">
+                        <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span>narpi push upload</span>
+                      <div className="w-16 bg-gray-200 rounded-full h-1">
+                        <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span>swale arrangement</span>
+                      <div className="w-16 bg-gray-200 rounded-full h-1">
+                        <div className="bg-gray-400 h-1 rounded-full" style={{width: '0%'}}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Button Bar */}
+                <div className="flex gap-2 mb-3">
+                  <button
+                    disabled
+                    className="px-2 py-1 text-xs font-medium text-white bg-gray-400 rounded cursor-not-allowed"
+                  >
+                    swale arrange
+                  </button>
+                </div>
+
+                {/* Run Hippo Button */}
+                <button
+                  onClick={() => {
+                    if (!tbn2_selectedGconPieceId) {
+                      setTbn2Error('❌ Please select a gcon piece first');
+                      return;
+                    }
+                    tbn2_handleHippoUpdatePageWithImages(tbn2_selectedGconPieceId);
+                  }}
+                  disabled={!tbn2_selectedGconPieceId || tbn2_hippoLoading}
+                  className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+                    !tbn2_selectedGconPieceId || tbn2_hippoLoading
+                      ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                      : 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
+                  }`}
+                  title={!tbn2_selectedGconPieceId ? 'Please select a gcon piece first' : 'Update Gutenberg page with images via Hippo'}
+                >
+                  {tbn2_hippoLoading ? 'Processing...' : 'run hippo'}
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Image Discovery Section with Tabs */}
+          {/* Vesicle Chamber - Image Discovery Section with Tabs */}
           <div className="bg-white border border-gray-300 rounded-lg p-2">
             {/* Vesicle Chamber Header - Always visible */}
             <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>vesicle_chamber</div>
