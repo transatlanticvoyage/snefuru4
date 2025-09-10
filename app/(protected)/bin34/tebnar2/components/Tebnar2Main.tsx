@@ -2679,14 +2679,14 @@ export default function Tebnar2Main() {
 
       console.log(`🔍 Found ${nwpiRecordIds.length} NWPI records for site ${selectedSitespren.sitespren_base}`);
 
-      // Now call the f47 API with the NWPI record IDs
-      const response = await fetch('/api/f47_generate_gcon_pieces', {
+      // Now call the f22 API with the NWPI record IDs (restored to working functionality)
+      const response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          internal_post_ids: nwpiRecordIds
+          recordIds: nwpiRecordIds
         }),
       });
 
@@ -2695,16 +2695,17 @@ export default function Tebnar2Main() {
       if (result.success) {
         setTbn2GadgetFeedback({
           action: 'F47 Generate GCon Pieces',
-          message: `Successfully generated ${result.data.created_count} GCon pieces from ${nwpiRecordIds.length} NWPI records.`,
+          message: `Successfully processed ${result.results?.processed || 0} records. Succeeded: ${result.results?.succeeded || 0}, Failed: ${result.results?.failed || 0}.`,
           type: 'success',
           timestamp
         });
         setTbn2F47Error(null); // Clear any previous errors on success
       } else {
-        const errorMessage = result.error || 'Failed to generate GCon pieces';
+        const errorMessage = result.error || 'Failed to process NWPI content';
+        const errorDetails = result.results?.errors?.length > 0 ? ` Errors: ${result.results.errors.join(', ')}` : '';
         setTbn2GadgetFeedback({
           action: 'F47 Generate GCon Pieces',
-          message: `Error: ${errorMessage}`,
+          message: `Error: ${errorMessage}. Processed: ${result.results?.processed || 0}, Succeeded: ${result.results?.succeeded || 0}, Failed: ${result.results?.failed || 0}.${errorDetails}`,
           type: 'error',
           timestamp
         });
