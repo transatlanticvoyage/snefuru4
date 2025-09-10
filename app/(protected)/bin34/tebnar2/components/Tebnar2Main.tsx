@@ -4145,10 +4145,10 @@ export default function Tebnar2Main() {
             )}
           </div>
         </div>
-      </div>
 
-      {/* medieval_chamber - Container for table configuration controls */}
-      <div className={`mb-6 p-4 border border-black bg-white medieval_chamber_div ${tbn2_medievalChamberVisible ? '' : 'hidden'}`} style={{ border: '1px solid black', backgroundColor: '#ffffff' }}>
+        {/* Third Row - Medieval Chamber */}
+        {/* medieval_chamber - Container for table configuration controls */}
+        <div className={`mb-6 p-4 border border-black bg-white medieval_chamber_div ${tbn2_medievalChamberVisible ? '' : 'hidden'}`} style={{ border: '1px solid black', backgroundColor: '#ffffff' }}>
         <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>medieval_chamber</div>
         
         {/* Column Template Controls - positioned just above the main table */}
