@@ -49,6 +49,7 @@ interface SitesprenSite {
   driggs_address_full: string | null;
   driggs_address_species_id: number | null;
   driggs_phone_1: string | null;
+  driggs_phone_country_code: number | null;
   driggs_phone1_platform_id: number | null;
   driggs_cgig_id: number | null;
   driggs_citations_done: boolean | null;
@@ -730,6 +731,7 @@ export default function DriggsmanTable({
     { key: 'driggs_brand_name', type: 'text', label: 'driggs_brand_name', group: 'business' },
     { key: 'driggs_revenue_goal', type: 'number', label: 'driggs_revenue_goal', group: 'business' },
     { key: 'phone_section_separator', type: 'section_header', label: 'phone section', group: 'separator' },
+    { key: 'driggs_phone_country_code', type: 'number', label: 'driggs_phone_country_code', group: 'contact' },
     { key: 'driggs_phone1_platform_id', type: 'platform_dropdown', label: 'driggs_phone1_platform_id', group: 'contact' },
     { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
     { key: 'address_section_separator', type: 'section_header', label: 'address section', group: 'separator' },
