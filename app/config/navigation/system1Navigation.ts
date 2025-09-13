@@ -75,6 +75,10 @@ export const system1Navigation: NavItem[] = [
       {
         name: 'Keyword Jar',
         path: '/kwjar'
+      },
+      {
+        name: 'Fabric Page',
+        path: '/fabric'
       }
     ]
   }
