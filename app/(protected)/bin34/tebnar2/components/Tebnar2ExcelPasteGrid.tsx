@@ -86,6 +86,12 @@ export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData }: 
         >
           <thead>
             <tr>
+              <th className="border border-gray-300 bg-gray-100 w-12 text-center">carrot</th>
+              {colHeaders.map((col, idx) => (
+                <th key={`carrot-${col}`} className="border border-gray-300 bg-gray-100 min-w-[120px] text-center">-</th>
+              ))}
+            </tr>
+            <tr>
               <th className="border border-gray-300 bg-gray-100 w-12 text-center">Row</th>
               {colHeaders.map((col, idx) => (
                 <th key={col} className="border border-gray-300 bg-gray-100 min-w-[120px] text-center">{col}</th>

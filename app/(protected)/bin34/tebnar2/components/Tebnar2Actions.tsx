@@ -88,6 +88,11 @@ export default function Tebnar2Actions({
     }
   };
 
+  const handleClearAllInfo = () => {
+    // Clear the grid data by setting it to empty array
+    onGridDataChange([]);
+  };
+
   return (
     <div className="w-full px-4">
       {/* Preset Data Button - positioned above kzelement6 - exact clone from tebnar1 */}
@@ -104,6 +109,12 @@ export default function Tebnar2Actions({
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-medium"
         >
           download dummy kregno xls info
+        </button>
+        <button
+          onClick={handleClearAllInfo}
+          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 font-medium"
+        >
+          clear all info
         </button>
       </div>
 
