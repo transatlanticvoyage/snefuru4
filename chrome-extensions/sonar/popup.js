@@ -401,13 +401,13 @@ document.addEventListener('DOMContentLoaded', function() {
           rootDomain = hostname;
         }
         
-        // Create driggsman URL
-        const driggsmanUrl = `http://localhost:3000/driggsman?activefilterchamber=daylight&sitesentered=${encodeURIComponent(rootDomain)}`;
+        // Create drom URL
+        const dromUrl = `http://localhost:3000/drom?activefilterchamber=daylight&sitesentered=${encodeURIComponent(rootDomain)}`;
         
         // Open in new tab
-        await chrome.tabs.create({ url: driggsmanUrl, active: true });
+        await chrome.tabs.create({ url: dromUrl, active: true });
         
-        showStatus(`Opened driggsman with root domain: ${rootDomain}`, 'success');
+        showStatus(`Opened drom with root domain: ${rootDomain}`, 'success');
         
         // Close popup after a short delay
         setTimeout(() => {
@@ -419,8 +419,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
     } catch (error) {
-      console.error('Error opening driggsman root:', error);
-      showStatus('Failed to open driggsman', 'error');
+      console.error('Error opening drom root:', error);
+      showStatus('Failed to open drom', 'error');
     } finally {
       driggsmanRootBtn.classList.remove('loading');
     }
@@ -447,13 +447,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Use full hostname including subdomains
         const fullDomain = url.hostname;
         
-        // Create driggsman URL
-        const driggsmanUrl = `http://localhost:3000/driggsman?activefilterchamber=daylight&sitesentered=${encodeURIComponent(fullDomain)}`;
+        // Create drom URL
+        const dromUrl = `http://localhost:3000/drom?activefilterchamber=daylight&sitesentered=${encodeURIComponent(fullDomain)}`;
         
         // Open in new tab
-        await chrome.tabs.create({ url: driggsmanUrl, active: true });
+        await chrome.tabs.create({ url: dromUrl, active: true });
         
-        showStatus(`Opened driggsman with full domain: ${fullDomain}`, 'success');
+        showStatus(`Opened drom with full domain: ${fullDomain}`, 'success');
         
         // Close popup after a short delay
         setTimeout(() => {
@@ -465,8 +465,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
     } catch (error) {
-      console.error('Error opening driggsman with subdomains:', error);
-      showStatus('Failed to open driggsman', 'error');
+      console.error('Error opening drom with subdomains:', error);
+      showStatus('Failed to open drom', 'error');
     } finally {
       driggsmanSubBtn.classList.remove('loading');
     }
