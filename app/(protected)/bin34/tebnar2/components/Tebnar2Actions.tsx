@@ -65,11 +65,32 @@ export default function Tebnar2Actions({
       if (result.success && result.data?.json1) {
         const { headers, rows } = result.data.json1;
         
+        // Map original column order to new column order for export
+        // Original: e_zpf_img_code, e_width, e_height, e_associated_content1, e_file_name1, e_more_instructions1, e_prompt1, e_ai_tool1
+        // New:      e_prompt1, e_zpf_img_code, e_width, e_height, e_associated_content1, e_file_name1, e_more_instructions1, e_ai_tool1, [empty]
+        
+        const originalHeaderMap = headers.reduce((map: Record<string, number>, header: string, index: number) => {
+          map[header] = index;
+          return map;
+        }, {});
+        
+        // New header order for export
+        const newHeaders = ['e_prompt1', 'e_zpf_img_code', 'e_width', 'e_height', 'e_associated_content1', 'e_file_name1', 'e_more_instructions1', 'e_ai_tool1', ''];
+        
+        // Remap the data rows to match new column order
+        const newRows = rows.map((row: string[]) => {
+          return newHeaders.map(header => {
+            if (header === '') return ''; // Empty column
+            const originalIndex = originalHeaderMap[header];
+            return originalIndex !== undefined ? row[originalIndex] : '';
+          });
+        });
+        
         // Create a new workbook
         const wb = XLSX.utils.book_new();
         
-        // Create worksheet data with headers as first row
-        const wsData = [headers, ...rows];
+        // Create worksheet data with new headers as first row and remapped data
+        const wsData = [newHeaders, ...newRows];
         
         // Convert array to worksheet
         const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -89,8 +110,9 @@ export default function Tebnar2Actions({
   };
 
   const handleClearAllInfo = () => {
-    // Clear the grid data by setting it to empty array
-    onGridDataChange([]);
+    // Clear the grid data by resetting it to empty grid structure (11 rows x 9 cols)
+    const emptyGrid = Array.from({ length: 11 }, () => Array(9).fill(''));
+    onGridDataChange(emptyGrid);
   };
 
   return (

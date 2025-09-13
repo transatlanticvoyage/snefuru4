@@ -86,13 +86,19 @@ export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData }: 
         >
           <thead>
             <tr>
-              <th className="border border-gray-300 bg-gray-100 w-12 text-center">carrot</th>
-              {colHeaders.map((col, idx) => (
-                <th key={`carrot-${col}`} className="border border-gray-300 bg-gray-100 min-w-[120px] text-center">-</th>
-              ))}
+              <th className="border border-gray-300 bg-gray-100 w-12 text-center">carrot row</th>
+              <th className="border border-gray-300 bg-gray-100 min-w-[120px] text-center"><strong>e_prompt1</strong></th>
+              <th className="border border-gray-300 bg-gray-100 min-w-[120px] text-center"><strong>e_zpf_img_code</strong></th>
+              <th className="border border-gray-300 bg-gray-100 min-w-[120px] text-center"><strong>e_width</strong></th>
+              <th className="border border-gray-300 bg-gray-100 min-w-[120px] text-center"><strong>e_height</strong></th>
+              <th className="border border-gray-300 bg-gray-100 min-w-[120px] text-center"><strong>e_associated_content1</strong></th>
+              <th className="border border-gray-300 bg-gray-100 min-w-[120px] text-center"><strong>e_file_name1</strong></th>
+              <th className="border border-gray-300 bg-gray-100 min-w-[120px] text-center"><strong>e_more_instructions1</strong></th>
+              <th className="border border-gray-300 bg-gray-100 min-w-[120px] text-center"><strong>e_ai_tool1</strong></th>
+              <th className="border border-gray-300 bg-gray-100 min-w-[120px] text-center"><strong>-</strong></th>
             </tr>
             <tr>
-              <th className="border border-gray-300 bg-gray-100 w-12 text-center">Row</th>
+              <th className="border border-gray-300 bg-gray-100 w-12 text-center">potato row</th>
               {colHeaders.map((col, idx) => (
                 <th key={col} className="border border-gray-300 bg-gray-100 min-w-[120px] text-center">{col}</th>
               ))}

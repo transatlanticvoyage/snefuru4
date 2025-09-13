@@ -17,13 +17,13 @@ export const TBN2_COLUMNS = [
   'rel_users_id',
   'rel_images_plans_batches_id',
   'created_at',
+  'e_prompt1',
   'e_zpf_img_code',
   'e_width',
   'e_height',
   'e_associated_content1',
   'e_file_name1',
   'e_more_instructions1',
-  'e_prompt1',
   'e_ai_tool1',
 ];
 
