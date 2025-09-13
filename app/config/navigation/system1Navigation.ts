@@ -37,14 +37,6 @@ export const system1Navigation: NavItem[] = [
     ]
   },
   {
-    name: '/karmawiz',
-    path: '/karmawiz'
-  },
-  {
-    name: '/karmajar',
-    path: '/karmajar'
-  },
-  {
     name: 'Other Links',
     children: [
       {
