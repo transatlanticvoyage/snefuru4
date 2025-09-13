@@ -1483,7 +1483,7 @@ export default function TornadoClient() {
                 {(selectedBatchId || gconPiece?.asn_image_plan_batch_id) && (
                   <div className="mt-3">
                     <a
-                      href={`https://snef.me/bin42/narpo1?fk_batch_id=${selectedBatchId || gconPiece?.asn_image_plan_batch_id}`}
+                      href={`https://snef.me/narpijar?fk_batch_id=${selectedBatchId || gconPiece?.asn_image_plan_batch_id}`}
                       className="px-4 py-2 rounded inline-block text-center"
                       style={{
                         backgroundColor: '#009bff', // bestlinkcol
@@ -1494,7 +1494,7 @@ export default function TornadoClient() {
                         textDecoration: 'none'
                       }}
                     >
-                      open /narpo1
+                      open /narpijar
                     </a>
                   </div>
                 )}

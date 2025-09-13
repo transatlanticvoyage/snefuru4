@@ -4,6 +4,7 @@ import { Tebnar2ThrottleSettings } from '../types/tebnar2-types';
 import Tebnar2ExcelPasteGrid from './Tebnar2ExcelPasteGrid';
 import { tbn2_func_create_plans_from_xls_2 } from '../utils/tbn2_func_create_plans_from_xls_2';
 import { tbn2_func_create_plans_make_images_2 } from '../utils/tbn2_func_create_plans_make_images_2';
+import * as XLSX from 'xlsx';
 
 interface Tebnar2ActionsProps {
   qtyPerPlan: number;
@@ -53,16 +54,56 @@ export default function Tebnar2Actions({
   onSubmitMakeImages
 }: Tebnar2ActionsProps) {
 
+  const handleDownloadDummyData = async () => {
+    try {
+      const response = await fetch('/api/admin-options/kregno_xls_info_1');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+      
+      const result = await response.json();
+      if (result.success && result.data?.json1) {
+        const { headers, rows } = result.data.json1;
+        
+        // Create a new workbook
+        const wb = XLSX.utils.book_new();
+        
+        // Create worksheet data with headers as first row
+        const wsData = [headers, ...rows];
+        
+        // Convert array to worksheet
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Dummy Kregno Data');
+        
+        // Generate and download the file
+        XLSX.writeFile(wb, 'dummy_kregno_xls_info.xlsx');
+      } else {
+        throw new Error('No data found or invalid format');
+      }
+    } catch (err) {
+      console.error('Error downloading dummy data:', err);
+      alert(`Failed to download dummy data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
   return (
     <div className="w-full px-4">
       {/* Preset Data Button - positioned above kzelement6 - exact clone from tebnar1 */}
-      <div className="mb-4">
+      <div className="mb-4 flex gap-2">
         <button
           onClick={onPresetLoad}
           disabled={loadingPreset}
           className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
         >
           {loadingPreset ? 'Loading...' : 'use dummy kregno xls info 1'}
+        </button>
+        <button
+          onClick={handleDownloadDummyData}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-medium"
+        >
+          download dummy kregno xls info
         </button>
       </div>
 

@@ -55,7 +55,7 @@ const getPageTitle = (path: string): string => {
     '/flatx1': 'JSON Flattener (Elementor)',
     '/slotx1': 'Slot View (Elementor)',
     '/fanex1': 'Prex System Tools (Elementor)',
-    '/narpo1': 'Narpi Image Pushes',
+    '/narpijar': 'Narpi Image Pushes',
     '/myhub': 'MyHub Account Settings',
     '/profile': 'Profile Settings',
     '/downloadplugin': 'Download Snefuruplin WP Plugin'

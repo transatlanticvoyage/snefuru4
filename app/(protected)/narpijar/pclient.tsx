@@ -16,7 +16,7 @@ interface NarpiPush {
   };
 }
 
-export default function Narpo1Client() {
+export default function NarpijarClient() {
   const { user } = useAuth();
   const [pushes, setPushes] = useState<NarpiPush[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,8 +88,8 @@ export default function Narpo1Client() {
     
     // Load state from URL parameters and localStorage
     const urlParamsForLayout = new URLSearchParams(window.location.search);
-    const colTempParam = urlParamsForLayout.get('coltemp') || localStorage.getItem('narpo1_coltemp') || 'option1';
-    const stickyColParam = urlParamsForLayout.get('stickycol') || localStorage.getItem('narpo1_stickycol') || 'option1';
+    const colTempParam = urlParamsForLayout.get('coltemp') || localStorage.getItem('narpijar_coltemp') || 'option1';
+    const stickyColParam = urlParamsForLayout.get('stickycol') || localStorage.getItem('narpijar_stickycol') || 'option1';
     
     setSelectedColumnTemplate(colTempParam);
     setSelectedStickyColumns(stickyColParam);
@@ -431,7 +431,7 @@ export default function Narpo1Client() {
     
     if (!hasTabInUrl) {
       // No tab specified in URL, use last remembered tab from localStorage
-      const lastTab = localStorage.getItem('narpo1_lastActiveTab') || 'ptab1';
+      const lastTab = localStorage.getItem('narpijar_lastActiveTab') || 'ptab1';
       setActivePopupTab(lastTab as any);
       updatePopupURL(true, lastTab);
     } else {
@@ -448,7 +448,7 @@ export default function Narpo1Client() {
   // Handle tab changes with URL updates and localStorage
   const handleTabChange = (tab: string) => {
     setActivePopupTab(tab as any);
-    localStorage.setItem('narpo1_lastActiveTab', tab); // Remember this tab for next time
+    localStorage.setItem('narpijar_lastActiveTab', tab); // Remember this tab for next time
     updatePopupURL(true, tab);
   };
 
@@ -460,8 +460,8 @@ export default function Narpo1Client() {
     window.history.replaceState({}, '', url.toString());
     
     // Update localStorage
-    localStorage.setItem('narpo1_coltemp', colTemp);
-    localStorage.setItem('narpo1_stickycol', stickyCol);
+    localStorage.setItem('narpijar_coltemp', colTemp);
+    localStorage.setItem('narpijar_stickycol', stickyCol);
   };
 
   const handleColumnTemplateChange = (option: string) => {

@@ -218,8 +218,8 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
         path: `${baseUrl}/karfi1`
       },
       {
-        name: '/narpo1 - Narpi Image Pushes',
-        path: '/narpo1'
+        name: '/narpijar - Narpi Image Pushes',
+        path: '/narpijar'
       }
     ]
   };

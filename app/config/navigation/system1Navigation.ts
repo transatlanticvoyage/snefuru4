@@ -33,6 +33,10 @@ export const system1Navigation: NavItem[] = [
       {
         name: 'Karma Jar',
         path: '/karmajar'
+      },
+      {
+        name: 'Narpi Pushes Jar',
+        path: '/narpijar'
       }
     ]
   },
