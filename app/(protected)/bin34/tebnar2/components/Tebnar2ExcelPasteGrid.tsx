@@ -9,9 +9,10 @@ const colHeaders = Array.from({ length: gridCols }, (_, i) => String.fromCharCod
 interface Tebnar2ExcelPasteGridProps {
   onGridDataChange?: (grid: string[][]) => void;
   presetData?: string[][] | null;
+  gridData?: string[][];
 }
 
-export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData }: Tebnar2ExcelPasteGridProps) {
+export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData, gridData }: Tebnar2ExcelPasteGridProps) {
   const [grid, setGrid] = useState<string[][]>(Array.from({ length: gridRows }, () => Array(gridCols).fill('')));
   const [selected, setSelected] = useState<{ row: number; col: number }>({ row: 0, col: 0 });
   const gridRef = useRef<HTMLTableElement>(null);
@@ -40,6 +41,30 @@ export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData }: 
       setGrid(newGrid);
     }
   }, [presetData]);
+
+  // Handle external grid data changes (for clear button, etc.)
+  useEffect(() => {
+    if (gridData !== undefined && Array.isArray(gridData)) {
+      // If it's an empty grid (for clearing), set it directly
+      if (gridData.length === 0 || (gridData.length > 0 && gridData.every(row => Array.isArray(row) && row.every(cell => cell === '')))) {
+        const emptyGrid = Array.from({ length: gridRows }, () => Array(gridCols).fill(''));
+        setGrid(emptyGrid);
+      } else {
+        // Otherwise, use the provided grid data
+        const newGrid = Array.from({ length: gridRows }, () => Array(gridCols).fill(''));
+        gridData.forEach((row, rowIndex) => {
+          if (rowIndex < gridRows && Array.isArray(row)) {
+            row.forEach((cell, colIndex) => {
+              if (colIndex < gridCols) {
+                newGrid[rowIndex][colIndex] = cell || '';
+              }
+            });
+          }
+        });
+        setGrid(newGrid);
+      }
+    }
+  }, [gridData]);
 
   // Handle cell click
   const handleCellClick = (row: number, col: number) => {

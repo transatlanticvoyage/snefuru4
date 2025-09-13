@@ -4611,6 +4611,14 @@ export default function Tebnar2Main() {
                     <h3 className="text-lg font-semibold mb-4">Create New Image Plans</h3>
                     <p className="text-gray-600 mb-6">Use the tools below to create and submit new batches of image plans.</p>
                     
+                    {/* Bat Chamber Section */}
+                    <div className="border border-black border-solid p-4 mb-6">
+                      <div className="font-bold text-base mb-4">bat_chamber</div>
+                      <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium">
+                        use dynorex
+                      </button>
+                    </div>
+                    
                     {/* Actions and Settings - moved from main page */}
                     <Tebnar2Actions
                       qtyPerPlan={tbn2_qtyPerPlan}

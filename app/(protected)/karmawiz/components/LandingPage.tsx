@@ -921,7 +921,7 @@ https://airductcharleston.com/wp-admin/post.php?post=826&action=elementor
                   
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      vez_karmawizardsessions.vez_janky_rel_sitesprivate_id
+                      karma_wizard_sessions.rel_sitespren_id
                     </label>
                     <input
                       type="text"
