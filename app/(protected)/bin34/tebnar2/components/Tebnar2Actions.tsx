@@ -110,9 +110,12 @@ export default function Tebnar2Actions({
   };
 
   const handleClearAllInfo = () => {
+    console.log('Clear button clicked - creating empty grid');
     // Clear the grid data by resetting it to empty grid structure (11 rows x 9 cols)
     const emptyGrid = Array.from({ length: 11 }, () => Array(9).fill(''));
+    console.log('Empty grid created:', emptyGrid);
     onGridDataChange(emptyGrid);
+    console.log('onGridDataChange called with empty grid');
   };
 
   return (
