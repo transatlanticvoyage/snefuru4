@@ -1505,7 +1505,7 @@ export default function Tebnar2Main() {
       url.searchParams.set('fpop', 'open');
       
       // Clear all tab parameters first
-      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].forEach(tab => {
+      ['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1'].forEach(tab => {
         url.searchParams.delete(tab);
       });
       
@@ -1519,7 +1519,7 @@ export default function Tebnar2Main() {
     } else {
       // Remove popup and all tab parameters when popup is closed
       url.searchParams.delete('fpop');
-      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].forEach(tab => {
+      ['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1'].forEach(tab => {
         url.searchParams.delete(tab);
       });
     }
@@ -1542,7 +1542,7 @@ export default function Tebnar2Main() {
     
     // Check if URL has specific tab parameter
     const urlParams = new URLSearchParams(window.location.search);
-    const hasTabInUrl = ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7']
+    const hasTabInUrl = ['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1']
       .some(tab => urlParams.get(tab) === 'active');
     
     if (!hasTabInUrl) {
@@ -4280,7 +4280,7 @@ export default function Tebnar2Main() {
 
       {/* Functions Popup Modal - cloned from nwjar1 */}
       {tbn2_isPopupOpen && (
-        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center px-4">
           <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative overflow-hidden">
             {/* uelbar37 header bar */}
             <div 
@@ -4494,7 +4494,7 @@ export default function Tebnar2Main() {
               {/* Tab Navigation */}
               <div className="border-b border-gray-200 bg-gray-50">
                 <nav className="flex">
-                  {['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].map((tab) => (
+                  {['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => tbn2_handleTabChange(tab)}
