@@ -298,7 +298,8 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
     { name: 'cdnjar', path: '/cdnjar' },
     { name: 'glacr', path: '/glacr' },
     { name: '/planchjar', path: '/planchjar' },
-    { name: 'cplatzar', path: '/cplatzar' }
+    { name: 'cplatzar', path: '/cplatzar' },
+    { name: '/tebnar2', path: '/bin34/tebnar2' }
   ];
 
   // Debug logging

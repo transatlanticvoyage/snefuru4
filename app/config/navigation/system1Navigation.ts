@@ -16,6 +16,27 @@ export const system1Navigation: NavItem[] = [
     path: '/drom'
   },
   {
+    name: 'Image Generation',
+    children: [
+      {
+        name: 'Generate Images (/tebnar2)',
+        path: '/bin34/tebnar2'
+      },
+      {
+        name: '__separator__',
+        path: undefined
+      },
+      {
+        name: 'Karma Wizard',
+        path: '/karmawiz'
+      },
+      {
+        name: 'Karma Jar',
+        path: '/karmajar'
+      }
+    ]
+  },
+  {
     name: '/karmawiz',
     path: '/karmawiz'
   },
