@@ -4475,7 +4475,7 @@ export default function Tebnar2Main() {
                 className="absolute right-0 top-0 bg-gray-400 text-gray-800 font-bold flex items-center justify-center hover:bg-gray-500 transition-colors"
                 style={{
                   width: '260px',
-                  height: '100px', // Spans both 50px bars
+                  height: '150px', // Spans all three visual rows
                   border: '2px solid #4a4a4a',
                   fontSize: '14px',
                   flexDirection: 'column',
@@ -4489,8 +4489,42 @@ export default function Tebnar2Main() {
               </button>
             </div>
             
-            {/* Popup content - adjusted to start below both headers */}
-            <div className="h-full" style={{ paddingTop: '100px' }}>
+            {/* uelbar45 section */}
+            <div 
+              className="absolute left-0 flex items-center px-4"
+              style={{ 
+                top: '100px',
+                right: '260px', // Leave space for close button
+                backgroundColor: '#f3f4f6',
+                color: '#374151'
+              }}
+            >
+              <span className="font-semibold mr-4">uelbar45</span>
+              
+              <table style={{ borderCollapse: 'collapse', fontSize: '16px' }}>
+                <thead>
+                  <tr>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                      <th key={num} style={{ border: '1px solid gray', padding: '0' }}>
+                        <div className="cell_inner_wrapper_div">{num}</div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                      <td key={num} style={{ border: '1px solid gray', padding: '0' }}>
+                        <div className="cell_inner_wrapper_div">-</div>
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Popup content - adjusted to start below all three headers */}
+            <div className="h-full" style={{ paddingTop: '150px' }}>
               {/* Tab Navigation */}
               <div className="border-b border-gray-200 bg-gray-50">
                 <nav className="flex">
