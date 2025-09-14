@@ -62,9 +62,9 @@ export default function Tebnar2Main() {
   const [tbn2_imagesById, setTbn2ImagesById] = useState<Record<string, Tebnar2Image>>({});
   const [tbn2_generateZip, setTbn2GenerateZip] = useState(false);
   const [tbn2_wipeMeta, setTbn2WipeMeta] = useState(true);
-  const [tbn2_screenshotImages, setTbn2ScreenshotImages] = useState(false);
+  const [tbn2_screenshotImages, setTbn2ScreenshotImages] = useState(true);
   const [tbn2_alterpro, setTbn2Alterpro] = useState({
-    enabled: false,
+    enabled: true,
     edgePercentages: {
       top: '1-5%',
       bottom: '1-5%',
