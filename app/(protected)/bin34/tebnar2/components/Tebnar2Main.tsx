@@ -62,6 +62,7 @@ export default function Tebnar2Main() {
   const [tbn2_imagesById, setTbn2ImagesById] = useState<Record<string, Tebnar2Image>>({});
   const [tbn2_generateZip, setTbn2GenerateZip] = useState(false);
   const [tbn2_wipeMeta, setTbn2WipeMeta] = useState(true);
+  const [tbn2_screenshotImages, setTbn2ScreenshotImages] = useState(false);
   const [tbn2_throttle1, setTbn2Throttle1] = useState<Tebnar2ThrottleSettings>(TBN2_DEFAULT_THROTTLE);
   const [tbn2_fetchingImages, setTbn2FetchingImages] = useState<Set<string>>(new Set());
   const [tbn2_loadingPreset, setTbn2LoadingPreset] = useState(false);
@@ -78,6 +79,9 @@ export default function Tebnar2Main() {
   // Sorting state - default to submission_order ascending
   const [tbn2_sortColumn, setTbn2SortColumn] = useState<string | null>('submission_order');
   const [tbn2_sortDirection, setTbn2SortDirection] = useState<'asc' | 'desc'>('asc');
+  
+  // Rename file state
+  const [tbn2_renamingFiles, setTbn2RenamingFiles] = useState<Set<string>>(new Set());
   
   // Sitespren state for asn_sitespren_id widget
   const [tbn2_sitesprenOptions, setTbn2SitesprenOptions] = useState<Array<{id: string, sitespren_base: string}>>([]);
@@ -754,6 +758,7 @@ export default function Tebnar2Main() {
         aiModel: tbn2_aiModel,
         generateZip: tbn2_generateZip,
         wipeMeta: tbn2_wipeMeta,
+        screenshotImages: tbn2_screenshotImages,
         throttle1: tbn2_throttle1,
         gridData: tbn2_gridData,
         batchId: tbn2_selectedBatchId
@@ -1028,7 +1033,7 @@ export default function Tebnar2Main() {
   const tbn2_getAllTableColumns = () => {
     return [
       'submission_order',
-      'int1', 'fk_image1_id', 'image1-preview',
+      'int1', 'fk_image1_id', 'image1-preview', 'supabase-filename', 'rename-field-1',
       'int2', 'fk_image2_id', 'image2-preview',
       'int3', 'fk_image3_id', 'image3-preview',
       'int4', 'fk_image4_id', 'image4-preview',
@@ -1073,6 +1078,39 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Rename file handler function
+  const tbn2_handleRenameFile = async (imageId: string, newFilename: string) => {
+    try {
+      setTbn2RenamingFiles(prev => new Set([...prev, imageId]));
+
+      const response = await fetch('/api/tbn2_rename_file', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageId, newFilename })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Refresh images to show updated filename
+        tbn2_fetchImages();
+        console.log(`✅ Successfully renamed file: ${result.message}`);
+      } else {
+        console.error(`❌ Failed to rename file: ${result.message}`);
+        alert(`Failed to rename file: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('❌ Error renaming file:', error);
+      alert(`Error renaming file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setTbn2RenamingFiles(prev => {
+        const updated = new Set(prev);
+        updated.delete(imageId);
+        return updated;
+      });
+    }
+  };
+
   // Function to sort plans data
   const tbn2_getSortedPlans = (plans: Tebnar2ImagePlan[]) => {
     if (!tbn2_sortColumn) {
@@ -1110,6 +1148,8 @@ export default function Tebnar2Main() {
       int1: '60px', int2: '60px', int3: '60px', int4: '60px',
       fk_image1_id: '45px', fk_image2_id: '45px', fk_image3_id: '45px', fk_image4_id: '45px',
       'image1-preview': '100px', 'image2-preview': '100px', 'image3-preview': '100px', 'image4-preview': '100px',
+      'supabase-filename': '180px',
+      'rename-field-1': '220px',
       id: '200px', rel_users_id: '150px', rel_images_plans_batches_id: '150px', created_at: '160px',
       e_zpf_img_code: '120px', e_width: '80px', e_height: '80px', e_associated_content1: '200px',
       e_file_name1: '200px', e_more_instructions1: '250px', e_prompt1: '300px', e_ai_tool1: '120px'
@@ -4582,6 +4622,8 @@ export default function Tebnar2Main() {
         sortColumn={tbn2_sortColumn}
         sortDirection={tbn2_sortDirection}
         onSort={tbn2_handleSort}
+        renamingFiles={tbn2_renamingFiles}
+        onRenameFile={tbn2_handleRenameFile}
       />
 
       {/* Functions Popup Modal - cloned from nwjar1 */}
@@ -5490,6 +5532,8 @@ export default function Tebnar2Main() {
                       onGenerateZipChange={setTbn2GenerateZip}
                       wipeMeta={tbn2_wipeMeta}
                       onWipeMetaChange={setTbn2WipeMeta}
+                      screenshotImages={tbn2_screenshotImages}
+                      onScreenshotImagesChange={setTbn2ScreenshotImages}
                       throttle1={tbn2_throttle1}
                       onThrottle1Change={setTbn2Throttle1}
                       submitLoading={tbn2_submitLoading}

@@ -6,7 +6,7 @@ import { logger } from '@/lib/error-logger';
 
 export async function POST(request: Request) {
   try {
-    const { records, qty, aiModel, generateZip, wipeMeta, throttle1, gridData, batchId } = await request.json();
+    const { records, qty, aiModel, generateZip, wipeMeta, screenshotImages, throttle1, gridData, batchId } = await request.json();
     if (!Array.isArray(records) || records.length === 0) {
       return NextResponse.json({ success: false, message: 'No records provided' }, { status: 400 });
     }
@@ -42,6 +42,7 @@ export async function POST(request: Request) {
           ai_model: aiModel,
           generate_zip: generateZip,
           wipe_meta: wipeMeta,
+          screenshot_images: screenshotImages || false,
           throttle1_enabled: throttle1?.enabled || false,
           throttle1_settings: throttle1?.enabled ? {
             delay_between_images: throttle1.delayBetweenImages,
@@ -397,13 +398,134 @@ export async function POST(request: Request) {
       });
     }
 
+    // POST-PROCESSING: SabertoothScreenshotImages if enabled
+    let screenshotResults: any[] = [];
+    if (screenshotImages && screenshotImages === true) {
+      await logger.info({
+        category: 'tbn2_sabertooth_screenshot',
+        message: `Tebnar2: Starting post-processing screenshots for batch ${batchId}`,
+        details: {
+          totalPlans: updatedPlans.length,
+          screenshotEnabled: true,
+          sourceSystem: 'tebnar2'
+        },
+        batch_id: batchId
+      });
+
+      try {
+        // Import the SabertoothScreenshotImages function
+        const { SabertoothScreenshotImages } = await import('@/app/(protected)/bin34/tebnar2/utils/SabertoothScreenshotImages');
+        
+        // Collect all successfully generated image IDs for screenshot processing
+        const imageIdsToProcess: string[] = [];
+        updatedPlans.forEach(plan => {
+          [plan.fk_image1_id, plan.fk_image2_id, plan.fk_image3_id, plan.fk_image4_id].forEach(imageId => {
+            if (imageId && typeof imageId === 'string') {
+              imageIdsToProcess.push(imageId);
+            }
+          });
+        });
+
+        if (imageIdsToProcess.length > 0) {
+          await logger.info({
+            category: 'tbn2_sabertooth_screenshot',
+            message: `Tebnar2: Processing ${imageIdsToProcess.length} images for screenshots`,
+            details: {
+              imageIds: imageIdsToProcess,
+              sourceSystem: 'tebnar2'
+            },
+            batch_id: batchId
+          });
+
+          // Process screenshots for all generated images
+          for (const imageId of imageIdsToProcess) {
+            const screenshotResult = await SabertoothScreenshotImages(imageId, session!.user.id);
+            screenshotResults.push({
+              imageId: imageId,
+              ...screenshotResult
+            });
+
+            // Log individual screenshot result
+            if (screenshotResult.success) {
+              await logger.info({
+                category: 'tbn2_sabertooth_screenshot',
+                message: `Tebnar2: Successfully processed screenshot for image ${imageId}`,
+                details: {
+                  imageId: imageId,
+                  originalUrl: screenshotResult.originalUrl,
+                  screenshotUrl: screenshotResult.screenshotUrl,
+                  sourceSystem: 'tebnar2'
+                },
+                batch_id: batchId
+              });
+            } else {
+              await logger.error({
+                category: 'tbn2_sabertooth_screenshot',
+                message: `Tebnar2: Failed to process screenshot for image ${imageId}`,
+                details: {
+                  imageId: imageId,
+                  error: screenshotResult.error,
+                  sourceSystem: 'tebnar2'
+                },
+                batch_id: batchId
+              });
+            }
+
+            // Small delay between screenshots to be gentle on resources
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+
+          const successfulScreenshots = screenshotResults.filter(r => r.success).length;
+          await logger.info({
+            category: 'tbn2_sabertooth_screenshot',
+            message: `Tebnar2: Completed screenshot processing for batch ${batchId}`,
+            details: {
+              totalImages: imageIdsToProcess.length,
+              successfulScreenshots: successfulScreenshots,
+              failedScreenshots: imageIdsToProcess.length - successfulScreenshots,
+              sourceSystem: 'tebnar2'
+            },
+            batch_id: batchId
+          });
+        } else {
+          await logger.info({
+            category: 'tbn2_sabertooth_screenshot',
+            message: `Tebnar2: No images found to process for screenshots in batch ${batchId}`,
+            details: {
+              sourceSystem: 'tebnar2'
+            },
+            batch_id: batchId
+          });
+        }
+
+      } catch (screenshotError) {
+        await logger.error({
+          category: 'tbn2_sabertooth_screenshot',
+          message: `Tebnar2: Error during screenshot processing for batch ${batchId}`,
+          details: {
+            error: screenshotError instanceof Error ? screenshotError.message : String(screenshotError),
+            sourceSystem: 'tebnar2'
+          },
+          batch_id: batchId,
+          stack_trace: screenshotError instanceof Error ? screenshotError.stack : undefined
+        });
+        // Don't fail the entire operation if screenshot processing fails
+      }
+    }
+
+    const successfulScreenshots = screenshotResults.filter(r => r.success).length;
+    const screenshotMessage = screenshotImages && screenshotResults.length > 0 
+      ? ` Screenshots: ${successfulScreenshots}/${screenshotResults.length} processed.`
+      : '';
+
     return NextResponse.json({ 
       success: true, 
-      message: `🚀 Tebnar2: Generated ${updatedPlans.length} plans with images in batch ${batchId}.`, 
+      message: `🚀 Tebnar2: Generated ${updatedPlans.length} plans with images in batch ${batchId}.${screenshotMessage}`, 
       batch_id: batchId, 
       plans: updatedPlans,
       source_system: 'tebnar2',
-      batch_folder: batchFolder
+      batch_folder: batchFolder,
+      screenshot_results: screenshotImages ? screenshotResults : undefined
     });
   } catch (error) {
     return NextResponse.json({ success: false, message: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });

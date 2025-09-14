@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Tebnar2ImagePlan, Tebnar2Image } from '../types/tebnar2-types';
 import { TBN2_PAGE_SIZE_OPTIONS } from '../constants/tebnar2-constants';
 import Tebnar2ImagePreview from './Tebnar2ImagePreview';
@@ -26,6 +27,12 @@ const tbn2_columnSettings = {
   'image2-preview': { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
   'image3-preview': { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
   'image4-preview': { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
+  
+  // Supabase filename column
+  'supabase-filename': { width: '180px', minWidth: '150px', maxWidth: '220px', textAlign: 'left' },
+  
+  // Rename field column
+  'rename-field-1': { width: '220px', minWidth: '200px', maxWidth: '250px', textAlign: 'left' },
   
   // Data columns
   id: { width: '200px', minWidth: '150px', maxWidth: '250px', textAlign: 'left' },
@@ -98,6 +105,8 @@ const tbn2_headerCustomizationSettings = {
     'image2-preview': 'center' as const,
     'image3-preview': 'center' as const,
     'image4-preview': 'center' as const,
+    'supabase-filename': 'left' as const,
+    'rename-field-1': 'left' as const,
     id: 'left' as const,
     rel_users_id: 'center' as const,
     rel_images_plans_batches_id: 'center' as const,
@@ -257,6 +266,12 @@ const tbn2_tableCellPaddingSettings = {
     'image3-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     'image4-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     
+    // Supabase filename column - 4px padding
+    'supabase-filename': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    
+    // Rename field column - 4px padding
+    'rename-field-1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    
     // Image ID columns - 4px padding
     'fk_image1_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     'fk_image2_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
@@ -406,6 +421,8 @@ interface Tebnar2TableProps {
   sortColumn: string | null;
   sortDirection: 'asc' | 'desc';
   onSort: (columnKey: string) => void;
+  renamingFiles: Set<string>;
+  onRenameFile: (imageId: string, newFilename: string) => void;
 }
 
 export default function Tebnar2Table({
@@ -429,8 +446,13 @@ export default function Tebnar2Table({
   onSelectionChange,
   sortColumn,
   sortDirection,
-  onSort
+  onSort,
+  renamingFiles,
+  onRenameFile
 }: Tebnar2TableProps) {
+
+  // State for tracking rename input values
+  const [renameInputs, setRenameInputs] = useState<Record<string, string>>({});
 
   // Get non-sticky visible columns (sticky columns are handled separately)
   const nonStickyColumns = visibleColumns.slice(stickyColumns.length);
@@ -459,6 +481,27 @@ export default function Tebnar2Table({
 
   const handleCheckboxCellClick = (planId: string) => {
     handleSelectRow(planId);
+  };
+
+  // Rename input handlers
+  const handleRenameInputChange = (imageId: string, value: string) => {
+    setRenameInputs(prev => ({
+      ...prev,
+      [imageId]: value
+    }));
+  };
+
+  const handleRenameSubmit = (imageId: string) => {
+    const newFilename = renameInputs[imageId];
+    if (newFilename && newFilename.trim()) {
+      onRenameFile(imageId, newFilename.trim());
+      // Clear the input after submission
+      setRenameInputs(prev => {
+        const updated = { ...prev };
+        delete updated[imageId];
+        return updated;
+      });
+    }
   };
 
   // Function to render sort indicator
@@ -575,6 +618,7 @@ export default function Tebnar2Table({
                 // Get width settings - use the new getColumnWidth function
                 const width = getColumnWidth(col);
                 const isLastSticky = index === stickyColumns.length - 1;
+                const hasBlackSeparator = col === 'image1-preview' || isLastSticky;
                 
                 return (
                   <th
@@ -588,7 +632,7 @@ export default function Tebnar2Table({
                       left: `calc(50px + ${calculateStickyLeft(index)})`,
                       zIndex: 20,
                       backgroundColor: tbn2_headerCustomizationSettings.headerRow.backgroundColor,
-                      borderRight: isLastSticky ? '4px solid black' : '1px solid #c7cbd3',
+                      borderRight: hasBlackSeparator ? '4px solid black' : '1px solid #c7cbd3',
                       fontSize: tbn2_headerCustomizationSettings.headerText.fontSize,
                       fontWeight: tbn2_headerCustomizationSettings.headerText.fontWeight,
                       color: tbn2_headerCustomizationSettings.headerText.color,
@@ -610,7 +654,9 @@ export default function Tebnar2Table({
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {col.startsWith('image') && col.includes('preview') ? 'Preview' : col}
+                      {col.startsWith('image') && col.includes('preview') ? 'Preview' : 
+                       col === 'supabase-filename' ? 'supabase filename:' :
+                       col === 'rename-field-1' ? 'rename field 1' : col}
                       {col === 'submission_order' && renderSortIndicator(col)}
                     </div>
                   </th>
@@ -652,7 +698,9 @@ export default function Tebnar2Table({
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {col.startsWith('image') && col.includes('preview') ? 'Preview' : col}
+                      {col.startsWith('image') && col.includes('preview') ? 'Preview' : 
+                       col === 'supabase-filename' ? 'supabase filename:' :
+                       col === 'rename-field-1' ? 'rename field 1' : col}
                       {col === 'submission_order' && renderSortIndicator(col)}
                     </div>
                   </th>
@@ -701,6 +749,7 @@ export default function Tebnar2Table({
                 {stickyColumns.map((col, index) => {
                   const width = getColumnWidth(col);
                   const isLastSticky = index === stickyColumns.length - 1;
+                  const hasBlackSeparator = col === 'image1-preview' || isLastSticky;
                   
                   return (
                     <td
@@ -713,7 +762,7 @@ export default function Tebnar2Table({
                         left: `calc(50px + ${calculateStickyLeft(index)})`,
                         zIndex: 10,
                         backgroundColor: '#ffffff',
-                        borderRight: isLastSticky ? '4px solid black' : '1px solid #c7cbd3',
+                        borderRight: hasBlackSeparator ? '4px solid black' : '1px solid #c7cbd3',
                         padding: '4px 4px',
                         verticalAlign: 'top',
                         overflow: 'hidden',
@@ -741,6 +790,66 @@ export default function Tebnar2Table({
                           onRefreshImages={onRefreshImages}
                           onFetchSingleImage={onFetchSingleImage}
                         />
+                      ) : col === 'supabase-filename' ? (
+                        (() => {
+                          // Get the image for image1 (this column is specifically for image1 filename)
+                          const image = plan['fk_image1_id'] ? imagesById[plan['fk_image1_id']] : null;
+                          if (image && image.img_file_url1) {
+                            // Extract filename from the full URL
+                            const url = image.img_file_url1;
+                            const filename = url.substring(url.lastIndexOf('/') + 1);
+                            return filename;
+                          }
+                          return '-';
+                        })()
+                      ) : col === 'rename-field-1' ? (
+                        (() => {
+                          // Get the image for image1 (this column is specifically for image1 renaming)
+                          const image = plan['fk_image1_id'] ? imagesById[plan['fk_image1_id']] : null;
+                          if (image && image.img_file_url1) {
+                            const imageId = image.id;
+                            const currentFilename = image.img_file_url1.substring(image.img_file_url1.lastIndexOf('/') + 1);
+                            const filenameWithoutExt = currentFilename.substring(0, currentFilename.lastIndexOf('.'));
+                            const isRenaming = renamingFiles.has(imageId);
+                            
+                            return (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <input
+                                  type="text"
+                                  value={renameInputs[imageId] || ''}
+                                  onChange={(e) => handleRenameInputChange(imageId, e.target.value)}
+                                  placeholder={filenameWithoutExt}
+                                  disabled={isRenaming}
+                                  style={{
+                                    flex: 1,
+                                    padding: '2px 4px',
+                                    fontSize: '12px',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '2px',
+                                    minWidth: '100px'
+                                  }}
+                                />
+                                <button
+                                  onClick={() => handleRenameSubmit(imageId)}
+                                  disabled={isRenaming || !renameInputs[imageId]?.trim()}
+                                  style={{
+                                    padding: '2px 6px',
+                                    fontSize: '11px',
+                                    border: '1px solid #007bff',
+                                    borderRadius: '2px',
+                                    backgroundColor: isRenaming ? '#ccc' : '#007bff',
+                                    color: 'white',
+                                    cursor: isRenaming || !renameInputs[imageId]?.trim() ? 'not-allowed' : 'pointer',
+                                    whiteSpace: 'nowrap'
+                                  }}
+                                >
+                                  {isRenaming ? '...' : 'submit'}
+                                </button>
+                              </div>
+                            );
+                          }
+                          return <span style={{ color: '#999', fontSize: '11px' }}>No image</span>;
+                        })()
                       ) : (
                         String(plan[col as keyof typeof plan] ?? '')
                       )}
@@ -788,6 +897,66 @@ export default function Tebnar2Table({
                           onRefreshImages={onRefreshImages}
                           onFetchSingleImage={onFetchSingleImage}
                         />
+                      ) : col === 'supabase-filename' ? (
+                        (() => {
+                          // Get the image for image1 (this column is specifically for image1 filename)
+                          const image = plan['fk_image1_id'] ? imagesById[plan['fk_image1_id']] : null;
+                          if (image && image.img_file_url1) {
+                            // Extract filename from the full URL
+                            const url = image.img_file_url1;
+                            const filename = url.substring(url.lastIndexOf('/') + 1);
+                            return filename;
+                          }
+                          return '-';
+                        })()
+                      ) : col === 'rename-field-1' ? (
+                        (() => {
+                          // Get the image for image1 (this column is specifically for image1 renaming)
+                          const image = plan['fk_image1_id'] ? imagesById[plan['fk_image1_id']] : null;
+                          if (image && image.img_file_url1) {
+                            const imageId = image.id;
+                            const currentFilename = image.img_file_url1.substring(image.img_file_url1.lastIndexOf('/') + 1);
+                            const filenameWithoutExt = currentFilename.substring(0, currentFilename.lastIndexOf('.'));
+                            const isRenaming = renamingFiles.has(imageId);
+                            
+                            return (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <input
+                                  type="text"
+                                  value={renameInputs[imageId] || ''}
+                                  onChange={(e) => handleRenameInputChange(imageId, e.target.value)}
+                                  placeholder={filenameWithoutExt}
+                                  disabled={isRenaming}
+                                  style={{
+                                    flex: 1,
+                                    padding: '2px 4px',
+                                    fontSize: '12px',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '2px',
+                                    minWidth: '100px'
+                                  }}
+                                />
+                                <button
+                                  onClick={() => handleRenameSubmit(imageId)}
+                                  disabled={isRenaming || !renameInputs[imageId]?.trim()}
+                                  style={{
+                                    padding: '2px 6px',
+                                    fontSize: '11px',
+                                    border: '1px solid #007bff',
+                                    borderRadius: '2px',
+                                    backgroundColor: isRenaming ? '#ccc' : '#007bff',
+                                    color: 'white',
+                                    cursor: isRenaming || !renameInputs[imageId]?.trim() ? 'not-allowed' : 'pointer',
+                                    whiteSpace: 'nowrap'
+                                  }}
+                                >
+                                  {isRenaming ? '...' : 'submit'}
+                                </button>
+                              </div>
+                            );
+                          }
+                          return <span style={{ color: '#999', fontSize: '11px' }}>No image</span>;
+                        })()
                       ) : (
                         String(plan[col as keyof typeof plan] ?? '')
                       )}

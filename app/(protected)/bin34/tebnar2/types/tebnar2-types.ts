@@ -28,7 +28,16 @@ export interface Tebnar2Image {
   id: string;
   rel_users_id: string;
   created_at: string;
+  rel_images_plans_id?: string;
   img_file_url1?: string;
+  img_file_extension?: string;
+  img_file_size?: number;
+  width?: number;
+  height?: number;
+  prompt1?: string;
+  status?: string;
+  function_used_to_fetch_the_image?: string;
+  // Legacy fields for compatibility
   file_name?: string;
   file_size?: number;
   metadata?: any;
@@ -152,7 +161,7 @@ export interface Tebnar2State {
   lastClickTime: Record<string, number>;
 }
 
-export type Tebnar2ColumnKey = keyof Tebnar2ImagePlan | 'image1-preview' | 'image2-preview' | 'image3-preview' | 'image4-preview';
+export type Tebnar2ColumnKey = keyof Tebnar2ImagePlan | 'image1-preview' | 'image2-preview' | 'image3-preview' | 'image4-preview' | 'supabase-filename' | 'rename-field-1';
 
 export interface Tebnar2ComponentProps {
   // Add component-specific props as needed

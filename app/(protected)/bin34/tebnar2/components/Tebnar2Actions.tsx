@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Tebnar2ThrottleSettings } from '../types/tebnar2-types';
 import Tebnar2ExcelPasteGrid from './Tebnar2ExcelPasteGrid';
 import { tbn2_func_create_plans_from_xls_2 } from '../utils/tbn2_func_create_plans_from_xls_2';
@@ -15,6 +16,8 @@ interface Tebnar2ActionsProps {
   onGenerateZipChange: (generate: boolean) => void;
   wipeMeta: boolean;
   onWipeMetaChange: (wipe: boolean) => void;
+  screenshotImages: boolean;
+  onScreenshotImagesChange: (screenshot: boolean) => void;
   throttle1: Tebnar2ThrottleSettings;
   onThrottle1Change: (throttle: Tebnar2ThrottleSettings) => void;
   submitLoading: boolean;
@@ -39,6 +42,8 @@ export default function Tebnar2Actions({
   onGenerateZipChange,
   wipeMeta,
   onWipeMetaChange,
+  screenshotImages,
+  onScreenshotImagesChange,
   throttle1,
   onThrottle1Change,
   submitLoading,
@@ -53,6 +58,13 @@ export default function Tebnar2Actions({
   onSubmitCreatePlans,
   onSubmitMakeImages
 }: Tebnar2ActionsProps) {
+  const [screenshotSizeAccordionOpen, setScreenshotSizeAccordionOpen] = useState(false);
+  const [edgePercentages, setEdgePercentages] = useState({
+    top: '1-5%',
+    bottom: '1-5%',
+    left: '1-5%',
+    right: '1-5%'
+  });
 
   const handleDownloadDummyData = async () => {
     try {
@@ -215,6 +227,74 @@ export default function Tebnar2Actions({
           />
           <label htmlFor="wipe-meta" className="text-sm font-medium">Wipe all meta data from images</label>
         </div>
+
+        <hr className="my-4 border-t border-gray-300" />
+
+        {/* Screenshot Images Checkbox */}
+        <div className="flex items-center mb-2">
+          <input
+            id="screenshot-images"
+            type="checkbox"
+            checked={screenshotImages}
+            onChange={e => onScreenshotImagesChange(e.target.checked)}
+            className="mr-2"
+          />
+          <label htmlFor="screenshot-images" className="text-sm font-medium">Screenshot images</label>
+        </div>
+
+        <hr className="my-4 border-t border-gray-300" />
+
+        {/* Screenshot Size Alterpro Option - only show if screenshot images is checked */}
+        {screenshotImages && (
+          <div className="mb-4">
+            <div className="flex items-center mb-2">
+              <span className="text-sm font-medium">Use "screenshot size alterpro"</span>
+            </div>
+            
+            <div className="mb-2">
+              <button
+                onClick={() => setScreenshotSizeAccordionOpen(!screenshotSizeAccordionOpen)}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1 rounded border text-sm font-medium transition-colors duration-150"
+              >
+                {screenshotSizeAccordionOpen ? 'collapse options' : 'expand options'}
+              </button>
+            </div>
+            
+            {screenshotSizeAccordionOpen && (
+              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <div className="text-xs text-gray-600 mb-3">
+                  Configure edge clipping percentages for downsized screenshot selection:
+                </div>
+                <table className="w-full border-collapse border border-gray-300 text-sm">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border border-gray-300 px-3 py-2 text-left font-medium">Edge</th>
+                      <th className="border border-gray-300 px-3 py-2 text-left font-medium">Percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(edgePercentages).map(([edge, percentage]) => (
+                      <tr key={edge}>
+                        <td className="border border-gray-300 px-3 py-2 capitalize">{edge}</td>
+                        <td className="border border-gray-300 px-3 py-2">
+                          <input
+                            type="text"
+                            value={percentage}
+                            onChange={(e) => setEdgePercentages(prev => ({ ...prev, [edge]: e.target.value }))}
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            placeholder="1-5%"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        <hr className="my-4 border-t border-gray-300" />
         
         {/* Throttle1 Controls - exact clone from tebnar1 */}
         <div className="border-t border-gray-200 pt-4 mt-4">

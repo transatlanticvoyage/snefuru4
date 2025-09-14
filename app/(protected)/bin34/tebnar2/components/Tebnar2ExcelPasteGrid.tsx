@@ -101,6 +101,9 @@ export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData, gr
 
   // Handle paste for individual input cells (plain text)
   const handleInputPaste = (e: React.ClipboardEvent<HTMLInputElement>, row: number, col: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     const pastedText = e.clipboardData.getData('text/plain');
     
     // Update the grid state with the pasted text
@@ -109,9 +112,6 @@ export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData, gr
       newGrid[row][col] = pastedText;
       return newGrid;
     });
-    
-    // Prevent the table paste handler from interfering
-    e.stopPropagation();
   };
 
   return (
