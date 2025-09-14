@@ -454,6 +454,25 @@ export default function Tebnar2Table({
   // State for tracking rename input values
   const [renameInputs, setRenameInputs] = useState<Record<string, string>>({});
 
+  // State for mongoose parse option - default is "hyphen"
+  const [mongooseParseOption, setMongooseParseOption] = useState<'hyphen' | 'underscore' | 'condense' | 'leave-spaces'>('hyphen');
+
+  // Mongoose parse function
+  const applyMongooseParse = (text: string): string => {
+    switch (mongooseParseOption) {
+      case 'hyphen':
+        return text.replace(/\s+/g, '-');
+      case 'underscore':
+        return text.replace(/\s+/g, '_');
+      case 'condense':
+        return text.replace(/\s+/g, '');
+      case 'leave-spaces':
+        return text;
+      default:
+        return text;
+    }
+  };
+
   // Get non-sticky visible columns (sticky columns are handled separately)
   const nonStickyColumns = visibleColumns.slice(stickyColumns.length);
 
@@ -494,7 +513,9 @@ export default function Tebnar2Table({
   const handleRenameSubmit = (imageId: string) => {
     const newFilename = renameInputs[imageId];
     if (newFilename && newFilename.trim()) {
-      onRenameFile(imageId, newFilename.trim());
+      // Apply mongoose parse to process spaces based on selected option
+      const processedFilename = applyMongooseParse(newFilename.trim());
+      onRenameFile(imageId, processedFilename);
       // Clear the input after submission
       setRenameInputs(prev => {
         const updated = { ...prev };
@@ -656,7 +677,35 @@ export default function Tebnar2Table({
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {col.startsWith('image') && col.includes('preview') ? 'Preview' : 
                        col === 'supabase-filename' ? 'supabase filename:' :
-                       col === 'rename-field-1' ? 'rename field 1' : col}
+                       col === 'rename-field-1' ? (
+                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                           <div>rename field 1</div>
+                           <div style={{ fontSize: '9px', color: '#666' }}>mongoose_parse</div>
+                           <div style={{ display: 'flex', border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden' }}>
+                             {(['hyphen', 'underscore', 'condense', 'leave-spaces'] as const).map((option) => (
+                               <button
+                                 key={option}
+                                 onClick={() => setMongooseParseOption(option)}
+                                 style={{
+                                   padding: '2px 6px',
+                                   fontSize: '10px',
+                                   border: 'none',
+                                   backgroundColor: mongooseParseOption === option ? '#3b82f6' : '#f8f9fa',
+                                   color: mongooseParseOption === option ? 'white' : '#374151',
+                                   cursor: 'pointer',
+                                   borderRight: option !== 'leave-spaces' ? '1px solid #ccc' : 'none',
+                                   minWidth: '45px',
+                                   textAlign: 'center'
+                                 }}
+                               >
+                                 {option === 'hyphen' ? 'hyphen' :
+                                  option === 'underscore' ? 'underscore' :
+                                  option === 'condense' ? 'condense' : 'leave spaces'}
+                               </button>
+                             ))}
+                           </div>
+                         </div>
+                       ) : col}
                       {col === 'submission_order' && renderSortIndicator(col)}
                     </div>
                   </th>
@@ -700,7 +749,35 @@ export default function Tebnar2Table({
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {col.startsWith('image') && col.includes('preview') ? 'Preview' : 
                        col === 'supabase-filename' ? 'supabase filename:' :
-                       col === 'rename-field-1' ? 'rename field 1' : col}
+                       col === 'rename-field-1' ? (
+                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                           <div>rename field 1</div>
+                           <div style={{ fontSize: '9px', color: '#666' }}>mongoose_parse</div>
+                           <div style={{ display: 'flex', border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden' }}>
+                             {(['hyphen', 'underscore', 'condense', 'leave-spaces'] as const).map((option) => (
+                               <button
+                                 key={option}
+                                 onClick={() => setMongooseParseOption(option)}
+                                 style={{
+                                   padding: '2px 6px',
+                                   fontSize: '10px',
+                                   border: 'none',
+                                   backgroundColor: mongooseParseOption === option ? '#3b82f6' : '#f8f9fa',
+                                   color: mongooseParseOption === option ? 'white' : '#374151',
+                                   cursor: 'pointer',
+                                   borderRight: option !== 'leave-spaces' ? '1px solid #ccc' : 'none',
+                                   minWidth: '45px',
+                                   textAlign: 'center'
+                                 }}
+                               >
+                                 {option === 'hyphen' ? 'hyphen' :
+                                  option === 'underscore' ? 'underscore' :
+                                  option === 'condense' ? 'condense' : 'leave spaces'}
+                               </button>
+                             ))}
+                           </div>
+                         </div>
+                       ) : col}
                       {col === 'submission_order' && renderSortIndicator(col)}
                     </div>
                   </th>
