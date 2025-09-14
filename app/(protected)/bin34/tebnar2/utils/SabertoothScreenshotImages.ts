@@ -94,7 +94,6 @@ export async function SabertoothScreenshotImages(
   
   try {
     console.log(`🦷 SabertoothScreenshotImages: Starting screenshot process for image ${imageId}`);
-    console.log(`🦷 SabertoothScreenshotImages: Alterpro data received:`, alterpro);
     
     // 1. Validate user access and get internal user ID
     const { data: userData, error: userError } = await supabase
