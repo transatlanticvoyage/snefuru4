@@ -1601,8 +1601,8 @@ export default function Tebnar2Main() {
 
   // Save asn_sitespren_id to current batch
   const tbn2_handleSitesprenSave = async () => {
-    if (!tbn2_selectedBatchId || !tbn2_selectedSitesprenId) {
-      alert('Please select both a batch and a sitespren option');
+    if (!tbn2_selectedBatchId) {
+      alert('Please select a batch first');
       return;
     }
 
@@ -1610,7 +1610,7 @@ export default function Tebnar2Main() {
     try {
       const { error } = await supabase
         .from('images_plans_batches')
-        .update({ asn_sitespren_id: tbn2_selectedSitesprenId })
+        .update({ asn_sitespren_id: tbn2_selectedSitesprenId || null })
         .eq('id', tbn2_selectedBatchId);
 
       if (error) {
@@ -1852,8 +1852,8 @@ export default function Tebnar2Main() {
 
   // Save asn_gcon_piece_id to current batch
   const tbn2_handleGconPieceSave = async () => {
-    if (!tbn2_selectedBatchId || !tbn2_selectedGconPieceId) {
-      alert('Please select both a batch and a gcon piece option');
+    if (!tbn2_selectedBatchId) {
+      alert('Please select a batch first');
       return;
     }
 
@@ -1861,7 +1861,7 @@ export default function Tebnar2Main() {
     try {
       const { error } = await supabase
         .from('images_plans_batches')
-        .update({ asn_gcon_piece_id: tbn2_selectedGconPieceId })
+        .update({ asn_gcon_piece_id: tbn2_selectedGconPieceId || null })
         .eq('id', tbn2_selectedBatchId);
 
       if (error) {
@@ -3366,6 +3366,23 @@ export default function Tebnar2Main() {
               />
               {tbn2_sitesprenDropdownOpen && tbn2_selectedBatchId && (
                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
+                  {/* Clear/Empty option - always shows first */}
+                  <div
+                    onClick={() => {
+                      setTbn2SelectedSitesprenId('');
+                      setTbn2CurrentSitesprenBase('');
+                      setTbn2SitesprenDropdownOpen(false);
+                      setTbn2SitesprenSearchTerm('');
+                      // Clear gcon pieces as well since they depend on sitespren
+                      setTbn2GconPieces([]);
+                      setTbn2SelectedGconPieceId('');
+                      setTbn2CurrentGconPieceTitle('');
+                    }}
+                    className="px-3 py-2 hover:bg-red-50 cursor-pointer border-b border-gray-200 bg-red-25"
+                    style={{ fontSize: '13px' }}
+                  >
+                    <span className="text-red-600 font-medium">(update to empty)</span>
+                  </div>
                   {tbn2_getFilteredSitesprenOptions().length > 0 ? (
                     tbn2_getFilteredSitesprenOptions().map((option) => (
                       <div
@@ -3395,7 +3412,7 @@ export default function Tebnar2Main() {
             </div>
             <button
               onClick={tbn2_handleSitesprenSave}
-              disabled={!tbn2_selectedSitesprenId || !tbn2_selectedBatchId || tbn2_sitesprenSaving}
+              disabled={!tbn2_selectedBatchId || tbn2_sitesprenSaving}
               className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               style={{ fontSize: '16px' }}
               title={!tbn2_selectedBatchId ? 'Select a batch first' : 'Save sitespren assignment'}
@@ -3403,6 +3420,84 @@ export default function Tebnar2Main() {
               {tbn2_sitesprenSaving ? '...' : 'save'}
             </button>
           </div>
+
+          {/* Site Tool Buttons */}
+          {tbn2_selectedSitesprenId && (() => {
+            const sitesprenBase = tbn2_getSelectedSitesprenDisplay()?.split(' - ')[1] || '';
+            return sitesprenBase ? (
+              <>
+                <hr className="my-3" />
+                <div className="font-bold text-gray-700 mb-2" style={{ fontSize: '16px' }}>Site Tools</div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => window.open(`https://${sitesprenBase}/wp-admin/`, '_blank')}
+                    className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    title="Open WP Admin"
+                  >
+                    WP
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://${sitesprenBase}`, '_blank')}
+                    className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                    title="Open Site"
+                  >
+                    Site
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(sitesprenBase);
+                    }}
+                    className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                    title="Copy domain to clipboard"
+                  >
+                    📋
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://www.google.com/search?q=site%3A${encodeURIComponent(sitesprenBase)}`, '_blank')}
+                    className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    title="Google site: search"
+                  >
+                    G
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://web.archive.org/web/*/${sitesprenBase}`, '_blank')}
+                    className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    title="View in Wayback Machine"
+                  >
+                    🕰️
+                  </button>
+                  <a
+                    href={`/nwjar1?coltemp=option1&sitebase=${encodeURIComponent(sitesprenBase)}`}
+                    className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    title="Open NW Jar"
+                  >
+                    NW
+                  </a>
+                  <a
+                    href={`/gconjar1?coltemp=option1&sitebase=${encodeURIComponent(sitesprenBase)}`}
+                    className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-teal-500 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                    title="Open GC Jar"
+                  >
+                    GC
+                  </a>
+                  <a
+                    href={`/drom?sitesentered=${encodeURIComponent(sitesprenBase)}&activefilterchamber=daylight&showmainchamberboxes=no&showtundrachamber=yes`}
+                    className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-purple-500 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                    title="Open Driggsman"
+                  >
+                    DG
+                  </a>
+                  <a
+                    href={`/sitejar4?sitesentered=${encodeURIComponent(sitesprenBase)}`}
+                    className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    title="View only this site"
+                  >
+                    IN
+                  </a>
+                </div>
+              </>
+            ) : null;
+          })()}
 
           {/* Pushador Actions Section */}
           {tbn2_selectedSitesprenId && (
@@ -3622,6 +3717,19 @@ export default function Tebnar2Main() {
                   />
                   {tbn2_gconPieceDropdownOpen && tbn2_selectedBatchId && tbn2_selectedSitesprenId && (
                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
+                      {/* Clear/Empty option - always shows first */}
+                      <div
+                        onClick={() => {
+                          setTbn2SelectedGconPieceId('');
+                          setTbn2CurrentGconPieceTitle('');
+                          setTbn2GconPieceDropdownOpen(false);
+                          setTbn2GconPieceSearchTerm('');
+                        }}
+                        className="px-3 py-2 hover:bg-red-50 cursor-pointer border-b border-gray-200 bg-red-25"
+                        style={{ fontSize: '13px' }}
+                      >
+                        <span className="text-red-600 font-medium">(update to empty)</span>
+                      </div>
                       {tbn2_getFilteredGconPieceOptions().length > 0 ? (
                         tbn2_getFilteredGconPieceOptions().map((option) => (
                           <div
@@ -3658,7 +3766,7 @@ export default function Tebnar2Main() {
                 </div>
                 <button
                   onClick={tbn2_handleGconPieceSave}
-                  disabled={!tbn2_selectedGconPieceId || !tbn2_selectedBatchId || tbn2_gconPieceSaving}
+                  disabled={!tbn2_selectedBatchId || tbn2_gconPieceSaving}
                   className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                   style={{ fontSize: '16px' }}
                   title={!tbn2_selectedBatchId ? 'Select a batch first' : 
@@ -4725,6 +4833,23 @@ export default function Tebnar2Main() {
                             />
                             {tbn2_sitesprenDropdownOpen && tbn2_selectedBatchId && (
                               <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-screen overflow-y-auto">
+                                {/* Clear/Empty option - always shows first */}
+                                <div
+                                  onClick={() => {
+                                    setTbn2SelectedSitesprenId('');
+                                    setTbn2CurrentSitesprenBase('');
+                                    setTbn2SitesprenDropdownOpen(false);
+                                    setTbn2SitesprenSearchTerm('');
+                                    // Clear gcon pieces as well since they depend on sitespren
+                                    setTbn2GconPieces([]);
+                                    setTbn2SelectedGconPieceId('');
+                                    setTbn2CurrentGconPieceTitle('');
+                                  }}
+                                  className="px-2 py-1 hover:bg-red-50 cursor-pointer border-b border-gray-200 bg-red-25"
+                                  style={{ fontSize: '16px' }}
+                                >
+                                  <span className="text-red-600 font-medium">(update to empty)</span>
+                                </div>
                                 {tbn2_getFilteredSitesprenOptions().length > 0 ? (
                                   tbn2_getFilteredSitesprenOptions().map((option) => (
                                     <div
@@ -4754,7 +4879,7 @@ export default function Tebnar2Main() {
                           </div>
                           <button
                             onClick={tbn2_handleSitesprenSave}
-                            disabled={!tbn2_selectedSitesprenId || !tbn2_selectedBatchId || tbn2_sitesprenSaving}
+                            disabled={!tbn2_selectedBatchId || tbn2_sitesprenSaving}
                             className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                             style={{ fontSize: '12px' }}
                             title={!tbn2_selectedBatchId ? 'Select a batch first' : 'Save sitespren assignment'}
@@ -4786,6 +4911,19 @@ export default function Tebnar2Main() {
                             />
                             {tbn2_gconPieceDropdownOpen && tbn2_selectedBatchId && tbn2_selectedSitesprenId && (
                               <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-screen overflow-y-auto">
+                                {/* Clear/Empty option - always shows first */}
+                                <div
+                                  onClick={() => {
+                                    setTbn2SelectedGconPieceId('');
+                                    setTbn2CurrentGconPieceTitle('');
+                                    setTbn2GconPieceDropdownOpen(false);
+                                    setTbn2GconPieceSearchTerm('');
+                                  }}
+                                  className="px-2 py-1 hover:bg-red-50 cursor-pointer border-b border-gray-200 bg-red-25"
+                                  style={{ fontSize: '16px' }}
+                                >
+                                  <span className="text-red-600 font-medium">(update to empty)</span>
+                                </div>
                                 {tbn2_getFilteredGconPieceOptions().length > 0 ? (
                                   tbn2_getFilteredGconPieceOptions().map((option) => (
                                     <div
@@ -4822,7 +4960,7 @@ export default function Tebnar2Main() {
                           </div>
                           <button
                             onClick={tbn2_handleGconPieceSave}
-                            disabled={!tbn2_selectedGconPieceId || !tbn2_selectedBatchId || tbn2_gconPieceSaving}
+                            disabled={!tbn2_selectedBatchId || tbn2_gconPieceSaving}
                             className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                             style={{ fontSize: '12px' }}
                             title={!tbn2_selectedBatchId ? 'Select a batch first' : 
@@ -4858,7 +4996,45 @@ export default function Tebnar2Main() {
                       <div className="cell_inner_wrapper_div">-</div>
                     </td>
                     <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
+                      <div className="cell_inner_wrapper_div">
+                        {tbn2_selectedSitesprenId && (() => {
+                          const sitesprenBase = tbn2_getSelectedSitesprenDisplay()?.split(' - ')[1] || '';
+                          return sitesprenBase ? (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => window.open(`https://${sitesprenBase}/wp-admin/`, '_blank')}
+                                className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                title="Open WP Admin"
+                              >
+                                WP
+                              </button>
+                              <button
+                                onClick={() => window.open(`https://${sitesprenBase}`, '_blank')}
+                                className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                                title="Open Site"
+                              >
+                                Site
+                              </button>
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(sitesprenBase);
+                                }}
+                                className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                title="Copy domain to clipboard"
+                              >
+                                📋
+                              </button>
+                              <button
+                                onClick={() => window.open(`https://www.google.com/search?q=site%3A${encodeURIComponent(sitesprenBase)}`, '_blank')}
+                                className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                title="Google site: search"
+                              >
+                                G
+                              </button>
+                            </div>
+                          ) : null;
+                        })()}
+                      </div>
                     </td>
                     <td style={{ border: '1px solid gray', padding: '0' }}>
                       <div className="cell_inner_wrapper_div">
@@ -4974,6 +5150,40 @@ export default function Tebnar2Main() {
                     <td style={{ border: '1px solid gray', padding: '0' }}>
                       <div className="cell_inner_wrapper_div">
                         <div className="flex items-center space-x-1">
+                          {/* Open URL button */}
+                          <button
+                            onClick={() => {
+                              if (tbn2_seedUrlWpEditor && tbn2_seedUrlWpEditor.trim()) {
+                                window.open(tbn2_seedUrlWpEditor, '_blank');
+                              } else {
+                                alert('Please enter a URL first');
+                              }
+                            }}
+                            disabled={!tbn2_seedUrlWpEditor || !tbn2_seedUrlWpEditor.trim()}
+                            className="w-8 h-8 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+                            title="Open WP editor URL in new tab"
+                          >
+                            🌐
+                          </button>
+                          {/* Copy URL button */}
+                          <button
+                            onClick={() => {
+                              if (tbn2_seedUrlWpEditor && tbn2_seedUrlWpEditor.trim()) {
+                                navigator.clipboard.writeText(tbn2_seedUrlWpEditor).then(() => {
+                                  alert('URL copied to clipboard');
+                                }).catch(() => {
+                                  alert('Failed to copy URL');
+                                });
+                              } else {
+                                alert('No URL to copy');
+                              }
+                            }}
+                            disabled={!tbn2_seedUrlWpEditor || !tbn2_seedUrlWpEditor.trim()}
+                            className="w-8 h-8 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+                            title="Copy WP editor URL to clipboard"
+                          >
+                            📋
+                          </button>
                           <input
                             type="text"
                             value={tbn2_seedUrlWpEditor}
@@ -4998,6 +5208,40 @@ export default function Tebnar2Main() {
                     <td style={{ border: '1px solid gray', padding: '0' }}>
                       <div className="cell_inner_wrapper_div">
                         <div className="flex items-center space-x-1">
+                          {/* Open URL button */}
+                          <button
+                            onClick={() => {
+                              if (tbn2_seedUrlFrontend && tbn2_seedUrlFrontend.trim()) {
+                                window.open(tbn2_seedUrlFrontend, '_blank');
+                              } else {
+                                alert('Please enter a URL first');
+                              }
+                            }}
+                            disabled={!tbn2_seedUrlFrontend || !tbn2_seedUrlFrontend.trim()}
+                            className="w-8 h-8 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+                            title="Open frontend URL in new tab"
+                          >
+                            🌐
+                          </button>
+                          {/* Copy URL button */}
+                          <button
+                            onClick={() => {
+                              if (tbn2_seedUrlFrontend && tbn2_seedUrlFrontend.trim()) {
+                                navigator.clipboard.writeText(tbn2_seedUrlFrontend).then(() => {
+                                  alert('URL copied to clipboard');
+                                }).catch(() => {
+                                  alert('Failed to copy URL');
+                                });
+                              } else {
+                                alert('No URL to copy');
+                              }
+                            }}
+                            disabled={!tbn2_seedUrlFrontend || !tbn2_seedUrlFrontend.trim()}
+                            className="w-8 h-8 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+                            title="Copy frontend URL to clipboard"
+                          >
+                            📋
+                          </button>
                           <input
                             type="text"
                             value={tbn2_seedUrlFrontend}
@@ -5161,7 +5405,7 @@ export default function Tebnar2Main() {
                 )}
                 {tbn2_activePopupTab === 'ptab2' && (
                   <div>
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4 mb-4">
                       <h3 className="text-lg font-semibold">Create New Image Plans</h3>
                       <button
                         onClick={tbn2_handleCreateNewBatch}
@@ -5256,6 +5500,23 @@ export default function Tebnar2Main() {
                           
                           {tbn2_sitesprenDropdownOpen && tbn2_selectedBatchId && (
                             <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                              {/* Clear/Empty option - always shows first */}
+                              <div
+                                onClick={() => {
+                                  setTbn2SelectedSitesprenId('');
+                                  setTbn2CurrentSitesprenBase('');
+                                  setTbn2SitesprenDropdownOpen(false);
+                                  setTbn2SitesprenSearchTerm('');
+                                  // Clear gcon pieces as well since they depend on sitespren
+                                  setTbn2GconPieces([]);
+                                  setTbn2SelectedGconPieceId('');
+                                  setTbn2CurrentGconPieceTitle('');
+                                }}
+                                className="px-3 py-2 hover:bg-red-50 cursor-pointer border-b border-gray-200 bg-red-25"
+                                style={{ fontSize: '14px' }}
+                              >
+                                <span className="text-red-600 font-medium">(update to empty)</span>
+                              </div>
                               {tbn2_getFilteredSitesprenOptions().map((option) => (
                                 <div
                                   key={option.id}
@@ -5288,9 +5549,9 @@ export default function Tebnar2Main() {
                         
                         <button
                           onClick={tbn2_handleSitesprenSave}
-                          disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId || tbn2_sitesprenSaving}
+                          disabled={!tbn2_selectedBatchId || tbn2_sitesprenSaving}
                           className={`px-3 py-1 text-white font-medium rounded ${
-                            !tbn2_selectedBatchId || !tbn2_selectedSitesprenId || tbn2_sitesprenSaving
+                            !tbn2_selectedBatchId || tbn2_sitesprenSaving
                               ? 'bg-gray-400 cursor-not-allowed'
                               : 'bg-blue-600 hover:bg-blue-700'
                           }`}
