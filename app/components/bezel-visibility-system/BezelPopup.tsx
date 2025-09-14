@@ -24,8 +24,8 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   // Folate chamber visibility state for /bin34/tebnar2 (default to false/hide)
   const [folateChamberVisible, setFolateChamberVisible] = useState(false);
   
-  // New chamber visibility states for /bin34/tebnar2 (entrench defaults to false for testing)
-  const [entrenchChamberVisible, setEntrenchChamberVisible] = useState(false);
+  // New chamber visibility states for /bin34/tebnar2 (all default to true/visible)
+  const [entrenchChamberVisible, setEntrenchChamberVisible] = useState(true);
   const [missileChamberVisible, setMissileChamberVisible] = useState(true);
   const [vesicleChamberVisible, setVesicleChamberVisible] = useState(true);
 
@@ -139,9 +139,9 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
       if (savedVisibility !== null) {
         setEntrenchChamberVisible(JSON.parse(savedVisibility));
       } else {
-        // Default to false (hidden) and save it
-        setEntrenchChamberVisible(false);
-        localStorage.setItem('tebnar2_entrenchChamberVisible', JSON.stringify(false));
+        // Default to true (visible) and save it
+        setEntrenchChamberVisible(true);
+        localStorage.setItem('tebnar2_entrenchChamberVisible', JSON.stringify(true));
       }
     }
   }, [pathname]);
@@ -176,16 +176,13 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
 
   // Handle entrench chamber toggle
   const handleEntrenchChamberToggle = (checked: boolean) => {
-    console.log('🔧 BezelPopup: Entrench chamber toggle clicked', { checked, pathname });
     setEntrenchChamberVisible(checked);
     localStorage.setItem('tebnar2_entrenchChamberVisible', JSON.stringify(checked));
     
     // Dispatch custom event to notify other components
-    console.log('🔧 BezelPopup: Dispatching entrenchChamberVisibilityChange event');
     window.dispatchEvent(new CustomEvent('entrenchChamberVisibilityChange', { 
       detail: { visible: checked } 
     }));
-    console.log('🔧 BezelPopup: Event dispatched successfully');
   };
 
   // Handle missile chamber toggle
@@ -214,11 +211,13 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-start justify-start"
+      style={{ backgroundColor: 'rgba(0, 0, 128, 0.5)' }}
       onClick={onClose}
     >
       <div 
         className="bg-white rounded-lg shadow-xl p-6 w-[800px] h-[800px] overflow-auto"
+        style={{ marginLeft: '51px' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

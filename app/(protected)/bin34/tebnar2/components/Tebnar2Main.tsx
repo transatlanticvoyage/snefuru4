@@ -138,7 +138,7 @@ export default function Tebnar2Main() {
   // Bezel chamber visibility states
   const [tbn2_medievalChamberVisible, setTbn2MedievalChamberVisible] = useState(false);
   const [tbn2_folateChamberVisible, setTbn2FolateChamberVisible] = useState(false);
-  const [tbn2_entrenchChamberVisible, setTbn2EntrenchChamberVisible] = useState(false);
+  const [tbn2_entrenchChamberVisible, setTbn2EntrenchChamberVisible] = useState(true);
   const [tbn2_missileChamberVisible, setTbn2MissileChamberVisible] = useState(true);
   const [tbn2_vesicleChamberVisible, setTbn2VesicleChamberVisible] = useState(true);
   
@@ -1639,28 +1639,20 @@ export default function Tebnar2Main() {
 
   // Initialize entrench chamber visibility from localStorage and listen for bezel events
   useEffect(() => {
-    console.log('🔧 Tebnar2Main: Initializing entrench chamber useEffect');
     // Initialize from localStorage
     const savedVisibility = localStorage.getItem('tebnar2_entrenchChamberVisible');
-    console.log('🔧 Tebnar2Main: Saved visibility from localStorage:', savedVisibility);
     if (savedVisibility !== null) {
-      const parsed = JSON.parse(savedVisibility);
-      console.log('🔧 Tebnar2Main: Setting entrench chamber initial state to:', parsed);
-      setTbn2EntrenchChamberVisible(parsed);
+      setTbn2EntrenchChamberVisible(JSON.parse(savedVisibility));
     } else {
-      // Default to false (hidden) and save it
-      console.log('🔧 Tebnar2Main: No saved state, defaulting to false');
-      setTbn2EntrenchChamberVisible(false);
-      localStorage.setItem('tebnar2_entrenchChamberVisible', JSON.stringify(false));
+      // Default to true (visible) and save it
+      setTbn2EntrenchChamberVisible(true);
+      localStorage.setItem('tebnar2_entrenchChamberVisible', JSON.stringify(true));
     }
 
     // Listen for bezel visibility change events
     const handleEntrenchChamberVisibilityChange = (event: CustomEvent) => {
-      console.log('🔧 Tebnar2Main: Received entrenchChamberVisibilityChange event', event.detail);
       const { visible } = event.detail;
-      console.log('🔧 Tebnar2Main: Setting entrench chamber visible to:', visible);
       setTbn2EntrenchChamberVisible(visible);
-      console.log('🔧 Tebnar2Main: State should now be:', visible);
     };
 
     window.addEventListener('entrenchChamberVisibilityChange', handleEntrenchChamberVisibilityChange as EventListener);
@@ -3637,8 +3629,12 @@ export default function Tebnar2Main() {
           functions popup
         </button>
 
-        {/* Sitespren Assignment Widget */}
-        <div 
+        {/* Folate Chamber - Sitespren and Content Management */}
+        <div className="bg-white border border-gray-300 rounded-lg p-4 mb-4" style={{ display: tbn2_folateChamberVisible ? 'block' : 'none' }}>
+          <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>folate_chamber</div>
+          
+          {/* Sitespren Assignment Widget */}
+          <div 
           className="bg-white border border-gray-300 rounded-lg p-2"
         >
           <div className="text-gray-700 mb-1" style={{ fontSize: '14px' }}>site for this img plan batch:</div>
@@ -4162,6 +4158,8 @@ export default function Tebnar2Main() {
             </div>
           </div>
         </div>
+        
+        </div> {/* End folate_chamber wrapper */}
 
       </div>
 
@@ -4170,7 +4168,7 @@ export default function Tebnar2Main() {
         {/* First Row - Entrench & Missile Chambers */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Entrench Chamber - Aranya Image Removal */}
-          <div className="bg-white border border-gray-300 rounded-lg p-4">
+          <div className="bg-white border border-gray-300 rounded-lg p-4" style={{ display: tbn2_entrenchChamberVisible ? 'block' : 'none' }}>
             <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>entrench_chamber</div>
             <div className="text-gray-600 text-sm mb-2">Remove all images from Elementor page</div>
             <button
@@ -4194,7 +4192,7 @@ export default function Tebnar2Main() {
           </div>
 
           {/* Missile Chamber - Hippo Gutenberg Updates */}
-          <div className="bg-white border border-gray-300 rounded-lg p-4">
+          <div className="bg-white border border-gray-300 rounded-lg p-4" style={{ display: tbn2_missileChamberVisible ? 'block' : 'none' }}>
             <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>missile_chamber</div>
             
             {/* Tab Navigation */}
@@ -4270,7 +4268,7 @@ export default function Tebnar2Main() {
         </div>
 
         {/* Second Row - Vesicle Chamber full width */}
-        <div className="bg-white border border-gray-300 rounded-lg p-4">
+        <div className="bg-white border border-gray-300 rounded-lg p-4" style={{ display: tbn2_vesicleChamberVisible ? 'block' : 'none' }}>
           {/* Vesicle Chamber Header - Always visible */}
           <div className="font-bold text-gray-700 mb-3" style={{ fontSize: '16px' }}>vesicle_chamber</div>
           
@@ -4800,39 +4798,6 @@ export default function Tebnar2Main() {
         </div>
       </div>
 
-      {/* Fourth Row - Entrench Chamber */}
-      {/* entrench_chamber - Container for entrench-related controls */}
-      <div className="mb-6 p-4 border border-black bg-white entrench_chamber_div" style={{ 
-        border: '1px solid black', 
-        backgroundColor: '#ffffff',
-        display: tbn2_entrenchChamberVisible ? 'block' : 'none'
-      }}>
-        <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>entrench_chamber</div>
-        <div className="text-gray-600">Entrench chamber controls and functionality will be implemented here.</div>
-        <div className="text-xs text-red-500 mt-2">DEBUG: tbn2_entrenchChamberVisible = {String(tbn2_entrenchChamberVisible)}</div>
-      </div>
-
-      {/* Fifth Row - Missile Chamber */}
-      {/* missile_chamber - Container for missile-related controls */}
-      <div className="mb-6 p-4 border border-black bg-white missile_chamber_div" style={{ 
-        border: '1px solid black', 
-        backgroundColor: '#ffffff',
-        display: tbn2_missileChamberVisible ? 'block' : 'none'
-      }}>
-        <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>missile_chamber</div>
-        <div className="text-gray-600">Missile chamber controls and functionality will be implemented here.</div>
-      </div>
-
-      {/* Sixth Row - Vesicle Chamber */}
-      {/* vesicle_chamber - Container for vesicle-related controls */}
-      <div className="mb-6 p-4 border border-black bg-white vesicle_chamber_div" style={{ 
-        border: '1px solid black', 
-        backgroundColor: '#ffffff',
-        display: tbn2_vesicleChamberVisible ? 'block' : 'none'
-      }}>
-        <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>vesicle_chamber</div>
-        <div className="text-gray-600">Vesicle chamber controls and functionality will be implemented here.</div>
-      </div>
 
       {/* Main Table - enhanced with column template system */}
       <Tebnar2Table

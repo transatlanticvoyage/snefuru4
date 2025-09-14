@@ -31,6 +31,7 @@ export default function BezelButton({ showButton = true }: BezelButtonProps) {
           left: '1px', 
           backgroundColor: '#c5bf7a',
           width: '41px', // Match hamburger width (p-2 = 8px padding * 2 + icon width)
+          height: '41px', // Half the current height (82px / 2)
           padding: '2px',
           fontSize: '12px',
           lineHeight: '1.2',
