@@ -4904,17 +4904,31 @@ export default function Tebnar2Main() {
                     </td>
                     <td style={{ border: '1px solid gray', padding: '0' }}>
                       <div className="cell_inner_wrapper_div">
-                        <select
-                          value={tbn2_selectedBatchId}
-                          onChange={e => tbn2_handleBatchChange(e.target.value)}
-                          className={`h-7 px-2 rounded text-black ${tbn2_selectedBatchId ? 'bg-teal-200' : 'bg-white'}`}
-                          style={{ minWidth: 120, fontSize: '14px' }}
-                        >
-                          <option value="">All Batches ({tbn2_batches.length})</option>
-                          {tbn2_batches.map(batch => (
-                            <option key={batch.id} value={batch.id}>{batch.id}</option>
-                          ))}
-                        </select>
+                        <div className="flex items-center space-x-2">
+                          <select
+                            value={tbn2_selectedBatchId}
+                            onChange={e => tbn2_handleBatchChange(e.target.value)}
+                            className={`h-7 px-2 rounded text-black ${tbn2_selectedBatchId ? 'bg-teal-200' : 'bg-white'}`}
+                            style={{ minWidth: 120, fontSize: '14px' }}
+                          >
+                            <option value="">All Batches ({tbn2_batches.length})</option>
+                            {tbn2_batches.map(batch => (
+                              <option key={batch.id} value={batch.id}>{batch.id}</option>
+                            ))}
+                          </select>
+                          
+                          {tbn2_selectedBatchId && (
+                            <button
+                              onClick={() => {
+                                const url = `http://localhost:3000/bin34/tebnar2?batchid=${tbn2_selectedBatchId}`;
+                                window.open(url, '_blank');
+                              }}
+                              className="h-7 px-3 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs font-medium"
+                            >
+                              open /tebnar2
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td style={{ border: '1px solid gray', padding: '0' }}>
