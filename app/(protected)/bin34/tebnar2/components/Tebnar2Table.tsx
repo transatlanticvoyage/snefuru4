@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tebnar2ImagePlan, Tebnar2Image } from '../types/tebnar2-types';
 import { TBN2_PAGE_SIZE_OPTIONS } from '../constants/tebnar2-constants';
 import Tebnar2ImagePreview from './Tebnar2ImagePreview';
@@ -486,6 +486,33 @@ export default function Tebnar2Table({
   // State for mongoose parse option - default is "hyphen"
   const [mongooseParseOption, setMongooseParseOption] = useState<'hyphen' | 'underscore' | 'condense' | 'leave-spaces'>('hyphen');
 
+  // State for rocket chamber visibility (default to true)
+  const [rocketChamberVisible, setRocketChamberVisible] = useState(true);
+
+  // Initialize rocket chamber visibility from localStorage and listen for changes
+  useEffect(() => {
+    // Initialize from localStorage
+    const savedVisibility = localStorage.getItem('tebnar2_rocketChamberVisible');
+    if (savedVisibility !== null) {
+      setRocketChamberVisible(JSON.parse(savedVisibility));
+    } else {
+      // Default to true and save it
+      setRocketChamberVisible(true);
+      localStorage.setItem('tebnar2_rocketChamberVisible', JSON.stringify(true));
+    }
+
+    // Listen for visibility changes from bezel popup
+    const handleRocketChamberVisibilityChange = (event: CustomEvent) => {
+      setRocketChamberVisible(event.detail.visible);
+    };
+
+    window.addEventListener('rocketChamberVisibilityChange', handleRocketChamberVisibilityChange as EventListener);
+
+    return () => {
+      window.removeEventListener('rocketChamberVisibilityChange', handleRocketChamberVisibilityChange as EventListener);
+    };
+  }, []);
+
   // Mongoose parse function
   const applyMongooseParse = (text: string): string => {
     switch (mongooseParseOption) {
@@ -603,21 +630,23 @@ export default function Tebnar2Table({
       </div>
       
       {/* Rocket Chamber - positioned below uitablegrid21 section but above main table */}
-      <Tebnar2RocketChamber
-        data={plans}
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
-        currentPage={rocketCurrentPage}
-        itemsPerPage={rocketItemsPerPage}
-        onPageChange={onRocketPageChange}
-        onItemsPerPageChange={onRocketItemsPerPageChange}
-        columnsPerPage={rocketColumnsPerPage}
-        currentColumnPage={rocketCurrentColumnPage}
-        onColumnPageChange={onRocketColumnPageChange}
-        onColumnsPerPageChange={onRocketColumnsPerPageChange}
-        onWolfOptionsClick={onWolfOptionsClick}
-        onPillarshiftColtempsClick={onPillarshiftColtempsClick}
-      />
+      {rocketChamberVisible && (
+        <Tebnar2RocketChamber
+          data={plans}
+          searchValue={searchValue}
+          onSearchChange={onSearchChange}
+          currentPage={rocketCurrentPage}
+          itemsPerPage={rocketItemsPerPage}
+          onPageChange={onRocketPageChange}
+          onItemsPerPageChange={onRocketItemsPerPageChange}
+          columnsPerPage={rocketColumnsPerPage}
+          currentColumnPage={rocketCurrentColumnPage}
+          onColumnPageChange={onRocketColumnPageChange}
+          onColumnsPerPageChange={onRocketColumnsPerPageChange}
+          onWolfOptionsClick={onWolfOptionsClick}
+          onPillarshiftColtempsClick={onPillarshiftColtempsClick}
+        />
+      )}
       
       <div className="overflow-x-auto w-full" style={{ marginTop: 0, paddingTop: 0 }}>
         <table 
