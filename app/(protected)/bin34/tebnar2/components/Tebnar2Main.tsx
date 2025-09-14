@@ -92,6 +92,57 @@ export default function Tebnar2Main() {
   const [tbn2_rocketItemsPerPage, setTbn2RocketItemsPerPage] = useState<number>(25);
   const [tbn2_rocketColumnsPerPage, setTbn2RocketColumnsPerPage] = useState<number>(8);
   const [tbn2_rocketCurrentColumnPage, setTbn2RocketCurrentColumnPage] = useState<number>(1);
+
+  // Wolf Options popup state
+  const [tbn2_isWolfOptionsOpen, setTbn2IsWolfOptionsOpen] = useState(false);
+  const [tbn2_wolfOptions, setTbn2WolfOptions] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('tebnar2-wolf-options');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    }
+    return {
+      submission_order: true,
+      int_columns: true,
+      image_previews: true,
+      metadata_fields: true,
+      timestamps: false,
+      technical_ids: false
+    };
+  });
+
+  // Pillarshift Coltemp System popup state
+  const [tbn2_isPillarShiftModalOpen, setTbn2IsPillarShiftModalOpen] = useState(false);
+  const [tbn2_activeTab, setTbn2ActiveTab] = useState('rtab1');
+  const [tbn2_sheafData, setTbn2SheafData] = useState<string>('');
+  const [tbn2_sheafLoading, setTbn2SheafLoading] = useState(false);
+  const [tbn2_pillarShiftActiveTab, setTbn2PillarShiftActiveTab] = useState('Active Sheaves');
+  
+  // Mock sheaf data for pillarshift modal
+  const tbn2_mockSheafData = [
+    {
+      name: 'Tebnar2 Primary Sheaf',
+      status: 'active',
+      description: 'Main processing sheaf for image plan data',
+      records: 247,
+      lastUpdated: '2 hours ago'
+    },
+    {
+      name: 'Template Processing Sheaf',
+      status: 'processing', 
+      description: 'Column template optimization sheaf',
+      records: 89,
+      lastUpdated: '15 minutes ago'
+    },
+    {
+      name: 'Archive Sheaf',
+      status: 'inactive',
+      description: 'Historical data archive sheaf',
+      records: 1456,
+      lastUpdated: '1 day ago'
+    }
+  ];
   
   // Sorting state - default to submission_order ascending
   const [tbn2_sortColumn, setTbn2SortColumn] = useState<string | null>('submission_order');
@@ -1216,13 +1267,70 @@ export default function Tebnar2Main() {
 
   // Rocket Chamber handler functions
   const tbn2_handleWolfOptionsClick = () => {
-    console.log('Wolf options clicked');
-    // TODO: Implement wolf options modal
+    setTbn2IsWolfOptionsOpen(true);
   };
 
   const tbn2_handlePillarshiftColtempsClick = () => {
-    console.log('Pillarshift coltemps clicked');
-    // TODO: Implement pillarshift coltemps modal
+    setTbn2IsPillarShiftModalOpen(true);
+    tbn2_fetchSheafData();
+  };
+
+  // Wolf options save handler
+  const tbn2_handleWolfOptionsChange = (newOptions: any) => {
+    setTbn2WolfOptions(newOptions);
+    localStorage.setItem('tebnar2-wolf-options', JSON.stringify(newOptions));
+  };
+
+  // Fetch sheaf data for tebnar2
+  const tbn2_fetchSheafData = async () => {
+    setTbn2SheafLoading(true);
+    try {
+      // Mock sheaf data for tebnar2 image plans table
+      const tbn2SheafData = {
+        columns: [
+          { id: 'submission_order', name: 'submission_order', type: 'number', width: '80px', group: 'ordering', visible: true, order: 1 },
+          { id: 'int1', name: 'int1', type: 'number', width: '60px', group: 'intent_columns', visible: true, order: 2 },
+          { id: 'int2', name: 'int2', type: 'number', width: '60px', group: 'intent_columns', visible: true, order: 3 },
+          { id: 'int3', name: 'int3', type: 'number', width: '60px', group: 'intent_columns', visible: true, order: 4 },
+          { id: 'int4', name: 'int4', type: 'number', width: '60px', group: 'intent_columns', visible: true, order: 5 },
+          { id: 'fk_image1_id', name: 'fk_image1_id', type: 'text', width: '45px', group: 'image_references', visible: true, order: 6 },
+          { id: 'fk_image2_id', name: 'fk_image2_id', type: 'text', width: '45px', group: 'image_references', visible: true, order: 7 },
+          { id: 'fk_image3_id', name: 'fk_image3_id', type: 'text', width: '45px', group: 'image_references', visible: true, order: 8 },
+          { id: 'fk_image4_id', name: 'fk_image4_id', type: 'text', width: '45px', group: 'image_references', visible: true, order: 9 },
+          { id: 'image1-preview', name: 'image1-preview', type: 'preview', width: '100px', group: 'image_previews', visible: true, order: 10 },
+          { id: 'image2-preview', name: 'image2-preview', type: 'preview', width: '100px', group: 'image_previews', visible: true, order: 11 },
+          { id: 'image3-preview', name: 'image3-preview', type: 'preview', width: '100px', group: 'image_previews', visible: true, order: 12 },
+          { id: 'image4-preview', name: 'image4-preview', type: 'preview', width: '100px', group: 'image_previews', visible: true, order: 13 },
+          { id: 'e_prompt1', name: 'e_prompt1', type: 'text', width: '300px', group: 'plan_content', visible: true, order: 14 },
+          { id: 'e_zpf_img_code', name: 'e_zpf_img_code', type: 'text', width: '120px', group: 'plan_content', visible: true, order: 15 },
+          { id: 'e_width', name: 'e_width', type: 'number', width: '80px', group: 'plan_content', visible: true, order: 16 },
+          { id: 'e_height', name: 'e_height', type: 'number', width: '80px', group: 'plan_content', visible: true, order: 17 },
+          { id: 'e_file_name1', name: 'e_file_name1', type: 'text', width: '200px', group: 'plan_content', visible: true, order: 18 },
+          { id: 'id', name: 'id', type: 'text', width: '200px', group: 'metadata', visible: true, order: 19 },
+          { id: 'created_at', name: 'created_at', type: 'datetime', width: '160px', group: 'metadata', visible: true, order: 20 }
+        ],
+        metadata: {
+          table_name: 'images_plans',
+          description: 'Tebnar2 Image Plans System - AI-generated image planning and execution',
+          utg_id: 'utg_tebnar2',
+          created_date: new Date().toISOString(),
+          column_groups: {
+            'ordering': 'Submission and display order fields',
+            'intent_columns': 'Intent tracking columns (int1-int4)',
+            'image_references': 'Foreign key references to generated images',
+            'image_previews': 'Preview columns for generated images',
+            'plan_content': 'Core image plan content and specifications',
+            'metadata': 'System metadata and timestamps'
+          }
+        }
+      };
+      
+      setTbn2SheafData(JSON.stringify(tbn2SheafData, null, 2));
+    } catch (error) {
+      console.error('Error generating sheaf data:', error);
+    } finally {
+      setTbn2SheafLoading(false);
+    }
   };
 
   // Function to sort plans data
@@ -6170,6 +6278,293 @@ export default function Tebnar2Main() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Wolf Options Popup */}
+      {tbn2_isWolfOptionsOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[500px] h-[500px] max-w-[90vw] max-h-[90vh] overflow-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Wolf Options - Tebnar2</h2>
+              <button
+                onClick={() => setTbn2IsWolfOptionsOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div className="border-b pb-4">
+                <h3 className="font-semibold mb-2">Image Plan Optimization</h3>
+                {[
+                  'Enable automatic image plan detection',
+                  'Use progressive optimization for large plans',
+                  'Apply smart cropping to plan thumbnails',
+                  'Enable plan metadata caching'
+                ].map((option, index) => (
+                  <label key={index} className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="checkbox"
+                      checked={tbn2_wolfOptions[`plan_${index}`] || false}
+                      onChange={(e) => tbn2_handleWolfOptionsChange({ [`plan_${index}`]: e.target.checked })}
+                      className="rounded"
+                    />
+                    <span className="text-sm">{option}</span>
+                  </label>
+                ))}
+              </div>
+              <div className="border-b pb-4">
+                <h3 className="font-semibold mb-2">Data Processing</h3>
+                {[
+                  'Enable batch processing for tebnar2 entries',
+                  'Use enhanced filtering algorithms',
+                  'Apply advanced sorting mechanisms',
+                  'Enable real-time data validation'
+                ].map((option, index) => (
+                  <label key={index} className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="checkbox"
+                      checked={tbn2_wolfOptions[`processing_${index}`] || false}
+                      onChange={(e) => tbn2_handleWolfOptionsChange({ [`processing_${index}`]: e.target.checked })}
+                      className="rounded"
+                    />
+                    <span className="text-sm">{option}</span>
+                  </label>
+                ))}
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Display Options</h3>
+                {[
+                  'Show extended tooltips on hover',
+                  'Enable compact view mode',
+                  'Use enhanced color coding',
+                  'Display advanced metrics panel'
+                ].map((option, index) => (
+                  <label key={index} className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="checkbox"
+                      checked={tbn2_wolfOptions[`display_${index}`] || false}
+                      onChange={(e) => tbn2_handleWolfOptionsChange({ [`display_${index}`]: e.target.checked })}
+                      className="rounded"
+                    />
+                    <span className="text-sm">{option}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={() => setTbn2IsWolfOptionsOpen(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  // Apply changes and close
+                  setTbn2IsWolfOptionsOpen(false);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Apply Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pillarshift Coltemp System Modal */}
+      {tbn2_isPillarShiftModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-[95vw] h-[95vh] overflow-hidden flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-xl font-bold">Pillarshift Coltemp System - Tebnar2</h2>
+              <button
+                onClick={() => setTbn2IsPillarShiftModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 flex">
+              {/* Left sidebar with tabs */}
+              <div className="w-64 bg-gray-50 border-r p-4">
+                <div className="space-y-2">
+                  {[
+                    'Active Sheaves',
+                    'Column Templates', 
+                    'Processing Queue',
+                    'System Metrics',
+                    'Configuration'
+                  ].map((tab, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setTbn2PillarShiftActiveTab(tab)}
+                      className={`w-full text-left px-3 py-2 rounded ${
+                        tbn2_pillarShiftActiveTab === tab 
+                          ? 'bg-blue-600 text-white' 
+                          : 'bg-white hover:bg-gray-100'
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Main content area */}
+              <div className="flex-1 p-6 overflow-auto">
+                {tbn2_pillarShiftActiveTab === 'Active Sheaves' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Active Tebnar2 Sheaves</h3>
+                    <div className="grid grid-cols-1 gap-4">
+                      {tbn2_mockSheafData.map((sheaf, index) => (
+                        <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-medium">{sheaf.name}</h4>
+                            <span className={`px-2 py-1 rounded text-xs ${
+                              sheaf.status === 'active' ? 'bg-green-100 text-green-800' :
+                              sheaf.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {sheaf.status}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">{sheaf.description}</p>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="font-medium">Records:</span> {sheaf.records}
+                            </div>
+                            <div>
+                              <span className="font-medium">Last Updated:</span> {sheaf.lastUpdated}
+                            </div>
+                          </div>
+                          <div className="mt-2 flex space-x-2">
+                            <button className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">
+                              View Details
+                            </button>
+                            <button className="px-3 py-1 bg-gray-600 text-white rounded text-xs hover:bg-gray-700">
+                              Configure
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {tbn2_pillarShiftActiveTab === 'Column Templates' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Tebnar2 Column Templates</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium mb-2">Standard Image Plan Template</h4>
+                        <p className="text-sm text-gray-600 mb-3">Default column configuration for image plan data</p>
+                        <div className="text-xs bg-gray-100 p-2 rounded mb-2">
+                          Columns: ID, Name, Plan Path, Status, Created Date
+                        </div>
+                        <button className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700">
+                          Apply Template
+                        </button>
+                      </div>
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium mb-2">Extended Metadata Template</h4>
+                        <p className="text-sm text-gray-600 mb-3">Enhanced template with additional metadata fields</p>
+                        <div className="text-xs bg-gray-100 p-2 rounded mb-2">
+                          Columns: ID, Name, Plan Path, Status, Tags, Modified, Size
+                        </div>
+                        <button className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700">
+                          Apply Template
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {tbn2_pillarShiftActiveTab === 'Processing Queue' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Tebnar2 Processing Queue</h3>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="text-center text-gray-500">
+                        <p>No items currently in processing queue</p>
+                        <p className="text-sm mt-2">Queue items will appear here when batch operations are running</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {tbn2_pillarShiftActiveTab === 'System Metrics' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">System Performance Metrics</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="bg-blue-50 p-4 rounded-lg text-center">
+                        <div className="text-2xl font-bold text-blue-600">1,247</div>
+                        <div className="text-sm text-gray-600">Total Records</div>
+                      </div>
+                      <div className="bg-green-50 p-4 rounded-lg text-center">
+                        <div className="text-2xl font-bold text-green-600">98.2%</div>
+                        <div className="text-sm text-gray-600">Success Rate</div>
+                      </div>
+                      <div className="bg-yellow-50 p-4 rounded-lg text-center">
+                        <div className="text-2xl font-bold text-yellow-600">12ms</div>
+                        <div className="text-sm text-gray-600">Avg Response</div>
+                      </div>
+                      <div className="bg-purple-50 p-4 rounded-lg text-center">
+                        <div className="text-2xl font-bold text-purple-600">5</div>
+                        <div className="text-sm text-gray-600">Active Tasks</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {tbn2_pillarShiftActiveTab === 'Configuration' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">System Configuration</h3>
+                    <div className="space-y-4">
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium mb-2">Processing Settings</h4>
+                        <div className="grid grid-cols-2 gap-4">
+                          <label className="flex items-center space-x-2">
+                            <input type="checkbox" className="rounded" defaultChecked />
+                            <span className="text-sm">Enable auto-processing</span>
+                          </label>
+                          <label className="flex items-center space-x-2">
+                            <input type="checkbox" className="rounded" />
+                            <span className="text-sm">Debug mode</span>
+                          </label>
+                        </div>
+                      </div>
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium mb-2">Performance Tuning</h4>
+                        <div className="space-y-2">
+                          <div>
+                            <label className="text-sm">Batch Size: </label>
+                            <input type="number" defaultValue="50" className="w-20 px-2 py-1 border rounded" />
+                          </div>
+                          <div>
+                            <label className="text-sm">Cache Timeout (minutes): </label>
+                            <input type="number" defaultValue="15" className="w-20 px-2 py-1 border rounded" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="p-4 border-t flex justify-end space-x-3">
+              <button
+                onClick={() => setTbn2IsPillarShiftModalOpen(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setTbn2IsPillarShiftModalOpen(false);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Save Configuration
+              </button>
             </div>
           </div>
         </div>
