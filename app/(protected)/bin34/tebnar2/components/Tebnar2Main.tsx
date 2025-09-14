@@ -17,6 +17,7 @@ import {
   TBN2_DEBOUNCE_MS,
   TBN2_MAIN_ELEMENT_STYLING
 } from '../constants/tebnar2-constants';
+import TigerBar from './TigerBar';
 import { 
   tbn2_fetchImagePlansData,
   tbn2_fetchImagesData,
@@ -3713,6 +3714,71 @@ export default function Tebnar2Main() {
         onErrorDismiss={() => setTbn2Error(null)}
       />
 
+      {/* Tiger Bar - componentized uelbar45 and uelbar50 on main page */}
+      <TigerBar
+        selectedBatchId={tbn2_selectedBatchId}
+        selectedSitesprenId={tbn2_selectedSitesprenId}
+        selectedGconPieceId={tbn2_selectedGconPieceId}
+        batches={tbn2_batches}
+        onBatchChange={tbn2_handleBatchChange}
+        sitesprenDropdownOpen={tbn2_sitesprenDropdownOpen}
+        sitesprenSearchTerm={tbn2_sitesprenSearchTerm}
+        onSitesprenSearchTermChange={setTbn2SitesprenSearchTerm}
+        onSitesprenDropdownOpenChange={setTbn2SitesprenDropdownOpen}
+        getSelectedSitesprenDisplay={tbn2_getSelectedSitesprenDisplay}
+        getFilteredSitesprenOptions={tbn2_getFilteredSitesprenOptions}
+        onSitesprenSelect={(id, base) => {
+          setTbn2SelectedSitesprenId(id);
+          setTbn2CurrentSitesprenBase(base);
+          setTbn2SitesprenDropdownOpen(false);
+          setTbn2SitesprenSearchTerm('');
+        }}
+        onSitesprenClear={() => {
+          setTbn2SelectedSitesprenId('');
+          setTbn2CurrentSitesprenBase('');
+          setTbn2SitesprenDropdownOpen(false);
+          setTbn2SitesprenSearchTerm('');
+          setTbn2GconPieces([]);
+          setTbn2SelectedGconPieceId('');
+          setTbn2CurrentGconPieceTitle('');
+        }}
+        onSitesprenSave={tbn2_handleSitesprenSave}
+        sitesprenSaving={tbn2_sitesprenSaving}
+        sitesprenDropdownRef={sitesprenDropdownRef}
+        truncateUUID={tbn2_truncateUUID}
+        fetchGconPieces={tbn2_fetchGconPieces}
+        gconPieceDropdownOpen={tbn2_gconPieceDropdownOpen}
+        gconPieceSearchTerm={tbn2_gconPieceSearchTerm}
+        onGconPieceSearchTermChange={setTbn2GconPieceSearchTerm}
+        onGconPieceDropdownOpenChange={setTbn2GconPieceDropdownOpen}
+        getSelectedGconPieceDisplay={tbn2_getSelectedGconPieceDisplay}
+        getFilteredGconPieceOptions={tbn2_getFilteredGconPieceOptions}
+        onGconPieceSelect={(id) => {
+          setTbn2SelectedGconPieceId(id);
+          setTbn2GconPieceDropdownOpen(false);
+          setTbn2GconPieceSearchTerm('');
+        }}
+        onGconPieceClear={() => {
+          setTbn2SelectedGconPieceId('');
+          setTbn2CurrentGconPieceTitle('');
+          setTbn2GconPieceDropdownOpen(false);
+          setTbn2GconPieceSearchTerm('');
+        }}
+        onGconPieceSave={tbn2_handleGconPieceSave}
+        gconPieceSaving={tbn2_gconPieceSaving}
+        gconPieceDropdownRef={gconPieceDropdownRef}
+        getGconPieceUrls={tbn2_getGconPieceUrls}
+        seedUrlWpEditor={tbn2_seedUrlWpEditor}
+        seedUrlFrontend={tbn2_seedUrlFrontend}
+        onSeedUrlWpEditorChange={setTbn2SeedUrlWpEditor}
+        onSeedUrlFrontendChange={setTbn2SeedUrlFrontend}
+        onSeedUrlWpEditorSave={tbn2_handleSeedUrlWpEditorSave}
+        onSeedUrlFrontendSave={tbn2_handleSeedUrlFrontendSave}
+        seedUrlSaving={tbn2_seedUrlSaving}
+        marginRight="0px"
+        className="mb-4"
+      />
+
       {/* Active Filter Indicator - tebnar2 specific */}
       {tbn2_selectedBatchId && (
         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -5179,565 +5245,69 @@ export default function Tebnar2Main() {
               </button>
             </div>
             
-            {/* uelbar45 section */}
-            <div 
-              className="flex items-center px-4 flex-shrink-0"
-              style={{ 
-                marginRight: '260px', // Leave space for close button
-                backgroundColor: '#f3f4f6',
-                color: '#374151',
-                borderTop: '1px solid #4a5568',
-                borderBottom: '1px solid #4a5568'
+            {/* Tiger Bar - componentized uelbar45 and uelbar50 */}
+            <TigerBar
+              selectedBatchId={tbn2_selectedBatchId}
+              selectedSitesprenId={tbn2_selectedSitesprenId}
+              selectedGconPieceId={tbn2_selectedGconPieceId}
+              batches={tbn2_batches}
+              onBatchChange={tbn2_handleBatchChange}
+              sitesprenDropdownOpen={tbn2_sitesprenDropdownOpen}
+              sitesprenSearchTerm={tbn2_sitesprenSearchTerm}
+              onSitesprenSearchTermChange={setTbn2SitesprenSearchTerm}
+              onSitesprenDropdownOpenChange={setTbn2SitesprenDropdownOpen}
+              getSelectedSitesprenDisplay={tbn2_getSelectedSitesprenDisplay}
+              getFilteredSitesprenOptions={tbn2_getFilteredSitesprenOptions}
+              onSitesprenSelect={(id, base) => {
+                setTbn2SelectedSitesprenId(id);
+                setTbn2CurrentSitesprenBase(base);
+                setTbn2SitesprenDropdownOpen(false);
+                setTbn2SitesprenSearchTerm('');
               }}
-            >
-              <span className="font-semibold mr-4">uelbar45</span>
-              
-              <table style={{ borderCollapse: 'collapse', fontSize: '16px' }}>
-                <thead>
-                  <tr>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">1</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">2</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">rel_images_plans_batches_id</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">4</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">asn_sitespren_id</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">asn_gcon_piece_id</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">7</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">8</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">9</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">10</div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">
-                        <div className="flex items-center space-x-2">
-                          <select
-                            value={tbn2_selectedBatchId}
-                            onChange={e => tbn2_handleBatchChange(e.target.value)}
-                            className={`h-7 px-2 rounded text-black ${tbn2_selectedBatchId ? 'bg-teal-200' : 'bg-white'}`}
-                            style={{ minWidth: 120, fontSize: '14px' }}
-                          >
-                            <option value="">All Batches ({tbn2_batches.length})</option>
-                            {tbn2_batches.map(batch => (
-                              <option key={batch.id} value={batch.id}>{batch.id}</option>
-                            ))}
-                          </select>
-                          
-                          {tbn2_selectedBatchId && (
-                            <button
-                              onClick={() => {
-                                const url = `http://localhost:3000/bin34/tebnar2?batchid=${tbn2_selectedBatchId}`;
-                                window.open(url, '_blank');
-                              }}
-                              className="h-7 px-3 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs font-medium"
-                            >
-                              open /tebnar2
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">
-                        <div className="flex items-center space-x-1">
-                          <div className="relative" ref={sitesprenDropdownRef} style={{ width: '410px' }}>
-                            <input
-                              type="text"
-                              value={tbn2_sitesprenDropdownOpen ? tbn2_sitesprenSearchTerm : (tbn2_selectedSitesprenId ? tbn2_getSelectedSitesprenDisplay() : '')}
-                              onChange={(e) => setTbn2SitesprenSearchTerm(e.target.value)}
-                              onFocus={() => {
-                                setTbn2SitesprenDropdownOpen(true);
-                                setTbn2SitesprenSearchTerm('');
-                              }}
-                              placeholder={!tbn2_selectedBatchId ? 'Select batch first' : 'Type to search by sitespren_base...'}
-                              disabled={!tbn2_selectedBatchId}
-                              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                              style={{ fontSize: '16px' }}
-                            />
-                            {tbn2_sitesprenDropdownOpen && tbn2_selectedBatchId && (
-                              <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-screen overflow-y-auto">
-                                {/* Clear/Empty option - always shows first */}
-                                <div
-                                  onClick={() => {
-                                    setTbn2SelectedSitesprenId('');
-                                    setTbn2CurrentSitesprenBase('');
-                                    setTbn2SitesprenDropdownOpen(false);
-                                    setTbn2SitesprenSearchTerm('');
-                                    // Clear gcon pieces as well since they depend on sitespren
-                                    setTbn2GconPieces([]);
-                                    setTbn2SelectedGconPieceId('');
-                                    setTbn2CurrentGconPieceTitle('');
-                                  }}
-                                  className="px-2 py-1 hover:bg-red-50 cursor-pointer border-b border-gray-200 bg-red-25"
-                                  style={{ fontSize: '16px' }}
-                                >
-                                  <span className="text-red-600 font-medium">(update to empty)</span>
-                                </div>
-                                {tbn2_getFilteredSitesprenOptions().length > 0 ? (
-                                  tbn2_getFilteredSitesprenOptions().map((option) => (
-                                    <div
-                                      key={option.id}
-                                      onClick={() => {
-                                        setTbn2SelectedSitesprenId(option.id);
-                                        setTbn2CurrentSitesprenBase(option.sitespren_base);
-                                        setTbn2SitesprenDropdownOpen(false);
-                                        setTbn2SitesprenSearchTerm('');
-                                        tbn2_fetchGconPieces(option.sitespren_base);
-                                      }}
-                                      className={`px-2 py-1 hover:bg-blue-50 cursor-pointer ${
-                                        option.id === tbn2_selectedSitesprenId ? 'bg-blue-100' : ''
-                                      }`}
-                                      style={{ fontSize: '16px' }}
-                                    >
-                                      <span className="text-gray-500">{tbn2_truncateUUID(option.id)}</span> - <span className="text-gray-900">{option.sitespren_base}</span>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <div className="px-2 py-1 text-gray-500" style={{ fontSize: '16px' }}>
-                                    No matches found
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          <button
-                            onClick={tbn2_handleSitesprenSave}
-                            disabled={!tbn2_selectedBatchId || tbn2_sitesprenSaving}
-                            className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                            style={{ fontSize: '12px' }}
-                            title={!tbn2_selectedBatchId ? 'Select a batch first' : 'Save sitespren assignment'}
-                          >
-                            {tbn2_sitesprenSaving ? '...' : 'save'}
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">
-                        <div className="flex items-center space-x-1">
-                          <div className="relative" ref={gconPieceDropdownRef} style={{ width: '370px' }}>
-                            <input
-                              type="text"
-                              value={tbn2_gconPieceDropdownOpen ? tbn2_gconPieceSearchTerm : (tbn2_selectedGconPieceId ? tbn2_getSelectedGconPieceDisplay() : '')}
-                              onChange={(e) => setTbn2GconPieceSearchTerm(e.target.value)}
-                              onFocus={() => {
-                                if (!tbn2_selectedBatchId || !tbn2_selectedSitesprenId) return;
-                                setTbn2GconPieceDropdownOpen(true);
-                                setTbn2GconPieceSearchTerm('');
-                              }}
-                              placeholder={!tbn2_selectedBatchId ? 'Select batch first' : 
-                                         !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
-                                         'Type to search by title or pageslug...'}
-                              disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
-                              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                              style={{ fontSize: '16px' }}
-                            />
-                            {tbn2_gconPieceDropdownOpen && tbn2_selectedBatchId && tbn2_selectedSitesprenId && (
-                              <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-screen overflow-y-auto">
-                                {/* Clear/Empty option - always shows first */}
-                                <div
-                                  onClick={() => {
-                                    setTbn2SelectedGconPieceId('');
-                                    setTbn2CurrentGconPieceTitle('');
-                                    setTbn2GconPieceDropdownOpen(false);
-                                    setTbn2GconPieceSearchTerm('');
-                                  }}
-                                  className="px-2 py-1 hover:bg-red-50 cursor-pointer border-b border-gray-200 bg-red-25"
-                                  style={{ fontSize: '16px' }}
-                                >
-                                  <span className="text-red-600 font-medium">(update to empty)</span>
-                                </div>
-                                {tbn2_getFilteredGconPieceOptions().length > 0 ? (
-                                  tbn2_getFilteredGconPieceOptions().map((option) => (
-                                    <div
-                                      key={option.id}
-                                      onClick={() => {
-                                        setTbn2SelectedGconPieceId(option.id);
-                                        setTbn2GconPieceDropdownOpen(false);
-                                        setTbn2GconPieceSearchTerm('');
-                                      }}
-                                      className={`px-2 py-1 hover:bg-blue-50 cursor-pointer ${
-                                        option.id === tbn2_selectedGconPieceId ? 'bg-blue-100' : ''
-                                      }`}
-                                      style={{ fontSize: '16px' }}
-                                    >
-                                      <div className="flex flex-col">
-                                        <div>
-                                          <span className="text-gray-500">{tbn2_truncateUUID(option.id)}</span> - <span className="text-gray-900 font-medium">{option.meta_title}</span>
-                                        </div>
-                                        {option.post_name && (
-                                          <div className="text-sm text-gray-600 mt-0.5">
-                                            pageslug: {option.post_name}
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <div className="px-2 py-1 text-gray-500" style={{ fontSize: '16px' }}>
-                                    No matches found
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          <button
-                            onClick={tbn2_handleGconPieceSave}
-                            disabled={!tbn2_selectedBatchId || tbn2_gconPieceSaving}
-                            className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                            style={{ fontSize: '12px' }}
-                            title={!tbn2_selectedBatchId ? 'Select a batch first' : 
-                                   !tbn2_selectedSitesprenId ? 'Select a sitespren first' :
-                                   'Save gcon piece assignment'}
-                          >
-                            {tbn2_gconPieceSaving ? '...' : 'save'}
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">
-                        {tbn2_selectedSitesprenId && (() => {
-                          const sitesprenBase = tbn2_getSelectedSitesprenDisplay()?.split(' - ')[1] || '';
-                          return sitesprenBase ? (
-                            <div className="flex items-center gap-1">
-                              <button
-                                onClick={() => window.open(`https://${sitesprenBase}/wp-admin/`, '_blank')}
-                                className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                                title="Open WP Admin"
-                              >
-                                WP
-                              </button>
-                              <button
-                                onClick={() => window.open(`https://${sitesprenBase}`, '_blank')}
-                                className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                                title="Open Site"
-                              >
-                                Site
-                              </button>
-                              <button
-                                onClick={() => {
-                                  navigator.clipboard.writeText(sitesprenBase);
-                                }}
-                                className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                title="Copy domain to clipboard"
-                              >
-                                📋
-                              </button>
-                              <button
-                                onClick={() => window.open(`https://www.google.com/search?q=site%3A${encodeURIComponent(sitesprenBase)}`, '_blank')}
-                                className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                title="Google site: search"
-                              >
-                                G
-                              </button>
-                            </div>
-                          ) : null;
-                        })()}
-                      </div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">
-                        {tbn2_selectedGconPieceId && (() => {
-                          const urls = tbn2_getGconPieceUrls();
-                          return urls ? (
-                            <div className="flex space-x-1">
-                              <button
-                                onClick={() => urls.pendulum && window.open(urls.pendulum, '_blank')}
-                                disabled={!urls.pendulum}
-                                className="px-2 text-xs font-medium rounded border transition-colors bg-gray-600 text-white border-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                style={{ height: '20px' }}
-                                title="Edit in WordPress admin"
-                              >
-                                pendulum
-                              </button>
-                              <button
-                                onClick={() => urls.elementor && window.open(urls.elementor, '_blank')}
-                                disabled={!urls.elementor}
-                                className="px-2 text-xs font-medium rounded border transition-colors bg-purple-600 text-white border-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                style={{ height: '20px' }}
-                                title="Edit with Elementor"
-                              >
-                                elementor
-                              </button>
-                              <button
-                                onClick={() => urls.frontend && window.open(urls.frontend, '_blank')}
-                                disabled={!urls.frontend}
-                                className="px-2 text-xs font-medium rounded border transition-colors bg-green-600 text-white border-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                style={{ height: '20px' }}
-                                title="View frontend page"
-                              >
-                                frontend
-                              </button>
-                            </div>
-                          ) : null;
-                        })()}
-                      </div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            
-            {/* uelbar50 section */}
-            <div 
-              className="flex items-center px-4 flex-shrink-0"
-              style={{ 
-                backgroundColor: '#f3f4f6',
-                color: '#374151',
-                borderTop: '1px solid #4a5568',
-                borderBottom: '1px solid #4a5568',
-                marginRight: '260px' // Leave space for close button
+              onSitesprenClear={() => {
+                setTbn2SelectedSitesprenId('');
+                setTbn2CurrentSitesprenBase('');
+                setTbn2SitesprenDropdownOpen(false);
+                setTbn2SitesprenSearchTerm('');
+                setTbn2GconPieces([]);
+                setTbn2SelectedGconPieceId('');
+                setTbn2CurrentGconPieceTitle('');
               }}
-            >
-              <span className="font-semibold mr-4">uelbar50</span>
-              
-              <table style={{ borderCollapse: 'collapse', fontSize: '16px' }}>
-                <thead>
-                  <tr>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">1</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">2</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">seed_url_wp_editor</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">seed_url_frontend</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">5</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">6</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">7</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">8</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">9</div>
-                    </th>
-                    <th style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">10</div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">
-                        <div className="flex items-center space-x-1">
-                          {/* Open URL button */}
-                          <button
-                            onClick={() => {
-                              if (tbn2_seedUrlWpEditor && tbn2_seedUrlWpEditor.trim()) {
-                                window.open(tbn2_seedUrlWpEditor, '_blank');
-                              } else {
-                                alert('Please enter a URL first');
-                              }
-                            }}
-                            disabled={!tbn2_seedUrlWpEditor || !tbn2_seedUrlWpEditor.trim()}
-                            className="w-8 h-8 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
-                            title="Open WP editor URL in new tab"
-                          >
-                            🌐
-                          </button>
-                          {/* Copy URL button */}
-                          <button
-                            onClick={() => {
-                              if (tbn2_seedUrlWpEditor && tbn2_seedUrlWpEditor.trim()) {
-                                navigator.clipboard.writeText(tbn2_seedUrlWpEditor).then(() => {
-                                  alert('URL copied to clipboard');
-                                }).catch(() => {
-                                  alert('Failed to copy URL');
-                                });
-                              } else {
-                                alert('No URL to copy');
-                              }
-                            }}
-                            disabled={!tbn2_seedUrlWpEditor || !tbn2_seedUrlWpEditor.trim()}
-                            className="w-8 h-8 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
-                            title="Copy WP editor URL to clipboard"
-                          >
-                            📋
-                          </button>
-                          <input
-                            type="text"
-                            value={tbn2_seedUrlWpEditor}
-                            onChange={(e) => setTbn2SeedUrlWpEditor(e.target.value)}
-                            placeholder={!tbn2_selectedBatchId ? 'Select batch first' : 'Enter WP editor URL...'}
-                            disabled={!tbn2_selectedBatchId}
-                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            style={{ fontSize: '16px', width: '300px' }}
-                          />
-                          <button
-                            onClick={tbn2_handleSeedUrlWpEditorSave}
-                            disabled={!tbn2_selectedBatchId || tbn2_seedUrlSaving.wpEditor}
-                            className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                            style={{ fontSize: '12px' }}
-                            title={!tbn2_selectedBatchId ? 'Select a batch first' : 'Save WP editor URL'}
-                          >
-                            {tbn2_seedUrlSaving.wpEditor ? '...' : 'save'}
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">
-                        <div className="flex items-center space-x-1">
-                          {/* Open URL button */}
-                          <button
-                            onClick={() => {
-                              if (tbn2_seedUrlFrontend && tbn2_seedUrlFrontend.trim()) {
-                                window.open(tbn2_seedUrlFrontend, '_blank');
-                              } else {
-                                alert('Please enter a URL first');
-                              }
-                            }}
-                            disabled={!tbn2_seedUrlFrontend || !tbn2_seedUrlFrontend.trim()}
-                            className="w-8 h-8 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
-                            title="Open frontend URL in new tab"
-                          >
-                            🌐
-                          </button>
-                          {/* Copy URL button */}
-                          <button
-                            onClick={() => {
-                              if (tbn2_seedUrlFrontend && tbn2_seedUrlFrontend.trim()) {
-                                navigator.clipboard.writeText(tbn2_seedUrlFrontend).then(() => {
-                                  alert('URL copied to clipboard');
-                                }).catch(() => {
-                                  alert('Failed to copy URL');
-                                });
-                              } else {
-                                alert('No URL to copy');
-                              }
-                            }}
-                            disabled={!tbn2_seedUrlFrontend || !tbn2_seedUrlFrontend.trim()}
-                            className="w-8 h-8 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
-                            title="Copy frontend URL to clipboard"
-                          >
-                            📋
-                          </button>
-                          <input
-                            type="text"
-                            value={tbn2_seedUrlFrontend}
-                            onChange={(e) => setTbn2SeedUrlFrontend(e.target.value)}
-                            placeholder={!tbn2_selectedBatchId ? 'Select batch first' : 'Enter frontend URL...'}
-                            disabled={!tbn2_selectedBatchId}
-                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            style={{ fontSize: '16px', width: '300px' }}
-                          />
-                          <button
-                            onClick={tbn2_handleSeedUrlFrontendSave}
-                            disabled={!tbn2_selectedBatchId || tbn2_seedUrlSaving.frontend}
-                            className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                            style={{ fontSize: '12px' }}
-                            title={!tbn2_selectedBatchId ? 'Select a batch first' : 'Save frontend URL'}
-                          >
-                            {tbn2_seedUrlSaving.frontend ? '...' : 'save'}
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                    <td style={{ border: '1px solid gray', padding: '0' }}>
-                      <div className="cell_inner_wrapper_div">-</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+              onSitesprenSave={tbn2_handleSitesprenSave}
+              sitesprenSaving={tbn2_sitesprenSaving}
+              sitesprenDropdownRef={sitesprenDropdownRef}
+              truncateUUID={tbn2_truncateUUID}
+              fetchGconPieces={tbn2_fetchGconPieces}
+              gconPieceDropdownOpen={tbn2_gconPieceDropdownOpen}
+              gconPieceSearchTerm={tbn2_gconPieceSearchTerm}
+              onGconPieceSearchTermChange={setTbn2GconPieceSearchTerm}
+              onGconPieceDropdownOpenChange={setTbn2GconPieceDropdownOpen}
+              getSelectedGconPieceDisplay={tbn2_getSelectedGconPieceDisplay}
+              getFilteredGconPieceOptions={tbn2_getFilteredGconPieceOptions}
+              onGconPieceSelect={(id) => {
+                setTbn2SelectedGconPieceId(id);
+                setTbn2GconPieceDropdownOpen(false);
+                setTbn2GconPieceSearchTerm('');
+              }}
+              onGconPieceClear={() => {
+                setTbn2SelectedGconPieceId('');
+                setTbn2CurrentGconPieceTitle('');
+                setTbn2GconPieceDropdownOpen(false);
+                setTbn2GconPieceSearchTerm('');
+              }}
+              onGconPieceSave={tbn2_handleGconPieceSave}
+              gconPieceSaving={tbn2_gconPieceSaving}
+              gconPieceDropdownRef={gconPieceDropdownRef}
+              getGconPieceUrls={tbn2_getGconPieceUrls}
+              seedUrlWpEditor={tbn2_seedUrlWpEditor}
+              seedUrlFrontend={tbn2_seedUrlFrontend}
+              onSeedUrlWpEditorChange={setTbn2SeedUrlWpEditor}
+              onSeedUrlFrontendChange={setTbn2SeedUrlFrontend}
+              onSeedUrlWpEditorSave={tbn2_handleSeedUrlWpEditorSave}
+              onSeedUrlFrontendSave={tbn2_handleSeedUrlFrontendSave}
+              seedUrlSaving={tbn2_seedUrlSaving}
+              marginRight="260px"
+            />
             
             {/* Popup content - adjusted to start below all three headers */}
             <div className="flex-grow flex flex-col overflow-hidden">
