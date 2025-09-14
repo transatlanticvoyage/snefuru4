@@ -205,8 +205,20 @@ export default function Tebnar2Actions({
           ))}
         </div>
 
+        {/* Horizontal rule above AI Model Selector */}
+        <hr className="my-4 border-gray-300" />
+
         {/* AI Model Selector - exact clone from tebnar1 */}
-        <div className="font-bold mb-2">Select AI Model To Use</div>
+        <div className="flex items-center gap-4 mb-2">
+          <div className="font-bold">Select AI Model To Use</div>
+          <button
+            type="button"
+            onClick={() => window.open('/clevnar3', '_blank')}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-150 font-medium text-sm"
+          >
+            open /clevnar3
+          </button>
+        </div>
         <div className="flex space-x-2 mb-2">
           {['openai', 'grok', 'gemini'].map(model => (
             <button
@@ -219,6 +231,9 @@ export default function Tebnar2Actions({
             </button>
           ))}
         </div>
+
+        {/* Horizontal rule above Generate Zip Checkbox */}
+        <hr className="my-4 border-gray-300" />
 
         {/* Generate Zip Checkbox - exact clone from tebnar1 */}
         <div className="flex items-center mb-2">

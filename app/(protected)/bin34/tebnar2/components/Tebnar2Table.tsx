@@ -661,6 +661,101 @@ export default function Tebnar2Table({
           className="w-full"
         >
           <thead className="bg-gray-50">
+            {/* Database Table Name Row */}
+            <tr className="shenfur_db_table_name_tr">
+              {/* Select Checkbox Header - special column */}
+              <th
+                style={{
+                  width: '50px',
+                  minWidth: '50px',
+                  maxWidth: '50px',
+                  position: 'sticky',
+                  left: '0px',
+                  zIndex: 20,
+                  backgroundColor: '#f3f4f6',
+                  borderRight: '1px solid #c7cbd3',
+                  padding: '4px',
+                  textAlign: 'center',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                  color: '#374151'
+                }}
+              >
+                -
+              </th>
+              
+              {/* Sticky Column DB Names */}
+              {stickyColumns.map((col, index) => {
+                const width = getColumnWidth(col);
+                const isLastSticky = index === stickyColumns.length - 1;
+                const hasBlackSeparator = col === 'image1-preview' || isLastSticky;
+                
+                // Map column to database table name
+                const getDbTableName = (column: string) => {
+                  if (column.includes('preview') || column === 'supabase-filename' || column === 'rename-field-1') {
+                    return '-';
+                  }
+                  return 'images_plans';
+                };
+                
+                return (
+                  <th
+                    key={`db-${col}`}
+                    style={{
+                      width: width,
+                      minWidth: width,
+                      maxWidth: width,
+                      position: 'sticky',
+                      left: `calc(50px + ${calculateStickyLeft(index)})`,
+                      zIndex: 20,
+                      backgroundColor: '#f3f4f6',
+                      borderRight: hasBlackSeparator ? '4px solid black' : '1px solid #c7cbd3',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      color: '#374151',
+                      padding: '4px',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {getDbTableName(col)}
+                  </th>
+                );
+              })}
+              
+              {/* Non-Sticky Column DB Names */}
+              {nonStickyColumns.map((col) => {
+                const width = getColumnWidth(col);
+                
+                // Map column to database table name
+                const getDbTableName = (column: string) => {
+                  if (column.includes('preview') || column === 'supabase-filename' || column === 'rename-field-1') {
+                    return '-';
+                  }
+                  return 'images_plans';
+                };
+                
+                return (
+                  <th
+                    key={`db-${col}`}
+                    style={{
+                      width: width,
+                      minWidth: width,
+                      maxWidth: width,
+                      backgroundColor: '#f3f4f6',
+                      borderRight: '1px solid #c7cbd3',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      color: '#374151',
+                      padding: '4px',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {getDbTableName(col)}
+                  </th>
+                );
+              })}
+            </tr>
+            
             <tr
               style={{
                 height: tbn2_headerCustomizationSettings.headerRow.height,
