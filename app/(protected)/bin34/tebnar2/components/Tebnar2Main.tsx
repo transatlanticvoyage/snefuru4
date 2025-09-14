@@ -470,8 +470,8 @@ export default function Tebnar2Main() {
           });
         });
         
-        // Create grid data with new headers as first row and remapped data
-        const newGridData = [newHeaders, ...newRows];
+        // Create grid data with ONLY remapped data rows (no header row)
+        const newGridData = newRows;
         setTbn2PresetData(newGridData);
         setTbn2Error('✅ Dummy data loaded successfully!');
       } else {
@@ -520,8 +520,8 @@ export default function Tebnar2Main() {
           });
         });
         
-        // Create grid data with new headers as first row and 2 remapped data rows
-        const newGridData = [newHeaders, ...newRows];
+        // Create grid data with ONLY 2 remapped data rows (no header row)
+        const newGridData = newRows;
         
         setTbn2PresetData(newGridData);
         setTbn2Error('✅ 2 random rows loaded successfully!');

@@ -27,13 +27,14 @@ export async function POST(request: Request) {
     }
     
     // Prepare the original submission data for storage - tbn2 independent version
+    // Now expects all rows to be real data (no header row in gridData)
     const originalSubmissionData = {
-      headers: gridData && gridData.length > 0 ? gridData[0] : [],
-      rows: gridData && gridData.length > 1 ? gridData.slice(1).filter((row: string[]) => row.some(cell => cell.trim() !== '')) : [],
+      headers: ['e_prompt1', 'e_zpf_img_code', 'e_width', 'e_height', 'e_associated_content1', 'e_file_name1', 'e_more_instructions1', 'e_ai_tool1'], // Fixed headers
+      rows: gridData && gridData.length > 0 ? gridData.filter((row: string[]) => row.some(cell => cell.trim() !== '')) : [],
       metadata: {
         submitted_at: new Date().toISOString(),
-        total_rows: gridData && gridData.length > 1 ? gridData.slice(1).filter((row: string[]) => row.some(cell => cell.trim() !== '')).length : 0,
-        total_columns: gridData && gridData.length > 0 ? gridData[0].length : 0,
+        total_rows: gridData && gridData.length > 0 ? gridData.filter((row: string[]) => row.some(cell => cell.trim() !== '')).length : 0,
+        total_columns: 8, // Fixed to 8 columns as per header structure
         processed_records_count: records.length,
         function_used: 'tbn2_sfunc_create_plans_make_images_2', // Independent tbn2 identifier
         source_system: 'tebnar2',

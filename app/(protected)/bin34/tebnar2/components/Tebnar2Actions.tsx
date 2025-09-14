@@ -131,8 +131,8 @@ export default function Tebnar2Actions({
   };
 
   const handleClearAllInfo = () => {
-    // Clear the grid data by resetting it to empty grid structure (11 rows x 9 cols)
-    const emptyGrid = Array.from({ length: 11 }, () => Array(9).fill(''));
+    // Clear the grid data by resetting it to empty grid structure (10 rows x 8 cols - no header row)
+    const emptyGrid = Array.from({ length: 10 }, () => Array(8).fill(''));
     onGridDataChange(emptyGrid);
   };
 
