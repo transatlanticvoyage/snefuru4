@@ -21,6 +21,40 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+/**
+ * Parse percentage range string and return random value within the range
+ * @param rangeStr - String like "1-5%" or "3%" 
+ * @returns Random percentage as decimal (e.g., 0.03 for 3%)
+ */
+function parseRandomPercentage(rangeStr: string): number {
+  // Remove % symbol and trim whitespace
+  const cleanStr = rangeStr.replace('%', '').trim();
+  
+  // Check if it's a range (contains dash)
+  if (cleanStr.includes('-')) {
+    const [minStr, maxStr] = cleanStr.split('-').map(s => s.trim());
+    const min = parseFloat(minStr);
+    const max = parseFloat(maxStr);
+    
+    if (isNaN(min) || isNaN(max)) {
+      console.warn(`Invalid range format: ${rangeStr}, defaulting to 3%`);
+      return 0.03;
+    }
+    
+    // Generate random percentage between min and max
+    const randomValue = min + Math.random() * (max - min);
+    return randomValue / 100; // Convert to decimal
+  } else {
+    // Single value
+    const value = parseFloat(cleanStr);
+    if (isNaN(value)) {
+      console.warn(`Invalid percentage format: ${rangeStr}, defaulting to 3%`);
+      return 0.03;
+    }
+    return value / 100; // Convert to decimal
+  }
+}
+
 interface SabertoothScreenshotResult {
   success: boolean;
   message: string;
@@ -47,11 +81,13 @@ interface ImageRecord {
  * Main SabertoothScreenshotImages function
  * @param imageId - The ID of the image record in the database
  * @param userId - The user ID for authorization
+ * @param alterpro - Optional alterpro settings for edge cropping
  * @returns Promise<SabertoothScreenshotResult>
  */
 export async function SabertoothScreenshotImages(
   imageId: string, 
-  userId: string
+  userId: string,
+  alterpro?: { enabled: boolean; edgePercentages: { top: string; bottom: string; left: string; right: string; } }
 ): Promise<SabertoothScreenshotResult> {
   
   let browser: any = null;
@@ -206,15 +242,51 @@ export async function SabertoothScreenshotImages(
 
     console.log(`🦷 SabertoothScreenshotImages: Taking screenshot...`);
 
+    // 9. Calculate crop dimensions if alterpro is enabled
+    let clipX = 0;
+    let clipY = 0;
+    let clipWidth = originalWidth;
+    let clipHeight = originalHeight;
+    
+    if (alterpro?.enabled && alterpro.edgePercentages) {
+      console.log(`🦷 SabertoothScreenshotImages: Alterpro enabled, calculating crop dimensions...`);
+      
+      // Parse random percentages for each edge
+      const topPercent = parseRandomPercentage(alterpro.edgePercentages.top);
+      const bottomPercent = parseRandomPercentage(alterpro.edgePercentages.bottom);
+      const leftPercent = parseRandomPercentage(alterpro.edgePercentages.left);
+      const rightPercent = parseRandomPercentage(alterpro.edgePercentages.right);
+      
+      console.log(`🦷 SabertoothScreenshotImages: Random edge percentages - Top: ${(topPercent * 100).toFixed(2)}%, Bottom: ${(bottomPercent * 100).toFixed(2)}%, Left: ${(leftPercent * 100).toFixed(2)}%, Right: ${(rightPercent * 100).toFixed(2)}%`);
+      
+      // Calculate crop offsets
+      const topOffset = Math.floor(originalHeight * topPercent);
+      const bottomOffset = Math.floor(originalHeight * bottomPercent);
+      const leftOffset = Math.floor(originalWidth * leftPercent);
+      const rightOffset = Math.floor(originalWidth * rightPercent);
+      
+      // Calculate final crop dimensions
+      clipX = leftOffset;
+      clipY = topOffset;
+      clipWidth = originalWidth - leftOffset - rightOffset;
+      clipHeight = originalHeight - topOffset - bottomOffset;
+      
+      // Ensure minimum dimensions
+      clipWidth = Math.max(clipWidth, 50); // Minimum 50px width
+      clipHeight = Math.max(clipHeight, 50); // Minimum 50px height
+      
+      console.log(`🦷 SabertoothScreenshotImages: Original: ${originalWidth}x${originalHeight}, Cropped: ${clipWidth}x${clipHeight} (offset: ${clipX},${clipY})`);
+    }
+
     // 9. Take screenshot
     const screenshotBuffer = await page.screenshot({
       type: 'png',
       fullPage: false,
       clip: {
-        x: 0,
-        y: 0,
-        width: originalWidth,
-        height: originalHeight
+        x: clipX,
+        y: clipY,
+        width: clipWidth,
+        height: clipHeight
       }
     });
 
@@ -254,9 +326,9 @@ export async function SabertoothScreenshotImages(
         img_file_url1: screenshotUrl,
         img_file_extension: 'png',
         img_file_size: screenshotBuffer.length,
-        width: originalWidth,
-        height: originalHeight,
-        function_used_to_fetch_the_image: `${imageRecord.function_used_to_fetch_the_image || 'unknown'}_sabertooth_screenshot`,
+        width: clipWidth,
+        height: clipHeight,
+        function_used_to_fetch_the_image: `${imageRecord.function_used_to_fetch_the_image || 'unknown'}_sabertooth_screenshot${alterpro?.enabled ? '_alterpro' : ''}`,
         status: 'screenshot_processed'
       })
       .eq('id', imageId);
@@ -311,11 +383,13 @@ export async function SabertoothScreenshotImages(
  * Batch processing function to handle multiple images
  * @param imageIds - Array of image IDs to process
  * @param userId - The user ID for authorization
+ * @param alterpro - Optional alterpro settings for edge cropping
  * @returns Promise<SabertoothScreenshotResult[]>
  */
 export async function SabertoothBatchScreenshotImages(
   imageIds: string[],
-  userId: string
+  userId: string,
+  alterpro?: { enabled: boolean; edgePercentages: { top: string; bottom: string; left: string; right: string; } }
 ): Promise<SabertoothScreenshotResult[]> {
   
   console.log(`🦷 SabertoothBatchScreenshotImages: Processing ${imageIds.length} images`);
@@ -327,7 +401,7 @@ export async function SabertoothBatchScreenshotImages(
     const imageId = imageIds[i];
     console.log(`🦷 SabertoothBatchScreenshotImages: Processing ${i + 1}/${imageIds.length}: ${imageId}`);
     
-    const result = await SabertoothScreenshotImages(imageId, userId);
+    const result = await SabertoothScreenshotImages(imageId, userId, alterpro);
     results.push(result);
     
     // Add small delay between screenshots to be gentle on resources

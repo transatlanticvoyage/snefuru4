@@ -5,6 +5,7 @@ export async function tbn2_func_create_plans_make_images_2({
   generateZip, 
   wipeMeta,
   screenshotImages,
+  alterpro,
   throttle1,
   gridData,
   batchId
@@ -15,6 +16,7 @@ export async function tbn2_func_create_plans_make_images_2({
   generateZip?: boolean, 
   wipeMeta?: boolean,
   screenshotImages?: boolean,
+  alterpro?: { enabled: boolean; edgePercentages: { top: string; bottom: string; left: string; right: string; } },
   throttle1?: { enabled: boolean, delayBetweenImages: number, delayBetweenPlans: number },
   gridData?: string[][],
   batchId?: string
@@ -23,7 +25,7 @@ export async function tbn2_func_create_plans_make_images_2({
     const response = await fetch('/api/tbn2_sfunc_create_plans_make_images_2', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ records, qty, aiModel, generateZip, wipeMeta, screenshotImages, throttle1, gridData, batchId }),
+      body: JSON.stringify({ records, qty, aiModel, generateZip, wipeMeta, screenshotImages, alterpro, throttle1, gridData, batchId }),
     });
     return await response.json();
   } catch (error) {

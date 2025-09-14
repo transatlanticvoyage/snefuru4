@@ -63,6 +63,15 @@ export default function Tebnar2Main() {
   const [tbn2_generateZip, setTbn2GenerateZip] = useState(false);
   const [tbn2_wipeMeta, setTbn2WipeMeta] = useState(true);
   const [tbn2_screenshotImages, setTbn2ScreenshotImages] = useState(false);
+  const [tbn2_alterpro, setTbn2Alterpro] = useState({
+    enabled: false,
+    edgePercentages: {
+      top: '1-5%',
+      bottom: '1-5%',
+      left: '1-5%',
+      right: '1-5%'
+    }
+  });
   const [tbn2_throttle1, setTbn2Throttle1] = useState<Tebnar2ThrottleSettings>(TBN2_DEFAULT_THROTTLE);
   const [tbn2_fetchingImages, setTbn2FetchingImages] = useState<Set<string>>(new Set());
   const [tbn2_loadingPreset, setTbn2LoadingPreset] = useState(false);
@@ -759,6 +768,7 @@ export default function Tebnar2Main() {
         generateZip: tbn2_generateZip,
         wipeMeta: tbn2_wipeMeta,
         screenshotImages: tbn2_screenshotImages,
+        alterpro: tbn2_alterpro,
         throttle1: tbn2_throttle1,
         gridData: tbn2_gridData,
         batchId: tbn2_selectedBatchId
@@ -5534,6 +5544,8 @@ export default function Tebnar2Main() {
                       onWipeMetaChange={setTbn2WipeMeta}
                       screenshotImages={tbn2_screenshotImages}
                       onScreenshotImagesChange={setTbn2ScreenshotImages}
+                      alterpro={tbn2_alterpro}
+                      onAlterproChange={setTbn2Alterpro}
                       throttle1={tbn2_throttle1}
                       onThrottle1Change={setTbn2Throttle1}
                       submitLoading={tbn2_submitLoading}

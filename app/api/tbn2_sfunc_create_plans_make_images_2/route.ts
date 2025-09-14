@@ -6,7 +6,7 @@ import { logger } from '@/lib/error-logger';
 
 export async function POST(request: Request) {
   try {
-    const { records, qty, aiModel, generateZip, wipeMeta, screenshotImages, throttle1, gridData, batchId } = await request.json();
+    const { records, qty, aiModel, generateZip, wipeMeta, screenshotImages, alterpro, throttle1, gridData, batchId } = await request.json();
     if (!Array.isArray(records) || records.length === 0) {
       return NextResponse.json({ success: false, message: 'No records provided' }, { status: 400 });
     }
@@ -43,6 +43,8 @@ export async function POST(request: Request) {
           generate_zip: generateZip,
           wipe_meta: wipeMeta,
           screenshot_images: screenshotImages || false,
+          alterpro_enabled: alterpro?.enabled || false,
+          alterpro_settings: alterpro?.enabled ? alterpro.edgePercentages : null,
           throttle1_enabled: throttle1?.enabled || false,
           throttle1_settings: throttle1?.enabled ? {
             delay_between_images: throttle1.delayBetweenImages,
@@ -439,7 +441,7 @@ export async function POST(request: Request) {
 
           // Process screenshots for all generated images
           for (const imageId of imageIdsToProcess) {
-            const screenshotResult = await SabertoothScreenshotImages(imageId, session!.user.id);
+            const screenshotResult = await SabertoothScreenshotImages(imageId, session!.user.id, alterpro);
             screenshotResults.push({
               imageId: imageId,
               ...screenshotResult

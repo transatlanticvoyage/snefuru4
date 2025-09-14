@@ -18,6 +18,8 @@ interface Tebnar2ActionsProps {
   onWipeMetaChange: (wipe: boolean) => void;
   screenshotImages: boolean;
   onScreenshotImagesChange: (screenshot: boolean) => void;
+  alterpro: { enabled: boolean; edgePercentages: { top: string; bottom: string; left: string; right: string; } };
+  onAlterproChange: (alterpro: { enabled: boolean; edgePercentages: { top: string; bottom: string; left: string; right: string; } }) => void;
   throttle1: Tebnar2ThrottleSettings;
   onThrottle1Change: (throttle: Tebnar2ThrottleSettings) => void;
   submitLoading: boolean;
@@ -44,6 +46,8 @@ export default function Tebnar2Actions({
   onWipeMetaChange,
   screenshotImages,
   onScreenshotImagesChange,
+  alterpro,
+  onAlterproChange,
   throttle1,
   onThrottle1Change,
   submitLoading,
@@ -59,12 +63,15 @@ export default function Tebnar2Actions({
   onSubmitMakeImages
 }: Tebnar2ActionsProps) {
   const [screenshotSizeAccordionOpen, setScreenshotSizeAccordionOpen] = useState(false);
-  const [edgePercentages, setEdgePercentages] = useState({
-    top: '1-5%',
-    bottom: '1-5%',
-    left: '1-5%',
-    right: '1-5%'
-  });
+
+  // Handle edge percentage changes
+  const handleEdgePercentageChange = (edge: string, value: string) => {
+    const newEdgePercentages = { ...alterpro.edgePercentages, [edge]: value };
+    onAlterproChange({
+      ...alterpro,
+      edgePercentages: newEdgePercentages
+    });
+  };
 
   const handleDownloadDummyData = async () => {
     try {
@@ -248,7 +255,14 @@ export default function Tebnar2Actions({
         {screenshotImages && (
           <div className="mb-4">
             <div className="flex items-center mb-2">
-              <span className="text-sm font-medium">Use "screenshot size alterpro"</span>
+              <input
+                id="alterpro-enabled"
+                type="checkbox"
+                checked={alterpro.enabled}
+                onChange={e => onAlterproChange({ ...alterpro, enabled: e.target.checked })}
+                className="mr-2"
+              />
+              <label htmlFor="alterpro-enabled" className="text-sm font-medium">Use "screenshot size alterpro"</label>
             </div>
             
             <div className="mb-2">
@@ -273,14 +287,14 @@ export default function Tebnar2Actions({
                     </tr>
                   </thead>
                   <tbody>
-                    {Object.entries(edgePercentages).map(([edge, percentage]) => (
+                    {Object.entries(alterpro.edgePercentages).map(([edge, percentage]) => (
                       <tr key={edge}>
                         <td className="border border-gray-300 px-3 py-2 capitalize">{edge}</td>
                         <td className="border border-gray-300 px-3 py-2">
                           <input
                             type="text"
                             value={percentage}
-                            onChange={(e) => setEdgePercentages(prev => ({ ...prev, [edge]: e.target.value }))}
+                            onChange={(e) => handleEdgePercentageChange(edge, e.target.value)}
                             className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
                             placeholder="1-5%"
                           />
