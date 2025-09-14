@@ -85,7 +85,8 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
     
-    const currentStoragePath = urlParts.slice(bucketIndex + 1).join('/');
+    // Decode the storage path to handle URL-encoded characters properly
+    const currentStoragePath = decodeURIComponent(urlParts.slice(bucketIndex + 1).join('/'));
     const currentFilename = currentStoragePath.split('/').pop() || '';
     const currentExtension = currentFilename.includes('.') ? 
       currentFilename.substring(currentFilename.lastIndexOf('.')) : '.png';

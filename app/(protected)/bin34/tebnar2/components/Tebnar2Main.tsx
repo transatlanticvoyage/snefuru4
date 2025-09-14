@@ -74,6 +74,7 @@ export default function Tebnar2Main() {
   });
   const [tbn2_throttle1, setTbn2Throttle1] = useState<Tebnar2ThrottleSettings>(TBN2_DEFAULT_THROTTLE);
   const [tbn2_fetchingImages, setTbn2FetchingImages] = useState<Set<string>>(new Set());
+  const [tbn2_fetchStatusMessages, setTbn2FetchStatusMessages] = useState<Record<string, string>>({});
   const [tbn2_loadingPreset, setTbn2LoadingPreset] = useState(false);
   const [tbn2_presetData, setTbn2PresetData] = useState<string[][] | null>(null);
   const [tbn2_lastClickTime, setTbn2LastClickTime] = useState<Record<string, number>>({});
@@ -134,8 +135,12 @@ export default function Tebnar2Main() {
   const [tbn2_activePopupTab, setTbn2ActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab6');
   const [tbn2_activeImageDiscoveryTab, setTbn2ActiveImageDiscoveryTab] = useState<'utab1' | 'utab2' | 'utab3' | 'utab4'>('utab4');
   
-  // Bezel chamber visibility state
+  // Bezel chamber visibility states
   const [tbn2_medievalChamberVisible, setTbn2MedievalChamberVisible] = useState(false);
+  const [tbn2_folateChamberVisible, setTbn2FolateChamberVisible] = useState(false);
+  const [tbn2_entrenchChamberVisible, setTbn2EntrenchChamberVisible] = useState(false);
+  const [tbn2_missileChamberVisible, setTbn2MissileChamberVisible] = useState(true);
+  const [tbn2_vesicleChamberVisible, setTbn2VesicleChamberVisible] = useState(true);
   
   // State for pelementor_cached data
   const [tbn2_pelementorCached, setTbn2PelementorCached] = useState<string>('');
@@ -946,6 +951,7 @@ export default function Tebnar2Main() {
     
     try {
       setTbn2FetchingImages(prev => new Set([...prev, fetchKey]));
+      setTbn2FetchStatusMessages(prev => ({ ...prev, [fetchKey]: 'Preparing...' }));
       setTbn2Error(null);
       
       // Validate prompt data
@@ -954,14 +960,22 @@ export default function Tebnar2Main() {
         throw new Error('No valid prompt found for this plan.');
       }
       
+      // Update status: sending prompt
+      setTbn2FetchStatusMessages(prev => ({ ...prev, [fetchKey]: 'Sending prompt...' }));
+      
       // Create request data
       const imageData = {
         plan_id: plan.id,
         image_slot: imageSlot,
         prompt: prompt.trim(),
         aiModel: tbn2_aiModel,
-        wipeMeta: tbn2_wipeMeta
+        wipeMeta: tbn2_wipeMeta,
+        screenshotImages: tbn2_screenshotImages,
+        alterpro: tbn2_alterpro
       };
+      
+      // Update status: fetching image
+      setTbn2FetchStatusMessages(prev => ({ ...prev, [fetchKey]: 'Fetching image...' }));
       
       // Make API call to tebnar2 endpoint
       const response = await fetch('/api/tbn2_sfunc_fetch_single_image', {
@@ -969,6 +983,17 @@ export default function Tebnar2Main() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(imageData)
       });
+      
+      // Update status based on screenshot settings
+      if (tbn2_screenshotImages) {
+        setTbn2FetchStatusMessages(prev => ({ ...prev, [fetchKey]: 'Screenshotting...' }));
+        
+        if (tbn2_alterpro?.enabled) {
+          setTimeout(() => {
+            setTbn2FetchStatusMessages(prev => ({ ...prev, [fetchKey]: 'Cropping with alterpro...' }));
+          }, 1000);
+        }
+      }
       
       if (!response.ok) {
         // Handle specific error cases
@@ -985,6 +1010,9 @@ export default function Tebnar2Main() {
       }
       
       const result = await response.json();
+      
+      // Update status: saving
+      setTbn2FetchStatusMessages(prev => ({ ...prev, [fetchKey]: 'Saving...' }));
       
       if (result.success) {
         // Refresh images and plans data using centralized functions
@@ -1022,6 +1050,13 @@ export default function Tebnar2Main() {
         const newSet = new Set(prev);
         newSet.delete(fetchKey);
         return newSet;
+      });
+      
+      // Clean up status message
+      setTbn2FetchStatusMessages(prev => {
+        const newMessages = { ...prev };
+        delete newMessages[fetchKey];
+        return newMessages;
       });
     }
   };
@@ -1577,6 +1612,111 @@ export default function Tebnar2Main() {
     
     return () => {
       window.removeEventListener('medievalChamberVisibilityChange', handleMedievalChamberVisibilityChange as EventListener);
+    };
+  }, []);
+
+  // Initialize folate chamber visibility from localStorage and listen for bezel events
+  useEffect(() => {
+    const savedVisibility = localStorage.getItem('tebnar2_folateChamberVisible');
+    if (savedVisibility !== null) {
+      setTbn2FolateChamberVisible(JSON.parse(savedVisibility));
+    } else {
+      setTbn2FolateChamberVisible(false);
+      localStorage.setItem('tebnar2_folateChamberVisible', JSON.stringify(false));
+    }
+
+    const handleFolateChamberVisibilityChange = (event: CustomEvent) => {
+      const { visible } = event.detail;
+      setTbn2FolateChamberVisible(visible);
+    };
+
+    window.addEventListener('folateChamberVisibilityChange', handleFolateChamberVisibilityChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('folateChamberVisibilityChange', handleFolateChamberVisibilityChange as EventListener);
+    };
+  }, []);
+
+  // Initialize entrench chamber visibility from localStorage and listen for bezel events
+  useEffect(() => {
+    console.log('🔧 Tebnar2Main: Initializing entrench chamber useEffect');
+    // Initialize from localStorage
+    const savedVisibility = localStorage.getItem('tebnar2_entrenchChamberVisible');
+    console.log('🔧 Tebnar2Main: Saved visibility from localStorage:', savedVisibility);
+    if (savedVisibility !== null) {
+      const parsed = JSON.parse(savedVisibility);
+      console.log('🔧 Tebnar2Main: Setting entrench chamber initial state to:', parsed);
+      setTbn2EntrenchChamberVisible(parsed);
+    } else {
+      // Default to false (hidden) and save it
+      console.log('🔧 Tebnar2Main: No saved state, defaulting to false');
+      setTbn2EntrenchChamberVisible(false);
+      localStorage.setItem('tebnar2_entrenchChamberVisible', JSON.stringify(false));
+    }
+
+    // Listen for bezel visibility change events
+    const handleEntrenchChamberVisibilityChange = (event: CustomEvent) => {
+      console.log('🔧 Tebnar2Main: Received entrenchChamberVisibilityChange event', event.detail);
+      const { visible } = event.detail;
+      console.log('🔧 Tebnar2Main: Setting entrench chamber visible to:', visible);
+      setTbn2EntrenchChamberVisible(visible);
+      console.log('🔧 Tebnar2Main: State should now be:', visible);
+    };
+
+    window.addEventListener('entrenchChamberVisibilityChange', handleEntrenchChamberVisibilityChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('entrenchChamberVisibilityChange', handleEntrenchChamberVisibilityChange as EventListener);
+    };
+  }, []);
+
+  // Initialize missile chamber visibility from localStorage and listen for bezel events
+  useEffect(() => {
+    // Initialize from localStorage
+    const savedVisibility = localStorage.getItem('tebnar2_missileChamberVisible');
+    if (savedVisibility !== null) {
+      setTbn2MissileChamberVisible(JSON.parse(savedVisibility));
+    } else {
+      // Default to true (visible) and save it
+      setTbn2MissileChamberVisible(true);
+      localStorage.setItem('tebnar2_missileChamberVisible', JSON.stringify(true));
+    }
+
+    // Listen for bezel visibility change events
+    const handleMissileChamberVisibilityChange = (event: CustomEvent) => {
+      const { visible } = event.detail;
+      setTbn2MissileChamberVisible(visible);
+    };
+
+    window.addEventListener('missileChamberVisibilityChange', handleMissileChamberVisibilityChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('missileChamberVisibilityChange', handleMissileChamberVisibilityChange as EventListener);
+    };
+  }, []);
+
+  // Initialize vesicle chamber visibility from localStorage and listen for bezel events
+  useEffect(() => {
+    // Initialize from localStorage
+    const savedVisibility = localStorage.getItem('tebnar2_vesicleChamberVisible');
+    if (savedVisibility !== null) {
+      setTbn2VesicleChamberVisible(JSON.parse(savedVisibility));
+    } else {
+      // Default to true (visible) and save it
+      setTbn2VesicleChamberVisible(true);
+      localStorage.setItem('tebnar2_vesicleChamberVisible', JSON.stringify(true));
+    }
+
+    // Listen for bezel visibility change events
+    const handleVesicleChamberVisibilityChange = (event: CustomEvent) => {
+      const { visible } = event.detail;
+      setTbn2VesicleChamberVisible(visible);
+    };
+
+    window.addEventListener('vesicleChamberVisibilityChange', handleVesicleChamberVisibilityChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('vesicleChamberVisibilityChange', handleVesicleChamberVisibilityChange as EventListener);
     };
   }, []);
 
@@ -4660,11 +4800,46 @@ export default function Tebnar2Main() {
         </div>
       </div>
 
+      {/* Fourth Row - Entrench Chamber */}
+      {/* entrench_chamber - Container for entrench-related controls */}
+      <div className="mb-6 p-4 border border-black bg-white entrench_chamber_div" style={{ 
+        border: '1px solid black', 
+        backgroundColor: '#ffffff',
+        display: tbn2_entrenchChamberVisible ? 'block' : 'none'
+      }}>
+        <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>entrench_chamber</div>
+        <div className="text-gray-600">Entrench chamber controls and functionality will be implemented here.</div>
+        <div className="text-xs text-red-500 mt-2">DEBUG: tbn2_entrenchChamberVisible = {String(tbn2_entrenchChamberVisible)}</div>
+      </div>
+
+      {/* Fifth Row - Missile Chamber */}
+      {/* missile_chamber - Container for missile-related controls */}
+      <div className="mb-6 p-4 border border-black bg-white missile_chamber_div" style={{ 
+        border: '1px solid black', 
+        backgroundColor: '#ffffff',
+        display: tbn2_missileChamberVisible ? 'block' : 'none'
+      }}>
+        <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>missile_chamber</div>
+        <div className="text-gray-600">Missile chamber controls and functionality will be implemented here.</div>
+      </div>
+
+      {/* Sixth Row - Vesicle Chamber */}
+      {/* vesicle_chamber - Container for vesicle-related controls */}
+      <div className="mb-6 p-4 border border-black bg-white vesicle_chamber_div" style={{ 
+        border: '1px solid black', 
+        backgroundColor: '#ffffff',
+        display: tbn2_vesicleChamberVisible ? 'block' : 'none'
+      }}>
+        <div className="font-bold text-gray-900 mb-4" style={{ fontSize: '16px' }}>vesicle_chamber</div>
+        <div className="text-gray-600">Vesicle chamber controls and functionality will be implemented here.</div>
+      </div>
+
       {/* Main Table - enhanced with column template system */}
       <Tebnar2Table
         plans={tbn2_paginatedPlans}
         imagesById={tbn2_imagesById}
         fetchingImages={tbn2_fetchingImages}
+        fetchStatusMessages={tbn2_fetchStatusMessages}
         lastClickTime={tbn2_lastClickTime}
         currentPage={tbn2_currentPage}
         pageSize={tbn2_pageSize}

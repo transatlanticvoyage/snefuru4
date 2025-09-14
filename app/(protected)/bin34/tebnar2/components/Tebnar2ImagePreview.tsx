@@ -13,6 +13,7 @@ interface Tebnar2ImagePreviewProps {
   lastClickTime: Record<string, number>;
   onRefreshImages: () => void;
   onFetchSingleImage: (plan: Tebnar2ImagePlan, imageSlot: number) => void;
+  fetchStatusMessages?: Record<string, string>;
 }
 
 export default function Tebnar2ImagePreview({
@@ -23,12 +24,14 @@ export default function Tebnar2ImagePreview({
   fetchingImages,
   lastClickTime,
   onRefreshImages,
-  onFetchSingleImage
+  onFetchSingleImage,
+  fetchStatusMessages = {}
 }: Tebnar2ImagePreviewProps) {
   
   const fetchKey = `${plan.id}-${imageNumber}`;
   const isFetching = fetchingImages.has(fetchKey);
   const showFetchButton = tbn2_shouldShowFetchButton(plan, imageNumber);
+  const statusMessage = fetchStatusMessages[fetchKey] || 'Processing...';
 
   // Handle fetch image button click - call parent function
   const tbn2_handleFetchImage = () => {
@@ -53,21 +56,34 @@ export default function Tebnar2ImagePreview({
   } else if (isFetching) {
     return (
       <div 
-        className="flex items-center justify-center bg-gray-100 rounded"
+        className="flex flex-col items-center justify-center bg-gray-100 rounded"
         style={{
           width: '80px',
           height: '80px',
           backgroundColor: '#f3f4f6',
+          padding: '4px',
         }}
       >
         <div 
           className="animate-spin rounded-full border-b-2 border-blue-600"
           style={{
-            width: '20px',
-            height: '20px',
+            width: '10px',
+            height: '10px',
             borderColor: 'transparent transparent #2563eb transparent',
+            marginBottom: '4px',
           }}
         ></div>
+        <div 
+          style={{
+            fontSize: '8px',
+            textAlign: 'center',
+            color: '#4b5563',
+            lineHeight: '1.2',
+            wordBreak: 'break-word',
+          }}
+        >
+          {statusMessage}
+        </div>
       </div>
     );
   } else if (showFetchButton) {

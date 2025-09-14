@@ -403,6 +403,7 @@ interface Tebnar2TableProps {
   plans: Tebnar2ImagePlan[];
   imagesById: Record<string, Tebnar2Image>;
   fetchingImages: Set<string>;
+  fetchStatusMessages: Record<string, string>;
   lastClickTime: Record<string, number>;
   currentPage: number;
   pageSize: number;
@@ -429,6 +430,7 @@ export default function Tebnar2Table({
   plans,
   imagesById,
   fetchingImages,
+  fetchStatusMessages,
   lastClickTime,
   currentPage,
   pageSize,
@@ -863,6 +865,7 @@ export default function Tebnar2Table({
                                       col === 'image3-preview' ? 3 :
                                       col === 'image4-preview' ? 4 : 1}
                           fetchingImages={fetchingImages}
+                          fetchStatusMessages={fetchStatusMessages}
                           lastClickTime={lastClickTime}
                           onRefreshImages={onRefreshImages}
                           onFetchSingleImage={onFetchSingleImage}
@@ -875,7 +878,106 @@ export default function Tebnar2Table({
                             // Extract filename from the full URL
                             const url = image.img_file_url1;
                             const filename = url.substring(url.lastIndexOf('/') + 1);
-                            return filename;
+                            
+                            // Handler functions for buttons
+                            const handleCopyFullPath = () => {
+                              navigator.clipboard.writeText(url);
+                            };
+                            
+                            const handleCopyFilename = () => {
+                              navigator.clipboard.writeText(filename);
+                            };
+                            
+                            const handleOpen = () => {
+                              window.open(url, '_blank');
+                            };
+                            
+                            const handleDownload = async () => {
+                              try {
+                                const response = await fetch(url);
+                                const blob = await response.blob();
+                                const downloadUrl = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = downloadUrl;
+                                a.download = filename;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                window.URL.revokeObjectURL(downloadUrl);
+                              } catch (error) {
+                                console.error('Download failed:', error);
+                              }
+                            };
+                            
+                            return (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <button
+                                  onClick={handleCopyFullPath}
+                                  style={{
+                                    padding: '3px',
+                                    fontSize: '12px',
+                                    backgroundColor: '#e5e7eb',
+                                    border: '1px solid #9ca3af',
+                                    borderRadius: '2px',
+                                    cursor: 'pointer'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'yellow'}
+                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+                                  title="Copy full path to clipboard"
+                                >
+                                  full path
+                                </button>
+                                <button
+                                  onClick={handleCopyFilename}
+                                  style={{
+                                    padding: '3px',
+                                    fontSize: '12px',
+                                    backgroundColor: '#e5e7eb',
+                                    border: '1px solid #9ca3af',
+                                    borderRadius: '2px',
+                                    cursor: 'pointer'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'yellow'}
+                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+                                  title="Copy filename to clipboard"
+                                >
+                                  file only
+                                </button>
+                                <button
+                                  onClick={handleOpen}
+                                  style={{
+                                    padding: '3px',
+                                    fontSize: '12px',
+                                    backgroundColor: '#e5e7eb',
+                                    border: '1px solid #9ca3af',
+                                    borderRadius: '2px',
+                                    cursor: 'pointer'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'yellow'}
+                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+                                  title="Open image in new tab"
+                                >
+                                  open
+                                </button>
+                                <button
+                                  onClick={handleDownload}
+                                  style={{
+                                    padding: '3px',
+                                    fontSize: '12px',
+                                    backgroundColor: '#e5e7eb',
+                                    border: '1px solid #9ca3af',
+                                    borderRadius: '2px',
+                                    cursor: 'pointer'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'yellow'}
+                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+                                  title="Download image"
+                                >
+                                  dl
+                                </button>
+                                <span>{filename}</span>
+                              </div>
+                            );
                           }
                           return '-';
                         })()
@@ -970,6 +1072,7 @@ export default function Tebnar2Table({
                                       col === 'image3-preview' ? 3 :
                                       col === 'image4-preview' ? 4 : 1}
                           fetchingImages={fetchingImages}
+                          fetchStatusMessages={fetchStatusMessages}
                           lastClickTime={lastClickTime}
                           onRefreshImages={onRefreshImages}
                           onFetchSingleImage={onFetchSingleImage}
@@ -982,7 +1085,106 @@ export default function Tebnar2Table({
                             // Extract filename from the full URL
                             const url = image.img_file_url1;
                             const filename = url.substring(url.lastIndexOf('/') + 1);
-                            return filename;
+                            
+                            // Handler functions for buttons
+                            const handleCopyFullPath = () => {
+                              navigator.clipboard.writeText(url);
+                            };
+                            
+                            const handleCopyFilename = () => {
+                              navigator.clipboard.writeText(filename);
+                            };
+                            
+                            const handleOpen = () => {
+                              window.open(url, '_blank');
+                            };
+                            
+                            const handleDownload = async () => {
+                              try {
+                                const response = await fetch(url);
+                                const blob = await response.blob();
+                                const downloadUrl = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = downloadUrl;
+                                a.download = filename;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                window.URL.revokeObjectURL(downloadUrl);
+                              } catch (error) {
+                                console.error('Download failed:', error);
+                              }
+                            };
+                            
+                            return (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <button
+                                  onClick={handleCopyFullPath}
+                                  style={{
+                                    padding: '3px',
+                                    fontSize: '12px',
+                                    backgroundColor: '#e5e7eb',
+                                    border: '1px solid #9ca3af',
+                                    borderRadius: '2px',
+                                    cursor: 'pointer'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'yellow'}
+                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+                                  title="Copy full path to clipboard"
+                                >
+                                  full path
+                                </button>
+                                <button
+                                  onClick={handleCopyFilename}
+                                  style={{
+                                    padding: '3px',
+                                    fontSize: '12px',
+                                    backgroundColor: '#e5e7eb',
+                                    border: '1px solid #9ca3af',
+                                    borderRadius: '2px',
+                                    cursor: 'pointer'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'yellow'}
+                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+                                  title="Copy filename to clipboard"
+                                >
+                                  file only
+                                </button>
+                                <button
+                                  onClick={handleOpen}
+                                  style={{
+                                    padding: '3px',
+                                    fontSize: '12px',
+                                    backgroundColor: '#e5e7eb',
+                                    border: '1px solid #9ca3af',
+                                    borderRadius: '2px',
+                                    cursor: 'pointer'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'yellow'}
+                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+                                  title="Open image in new tab"
+                                >
+                                  open
+                                </button>
+                                <button
+                                  onClick={handleDownload}
+                                  style={{
+                                    padding: '3px',
+                                    fontSize: '12px',
+                                    backgroundColor: '#e5e7eb',
+                                    border: '1px solid #9ca3af',
+                                    borderRadius: '2px',
+                                    cursor: 'pointer'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'yellow'}
+                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+                                  title="Download image"
+                                >
+                                  dl
+                                </button>
+                                <span>{filename}</span>
+                              </div>
+                            );
                           }
                           return '-';
                         })()

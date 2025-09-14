@@ -23,6 +23,11 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   
   // Folate chamber visibility state for /bin34/tebnar2 (default to false/hide)
   const [folateChamberVisible, setFolateChamberVisible] = useState(false);
+  
+  // New chamber visibility states for /bin34/tebnar2 (entrench defaults to false for testing)
+  const [entrenchChamberVisible, setEntrenchChamberVisible] = useState(false);
+  const [missileChamberVisible, setMissileChamberVisible] = useState(true);
+  const [vesicleChamberVisible, setVesicleChamberVisible] = useState(true);
 
   useEffect(() => {
     // Check if current page has bezel configuration
@@ -79,7 +84,7 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
 
   // Initialize medieval chamber visibility from localStorage for /bin34/tebnar2
   useEffect(() => {
-    if (pathname === '/bin34/tebnar2') {
+    if (pathname.startsWith('/bin34/tebnar2')) {
       const savedVisibility = localStorage.getItem('tebnar2_medievalChamberVisible');
       if (savedVisibility !== null) {
         setMedievalChamberVisible(JSON.parse(savedVisibility));
@@ -93,7 +98,7 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
 
   // Initialize folate chamber visibility from localStorage for /bin34/tebnar2
   useEffect(() => {
-    if (pathname === '/bin34/tebnar2') {
+    if (pathname.startsWith('/bin34/tebnar2')) {
       const savedVisibility = localStorage.getItem('tebnar2_folateChamberVisible');
       if (savedVisibility !== null) {
         setFolateChamberVisible(JSON.parse(savedVisibility));
@@ -123,6 +128,84 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     
     // Dispatch custom event to notify other components
     window.dispatchEvent(new CustomEvent('folateChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Initialize entrench chamber visibility from localStorage for /bin34/tebnar2
+  useEffect(() => {
+    if (pathname.startsWith('/bin34/tebnar2')) {
+      const savedVisibility = localStorage.getItem('tebnar2_entrenchChamberVisible');
+      if (savedVisibility !== null) {
+        setEntrenchChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to false (hidden) and save it
+        setEntrenchChamberVisible(false);
+        localStorage.setItem('tebnar2_entrenchChamberVisible', JSON.stringify(false));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize missile chamber visibility from localStorage for /bin34/tebnar2
+  useEffect(() => {
+    if (pathname.startsWith('/bin34/tebnar2')) {
+      const savedVisibility = localStorage.getItem('tebnar2_missileChamberVisible');
+      if (savedVisibility !== null) {
+        setMissileChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setMissileChamberVisible(true);
+        localStorage.setItem('tebnar2_missileChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize vesicle chamber visibility from localStorage for /bin34/tebnar2
+  useEffect(() => {
+    if (pathname.startsWith('/bin34/tebnar2')) {
+      const savedVisibility = localStorage.getItem('tebnar2_vesicleChamberVisible');
+      if (savedVisibility !== null) {
+        setVesicleChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setVesicleChamberVisible(true);
+        localStorage.setItem('tebnar2_vesicleChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Handle entrench chamber toggle
+  const handleEntrenchChamberToggle = (checked: boolean) => {
+    console.log('🔧 BezelPopup: Entrench chamber toggle clicked', { checked, pathname });
+    setEntrenchChamberVisible(checked);
+    localStorage.setItem('tebnar2_entrenchChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    console.log('🔧 BezelPopup: Dispatching entrenchChamberVisibilityChange event');
+    window.dispatchEvent(new CustomEvent('entrenchChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+    console.log('🔧 BezelPopup: Event dispatched successfully');
+  };
+
+  // Handle missile chamber toggle
+  const handleMissileChamberToggle = (checked: boolean) => {
+    setMissileChamberVisible(checked);
+    localStorage.setItem('tebnar2_missileChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('missileChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Handle vesicle chamber toggle
+  const handleVesicleChamberToggle = (checked: boolean) => {
+    setVesicleChamberVisible(checked);
+    localStorage.setItem('tebnar2_vesicleChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('vesicleChamberVisibilityChange', { 
       detail: { visible: checked } 
     }));
   };
@@ -217,7 +300,7 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
               )}
               
               {/* /bin34/tebnar2 page specific controls */}
-              {pathname === '/bin34/tebnar2' && (
+              {pathname.startsWith('/bin34/tebnar2') && (
                 <div className="space-y-6">
                   <div className="bg-gray-50 p-4 rounded-lg border">
                     <h3 className="text-lg font-semibold mb-4 text-gray-800">Page Visibility Controls</h3>
@@ -269,6 +352,84 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
                     <div className="mt-3 text-sm text-gray-600">
                       <p>Toggle visibility of the folate chamber on the tebnar2 page.</p>
                       <p>Current state: <strong>{folateChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Horizontal Rule Separator */}
+                    <hr className="my-6 border-gray-300" />
+
+                    {/* Entrench Chamber Toggle */}
+                    <div className="flex items-center space-x-4">
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={entrenchChamberVisible}
+                          onChange={(e) => handleEntrenchChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      {/* Label Text */}
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        entrench_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the entrench chamber on the tebnar2 page.</p>
+                      <p>Current state: <strong>{entrenchChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Missile Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={missileChamberVisible}
+                          onChange={(e) => handleMissileChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      {/* Label Text */}
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        missile_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the missile chamber on the tebnar2 page.</p>
+                      <p>Current state: <strong>{missileChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Vesicle Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={vesicleChamberVisible}
+                          onChange={(e) => handleVesicleChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      {/* Label Text */}
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        vesicle_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the vesicle chamber on the tebnar2 page.</p>
+                      <p>Current state: <strong>{vesicleChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
                       <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
                     </div>
                   </div>
