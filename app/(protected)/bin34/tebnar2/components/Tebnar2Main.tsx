@@ -190,7 +190,7 @@ export default function Tebnar2Main() {
   const [tbn2_isPopupOpen, setTbn2IsPopupOpen] = useState(false);
   const [tbn2_kz101Checked, setTbn2Kz101Checked] = useState(false);
   const [tbn2_kz103Checked, setTbn2Kz103Checked] = useState(false);
-  const [tbn2_activePopupTab, setTbn2ActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab6');
+  const [tbn2_activePopupTab, setTbn2ActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7' | 'ptab8'>('ptab6');
   const [tbn2_activeImageDiscoveryTab, setTbn2ActiveImageDiscoveryTab] = useState<'utab1' | 'utab2' | 'utab3' | 'utab4'>('utab4');
   
   // Bezel chamber visibility states
@@ -1617,6 +1617,7 @@ export default function Tebnar2Main() {
     const ptab5 = urlParams.get('ptab5');
     const ptab6 = urlParams.get('ptab6');
     const ptab7 = urlParams.get('ptab7');
+    const ptab8 = urlParams.get('ptab8');
     
     // Auto-open popup if fpop=open is in URL
     if (fpop === 'open') {
@@ -1637,6 +1638,8 @@ export default function Tebnar2Main() {
         setTbn2ActivePopupTab('ptab6');
       } else if (ptab7 === 'active') {
         setTbn2ActivePopupTab('ptab7');
+      } else if (ptab8 === 'active') {
+        setTbn2ActivePopupTab('ptab8');
       }
     }
   }, []);
@@ -1929,7 +1932,7 @@ export default function Tebnar2Main() {
       url.searchParams.set('fpop', 'open');
       
       // Clear all tab parameters first
-      ['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1'].forEach(tab => {
+      ['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1', 'ptab8'].forEach(tab => {
         url.searchParams.delete(tab);
       });
       
@@ -1943,7 +1946,7 @@ export default function Tebnar2Main() {
     } else {
       // Remove popup and all tab parameters when popup is closed
       url.searchParams.delete('fpop');
-      ['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1'].forEach(tab => {
+      ['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1', 'ptab8'].forEach(tab => {
         url.searchParams.delete(tab);
       });
     }
@@ -1966,7 +1969,7 @@ export default function Tebnar2Main() {
     
     // Check if URL has specific tab parameter
     const urlParams = new URLSearchParams(window.location.search);
-    const hasTabInUrl = ['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1']
+    const hasTabInUrl = ['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1', 'ptab8']
       .some(tab => urlParams.get(tab) === 'active');
     
     if (!hasTabInUrl) {
@@ -4969,7 +4972,7 @@ export default function Tebnar2Main() {
       {/* Functions Popup Modal - cloned from nwjar1 */}
       {tbn2_isPopupOpen && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center px-4">
-          <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative flex flex-col overflow-hidden">
+          <div className="bg-white w-full h-full max-w-[95vw] max-h-[100vh] rounded-lg shadow-xl relative flex flex-col overflow-hidden">
             {/* uelbar37 header bar */}
             <div 
               className="flex items-center px-4 flex-shrink-0"
@@ -5741,7 +5744,7 @@ export default function Tebnar2Main() {
               {/* Tab Navigation */}
               <div className="border-b border-gray-200 bg-gray-50 flex-shrink-0">
                 <nav className="flex">
-                  {['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1'].map((tab) => (
+                  {['ptab3', 'ptab2', 'ptab8', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => tbn2_handleTabChange(tab)}
@@ -5753,6 +5756,7 @@ export default function Tebnar2Main() {
                     >
                       {tab === 'ptab1' ? 'Functions' : 
                        tab === 'ptab2' ? 'Create Plans' : 
+                       tab === 'ptab8' ? 'Create Plans Adjunct' :
                        tab === 'ptab3' ? 'karmawiz nexus' : 
                        tab === 'ptab4' ? 'force to site' : 
                        tab === 'ptab7' ? 'random tab' : 
@@ -6275,6 +6279,12 @@ export default function Tebnar2Main() {
                         </button>
                       </div>
                     </div>
+                  </div>
+                )}
+                {tbn2_activePopupTab === 'ptab8' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Create Plans Adjunct</h3>
+                    {/* Content for Create Plans Adjunct tab - left blank for now */}
                   </div>
                 )}
               </div>

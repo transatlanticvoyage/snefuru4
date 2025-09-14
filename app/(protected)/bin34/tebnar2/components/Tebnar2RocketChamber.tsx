@@ -121,7 +121,7 @@ export default function Tebnar2RocketChamber({
         <div className="flex items-center">
           <span className="text-xs text-gray-600 mr-2">Row page:</span>
           <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-            {/* Previous button - Left arrow */}
+            {/* Previous button - Circular refresh wheel */}
             <button
               onClick={() => onPageChange(currentPage === 1 ? totalPages : currentPage - 1)}
               className="relative inline-flex items-center rounded-l-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
@@ -131,7 +131,10 @@ export default function Tebnar2RocketChamber({
                 paddingBottom: '10px'
               }}
             >
-              ←
+              <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <path d="M1 4v6h6" />
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+              </svg>
             </button>
             
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -153,7 +156,7 @@ export default function Tebnar2RocketChamber({
               );
             })}
             
-            {/* Next button - Right arrow */}
+            {/* Next button - Circular refresh wheel */}
             <button
               onClick={() => onPageChange(currentPage === totalPages ? 1 : currentPage + 1)}
               className="relative inline-flex items-center rounded-r-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
@@ -163,7 +166,10 @@ export default function Tebnar2RocketChamber({
                 paddingBottom: '10px'
               }}
             >
-              →
+              <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <path d="M23 4v6h-6" />
+                <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+              </svg>
             </button>
           </nav>
         </div>
@@ -255,7 +261,10 @@ export default function Tebnar2RocketChamber({
             className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
             style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
           >
-            ←
+            <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <path d="M1 4v6h6" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </svg>
           </button>
           
           {Array.from({ length: Math.min(5, totalColumnPages) }, (_, i) => {
@@ -282,7 +291,10 @@ export default function Tebnar2RocketChamber({
             className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
             style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
           >
-            →
+            <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <path d="M23 4v6h-6" />
+              <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+            </svg>
           </button>
           <button
             onClick={() => onColumnPageChange(totalColumnPages)}
