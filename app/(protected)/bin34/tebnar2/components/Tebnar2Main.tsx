@@ -104,6 +104,9 @@ export default function Tebnar2Main() {
   const [tbn2_seedUrlFrontend, setTbn2SeedUrlFrontend] = useState<string>('');
   const [tbn2_seedUrlSaving, setTbn2SeedUrlSaving] = useState<{wpEditor: boolean, frontend: boolean}>({wpEditor: false, frontend: false});
   
+  // Create new batch state
+  const [tbn2_createBatchLoading, setTbn2CreateBatchLoading] = useState<boolean>(false);
+  
   // Pushador actions state - sync actions from sitejar4
   const [tbn2_syncLoading, setTbn2SyncLoading] = useState<Set<string>>(new Set());
   const [tbn2_syncResults, setTbn2SyncResults] = useState<{[key: string]: {type: 'success' | 'error', message: string}}>({});
@@ -1954,6 +1957,56 @@ export default function Tebnar2Main() {
       alert('An error occurred while saving');
     } finally {
       setTbn2SeedUrlSaving(prev => ({ ...prev, frontend: false }));
+    }
+  };
+
+  // Create new batch function
+  const tbn2_handleCreateNewBatch = async () => {
+    if (!user?.id) {
+      alert('User not authenticated');
+      return;
+    }
+
+    setTbn2CreateBatchLoading(true);
+    
+    try {
+      // Validate user access and get internal user ID
+      const userValidation = await tbn2_validateUserAccess(user.id);
+      if (!userValidation.success) {
+        alert('User validation failed');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('images_plans_batches')
+        .insert({
+          rel_users_id: userValidation.internalUserId,
+          created_at: new Date().toISOString(),
+          // Add any other default fields needed for a new batch
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        alert('Error creating new batch: ' + error.message);
+        return;
+      }
+
+      const newBatchId = data.id;
+      
+      // Update the current page to view the new batch
+      tbn2_handleBatchChange(newBatchId);
+      
+      // Refresh the batches list to include the new batch
+      tbn2_fetchBatches();
+      
+      alert('✅ New batch created successfully! Now viewing batch: ' + newBatchId);
+      
+    } catch (err) {
+      console.error('Error creating new batch:', err);
+      alert('An error occurred while creating the new batch');
+    } finally {
+      setTbn2CreateBatchLoading(false);
     }
   };
 
@@ -5108,7 +5161,17 @@ export default function Tebnar2Main() {
                 )}
                 {tbn2_activePopupTab === 'ptab2' && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Create New Image Plans</h3>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Create New Image Plans</h3>
+                      <button
+                        onClick={tbn2_handleCreateNewBatch}
+                        disabled={tbn2_createBatchLoading}
+                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+                        title="Create a new empty batch and switch to it"
+                      >
+                        {tbn2_createBatchLoading ? 'Creating...' : 'create new batch'}
+                      </button>
+                    </div>
                     <p className="text-gray-600 mb-6">Use the tools below to create and submit new batches of image plans.</p>
                     
                     {/* Bat Chamber Section */}
