@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
-    const { records, gridData } = await request.json();
+    const { records, gridData, batchId } = await request.json();
     if (!Array.isArray(records) || records.length === 0) {
       return NextResponse.json({ success: false, message: 'No records provided' }, { status: 400 });
     }
@@ -38,19 +38,20 @@ export async function POST(request: Request) {
       }
     };
     
-    // 1. Create a new batch row with original submission data
+    // 1. Validate the provided batch ID exists and belongs to user
+    if (!batchId) {
+      return NextResponse.json({ success: false, message: 'Batch ID is required' }, { status: 400 });
+    }
+    
     const { data: batchData, error: batchError } = await supabase
       .from('images_plans_batches')
-      .insert({ 
-        rel_users_id: userData.id,
-        xlslike_original_submission: originalSubmissionData
-      })
       .select('id')
+      .eq('id', batchId)
+      .eq('rel_users_id', userData.id)
       .single();
     if (batchError || !batchData) {
-      return NextResponse.json({ success: false, message: 'Failed to create batch: ' + (batchError?.message || 'Unknown error') }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Batch not found or access denied: ' + (batchError?.message || 'Unknown error') }, { status: 404 });
     }
-    const batchId = batchData.id;
     // 2. Insert all images_plans rows with rel_images_plans_batches_id set
     const recordsToInsert = records.map((rec: any, index: number) => ({ 
       ...rec, 

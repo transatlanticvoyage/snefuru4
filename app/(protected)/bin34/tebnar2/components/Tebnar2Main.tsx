@@ -612,16 +612,42 @@ export default function Tebnar2Main() {
     setTbn2SubmitResult(null);
     
     try {
-      // Convert gridData to records - exact logic from tebnar1
+      // Check if user has selected a batch
+      if (!tbn2_selectedBatchId) {
+        throw new Error('Please select or create a batch first.');
+      }
+
+      // Convert gridData to records - updated to use default headers if first row is empty
       if (!tbn2_gridData || tbn2_gridData.length === 0) {
         throw new Error('Grid is empty. Please load data first.');
       }
       
-      const fieldNames = tbn2_gridData[0].map(f => f.trim()).filter(Boolean);
-      const rows = tbn2_gridData.slice(1).filter(row => row.some(cell => cell.trim() !== ''));
+      // Default column headers based on the table structure
+      const defaultHeaders = [
+        'e_prompt1', 'e_zpf_img_code', 'e_width', 'e_height', 
+        'e_associated_content1', 'e_file_name1', 'e_more_instructions1', 'e_ai_tool1', ''
+      ];
       
-      if (fieldNames.length === 0 || rows.length === 0) {
-        throw new Error('Grid is empty or missing headers');
+      // Check if first row contains valid headers or is empty
+      const firstRowHasHeaders = tbn2_gridData[0].some(cell => 
+        cell.trim() && defaultHeaders.includes(cell.trim())
+      );
+      
+      let fieldNames: string[];
+      let rows: string[][];
+      
+      if (firstRowHasHeaders) {
+        // Use first row as headers
+        fieldNames = tbn2_gridData[0].map(f => f.trim()).filter(Boolean);
+        rows = tbn2_gridData.slice(1).filter(row => row.some(cell => cell.trim() !== ''));
+      } else {
+        // Use default headers and include all rows (including first row)
+        fieldNames = defaultHeaders.filter(h => h !== ''); // Remove empty header
+        rows = tbn2_gridData.filter(row => row.some(cell => cell.trim() !== ''));
+      }
+      
+      if (rows.length === 0) {
+        throw new Error('Grid has no data rows');
       }
       
       const records = rows.map(row => {
@@ -632,7 +658,7 @@ export default function Tebnar2Main() {
         return obj;
       });
       
-      const result = await tbn2_func_create_plans_from_xls_2(records, tbn2_gridData);
+      const result = await tbn2_func_create_plans_from_xls_2(records, tbn2_gridData, tbn2_selectedBatchId);
       
       if (result.success) {
         setTbn2SubmitResult('✅ Plans created successfully!');
@@ -655,16 +681,42 @@ export default function Tebnar2Main() {
     setTbn2MakeImagesResult(null);
     
     try {
-      // Convert gridData to records - exact logic from tebnar1
+      // Check if user has selected a batch
+      if (!tbn2_selectedBatchId) {
+        throw new Error('Please select or create a batch first.');
+      }
+
+      // Convert gridData to records - updated to use default headers if first row is empty
       if (!tbn2_gridData || tbn2_gridData.length === 0) {
         throw new Error('Grid is empty. Please load data first.');
       }
       
-      const fieldNames = tbn2_gridData[0].map(f => f.trim()).filter(Boolean);
-      const rows = tbn2_gridData.slice(1).filter(row => row.some(cell => cell.trim() !== ''));
+      // Default column headers based on the table structure
+      const defaultHeaders = [
+        'e_prompt1', 'e_zpf_img_code', 'e_width', 'e_height', 
+        'e_associated_content1', 'e_file_name1', 'e_more_instructions1', 'e_ai_tool1', ''
+      ];
       
-      if (fieldNames.length === 0 || rows.length === 0) {
-        throw new Error('Grid is empty or missing headers');
+      // Check if first row contains valid headers or is empty
+      const firstRowHasHeaders = tbn2_gridData[0].some(cell => 
+        cell.trim() && defaultHeaders.includes(cell.trim())
+      );
+      
+      let fieldNames: string[];
+      let rows: string[][];
+      
+      if (firstRowHasHeaders) {
+        // Use first row as headers
+        fieldNames = tbn2_gridData[0].map(f => f.trim()).filter(Boolean);
+        rows = tbn2_gridData.slice(1).filter(row => row.some(cell => cell.trim() !== ''));
+      } else {
+        // Use default headers and include all rows (including first row)
+        fieldNames = defaultHeaders.filter(h => h !== ''); // Remove empty header
+        rows = tbn2_gridData.filter(row => row.some(cell => cell.trim() !== ''));
+      }
+      
+      if (rows.length === 0) {
+        throw new Error('Grid has no data rows');
       }
       
       // Find e_prompt1 column index - REQUIRED FIELD
@@ -678,7 +730,9 @@ export default function Tebnar2Main() {
       rows.forEach((row, index) => {
         const promptValue = row[promptColumnIndex]?.trim();
         if (!promptValue) {
-          invalidRows.push(index + 2); // +2 because row 1 is headers, arrays are 0-indexed
+          // Adjust row number based on whether first row was headers
+          const rowNum = firstRowHasHeaders ? index + 2 : index + 1;
+          invalidRows.push(rowNum);
         }
       });
       
@@ -701,7 +755,8 @@ export default function Tebnar2Main() {
         generateZip: tbn2_generateZip,
         wipeMeta: tbn2_wipeMeta,
         throttle1: tbn2_throttle1,
-        gridData: tbn2_gridData
+        gridData: tbn2_gridData,
+        batchId: tbn2_selectedBatchId
       });
       
       if (result.success) {
@@ -1243,6 +1298,7 @@ export default function Tebnar2Main() {
         tbn2_fetchBatchSitespren(tbn2_urlBatchId);
         tbn2_fetchBatchGconPiece(tbn2_urlBatchId);
         tbn2_fetchAssignedGconPiece(tbn2_urlBatchId);
+        tbn2_fetchBatchSeedUrls(tbn2_urlBatchId); // Fetch seed URLs on page load
         setTbn2UrlBatchId(null); // Clear the URL batch ID state
       } else {
         // Invalid batch ID - show error and clear URL param
@@ -4531,10 +4587,10 @@ export default function Tebnar2Main() {
       {/* Functions Popup Modal - cloned from nwjar1 */}
       {tbn2_isPopupOpen && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center px-4">
-          <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative overflow-hidden">
+          <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative flex flex-col overflow-hidden">
             {/* uelbar37 header bar */}
             <div 
-              className="absolute top-0 left-0 right-0 flex items-center px-4"
+              className="flex items-center px-4 flex-shrink-0"
               style={{ 
                 height: '50px',
                 backgroundColor: tbn2_uelBar37Colors.bg,
@@ -4641,9 +4697,8 @@ export default function Tebnar2Main() {
             
             {/* uelbar38 header bar */}
             <div 
-              className="absolute left-0 right-0 flex items-center px-4"
+              className="flex items-center px-4 flex-shrink-0"
               style={{ 
-                top: '50px',
                 height: '50px',
                 backgroundColor: tbn2_uelBarColors.bg,
                 color: tbn2_uelBarColors.text
@@ -4741,9 +4796,8 @@ export default function Tebnar2Main() {
             
             {/* uelbar45 section */}
             <div 
-              className="flex items-center px-4"
+              className="flex items-center px-4 flex-shrink-0"
               style={{ 
-                marginTop: '100px',
                 marginRight: '260px', // Leave space for close button
                 backgroundColor: '#f3f4f6',
                 color: '#374151',
@@ -5093,7 +5147,7 @@ export default function Tebnar2Main() {
             
             {/* uelbar50 section */}
             <div 
-              className="flex items-center px-4"
+              className="flex items-center px-4 flex-shrink-0"
               style={{ 
                 backgroundColor: '#f3f4f6',
                 color: '#374151',
@@ -5287,9 +5341,9 @@ export default function Tebnar2Main() {
             </div>
             
             {/* Popup content - adjusted to start below all three headers */}
-            <div className="h-full" style={{ paddingTop: '20px' }}>
+            <div className="flex-grow flex flex-col overflow-hidden">
               {/* Tab Navigation */}
-              <div className="border-b border-gray-200 bg-gray-50">
+              <div className="border-b border-gray-200 bg-gray-50 flex-shrink-0">
                 <nav className="flex">
                   {['ptab3', 'ptab2', 'ptab4', 'ptab5', 'ptab6', 'ptab7', 'ptab1'].map((tab) => (
                     <button
@@ -5313,7 +5367,7 @@ export default function Tebnar2Main() {
               </div>
               
               {/* Tab Content */}
-              <div className="p-8 h-full overflow-auto">
+              <div className="p-8 flex-grow overflow-auto">
                 {tbn2_activePopupTab === 'ptab1' && (
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Functions</h3>

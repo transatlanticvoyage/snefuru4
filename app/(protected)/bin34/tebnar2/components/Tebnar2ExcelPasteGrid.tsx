@@ -18,8 +18,11 @@ export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData, gr
   const gridRef = useRef<HTMLTableElement>(null);
 
   useEffect(() => {
-    if (onGridDataChange) onGridDataChange(grid);
-  }, [grid, onGridDataChange]);
+    if (onGridDataChange) {
+      onGridDataChange(grid);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grid]); // Intentionally omitting onGridDataChange to prevent re-render loops
 
   // Handle preset data when it changes
   useEffect(() => {
@@ -43,25 +46,22 @@ export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData, gr
   }, [presetData]);
 
   // Handle external grid data changes (for clear button, etc.)
+  const lastClearTimestamp = useRef(0);
   useEffect(() => {
+    // Only update from external gridData if it's a clear operation
     if (gridData !== undefined && Array.isArray(gridData)) {
-      // If it's an empty grid (for clearing), set it directly
-      if (gridData.length === 0 || (gridData.length > 0 && gridData.every(row => Array.isArray(row) && row.every(cell => cell === '')))) {
-        const emptyGrid = Array.from({ length: gridRows }, () => Array(gridCols).fill(''));
-        setGrid(emptyGrid);
-      } else {
-        // Otherwise, use the provided grid data
-        const newGrid = Array.from({ length: gridRows }, () => Array(gridCols).fill(''));
-        gridData.forEach((row, rowIndex) => {
-          if (rowIndex < gridRows && Array.isArray(row)) {
-            row.forEach((cell, colIndex) => {
-              if (colIndex < gridCols) {
-                newGrid[rowIndex][colIndex] = cell || '';
-              }
-            });
-          }
-        });
-        setGrid(newGrid);
+      // Check if this is a clear operation (all empty)
+      const isClearOperation = gridData.length === 0 || 
+        (gridData.length > 0 && gridData.every(row => Array.isArray(row) && row.every(cell => cell === '')));
+      
+      if (isClearOperation) {
+        const now = Date.now();
+        // Prevent duplicate clear operations within 100ms
+        if (now - lastClearTimestamp.current > 100) {
+          lastClearTimestamp.current = now;
+          const emptyGrid = Array.from({ length: gridRows }, () => Array(gridCols).fill(''));
+          setGrid(emptyGrid);
+        }
       }
     }
   }, [gridData]);
@@ -80,7 +80,7 @@ export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData, gr
     });
   };
 
-  // Handle paste
+  // Handle paste for table (tab-separated values from Excel/spreadsheet)
   const handlePaste = (e: React.ClipboardEvent<HTMLTableElement>) => {
     e.preventDefault();
     const text = e.clipboardData.getData('text/plain');
@@ -97,6 +97,21 @@ export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData, gr
       });
     });
     setGrid(newGrid);
+  };
+
+  // Handle paste for individual input cells (plain text)
+  const handleInputPaste = (e: React.ClipboardEvent<HTMLInputElement>, row: number, col: number) => {
+    const pastedText = e.clipboardData.getData('text/plain');
+    
+    // Update the grid state with the pasted text
+    setGrid(prev => {
+      const newGrid = prev.map(rowArr => [...rowArr]);
+      newGrid[row][col] = pastedText;
+      return newGrid;
+    });
+    
+    // Prevent the table paste handler from interfering
+    e.stopPropagation();
   };
 
   return (
@@ -145,6 +160,7 @@ export default function Tebnar2ExcelPasteGrid({ onGridDataChange, presetData, gr
                       onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
                       className="w-full h-full px-2 bg-transparent outline-none border-none"
                       onFocus={() => handleCellClick(rowIdx, colIdx)}
+                      onPaste={e => handleInputPaste(e, rowIdx, colIdx)}
                     />
                   </td>
                 ))}
