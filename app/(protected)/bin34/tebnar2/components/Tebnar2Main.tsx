@@ -99,6 +99,11 @@ export default function Tebnar2Main() {
   // Reverse relation state - for finding gcon_piece assigned to current batch
   const [tbn2_assignedGconPiece, setTbn2AssignedGconPiece] = useState<{id: string, asn_sitespren_base: string, post_name: string} | null>(null);
   
+  // Seed URL state for batch editing
+  const [tbn2_seedUrlWpEditor, setTbn2SeedUrlWpEditor] = useState<string>('');
+  const [tbn2_seedUrlFrontend, setTbn2SeedUrlFrontend] = useState<string>('');
+  const [tbn2_seedUrlSaving, setTbn2SeedUrlSaving] = useState<{wpEditor: boolean, frontend: boolean}>({wpEditor: false, frontend: false});
+  
   // Pushador actions state - sync actions from sitejar4
   const [tbn2_syncLoading, setTbn2SyncLoading] = useState<Set<string>>(new Set());
   const [tbn2_syncResults, setTbn2SyncResults] = useState<{[key: string]: {type: 'success' | 'error', message: string}}>({});
@@ -1206,6 +1211,7 @@ export default function Tebnar2Main() {
     tbn2_fetchBatchSitespren(batchId);
     tbn2_fetchBatchGconPiece(batchId);
     tbn2_fetchAssignedGconPiece(batchId);
+    tbn2_fetchBatchSeedUrls(batchId);
   };
 
   // Function to read URL parameters on component mount
@@ -1865,6 +1871,89 @@ export default function Tebnar2Main() {
       alert('An error occurred while saving');
     } finally {
       setTbn2GconPieceSaving(false);
+    }
+  };
+
+  // Fetch seed URLs for current batch
+  const tbn2_fetchBatchSeedUrls = async (batchId: string) => {
+    if (!batchId) {
+      setTbn2SeedUrlWpEditor('');
+      setTbn2SeedUrlFrontend('');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('images_plans_batches')
+        .select('seed_url_wp_editor, seed_url_frontend')
+        .eq('id', batchId)
+        .single();
+
+      if (!error && data) {
+        setTbn2SeedUrlWpEditor(data.seed_url_wp_editor || '');
+        setTbn2SeedUrlFrontend(data.seed_url_frontend || '');
+      } else {
+        setTbn2SeedUrlWpEditor('');
+        setTbn2SeedUrlFrontend('');
+      }
+    } catch (err) {
+      console.error('Error fetching batch seed URLs:', err);
+      setTbn2SeedUrlWpEditor('');
+      setTbn2SeedUrlFrontend('');
+    }
+  };
+
+  // Save seed URL wp editor to current batch
+  const tbn2_handleSeedUrlWpEditorSave = async () => {
+    if (!tbn2_selectedBatchId) {
+      alert('Please select a batch first');
+      return;
+    }
+
+    setTbn2SeedUrlSaving(prev => ({ ...prev, wpEditor: true }));
+    try {
+      const { error } = await supabase
+        .from('images_plans_batches')
+        .update({ seed_url_wp_editor: tbn2_seedUrlWpEditor })
+        .eq('id', tbn2_selectedBatchId);
+
+      if (error) {
+        alert('Error saving seed URL wp editor: ' + error.message);
+      } else {
+        alert('Seed URL wp editor saved successfully');
+      }
+    } catch (err) {
+      console.error('Error saving seed URL wp editor:', err);
+      alert('An error occurred while saving');
+    } finally {
+      setTbn2SeedUrlSaving(prev => ({ ...prev, wpEditor: false }));
+    }
+  };
+
+  // Save seed URL frontend to current batch
+  const tbn2_handleSeedUrlFrontendSave = async () => {
+    if (!tbn2_selectedBatchId) {
+      alert('Please select a batch first');
+      return;
+    }
+
+    setTbn2SeedUrlSaving(prev => ({ ...prev, frontend: true }));
+    try {
+      const { error } = await supabase
+        .from('images_plans_batches')
+        .update({ seed_url_frontend: tbn2_seedUrlFrontend })
+        .eq('id', tbn2_selectedBatchId);
+
+      if (error) {
+        alert('Error saving seed URL frontend: ' + error.message);
+      } else {
+        alert('Seed URL frontend saved successfully');
+      }
+    } catch (err) {
+      console.error('Error saving seed URL frontend:', err);
+      alert('An error occurred while saving');
+    } finally {
+      setTbn2SeedUrlSaving(prev => ({ ...prev, frontend: false }));
     }
   };
 
@@ -3461,7 +3550,7 @@ export default function Tebnar2Main() {
             >
               <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>asn_gcon_piece_id</div>
               <div className="flex items-center space-x-2">
-                <div className="relative" ref={gconPieceDropdownRef} style={{ width: '400px' }}>
+                <div className="relative" ref={gconPieceDropdownRef} style={{ width: '370px' }}>
                   <input
                     type="text"
                     value={tbn2_gconPieceDropdownOpen ? tbn2_gconPieceSearchTerm : (tbn2_selectedGconPieceId ? tbn2_getSelectedGconPieceDisplay() : '')}
@@ -4474,7 +4563,7 @@ export default function Tebnar2Main() {
                 onClick={tbn2_handlePopupClose}
                 className="absolute right-0 top-0 bg-gray-400 text-gray-800 font-bold flex items-center justify-center hover:bg-gray-500 transition-colors"
                 style={{
-                  width: '260px',
+                  width: '60px',
                   height: '150px', // Spans all three visual rows
                   border: '2px solid #4a4a4a',
                   fontSize: '14px',
@@ -4491,10 +4580,10 @@ export default function Tebnar2Main() {
             
             {/* uelbar45 section */}
             <div 
-              className="absolute left-0 flex items-center px-4"
+              className="flex items-center px-4"
               style={{ 
-                top: '100px',
-                right: '260px', // Leave space for close button
+                marginTop: '100px',
+                marginRight: '260px', // Leave space for close button
                 backgroundColor: '#f3f4f6',
                 color: '#374151',
                 borderTop: '1px solid #4a5568',
@@ -4567,7 +4656,7 @@ export default function Tebnar2Main() {
                     <td style={{ border: '1px solid gray', padding: '0' }}>
                       <div className="cell_inner_wrapper_div">
                         <div className="flex items-center space-x-1">
-                          <div className="relative" ref={sitesprenDropdownRef} style={{ width: '450px' }}>
+                          <div className="relative" ref={sitesprenDropdownRef} style={{ width: '410px' }}>
                             <input
                               type="text"
                               value={tbn2_sitesprenDropdownOpen ? tbn2_sitesprenSearchTerm : (tbn2_selectedSitesprenId ? tbn2_getSelectedSitesprenDisplay() : '')}
@@ -4625,7 +4714,7 @@ export default function Tebnar2Main() {
                     <td style={{ border: '1px solid gray', padding: '0' }}>
                       <div className="cell_inner_wrapper_div">
                         <div className="flex items-center space-x-1">
-                          <div className="relative" ref={gconPieceDropdownRef} style={{ width: '200px' }}>
+                          <div className="relative" ref={gconPieceDropdownRef} style={{ width: '370px' }}>
                             <input
                               type="text"
                               value={tbn2_gconPieceDropdownOpen ? tbn2_gconPieceSearchTerm : (tbn2_selectedGconPieceId ? tbn2_getSelectedGconPieceDisplay() : '')}
@@ -4701,6 +4790,197 @@ export default function Tebnar2Main() {
                     <td style={{ border: '1px solid gray', padding: '0' }}>
                       <div className="cell_inner_wrapper_div">-</div>
                     </td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">
+                        {tbn2_selectedGconPieceId && (() => {
+                          const urls = tbn2_getGconPieceUrls();
+                          return urls ? (
+                            <div className="flex space-x-1">
+                              <button
+                                onClick={() => urls.pendulum && window.open(urls.pendulum, '_blank')}
+                                disabled={!urls.pendulum}
+                                className="px-2 text-xs font-medium rounded border transition-colors bg-gray-600 text-white border-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                style={{ height: '20px' }}
+                                title="Edit in WordPress admin"
+                              >
+                                pendulum
+                              </button>
+                              <button
+                                onClick={() => urls.elementor && window.open(urls.elementor, '_blank')}
+                                disabled={!urls.elementor}
+                                className="px-2 text-xs font-medium rounded border transition-colors bg-purple-600 text-white border-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                style={{ height: '20px' }}
+                                title="Edit with Elementor"
+                              >
+                                elementor
+                              </button>
+                              <button
+                                onClick={() => urls.frontend && window.open(urls.frontend, '_blank')}
+                                disabled={!urls.frontend}
+                                className="px-2 text-xs font-medium rounded border transition-colors bg-green-600 text-white border-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                style={{ height: '20px' }}
+                                title="View frontend page"
+                              >
+                                frontend
+                              </button>
+                            </div>
+                          ) : null;
+                        })()}
+                      </div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            {/* uelbar50 section */}
+            <div 
+              className="flex items-center px-4"
+              style={{ 
+                backgroundColor: '#f3f4f6',
+                color: '#374151',
+                borderTop: '1px solid #4a5568',
+                borderBottom: '1px solid #4a5568',
+                marginRight: '260px' // Leave space for close button
+              }}
+            >
+              <span className="font-semibold mr-4">uelbar50</span>
+              
+              <table style={{ borderCollapse: 'collapse', fontSize: '16px' }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">1</div>
+                    </th>
+                    <th style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">2</div>
+                    </th>
+                    <th style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">seed_url_wp_editor</div>
+                    </th>
+                    <th style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">seed_url_frontend</div>
+                    </th>
+                    <th style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">5</div>
+                    </th>
+                    <th style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">6</div>
+                    </th>
+                    <th style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">7</div>
+                    </th>
+                    <th style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">8</div>
+                    </th>
+                    <th style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">9</div>
+                    </th>
+                    <th style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">10</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">
+                        <div className="flex items-center space-x-1">
+                          <input
+                            type="text"
+                            value={tbn2_seedUrlWpEditor}
+                            onChange={(e) => setTbn2SeedUrlWpEditor(e.target.value)}
+                            placeholder={!tbn2_selectedBatchId ? 'Select batch first' : 'Enter WP editor URL...'}
+                            disabled={!tbn2_selectedBatchId}
+                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            style={{ fontSize: '16px', width: '300px' }}
+                          />
+                          <button
+                            onClick={tbn2_handleSeedUrlWpEditorSave}
+                            disabled={!tbn2_selectedBatchId || tbn2_seedUrlSaving.wpEditor}
+                            className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            style={{ fontSize: '12px' }}
+                            title={!tbn2_selectedBatchId ? 'Select a batch first' : 'Save WP editor URL'}
+                          >
+                            {tbn2_seedUrlSaving.wpEditor ? '...' : 'save'}
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">
+                        <div className="flex items-center space-x-1">
+                          <input
+                            type="text"
+                            value={tbn2_seedUrlFrontend}
+                            onChange={(e) => setTbn2SeedUrlFrontend(e.target.value)}
+                            placeholder={!tbn2_selectedBatchId ? 'Select batch first' : 'Enter frontend URL...'}
+                            disabled={!tbn2_selectedBatchId}
+                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            style={{ fontSize: '16px', width: '300px' }}
+                          />
+                          <button
+                            onClick={tbn2_handleSeedUrlFrontendSave}
+                            disabled={!tbn2_selectedBatchId || tbn2_seedUrlSaving.frontend}
+                            className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            style={{ fontSize: '12px' }}
+                            title={!tbn2_selectedBatchId ? 'Select a batch first' : 'Save frontend URL'}
+                          >
+                            {tbn2_seedUrlSaving.frontend ? '...' : 'save'}
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
+                    <td style={{ border: '1px solid gray', padding: '0' }}>
+                      <div className="cell_inner_wrapper_div">-</div>
+                    </td>
                     <td style={{ border: '1px solid gray', padding: '0' }}>
                       <div className="cell_inner_wrapper_div">-</div>
                     </td>
@@ -4710,7 +4990,7 @@ export default function Tebnar2Main() {
             </div>
             
             {/* Popup content - adjusted to start below all three headers */}
-            <div className="h-full" style={{ paddingTop: '150px' }}>
+            <div className="h-full" style={{ paddingTop: '20px' }}>
               {/* Tab Navigation */}
               <div className="border-b border-gray-200 bg-gray-50">
                 <nav className="flex">
