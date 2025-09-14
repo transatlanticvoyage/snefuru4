@@ -147,7 +147,7 @@ export async function SabertoothScreenshotImages(
         error: 'Could not parse bucket path from URL'
       };
     }
-    const storagePath = urlParts.slice(bucketIndex + 1).join('/');
+    const storagePath = decodeURIComponent(urlParts.slice(bucketIndex + 1).join('/'));
     
     // 4. Launch puppeteer browser
     console.log(`🦷 SabertoothScreenshotImages: Launching browser...`);

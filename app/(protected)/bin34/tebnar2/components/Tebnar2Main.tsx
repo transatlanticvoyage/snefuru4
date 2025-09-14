@@ -480,6 +480,57 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Function to load 2 random rows from dummy data - new function
+  const tbn2_loadDummyData2Rows = async () => {
+    setTbn2LoadingPreset(true);
+    try {
+      const response = await fetch('/api/admin-options/kregno_xls_info_1');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+      
+      const result = await response.json();
+      if (result.success && result.data?.json1) {
+        const { headers, rows } = result.data.json1;
+        
+        // Randomly select 2 rows from the available rows
+        const shuffledRows = [...rows].sort(() => Math.random() - 0.5);
+        const selectedRows = shuffledRows.slice(0, 2);
+        
+        // Map original column order to new column order (same as full dummy data)
+        const originalHeaderMap = headers.reduce((map: Record<string, number>, header: string, index: number) => {
+          map[header] = index;
+          return map;
+        }, {});
+        
+        // New header order for the grid
+        const newHeaders = ['e_prompt1', 'e_zpf_img_code', 'e_width', 'e_height', 'e_associated_content1', 'e_file_name1', 'e_more_instructions1', 'e_ai_tool1', ''];
+        
+        // Remap the selected 2 rows to match new column order
+        const newRows = selectedRows.map((row: string[]) => {
+          return newHeaders.map(header => {
+            if (header === '') return ''; // Empty column
+            const originalIndex = originalHeaderMap[header];
+            return originalIndex !== undefined ? row[originalIndex] : '';
+          });
+        });
+        
+        // Create grid data with new headers as first row and 2 remapped data rows
+        const newGridData = [newHeaders, ...newRows];
+        
+        setTbn2PresetData(newGridData);
+        setTbn2Error('✅ 2 random rows loaded successfully!');
+      } else {
+        throw new Error('No data found or invalid format');
+      }
+    } catch (err) {
+      console.error('Error loading 2 random rows:', err);
+      setTbn2Error(`❌ Failed to load 2 random rows: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setTbn2LoadingPreset(false);
+    }
+  };
+
   // Function to fetch available narpi pushes for the current sitespren
   const tbn2_fetchAvailableNarpiPushes = async () => {
     if (!tbn2_selectedSitesprenId) {
@@ -5568,6 +5619,7 @@ export default function Tebnar2Main() {
                       makeImagesResult={tbn2_makeImagesResult}
                       loadingPreset={tbn2_loadingPreset}
                       onPresetLoad={tbn2_loadDummyData}
+                      onPresetLoad2Rows={tbn2_loadDummyData2Rows}
                       gridData={tbn2_gridData}
                       onGridDataChange={setTbn2GridData}
                       presetData={tbn2_presetData}

@@ -28,6 +28,7 @@ interface Tebnar2ActionsProps {
   makeImagesResult: string | null;
   loadingPreset: boolean;
   onPresetLoad: () => void;
+  onPresetLoad2Rows: () => void;
   gridData: string[][];
   onGridDataChange: (grid: string[][]) => void;
   presetData: string[][] | null;
@@ -56,6 +57,7 @@ export default function Tebnar2Actions({
   makeImagesResult,
   loadingPreset,
   onPresetLoad,
+  onPresetLoad2Rows,
   gridData,
   onGridDataChange,
   presetData,
@@ -144,6 +146,13 @@ export default function Tebnar2Actions({
           className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
         >
           {loadingPreset ? 'Loading...' : 'use dummy kregno xls info 1'}
+        </button>
+        <button
+          onClick={onPresetLoad2Rows}
+          disabled={loadingPreset}
+          className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+        >
+          {loadingPreset ? 'Loading...' : '2 rows only (random)'}
         </button>
         <button
           onClick={handleDownloadDummyData}
