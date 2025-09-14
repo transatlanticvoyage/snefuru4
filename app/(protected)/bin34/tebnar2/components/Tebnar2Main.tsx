@@ -86,6 +86,13 @@ export default function Tebnar2Main() {
   const [tbn2_narpiPushStatus, setTbn2NarpiPushStatus] = useState<string | null>(null);
   const [tbn2_selectedRows, setTbn2SelectedRows] = useState<Set<string>>(new Set());
   
+  // Rocket Chamber state
+  const [tbn2_rocketSearchValue, setTbn2RocketSearchValue] = useState<string>('');
+  const [tbn2_rocketCurrentPage, setTbn2RocketCurrentPage] = useState<number>(1);
+  const [tbn2_rocketItemsPerPage, setTbn2RocketItemsPerPage] = useState<number>(25);
+  const [tbn2_rocketColumnsPerPage, setTbn2RocketColumnsPerPage] = useState<number>(8);
+  const [tbn2_rocketCurrentColumnPage, setTbn2RocketCurrentColumnPage] = useState<number>(1);
+  
   // Sorting state - default to submission_order ascending
   const [tbn2_sortColumn, setTbn2SortColumn] = useState<string | null>('submission_order');
   const [tbn2_sortDirection, setTbn2SortDirection] = useState<'asc' | 'desc'>('asc');
@@ -1205,6 +1212,17 @@ export default function Tebnar2Main() {
         return updated;
       });
     }
+  };
+
+  // Rocket Chamber handler functions
+  const tbn2_handleWolfOptionsClick = () => {
+    console.log('Wolf options clicked');
+    // TODO: Implement wolf options modal
+  };
+
+  const tbn2_handlePillarshiftColtempsClick = () => {
+    console.log('Pillarshift coltemps clicked');
+    // TODO: Implement pillarshift coltemps modal
   };
 
   // Function to sort plans data
@@ -4825,6 +4843,19 @@ export default function Tebnar2Main() {
         onSort={tbn2_handleSort}
         renamingFiles={tbn2_renamingFiles}
         onRenameFile={tbn2_handleRenameFile}
+        // Rocket Chamber props
+        searchValue={tbn2_rocketSearchValue}
+        onSearchChange={setTbn2RocketSearchValue}
+        rocketCurrentPage={tbn2_rocketCurrentPage}
+        rocketItemsPerPage={tbn2_rocketItemsPerPage}
+        onRocketPageChange={setTbn2RocketCurrentPage}
+        onRocketItemsPerPageChange={setTbn2RocketItemsPerPage}
+        rocketColumnsPerPage={tbn2_rocketColumnsPerPage}
+        rocketCurrentColumnPage={tbn2_rocketCurrentColumnPage}
+        onRocketColumnPageChange={setTbn2RocketCurrentColumnPage}
+        onRocketColumnsPerPageChange={setTbn2RocketColumnsPerPage}
+        onWolfOptionsClick={tbn2_handleWolfOptionsClick}
+        onPillarshiftColtempsClick={tbn2_handlePillarshiftColtempsClick}
       />
 
       {/* Functions Popup Modal - cloned from nwjar1 */}

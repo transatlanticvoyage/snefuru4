@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Tebnar2ImagePlan, Tebnar2Image } from '../types/tebnar2-types';
 import { TBN2_PAGE_SIZE_OPTIONS } from '../constants/tebnar2-constants';
 import Tebnar2ImagePreview from './Tebnar2ImagePreview';
+import Tebnar2RocketChamber from './Tebnar2RocketChamber';
 
 // Complete column settings - exact clone from tebnar1
 const tbn2_columnSettings = {
@@ -424,6 +425,19 @@ interface Tebnar2TableProps {
   onSort: (columnKey: string) => void;
   renamingFiles: Set<string>;
   onRenameFile: (imageId: string, newFilename: string) => void;
+  // Rocket Chamber props
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  rocketCurrentPage: number;
+  rocketItemsPerPage: number;
+  onRocketPageChange: (page: number) => void;
+  onRocketItemsPerPageChange: (itemsPerPage: number) => void;
+  rocketColumnsPerPage: number;
+  rocketCurrentColumnPage: number;
+  onRocketColumnPageChange: (page: number) => void;
+  onRocketColumnsPerPageChange: (columnsPerPage: number) => void;
+  onWolfOptionsClick?: () => void;
+  onPillarshiftColtempsClick?: () => void;
 }
 
 export default function Tebnar2Table({
@@ -450,7 +464,20 @@ export default function Tebnar2Table({
   sortDirection,
   onSort,
   renamingFiles,
-  onRenameFile
+  onRenameFile,
+  // Rocket Chamber props
+  searchValue,
+  onSearchChange,
+  rocketCurrentPage,
+  rocketItemsPerPage,
+  onRocketPageChange,
+  onRocketItemsPerPageChange,
+  rocketColumnsPerPage,
+  rocketCurrentColumnPage,
+  onRocketColumnPageChange,
+  onRocketColumnsPerPageChange,
+  onWolfOptionsClick,
+  onPillarshiftColtempsClick
 }: Tebnar2TableProps) {
 
   // State for tracking rename input values
@@ -575,8 +602,24 @@ export default function Tebnar2Table({
         </button>
       </div>
       
+      {/* Rocket Chamber - positioned below uitablegrid21 section but above main table */}
+      <Tebnar2RocketChamber
+        data={plans}
+        searchValue={searchValue}
+        onSearchChange={onSearchChange}
+        currentPage={rocketCurrentPage}
+        itemsPerPage={rocketItemsPerPage}
+        onPageChange={onRocketPageChange}
+        onItemsPerPageChange={onRocketItemsPerPageChange}
+        columnsPerPage={rocketColumnsPerPage}
+        currentColumnPage={rocketCurrentColumnPage}
+        onColumnPageChange={onRocketColumnPageChange}
+        onColumnsPerPageChange={onRocketColumnsPerPageChange}
+        onWolfOptionsClick={onWolfOptionsClick}
+        onPillarshiftColtempsClick={onPillarshiftColtempsClick}
+      />
       
-      <div className="overflow-x-auto w-full">
+      <div className="overflow-x-auto w-full" style={{ marginTop: 0, paddingTop: 0 }}>
         <table 
           style={{
             ...tbn2_tableStyleSettings.table,
