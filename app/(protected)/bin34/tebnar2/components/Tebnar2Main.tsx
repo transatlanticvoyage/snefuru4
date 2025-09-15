@@ -1192,13 +1192,14 @@ export default function Tebnar2Main() {
   const tbn2_getAllTableColumns = () => {
     return [
       'submission_order',
+      'e_prompt1', // Moved right after submission_order
       'int1', 'fk_image1_id', 'image1-preview', 'supabase-filename', 'rename-field-1',
       'int2', 'fk_image2_id', 'image2-preview',
       'int3', 'fk_image3_id', 'image3-preview',
       'int4', 'fk_image4_id', 'image4-preview',
       'id', 'rel_users_id', 'rel_images_plans_batches_id', 'created_at',
       'e_zpf_img_code', 'e_width', 'e_height', 'e_associated_content1',
-      'e_file_name1', 'e_more_instructions1', 'e_prompt1', 'e_ai_tool1'
+      'e_file_name1', 'e_more_instructions1', 'e_ai_tool1'
     ];
   };
 

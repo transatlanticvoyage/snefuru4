@@ -688,12 +688,15 @@ export default function Tebnar2Table({
               {stickyColumns.map((col, index) => {
                 const width = getColumnWidth(col);
                 const isLastSticky = index === stickyColumns.length - 1;
-                const hasBlackSeparator = col === 'image1-preview' || isLastSticky;
+                const hasBlackSeparator = col === 'submission_order' || col === 'e_prompt1' || col === 'image1-preview' || isLastSticky;
                 
                 // Map column to database table name
                 const getDbTableName = (column: string) => {
                   if (column.includes('preview') || column === 'supabase-filename' || column === 'rename-field-1') {
                     return '-';
+                  }
+                  if (column === 'e_prompt1') {
+                    return '(waiting)';
                   }
                   return 'images_plans';
                 };
@@ -725,11 +728,15 @@ export default function Tebnar2Table({
               {/* Non-Sticky Column DB Names */}
               {nonStickyColumns.map((col) => {
                 const width = getColumnWidth(col);
+                const hasBlackSeparator = col === 'e_prompt1' || col === 'image1-preview';
                 
                 // Map column to database table name
                 const getDbTableName = (column: string) => {
                   if (column.includes('preview') || column === 'supabase-filename' || column === 'rename-field-1') {
                     return '-';
+                  }
+                  if (column === 'e_prompt1') {
+                    return '(waiting)';
                   }
                   return 'images_plans';
                 };
@@ -742,7 +749,7 @@ export default function Tebnar2Table({
                       minWidth: width,
                       maxWidth: width,
                       backgroundColor: '#f3f4f6',
-                      borderRight: '1px solid #c7cbd3',
+                      borderRight: hasBlackSeparator ? '4px solid black' : '1px solid #c7cbd3',
                       fontSize: '11px',
                       fontWeight: 'bold',
                       color: '#374151',
@@ -808,7 +815,7 @@ export default function Tebnar2Table({
                 // Get width settings - use the new getColumnWidth function
                 const width = getColumnWidth(col);
                 const isLastSticky = index === stickyColumns.length - 1;
-                const hasBlackSeparator = col === 'image1-preview' || isLastSticky;
+                const hasBlackSeparator = col === 'submission_order' || col === 'e_prompt1' || col === 'image1-preview' || isLastSticky;
                 
                 return (
                   <th
@@ -846,6 +853,7 @@ export default function Tebnar2Table({
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {col.startsWith('image') && col.includes('preview') ? 'Preview' : 
                        col === 'supabase-filename' ? 'supabase filename:' :
+                       col === 'e_prompt1' ? 'e_prompt1' :
                        col === 'rename-field-1' ? (
                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                            <div>rename field 1</div>
@@ -884,6 +892,7 @@ export default function Tebnar2Table({
               {/* Non-Sticky Headers */}
               {nonStickyColumns.map((col) => {
                 const width = getColumnWidth(col);
+                const hasBlackSeparator = col === 'e_prompt1' || col === 'image1-preview';
                 
                 return (
                   <th
@@ -894,7 +903,7 @@ export default function Tebnar2Table({
                       minWidth: width,
                       maxWidth: width,
                       backgroundColor: tbn2_headerCustomizationSettings.headerRow.backgroundColor,
-                      borderRight: '1px solid #c7cbd3',
+                      borderRight: hasBlackSeparator ? '4px solid black' : '1px solid #c7cbd3',
                       fontSize: tbn2_headerCustomizationSettings.headerText.fontSize,
                       fontWeight: tbn2_headerCustomizationSettings.headerText.fontWeight,
                       color: tbn2_headerCustomizationSettings.headerText.color,
@@ -918,6 +927,7 @@ export default function Tebnar2Table({
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {col.startsWith('image') && col.includes('preview') ? 'Preview' : 
                        col === 'supabase-filename' ? 'supabase filename:' :
+                       col === 'e_prompt1' ? 'e_prompt1' :
                        col === 'rename-field-1' ? (
                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                            <div>rename field 1</div>
@@ -995,7 +1005,7 @@ export default function Tebnar2Table({
                 {stickyColumns.map((col, index) => {
                   const width = getColumnWidth(col);
                   const isLastSticky = index === stickyColumns.length - 1;
-                  const hasBlackSeparator = col === 'image1-preview' || isLastSticky;
+                  const hasBlackSeparator = col === 'submission_order' || col === 'e_prompt1' || col === 'image1-preview' || isLastSticky;
                   
                   return (
                     <td
@@ -1148,6 +1158,19 @@ export default function Tebnar2Table({
                           }
                           return '-';
                         })()
+                      ) : col === 'e_prompt1' ? (
+                        <input
+                          type="text"
+                          placeholder=""
+                          style={{
+                            width: '100%',
+                            padding: '4px 8px',
+                            fontSize: '12px',
+                            border: '1px solid #ccc',
+                            borderRadius: '2px',
+                            backgroundColor: '#ffffff'
+                          }}
+                        />
                       ) : col === 'rename-field-1' ? (
                         (() => {
                           // Get the image for image1 (this column is specifically for image1 renaming)
@@ -1206,6 +1229,7 @@ export default function Tebnar2Table({
                 {/* Non-Sticky Cells */}
                 {nonStickyColumns.map((col) => {
                   const width = getColumnWidth(col);
+                  const hasBlackSeparator = col === 'e_prompt1' || col === 'image1-preview';
                   
                   return (
                     <td
@@ -1215,7 +1239,7 @@ export default function Tebnar2Table({
                         minWidth: width,
                         maxWidth: width,
                         backgroundColor: '#ffffff',
-                        borderRight: '1px solid #c7cbd3',
+                        borderRight: hasBlackSeparator ? '4px solid black' : '1px solid #c7cbd3',
                         padding: '4px 4px',
                         verticalAlign: 'top',
                         overflow: 'hidden',
@@ -1355,6 +1379,19 @@ export default function Tebnar2Table({
                           }
                           return '-';
                         })()
+                      ) : col === 'e_prompt1' ? (
+                        <input
+                          type="text"
+                          placeholder=""
+                          style={{
+                            width: '100%',
+                            padding: '4px 8px',
+                            fontSize: '12px',
+                            border: '1px solid #ccc',
+                            borderRadius: '2px',
+                            backgroundColor: '#ffffff'
+                          }}
+                        />
                       ) : col === 'rename-field-1' ? (
                         (() => {
                           // Get the image for image1 (this column is specifically for image1 renaming)
