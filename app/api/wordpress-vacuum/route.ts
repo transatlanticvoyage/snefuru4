@@ -56,6 +56,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate that we have proper UUIDs
+    if (!siteData.id || typeof siteData.id !== 'string') {
+      return NextResponse.json(
+        { success: false, message: 'Invalid site ID format' },
+        { status: 400 }
+      );
+    }
+
+    console.log('Site data for vacuum:', {
+      siteId: siteData.id,
+      userId: userData.id,
+      sitesprenBase: siteData.sitespren_base
+    });
+
     // Perform WordPress vacuum operation
     const vacuumResult = await performWordPressVacuum(siteData);
     
@@ -240,13 +254,34 @@ async function saveVacuumDataToSupabase(
     
     // Prepare the vacuum data for insertion/update
     const vacuumRecord = {
-      fk_sitespren_id: siteData.id,
-      fk_users_id: userId,
+      fk_sitespren_id: siteData.id, // This should be a valid UUID from Supabase
+      fk_users_id: userId, // This should be a valid UUID from Supabase
       // Only copy fields that exist in the Supabase table
       ...filteredData.validFields,
       // Override/ensure certain fields
       updated_at: new Date().toISOString()
     };
+    
+    // Additional validation for critical UUID fields
+    if (!vacuumRecord.fk_sitespren_id || vacuumRecord.fk_sitespren_id === '') {
+      console.error('Invalid fk_sitespren_id:', vacuumRecord.fk_sitespren_id);
+      return {
+        success: false,
+        message: 'Invalid site ID - cannot create vacuum record',
+        recordCount: 0,
+        details: { savedFields: filteredData.savedFields, skippedFields: filteredData.skippedFields }
+      };
+    }
+    
+    if (!vacuumRecord.fk_users_id || vacuumRecord.fk_users_id === '') {
+      console.error('Invalid fk_users_id:', vacuumRecord.fk_users_id);
+      return {
+        success: false,
+        message: 'Invalid user ID - cannot create vacuum record',
+        recordCount: 0,
+        details: { savedFields: filteredData.savedFields, skippedFields: filteredData.skippedFields }
+      };
+    }
     
     console.log('Filtered vacuum record:', {
       totalWpFields: Object.keys(wpData).length,
@@ -379,10 +414,31 @@ function filterDataBySchema(wpData: any, validColumns: string[]) {
   const savedFields: string[] = [];
   const skippedFields: string[] = [];
   
+  // WordPress metadata fields that should always be excluded
+  const excludedWpFields = [
+    'id', 'wppma_id', 'wppma_db_only_created_at', 'wppma_db_only_updated_at',
+    'vacuum_id' // This is for Supabase auto-generation
+  ];
+  
   // Go through each field in WordPress data
   for (const [key, value] of Object.entries(wpData)) {
+    // Skip WordPress metadata fields
+    if (excludedWpFields.includes(key)) {
+      skippedFields.push(key);
+      console.log(`⚠️ Skipping WordPress metadata field '${key}'`);
+      continue;
+    }
+    
     if (validColumns.includes(key)) {
-      // Field exists in Supabase schema
+      // Field exists in Supabase schema and is not excluded
+      // Handle empty string UUIDs and other problematic values
+      if (key.includes('_id') && value === '') {
+        // Skip empty UUID fields to avoid UUID format errors
+        skippedFields.push(key);
+        console.log(`⚠️ Skipping empty UUID field '${key}'`);
+        continue;
+      }
+      
       validFields[key] = value;
       savedFields.push(key);
     } else {
@@ -393,6 +449,8 @@ function filterDataBySchema(wpData: any, validColumns: string[]) {
   }
   
   console.log(`Schema filtering: ${savedFields.length} fields will be saved, ${skippedFields.length} fields skipped`);
+  console.log(`Saved fields: ${savedFields.join(', ')}`);
+  console.log(`Skipped fields: ${skippedFields.join(', ')}`);
   
   return {
     validFields,

@@ -355,6 +355,118 @@ const CheckboxCell = ({
   );
 };
 
+// Enhanced feedback display component with expandable details and copy functionality
+const VacuumFeedbackDisplay = ({ 
+  feedback 
+}: { 
+  feedback: {type: 'success' | 'error' | 'info', message: string, details?: any} 
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState('');
+
+  const handleCopyAll = () => {
+    const fullMessage = feedback.details 
+      ? `${feedback.message}\n\nDetails:\n${JSON.stringify(feedback.details, null, 2)}`
+      : feedback.message;
+    
+    navigator.clipboard.writeText(fullMessage).then(() => {
+      setCopyFeedback('Copied to clipboard!');
+      setTimeout(() => setCopyFeedback(''), 2000);
+    });
+  };
+
+  const hasDetails = feedback.details && (
+    feedback.details.skipped_fields?.length > 0 || 
+    feedback.details.fields_saved || 
+    feedback.details.fields_skipped
+  );
+
+  return (
+    <div className={`mt-4 p-3 rounded-lg text-sm border ${
+      feedback.type === 'success' ? 'bg-green-100 text-green-800 border-green-200' :
+      feedback.type === 'error' ? 'bg-red-100 text-red-800 border-red-200' :
+      'bg-blue-100 text-blue-800 border-blue-200'
+    }`}>
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="font-medium mb-1 flex items-center gap-2">
+            {feedback.type === 'success' ? '✅ Success' :
+             feedback.type === 'error' ? '❌ Error' : 'ℹ️ Info'}
+            {hasDetails && (
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className={`text-xs px-2 py-1 rounded border ${
+                  feedback.type === 'success' ? 'border-green-300 hover:bg-green-200' :
+                  feedback.type === 'error' ? 'border-red-300 hover:bg-red-200' :
+                  'border-blue-300 hover:bg-blue-200'
+                }`}
+              >
+                {isExpanded ? 'Hide Details' : 'Show Details'}
+              </button>
+            )}
+          </div>
+          <div className="mb-2">{feedback.message}</div>
+          
+          {isExpanded && hasDetails && (
+            <div className="mt-3 p-3 bg-white bg-opacity-50 rounded border">
+              <div className="text-xs font-medium mb-2">Detailed Information:</div>
+              
+              {feedback.details.fields_saved !== undefined && (
+                <div className="mb-2">
+                  <span className="font-medium">Fields Saved:</span> {feedback.details.fields_saved}
+                </div>
+              )}
+              
+              {feedback.details.fields_skipped !== undefined && (
+                <div className="mb-2">
+                  <span className="font-medium">Fields Skipped:</span> {feedback.details.fields_skipped}
+                </div>
+              )}
+              
+              {feedback.details.operation && (
+                <div className="mb-2">
+                  <span className="font-medium">Operation:</span> {feedback.details.operation}
+                </div>
+              )}
+              
+              {feedback.details.skipped_fields?.length > 0 && (
+                <div className="mb-2">
+                  <div className="font-medium mb-1">Skipped Fields ({feedback.details.skipped_fields.length}):</div>
+                  <div className="max-h-32 overflow-y-auto bg-gray-50 p-2 rounded text-xs">
+                    {feedback.details.skipped_fields.map((field: string, index: number) => (
+                      <div key={index} className="py-0.5">{field}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        
+        <div className="ml-3 flex flex-col gap-1">
+          <button
+            onClick={handleCopyAll}
+            className={`text-xs px-2 py-1 rounded border ${
+              feedback.type === 'success' ? 'border-green-300 hover:bg-green-200' :
+              feedback.type === 'error' ? 'border-red-300 hover:bg-red-200' :
+              'border-blue-300 hover:bg-blue-200'
+            }`}
+            title="Copy full message to clipboard"
+          >
+            📋 Copy
+          </button>
+          
+          {copyFeedback && (
+            <div className="text-xs text-green-600 font-medium">
+              {copyFeedback}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function DriggsmanTable({ 
   onControlsRender,
   showVerificationColumn = false,
@@ -1786,7 +1898,8 @@ export default function DriggsmanTable({
       if (result.success) {
         setVacuumFeedback({ 
           type: 'success', 
-          message: `Successfully vacuumed ${result.recordCount || 0} fields from WordPress zen_sitespren table. Data stored in sitespren_vacuums table.` 
+          message: result.message,
+          details: result.data
         });
         
         // Refresh vacuum data
@@ -1794,7 +1907,8 @@ export default function DriggsmanTable({
       } else {
         setVacuumFeedback({ 
           type: 'error', 
-          message: result.message || 'Failed to vacuum WordPress data' 
+          message: result.message || 'Failed to vacuum WordPress data',
+          details: result.data
         });
       }
     } catch (error) {
@@ -4370,17 +4484,7 @@ export default function DriggsmanTable({
                             </div>
                             
                             {vacuumFeedback && (
-                              <div className={`mt-4 p-3 rounded-lg text-sm ${
-                                vacuumFeedback.type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
-                                vacuumFeedback.type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
-                                'bg-blue-100 text-blue-800 border border-blue-200'
-                              }`}>
-                                <div className="font-medium mb-1">
-                                  {vacuumFeedback.type === 'success' ? '✅ Success' :
-                                   vacuumFeedback.type === 'error' ? '❌ Error' : 'ℹ️ Info'}
-                                </div>
-                                <div>{vacuumFeedback.message}</div>
-                              </div>
+                              <VacuumFeedbackDisplay feedback={vacuumFeedback} />
                             )}
                           </div>
                         </div>
