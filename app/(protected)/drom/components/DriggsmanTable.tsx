@@ -4631,7 +4631,7 @@ export default function DriggsmanTable({
                       key={site.id}
                       className="text-left border-r border-gray-300 relative"
                       title={site.sitespren_base || site.id}
-                      style={{ padding: '0', minWidth: '600px', width: '600px' }}
+                      style={{ padding: '0', minWidth: '600px', width: 'auto', maxWidth: '700px' }}
                     >
                       {/* Reindeer box - positioned on right */}
                       <div 
@@ -4931,7 +4931,7 @@ export default function DriggsmanTable({
                     <th
                       key={`${site.id}-vacuum`}
                       className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
-                      style={{ borderLeft: '2px solid black' }}
+                      style={{ borderLeft: '2px solid black', minWidth: '192px', width: 'auto', maxWidth: '700px' }}
                     >
                       <div className="flex flex-col items-center justify-center">
                         {/* Vacuum Icon */}
@@ -5098,10 +5098,15 @@ export default function DriggsmanTable({
                         <>
                           <td 
                             key={`${field.key}-${site.id}`} 
-                            className={`px-3 py-2 text-sm font-bold text-gray-900 w-48 border-r border-gray-300 ${
+                            className={`px-3 py-2 text-sm font-bold text-gray-900 border-r border-gray-300 ${
                               field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '' : 'bg-gray-100'
                             }`}
-                            style={field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? { backgroundColor: '#dddddd' } : {}}
+                            style={{
+                              minWidth: '192px', 
+                              width: 'auto', 
+                              maxWidth: '700px',
+                              ...(field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? { backgroundColor: '#dddddd' } : {})
+                            }}
                           >
                             {field.label}
                           </td>
@@ -5130,7 +5135,12 @@ export default function DriggsmanTable({
                           <td 
                             key={`${field.key}-${site.id}-vacuum`}
                             className="px-1 py-2 text-center border-r border-gray-300"
-                            style={{ backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+                            style={{ 
+                              minWidth: '192px', 
+                              width: 'auto', 
+                              maxWidth: '700px',
+                              backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' 
+                            }}
                           >
                           </td>
                           {/* Scraper column for section headers */}
@@ -5149,7 +5159,8 @@ export default function DriggsmanTable({
                         <>
                           <td 
                             key={`${field.key}-${site.id}`} 
-                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
+                            className="px-3 py-2 text-sm text-gray-900 border-r border-gray-300"
+                            style={{ minWidth: '192px', width: 'auto', maxWidth: '700px' }}
                           >
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input
@@ -5276,7 +5287,8 @@ export default function DriggsmanTable({
                           {/* Vacuum column for boolean fields */}
                           <td 
                             key={`${field.key}-${site.id}-vacuum`}
-                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
+                            className="px-3 py-2 text-sm text-gray-900 border-r border-gray-300"
+                            style={{ minWidth: '192px', width: 'auto', maxWidth: '700px' }}
                           >
                             <div className="flex items-center justify-between">
                               <label className="relative inline-flex items-center cursor-pointer">
@@ -5550,7 +5562,8 @@ export default function DriggsmanTable({
                           {/* Vacuum column for platform_dropdown fields */}
                           <td 
                             key={`${field.key}-${site.id}-vacuum`}
-                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
+                            className="px-3 py-2 text-sm text-gray-900 border-r border-gray-300"
+                            style={{ minWidth: '192px', width: 'auto', maxWidth: '700px' }}
                           >
                             <div className="flex items-center justify-between">
                               <input
@@ -5818,7 +5831,8 @@ export default function DriggsmanTable({
                           {/* Vacuum column for address_species_dropdown fields */}
                           <td 
                             key={`${field.key}-${site.id}-vacuum`}
-                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
+                            className="px-3 py-2 text-sm text-gray-900 border-r border-gray-300"
+                            style={{ minWidth: '192px', width: 'auto', maxWidth: '700px' }}
                           >
                             <div className="flex items-center justify-between">
                               <input
@@ -6192,7 +6206,8 @@ export default function DriggsmanTable({
                           {/* Vacuum column for cgig_dropdown fields */}
                           <td 
                             key={`${field.key}-${site.id}-vacuum`}
-                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
+                            className="px-3 py-2 text-sm text-gray-900 border-r border-gray-300"
+                            style={{ minWidth: '192px', width: 'auto', maxWidth: '700px' }}
                           >
                             <div className="flex items-center justify-between">
                               <input
@@ -6235,10 +6250,15 @@ export default function DriggsmanTable({
                         <td
                           key={`${field.key}-${site.id}`}
                           className={`px-3 py-2 text-sm text-gray-900 border-r border-gray-300 ${
-                            field.key === 'driggs_phone_1' ? 'w-80' : (fieldDefinitions.find(f => f.key === field.key)?.type === 'readonly' || fieldDefinitions.find(f => f.key === field.key)?.type === 'section_header' ? 'w-48' : 'cursor-pointer w-48')
+                            field.key === 'driggs_phone_1' ? 'w-80' : (fieldDefinitions.find(f => f.key === field.key)?.type === 'readonly' || fieldDefinitions.find(f => f.key === field.key)?.type === 'section_header' ? '' : 'cursor-pointer')
                           } ${
                             field.key === 'driggs_brand_name' && isEditing ? 'border-2 border-blue-500' : ''
                           }`}
+                          style={{ 
+                            minWidth: field.key === 'driggs_phone_1' ? '320px' : '192px', 
+                            width: 'auto', 
+                            maxWidth: '700px' 
+                          }}
                           onClick={() => field.key !== 'driggs_phone_1' && fieldDefinitions.find(f => f.key === field.key)?.type !== 'readonly' && fieldDefinitions.find(f => f.key === field.key)?.type !== 'section_header' && !isEditing && handleCellClick(field.key, site.id, value)}
                         >
                         {field.key === 'driggs_phone_1' ? (
@@ -6457,7 +6477,8 @@ export default function DriggsmanTable({
                         {/* Vacuum column for default fields */}
                         <td 
                           key={`${field.key}-${site.id}-vacuum`}
-                          className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
+                          className="px-3 py-2 text-sm text-gray-900 border-r border-gray-300"
+                          style={{ minWidth: '192px', width: 'auto', maxWidth: '700px' }}
                         >
                           <div className="flex items-center justify-between">
                             <input
