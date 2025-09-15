@@ -220,7 +220,7 @@ interface DriggsmanTableProps {
   onCurrentPageChange?: (page: number) => void;
 }
 
-// Helper component for vacuum/zarpscrape cell display
+// Helper component for scraper cell display (still used by scraper columns)
 const VacuumZarpscrapeCell = ({ 
   value, 
   fieldKey, 
@@ -234,6 +234,7 @@ const VacuumZarpscrapeCell = ({
   onDelete: (siteId: string, fieldKey: string) => void;
   isBoolean?: boolean;
 }) => {
+  
   if (value !== undefined && value !== null) {
     let displayValue = '';
     
@@ -5275,15 +5276,28 @@ export default function DriggsmanTable({
                           {/* Vacuum column for boolean fields */}
                           <td 
                             key={`${field.key}-${site.id}-vacuum`}
-                            className="px-1 py-2 text-center border-r border-gray-300"
+                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
                           >
-                            <VacuumZarpscrapeCell
-                              value={vacuumData.get(site.id)?.[field.key]}
-                              fieldKey={field.key}
-                              siteId={site.id}
-                              onDelete={deleteVacuumField}
-                              isBoolean={true}
-                            />
+                            <div className="flex items-center justify-between">
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={!!vacuumData.get(site.id)?.[field.key]}
+                                  readOnly
+                                  className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                              </label>
+                              {vacuumData.get(site.id)?.[field.key] !== undefined && (
+                                <button
+                                  onClick={() => deleteVacuumField(site.id, field.key)}
+                                  className="ml-2 text-red-500 hover:text-red-700 text-sm"
+                                  title="Delete vacuum value"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </div>
                           </td>
                           {/* Scraper column for boolean fields */}
                           <td 
@@ -5536,14 +5550,26 @@ export default function DriggsmanTable({
                           {/* Vacuum column for platform_dropdown fields */}
                           <td 
                             key={`${field.key}-${site.id}-vacuum`}
-                            className="px-1 py-2 text-center border-r border-gray-300"
+                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
                           >
-                            <VacuumZarpscrapeCell
-                              value={vacuumData.get(site.id)?.[field.key]}
-                              fieldKey={field.key}
-                              siteId={site.id}
-                              onDelete={deleteVacuumField}
-                            />
+                            <div className="flex items-center justify-between">
+                              <input
+                                type="text"
+                                value={vacuumData.get(site.id)?.[field.key] ? getPlatformName(vacuumData.get(site.id)?.[field.key] as number) : ''}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none bg-gray-50"
+                                placeholder="No vacuum data"
+                              />
+                              {vacuumData.get(site.id)?.[field.key] !== undefined && (
+                                <button
+                                  onClick={() => deleteVacuumField(site.id, field.key)}
+                                  className="ml-2 text-red-500 hover:text-red-700 text-sm"
+                                  title="Delete vacuum value"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </div>
                           </td>
                           {/* Scraper column for platform_dropdown fields */}
                           <td 
@@ -5792,14 +5818,26 @@ export default function DriggsmanTable({
                           {/* Vacuum column for address_species_dropdown fields */}
                           <td 
                             key={`${field.key}-${site.id}-vacuum`}
-                            className="px-1 py-2 text-center border-r border-gray-300"
+                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
                           >
-                            <VacuumZarpscrapeCell
-                              value={vacuumData.get(site.id)?.[field.key]}
-                              fieldKey={field.key}
-                              siteId={site.id}
-                              onDelete={deleteVacuumField}
-                            />
+                            <div className="flex items-center justify-between">
+                              <input
+                                type="text"
+                                value={vacuumData.get(site.id)?.[field.key] ? getAddressSpeciesName(vacuumData.get(site.id)?.[field.key] as number) : ''}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none bg-gray-50"
+                                placeholder="No vacuum data"
+                              />
+                              {vacuumData.get(site.id)?.[field.key] !== undefined && (
+                                <button
+                                  onClick={() => deleteVacuumField(site.id, field.key)}
+                                  className="ml-2 text-red-500 hover:text-red-700 text-sm"
+                                  title="Delete vacuum value"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </div>
                           </td>
                           {/* Scraper column for address_species_dropdown fields */}
                           <td 
@@ -6154,14 +6192,26 @@ export default function DriggsmanTable({
                           {/* Vacuum column for cgig_dropdown fields */}
                           <td 
                             key={`${field.key}-${site.id}-vacuum`}
-                            className="px-1 py-2 text-center border-r border-gray-300"
+                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
                           >
-                            <VacuumZarpscrapeCell
-                              value={vacuumData.get(site.id)?.[field.key]}
-                              fieldKey={field.key}
-                              siteId={site.id}
-                              onDelete={deleteVacuumField}
-                            />
+                            <div className="flex items-center justify-between">
+                              <input
+                                type="text"
+                                value={vacuumData.get(site.id)?.[field.key] ? getCitationGigName(vacuumData.get(site.id)?.[field.key] as number) : ''}
+                                readOnly
+                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none bg-gray-50"
+                                placeholder="No vacuum data"
+                              />
+                              {vacuumData.get(site.id)?.[field.key] !== undefined && (
+                                <button
+                                  onClick={() => deleteVacuumField(site.id, field.key)}
+                                  className="ml-2 text-red-500 hover:text-red-700 text-sm"
+                                  title="Delete vacuum value"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </div>
                           </td>
                           {/* Scraper column for cgig_dropdown fields */}
                           <td 
@@ -6407,13 +6457,26 @@ export default function DriggsmanTable({
                         {/* Vacuum column for default fields */}
                         <td 
                           key={`${field.key}-${site.id}-vacuum`}
-                          className="px-1 py-2 text-center border-r border-gray-300"
+                          className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
                         >
-                          <input
-                            type="text"
-                            className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            placeholder=""
-                          />
+                          <div className="flex items-center justify-between">
+                            <input
+                              type="text"
+                              value={vacuumData.get(site.id)?.[field.key] || ''}
+                              readOnly
+                              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none bg-gray-50"
+                              placeholder="No vacuum data"
+                            />
+                            {vacuumData.get(site.id)?.[field.key] !== undefined && (
+                              <button
+                                onClick={() => deleteVacuumField(site.id, field.key)}
+                                className="ml-2 text-red-500 hover:text-red-700 text-sm"
+                                title="Delete vacuum value"
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
                         </td>
                         {/* Scraper column for default fields */}
                         <td 
