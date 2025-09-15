@@ -69,20 +69,40 @@ export async function POST(request: NextRequest) {
       );
       
       if (saveResult.success) {
+        // Create detailed success message
+        let message = `Successfully vacuumed WordPress data and stored ${saveResult.recordCount} fields`;
+        if (saveResult.details?.skippedFields?.length > 0) {
+          message += `. Note: ${saveResult.details.skippedFields.length} fields were skipped due to schema differences (${saveResult.details.skippedFields.slice(0, 3).join(', ')}${saveResult.details.skippedFields.length > 3 ? '...' : ''})`;
+        }
+        
         return NextResponse.json({
           success: true,
-          message: `Successfully vacuumed WordPress data and stored ${saveResult.recordCount} fields`,
+          message: message,
           recordCount: saveResult.recordCount,
           data: {
-            fields_vacuumed: saveResult.recordCount,
+            fields_saved: saveResult.recordCount,
+            fields_skipped: saveResult.details?.skippedFields?.length || 0,
             source_site: siteData.sitespren_base,
-            vacuum_timestamp: new Date().toISOString()
+            vacuum_timestamp: new Date().toISOString(),
+            operation: saveResult.details?.operation || 'unknown',
+            skipped_fields: saveResult.details?.skippedFields || []
           }
         });
       } else {
+        // Even if save failed, show what would have been skipped for troubleshooting
+        let message = `WordPress vacuum successful but failed to save to database: ${saveResult.message}`;
+        if (saveResult.details?.skippedFields?.length > 0) {
+          message += `. Schema issues detected: ${saveResult.details.skippedFields.length} fields would be skipped (${saveResult.details.skippedFields.slice(0, 3).join(', ')}${saveResult.details.skippedFields.length > 3 ? '...' : ''})`;
+        }
+        
         return NextResponse.json({
           success: false,
-          message: `WordPress vacuum successful but failed to save to database: ${saveResult.message}`
+          message: message,
+          data: {
+            fields_that_would_be_saved: saveResult.details?.savedFields?.length || 0,
+            fields_that_would_be_skipped: saveResult.details?.skippedFields?.length || 0,
+            skipped_fields: saveResult.details?.skippedFields || []
+          }
         }, { status: 500 });
       }
     } else {
@@ -174,12 +194,28 @@ async function saveVacuumDataToSupabase(
       return {
         success: false,
         message: 'No data to save',
-        recordCount: 0
+        recordCount: 0,
+        details: { savedFields: [], skippedFields: [] }
       };
     }
     
     // We expect only one record from zen_sitespren table typically
     const wpData = vacuumData[0];
+    
+    // Get the schema for sitespren_vacuums table to filter fields
+    const schemaResult = await getSupabaseTableSchema(supabase, 'sitespren_vacuums');
+    if (!schemaResult.success) {
+      console.error('Failed to get table schema:', schemaResult.message);
+      return {
+        success: false,
+        message: `Failed to get table schema: ${schemaResult.message}`,
+        recordCount: 0,
+        details: { savedFields: [], skippedFields: [] }
+      };
+    }
+    
+    const validColumns = schemaResult.columns;
+    console.log('Valid sitespren_vacuums columns:', validColumns);
     
     // Check if vacuum record already exists for this site
     const { data: existingVacuum, error: checkError } = await supabase
@@ -194,23 +230,30 @@ async function saveVacuumDataToSupabase(
       return {
         success: false,
         message: `Error checking existing vacuum: ${checkError.message}`,
-        recordCount: 0
+        recordCount: 0,
+        details: { savedFields: [], skippedFields: [] }
       };
     }
+    
+    // Filter WordPress data to only include fields that exist in Supabase table
+    const filteredData = filterDataBySchema(wpData, validColumns);
     
     // Prepare the vacuum data for insertion/update
     const vacuumRecord = {
       fk_sitespren_id: siteData.id,
       fk_users_id: userId,
-      // Copy all fields from WordPress zen_sitespren data
-      ...wpData,
+      // Only copy fields that exist in the Supabase table
+      ...filteredData.validFields,
       // Override/ensure certain fields
       updated_at: new Date().toISOString()
     };
     
-    // Remove fields that shouldn't be copied or might cause conflicts
-    delete vacuumRecord.vacuum_id; // Let Supabase auto-generate
-    delete vacuumRecord.id; // This is the WordPress record ID, not the vacuum ID
+    console.log('Filtered vacuum record:', {
+      totalWpFields: Object.keys(wpData).length,
+      validFields: filteredData.savedFields.length,
+      skippedFields: filteredData.skippedFields.length,
+      skippedFieldNames: filteredData.skippedFields
+    });
     
     if (existingVacuum) {
       // Update existing vacuum record
@@ -224,7 +267,8 @@ async function saveVacuumDataToSupabase(
         return {
           success: false,
           message: `Error updating vacuum record: ${updateError.message}`,
-          recordCount: 0
+          recordCount: 0,
+          details: { savedFields: filteredData.savedFields, skippedFields: filteredData.skippedFields }
         };
       }
       
@@ -240,22 +284,29 @@ async function saveVacuumDataToSupabase(
         return {
           success: false,
           message: `Error inserting vacuum record: ${insertError.message}`,
-          recordCount: 0
+          recordCount: 0,
+          details: { savedFields: filteredData.savedFields, skippedFields: filteredData.skippedFields }
         };
       }
       
       console.log('✅ Inserted new vacuum record');
     }
     
-    // Count the number of non-null fields that were saved
-    const fieldCount = Object.keys(vacuumRecord).filter(key => 
-      vacuumRecord[key] !== null && vacuumRecord[key] !== undefined && vacuumRecord[key] !== ''
-    ).length;
+    // Create detailed success message
+    let message = `Vacuum data saved successfully. ${filteredData.savedFields.length} fields saved`;
+    if (filteredData.skippedFields.length > 0) {
+      message += `, ${filteredData.skippedFields.length} fields skipped due to schema differences`;
+    }
     
     return {
       success: true,
-      message: 'Vacuum data saved successfully',
-      recordCount: fieldCount
+      message: message,
+      recordCount: filteredData.savedFields.length,
+      details: {
+        savedFields: filteredData.savedFields,
+        skippedFields: filteredData.skippedFields,
+        operation: existingVacuum ? 'updated' : 'inserted'
+      }
     };
     
   } catch (error) {
@@ -263,7 +314,89 @@ async function saveVacuumDataToSupabase(
     return {
       success: false,
       message: `Error saving vacuum data: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      recordCount: 0
+      recordCount: 0,
+      details: { savedFields: [], skippedFields: [] }
     };
   }
+}
+
+// Get Supabase table schema by querying the table structure
+async function getSupabaseTableSchema(supabase: any, tableName: string) {
+  try {
+    // Try to get table schema by doing a minimal select to see what columns exist
+    const { data, error } = await supabase
+      .from(tableName)
+      .select('*')
+      .limit(1);
+    
+    if (error) {
+      // If the error is about no rows, that's fine - we just want the column structure
+      if (error.code !== 'PGRST116') {
+        console.error('Schema query error:', error);
+        return {
+          success: false,
+          message: `Failed to query table schema: ${error.message}`,
+          columns: []
+        };
+      }
+    }
+    
+    // Get column names from the query metadata
+    // Since we can't directly access Supabase schema in the client,
+    // we'll use a predefined list of known columns for sitespren_vacuums
+    const knownColumns = [
+      'vacuum_id', 'fk_sitespren_id', 'fk_users_id', 'created_at', 'updated_at',
+      'sitespren_base', 'true_root_domain', 'full_subdomain', 'webproperty_type',
+      'wpuser1', 'wppass1', 'wp_plugin_installed1', 'wp_plugin_connected2',
+      'fk_domreg_hostaccount', 'is_wp_site', 'wp_rest_app_pass',
+      'driggs_industry', 'driggs_city', 'driggs_brand_name', 'driggs_site_type_purpose',
+      'driggs_email_1', 'driggs_address_full', 'driggs_address_species_id',
+      'driggs_phone_1', 'driggs_phone1_platform_id', 'driggs_cgig_id',
+      'driggs_citations_done', 'driggs_social_profiles_done',
+      'driggs_special_note_for_ai_tool', 'driggs_hours', 'driggs_owner_name',
+      'driggs_short_descr', 'driggs_long_descr'
+    ];
+    
+    return {
+      success: true,
+      message: 'Schema retrieved successfully',
+      columns: knownColumns
+    };
+    
+  } catch (error) {
+    console.error('Error getting table schema:', error);
+    return {
+      success: false,
+      message: `Error getting table schema: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      columns: []
+    };
+  }
+}
+
+// Filter WordPress data to only include fields that exist in Supabase table
+function filterDataBySchema(wpData: any, validColumns: string[]) {
+  const validFields: any = {};
+  const savedFields: string[] = [];
+  const skippedFields: string[] = [];
+  
+  // Go through each field in WordPress data
+  for (const [key, value] of Object.entries(wpData)) {
+    if (validColumns.includes(key)) {
+      // Field exists in Supabase schema
+      validFields[key] = value;
+      savedFields.push(key);
+    } else {
+      // Field doesn't exist in Supabase schema
+      skippedFields.push(key);
+      console.log(`⚠️ Skipping field '${key}' - not found in sitespren_vacuums schema`);
+    }
+  }
+  
+  console.log(`Schema filtering: ${savedFields.length} fields will be saved, ${skippedFields.length} fields skipped`);
+  
+  return {
+    validFields,
+    savedFields,
+    skippedFields
+  };
 }
