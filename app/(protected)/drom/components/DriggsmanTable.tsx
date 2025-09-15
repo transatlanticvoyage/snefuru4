@@ -656,6 +656,11 @@ export default function DriggsmanTable({
   const [showChamberBoxes, setShowChamberBoxes] = useState(true); // Visibility toggle for chamber boxes
   const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
   
+  // Tundra chamber tab state
+  const [activeTundraTab, setActiveTundraTab] = useState(1);
+  const [vacuumLoading, setVacuumLoading] = useState(false);
+  const [vacuumFeedback, setVacuumFeedback] = useState<{type: 'success' | 'error' | 'info', message: string} | null>(null)
+  
   // Vacuum and Zarpscrapes states
   const [vacuumData, setVacuumData] = useState<Map<string, VacuumData>>(new Map());
   const [zarpscrapesData, setZarpscrapesData] = useState<Map<string, ZarpscrapeData>>(new Map());
@@ -1755,6 +1760,52 @@ export default function DriggsmanTable({
   // Handle zarpo medallion interactions (simplified handlers)  
   const handleZarpoMedallionClick = (medallionType: string, siteId: string) => {
     console.log('Zarpo medallion clicked:', medallionType, siteId);
+  };
+
+  // Handle WordPress Vacuum operation
+  const handleWordPressVacuum = async (site: SitesprenSite) => {
+    setVacuumLoading(true);
+    setVacuumFeedback(null);
+    
+    try {
+      setVacuumFeedback({ type: 'info', message: 'Connecting to WordPress site...' });
+      
+      const response = await fetch('/api/wordpress-vacuum', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: site.id,
+          sitesprenBase: site.sitespren_base
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setVacuumFeedback({ 
+          type: 'success', 
+          message: `Successfully vacuumed ${result.recordCount || 0} fields from WordPress zen_sitespren table. Data stored in sitespren_vacuums table.` 
+        });
+        
+        // Refresh vacuum data
+        await fetchVacuumData();
+      } else {
+        setVacuumFeedback({ 
+          type: 'error', 
+          message: result.message || 'Failed to vacuum WordPress data' 
+        });
+      }
+    } catch (error) {
+      console.error('WordPress vacuum error:', error);
+      setVacuumFeedback({ 
+        type: 'error', 
+        message: `Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}` 
+      });
+    } finally {
+      setVacuumLoading(false);
+    }
   };
 
   const handleZarpoFiller1aClick = (actionType: string, siteId: string) => {
@@ -3625,42 +3676,87 @@ export default function DriggsmanTable({
               <div className="mt-6 border-t border-gray-300 pt-4">
                 {/* Tab Headers */}
                 <div className="flex border-b border-gray-200">
-                  <button className="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600 bg-blue-50">
+                  <button 
+                    onClick={() => setActiveTundraTab(1)}
+                    className={`px-4 py-2 text-sm font-medium ${
+                      activeTundraTab === 1 
+                        ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}>
                     ntab1
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    onClick={() => setActiveTundraTab(2)}
+                    className={`px-4 py-2 text-sm font-medium ${
+                      activeTundraTab === 2 
+                        ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}>
                     ntab2
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    onClick={() => setActiveTundraTab(3)}
+                    className={`px-4 py-2 text-sm font-medium ${
+                      activeTundraTab === 3 
+                        ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}>
                     ntab3
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    onClick={() => setActiveTundraTab(4)}
+                    className={`px-4 py-2 text-sm font-medium ${
+                      activeTundraTab === 4 
+                        ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}>
                     ntab4
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    onClick={() => setActiveTundraTab(5)}
+                    className={`px-4 py-2 text-sm font-medium ${
+                      activeTundraTab === 5 
+                        ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}>
                     ntab5
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    onClick={() => setActiveTundraTab(6)}
+                    className={`px-4 py-2 text-sm font-medium ${
+                      activeTundraTab === 6 
+                        ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}>
                     ntab6
                   </button>
-                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                  <button 
+                    onClick={() => setActiveTundraTab(7)}
+                    className={`px-4 py-2 text-sm font-medium ${
+                      activeTundraTab === 7 
+                        ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}>
                     ntab7
                   </button>
                 </div>
                 
                 {/* Tab Content */}
                 <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-base font-bold" style={{ fontSize: '16px' }}>
-                      ntab1 chamber - Website Screenshot
-                    </div>
-                    <a 
-                      href={`/planchjar?tab=dpackjartab&site=${paginatedSites[0]?.sitespren_base || ''}`}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors duration-200"
-                    >
-                      /planchjar
-                    </a>
-                  </div>
+                  {/* ntab1 content - Screenshot */}
+                  {activeTundraTab === 1 && (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="text-base font-bold" style={{ fontSize: '16px' }}>
+                          ntab1 chamber - Website Screenshot
+                        </div>
+                        <a 
+                          href={`/planchjar?tab=dpackjartab&site=${paginatedSites[0]?.sitespren_base || ''}`}
+                          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors duration-200"
+                        >
+                          /planchjar
+                        </a>
+                      </div>
                   
                   {/* Screenshot Preview Area */}
                   {paginatedSites[0] && (
@@ -4217,6 +4313,91 @@ export default function DriggsmanTable({
                   {!paginatedSites[0] && (
                     <div className="text-center text-gray-500 py-8">
                       No sites available for screenshot capture
+                    </div>
+                  )}
+                    </>
+                  )}
+
+                  {/* ntab2 content - WordPress Vacuum */}
+                  {activeTundraTab === 2 && (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="text-base font-bold" style={{ fontSize: '16px' }}>
+                          ntab2 chamber - WordPress Vacuum
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Pull zen_sitespren data from WordPress to Supabase
+                        </div>
+                      </div>
+                      
+                      {paginatedSites[0] && (
+                        <div className="space-y-4">
+                          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div className="text-sm font-medium text-blue-900 mb-2">
+                              Target Site: <span className="font-bold">{paginatedSites[0].sitespren_base}</span>
+                            </div>
+                            <div className="text-xs text-blue-700 mb-4">
+                              This will connect to the WordPress site and pull all data from the zen_sitespren table into our sitespren_vacuums table for reference.
+                            </div>
+                            
+                            <div className="flex items-center gap-4">
+                              <button
+                                onClick={() => handleWordPressVacuum(paginatedSites[0])}
+                                disabled={vacuumLoading}
+                                className="px-6 py-3 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 disabled:cursor-not-allowed rounded-md transition-colors duration-200 flex items-center gap-2"
+                              >
+                                {vacuumLoading ? (
+                                  <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    Processing...
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                    </svg>
+                                    Run WordPress Vacuum
+                                  </>
+                                )}
+                              </button>
+                              
+                              {vacuumLoading && (
+                                <div className="flex items-center gap-2 text-sm text-blue-700">
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700"></div>
+                                  Connecting to WordPress and pulling data...
+                                </div>
+                              )}
+                            </div>
+                            
+                            {vacuumFeedback && (
+                              <div className={`mt-4 p-3 rounded-lg text-sm ${
+                                vacuumFeedback.type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
+                                vacuumFeedback.type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
+                                'bg-blue-100 text-blue-800 border border-blue-200'
+                              }`}>
+                                <div className="font-medium mb-1">
+                                  {vacuumFeedback.type === 'success' ? '✅ Success' :
+                                   vacuumFeedback.type === 'error' ? '❌ Error' : 'ℹ️ Info'}
+                                </div>
+                                <div>{vacuumFeedback.message}</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {!paginatedSites[0] && (
+                        <div className="text-center text-gray-500 py-8">
+                          No sites available for vacuum operation
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* ntab3+ content - Placeholder for future tabs */}
+                  {activeTundraTab >= 3 && (
+                    <div className="text-center text-gray-500 py-8">
+                      ntab{activeTundraTab} content coming soon...
                     </div>
                   )}
                 </div>
