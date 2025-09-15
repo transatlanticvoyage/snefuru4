@@ -159,6 +159,8 @@ export default function Tebnar2Main() {
   const [tbn2_sitesprenSearchTerm, setTbn2SitesprenSearchTerm] = useState<string>('');
   const [tbn2_sitesprenDropdownOpen, setTbn2SitesprenDropdownOpen] = useState(false);
   const sitesprenDropdownRef = useRef<HTMLDivElement>(null);
+  const sitesprenDropdownRefMainPage = useRef<HTMLDivElement>(null);
+  const sitesprenDropdownRefPopup = useRef<HTMLDivElement>(null);
   
   // Gcon piece state for asn_gcon_piece_id widget
   const [tbn2_gconPieceOptions, setTbn2GconPieceOptions] = useState<Array<{id: string, meta_title: string, asn_sitespren_base: string, post_name: string, g_post_id: string, pageurl: string}>>([]);
@@ -168,6 +170,8 @@ export default function Tebnar2Main() {
   const [tbn2_gconPieceSearchTerm, setTbn2GconPieceSearchTerm] = useState<string>('');
   const [tbn2_gconPieceDropdownOpen, setTbn2GconPieceDropdownOpen] = useState(false);
   const gconPieceDropdownRef = useRef<HTMLDivElement>(null);
+  const gconPieceDropdownRefMainPage = useRef<HTMLDivElement>(null);
+  const gconPieceDropdownRefPopup = useRef<HTMLDivElement>(null);
   
   // Reverse relation state - for finding gcon_piece assigned to current batch
   const [tbn2_assignedGconPiece, setTbn2AssignedGconPiece] = useState<{id: string, asn_sitespren_base: string, post_name: string} | null>(null);
@@ -3744,7 +3748,7 @@ export default function Tebnar2Main() {
         }}
         onSitesprenSave={tbn2_handleSitesprenSave}
         sitesprenSaving={tbn2_sitesprenSaving}
-        sitesprenDropdownRef={sitesprenDropdownRef}
+        sitesprenDropdownRef={sitesprenDropdownRefMainPage}
         truncateUUID={tbn2_truncateUUID}
         fetchGconPieces={tbn2_fetchGconPieces}
         gconPieceDropdownOpen={tbn2_gconPieceDropdownOpen}
@@ -3766,7 +3770,7 @@ export default function Tebnar2Main() {
         }}
         onGconPieceSave={tbn2_handleGconPieceSave}
         gconPieceSaving={tbn2_gconPieceSaving}
-        gconPieceDropdownRef={gconPieceDropdownRef}
+        gconPieceDropdownRef={gconPieceDropdownRefMainPage}
         getGconPieceUrls={tbn2_getGconPieceUrls}
         seedUrlWpEditor={tbn2_seedUrlWpEditor}
         seedUrlFrontend={tbn2_seedUrlFrontend}
@@ -5275,7 +5279,7 @@ export default function Tebnar2Main() {
               }}
               onSitesprenSave={tbn2_handleSitesprenSave}
               sitesprenSaving={tbn2_sitesprenSaving}
-              sitesprenDropdownRef={sitesprenDropdownRef}
+              sitesprenDropdownRef={sitesprenDropdownRefPopup}
               truncateUUID={tbn2_truncateUUID}
               fetchGconPieces={tbn2_fetchGconPieces}
               gconPieceDropdownOpen={tbn2_gconPieceDropdownOpen}
@@ -5297,7 +5301,7 @@ export default function Tebnar2Main() {
               }}
               onGconPieceSave={tbn2_handleGconPieceSave}
               gconPieceSaving={tbn2_gconPieceSaving}
-              gconPieceDropdownRef={gconPieceDropdownRef}
+              gconPieceDropdownRef={gconPieceDropdownRefPopup}
               getGconPieceUrls={tbn2_getGconPieceUrls}
               seedUrlWpEditor={tbn2_seedUrlWpEditor}
               seedUrlFrontend={tbn2_seedUrlFrontend}
