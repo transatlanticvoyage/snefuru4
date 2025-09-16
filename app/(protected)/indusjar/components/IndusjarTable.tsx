@@ -47,26 +47,6 @@ export default function IndusjarTable() {
   const [columnsPerPage, setColumnsPerPage] = useState(6);
   const [currentColumnPage, setCurrentColumnPage] = useState(1);
   
-  // Wolf exclusion band columns (always shown leftmost like sitejar4)
-  const wolfExclusionBandColumns = ['industry_id'];
-  
-  // All columns for pagination
-  const allColumns = columns.map(col => col.key as string);
-  
-  // Paginated columns (exclude wolf band)
-  const paginatedColumns = useMemo(() => allColumns.filter(column => 
-    !wolfExclusionBandColumns.includes(column)
-  ), [allColumns]);
-  
-  const totalColumnPages = useMemo(() => Math.ceil(paginatedColumns.length / columnsPerPage), [paginatedColumns, columnsPerPage]);
-  
-  // Visible columns calculation
-  const visibleColumns = useMemo(() => {
-    const startColumnIndex = (currentColumnPage - 1) * columnsPerPage;
-    const visiblePaginatedColumns = paginatedColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
-    return [...wolfExclusionBandColumns, ...visiblePaginatedColumns];
-  }, [wolfExclusionBandColumns, paginatedColumns, currentColumnPage, columnsPerPage]);
-  
   // Search state for rocket chamber (using existing searchTerm)
   const handleRocketChamberSearchChange = (value: string) => {
     setSearchTerm(value);
@@ -95,6 +75,26 @@ export default function IndusjarTable() {
     { key: 'created_at' as keyof Industry, label: 'created_at', type: 'datetime', readOnly: true },
     { key: 'updated_at' as keyof Industry, label: 'updated_at', type: 'datetime', readOnly: true }
   ];
+  
+  // Wolf exclusion band columns (always shown leftmost like sitejar4)
+  const wolfExclusionBandColumns = ['industry_id'];
+  
+  // All columns for pagination
+  const allColumns = useMemo(() => columns.map(col => col.key as string), [columns]);
+  
+  // Paginated columns (exclude wolf band)
+  const paginatedColumns = useMemo(() => allColumns.filter(column => 
+    !wolfExclusionBandColumns.includes(column)
+  ), [allColumns]);
+  
+  const totalColumnPages = useMemo(() => Math.ceil(paginatedColumns.length / columnsPerPage), [paginatedColumns, columnsPerPage]);
+  
+  // Visible columns calculation
+  const visibleColumns = useMemo(() => {
+    const startColumnIndex = (currentColumnPage - 1) * columnsPerPage;
+    const visiblePaginatedColumns = paginatedColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+    return [...wolfExclusionBandColumns, ...visiblePaginatedColumns];
+  }, [wolfExclusionBandColumns, paginatedColumns, currentColumnPage, columnsPerPage]);
 
   // Fetch data from Supabase
   const fetchData = async () => {
