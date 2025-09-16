@@ -3,6 +3,7 @@
 /**
  * Ruplin WP Database Horse Class
  * Handles creation and management of zen_services and zen_locations tables
+ * Git test comment - December 2024 revision update
  */
 class Ruplin_WP_Database_Horse_Class {
     
