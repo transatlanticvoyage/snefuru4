@@ -43,7 +43,10 @@ export default function IndustryEntitiesRocketChamber({
   
   // All columns for industry entities
   const allColumns = [
-    'industry_id', 'industry_name', 'emd_stamp_slug', 'industry_description', 'created_at', 'updated_at'
+    'industry_id', 'industry_name', 'emd_stamp_slug', 'industry_description', 
+    'taurus_prompt_1_datum', 'taurus_prompt_1_main_ai_model_note',
+    'taurus_prompt_2_datum', 'taurus_prompt_2_main_ai_model_note',
+    'created_at', 'updated_at'
   ];
   
   // Wolf exclusion band columns (always shown leftmost)

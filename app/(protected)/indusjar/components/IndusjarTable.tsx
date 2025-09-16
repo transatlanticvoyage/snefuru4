@@ -19,6 +19,10 @@ interface Industry {
   industry_name: string | null;
   emd_stamp_slug: string | null;
   industry_description: string | null;
+  taurus_prompt_1_datum: string | null;
+  taurus_prompt_1_main_ai_model_note: string | null;
+  taurus_prompt_2_datum: string | null;
+  taurus_prompt_2_main_ai_model_note: string | null;
   created_at: string;
   updated_at: string | null;
 }
@@ -61,7 +65,11 @@ export default function IndusjarTable() {
   const [formData, setFormData] = useState({
     industry_name: '',
     emd_stamp_slug: '',
-    industry_description: ''
+    industry_description: '',
+    taurus_prompt_1_datum: '',
+    taurus_prompt_1_main_ai_model_note: '',
+    taurus_prompt_2_datum: '',
+    taurus_prompt_2_main_ai_model_note: ''
   });
 
   const supabase = createClientComponentClient();
@@ -72,6 +80,10 @@ export default function IndusjarTable() {
     { key: 'industry_name' as keyof Industry, label: 'industry_name', type: 'text' },
     { key: 'emd_stamp_slug' as keyof Industry, label: 'emd_stamp_slug', type: 'text' },
     { key: 'industry_description' as keyof Industry, label: 'industry_description', type: 'text' },
+    { key: 'taurus_prompt_1_datum' as keyof Industry, label: 'taurus_prompt_1_datum', type: 'text' },
+    { key: 'taurus_prompt_1_main_ai_model_note' as keyof Industry, label: 'taurus_prompt_1_main_ai_model_note', type: 'text' },
+    { key: 'taurus_prompt_2_datum' as keyof Industry, label: 'taurus_prompt_2_datum', type: 'text' },
+    { key: 'taurus_prompt_2_main_ai_model_note' as keyof Industry, label: 'taurus_prompt_2_main_ai_model_note', type: 'text' },
     { key: 'created_at' as keyof Industry, label: 'created_at', type: 'datetime', readOnly: true },
     { key: 'updated_at' as keyof Industry, label: 'updated_at', type: 'datetime', readOnly: true }
   ];
@@ -240,7 +252,11 @@ export default function IndusjarTable() {
       const newRecord = {
         industry_name: 'New Industry',
         emd_stamp_slug: '',
-        industry_description: 'Industry description here'
+        industry_description: 'Industry description here',
+        taurus_prompt_1_datum: '',
+        taurus_prompt_1_main_ai_model_note: '',
+        taurus_prompt_2_datum: '',
+        taurus_prompt_2_main_ai_model_note: ''
       };
 
       const { data: insertedData, error } = await supabase
@@ -269,7 +285,11 @@ export default function IndusjarTable() {
       const insertData = {
         industry_name: formData.industry_name?.trim() || null,
         emd_stamp_slug: formData.emd_stamp_slug?.trim() || null,
-        industry_description: formData.industry_description?.trim() || null
+        industry_description: formData.industry_description?.trim() || null,
+        taurus_prompt_1_datum: formData.taurus_prompt_1_datum?.trim() || null,
+        taurus_prompt_1_main_ai_model_note: formData.taurus_prompt_1_main_ai_model_note?.trim() || null,
+        taurus_prompt_2_datum: formData.taurus_prompt_2_datum?.trim() || null,
+        taurus_prompt_2_main_ai_model_note: formData.taurus_prompt_2_main_ai_model_note?.trim() || null
       };
       
       const { data: insertedData, error } = await supabase
@@ -294,7 +314,11 @@ export default function IndusjarTable() {
     setFormData({
       industry_name: '',
       emd_stamp_slug: '',
-      industry_description: ''
+      industry_description: '',
+      taurus_prompt_1_datum: '',
+      taurus_prompt_1_main_ai_model_note: '',
+      taurus_prompt_2_datum: '',
+      taurus_prompt_2_main_ai_model_note: ''
     });
   };
 
@@ -324,7 +348,7 @@ export default function IndusjarTable() {
     if (isEditing) {
       return (
         <div className="flex items-center space-x-2">
-          {column.key === 'industry_description' ? (
+          {(column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? (
             <textarea
               value={editingValue}
               onChange={(e) => setEditingValue(e.target.value)}
@@ -366,7 +390,7 @@ export default function IndusjarTable() {
       <div
         onClick={() => handleCellClick(item.industry_id, column.key, value)}
         className={`cursor-pointer hover:bg-gray-100 px-2 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'} ${
-          column.key === 'industry_description' ? 'min-h-[60px] whitespace-pre-wrap' : ''
+          (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? 'min-h-[60px] whitespace-pre-wrap' : ''
         }`}
       >
         {column.type === 'datetime' && value ? 
@@ -574,8 +598,8 @@ export default function IndusjarTable() {
                     onClick={() => handleSort(column.key)}
                     style={{ 
                       width: 'auto', 
-                      whiteSpace: column.key === 'industry_description' ? 'normal' : 'nowrap',
-                      minWidth: column.key === 'industry_description' ? '200px' : 'auto'
+                      whiteSpace: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? 'normal' : 'nowrap',
+                      minWidth: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? '200px' : 'auto'
                     }}
                   >
                     <div className="flex items-center space-x-1">
@@ -617,8 +641,8 @@ export default function IndusjarTable() {
                   {columns.filter(column => visibleColumns.includes(column.key as string)).map((column) => (
                     <td key={column.key} className="border border-gray-200" style={{ 
                       width: 'auto', 
-                      whiteSpace: column.key === 'industry_description' ? 'normal' : 'nowrap',
-                      minWidth: column.key === 'industry_description' ? '200px' : 'auto'
+                      whiteSpace: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? 'normal' : 'nowrap',
+                      minWidth: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? '200px' : 'auto'
                     }}>
                       {renderCell(item, column)}
                     </td>
@@ -668,6 +692,50 @@ export default function IndusjarTable() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                   rows={4}
                   placeholder="Enter industry description"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Taurus Prompt 1 Datum</label>
+                <textarea
+                  value={formData.taurus_prompt_1_datum}
+                  onChange={(e) => setFormData({ ...formData, taurus_prompt_1_datum: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  rows={3}
+                  placeholder="Enter taurus prompt 1 datum"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Taurus Prompt 1 Main AI Model Note</label>
+                <textarea
+                  value={formData.taurus_prompt_1_main_ai_model_note}
+                  onChange={(e) => setFormData({ ...formData, taurus_prompt_1_main_ai_model_note: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  rows={3}
+                  placeholder="Enter taurus prompt 1 main AI model note"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Taurus Prompt 2 Datum</label>
+                <textarea
+                  value={formData.taurus_prompt_2_datum}
+                  onChange={(e) => setFormData({ ...formData, taurus_prompt_2_datum: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  rows={3}
+                  placeholder="Enter taurus prompt 2 datum"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Taurus Prompt 2 Main AI Model Note</label>
+                <textarea
+                  value={formData.taurus_prompt_2_main_ai_model_note}
+                  onChange={(e) => setFormData({ ...formData, taurus_prompt_2_main_ai_model_note: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  rows={3}
+                  placeholder="Enter taurus prompt 2 main AI model note"
                 />
               </div>
             </div>
