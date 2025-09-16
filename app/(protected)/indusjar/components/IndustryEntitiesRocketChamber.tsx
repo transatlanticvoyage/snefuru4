@@ -41,13 +41,20 @@ export default function IndustryEntitiesRocketChamber({
   onColumnsPerPageChange
 }: IndustryEntitiesRocketChamberProps) {
   
-  // Sample columns for industry entities (this would be configured based on actual data structure)
+  // All columns for industry entities
   const allColumns = [
     'industry_id', 'industry_name', 'emd_stamp_slug', 'industry_description', 'created_at', 'updated_at'
   ];
   
-  const paginatedColumns = useMemo(() => allColumns.slice(), [allColumns]);
-  const totalColumnPages = useMemo(() => Math.ceil(paginatedColumns.length / columnsPerPage), [paginatedColumns, columnsPerPage]);
+  // Wolf exclusion band columns (always shown leftmost)
+  const wolfExclusionBandColumns = ['industry_id'];
+  
+  // Paginated columns (exclude wolf band)
+  const paginatedColumnsFiltered = allColumns.filter(column => 
+    !wolfExclusionBandColumns.includes(column)
+  );
+  
+  const totalColumnPages = useMemo(() => Math.ceil(paginatedColumnsFiltered.length / columnsPerPage), [paginatedColumnsFiltered, columnsPerPage]);
 
   // Filter and pagination logic
   const filteredData = useMemo(() => {
@@ -388,7 +395,7 @@ export default function IndustryEntitiesRocketChamber({
                     <div style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                       <span style={{ fontWeight: 'bold' }}>column pagination</span>
                       <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
-                        Showing <span style={{ fontWeight: 'bold' }}>{Math.min(columnsPerPage, paginatedColumns.length - ((currentColumnPage - 1) * columnsPerPage))}</span> non-sticky(non wolf band) columns of <span style={{ fontWeight: 'bold' }}>{allColumns.length}</span> sourcedef columns
+                        Showing <span style={{ fontWeight: 'bold' }}>{Math.min(columnsPerPage, paginatedColumnsFiltered.length - ((currentColumnPage - 1) * columnsPerPage))}</span> non-sticky(non wolf band) columns of <span style={{ fontWeight: 'bold' }}>{paginatedColumnsFiltered.length}</span> sourcedef columns
                       </span>
                     </div>
                   </td>
