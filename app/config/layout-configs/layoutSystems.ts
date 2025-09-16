@@ -3,7 +3,7 @@ import { LayoutSystemConfig } from './types';
 export const LAYOUT_SYSTEMS: Record<string, LayoutSystemConfig> = {
   system1: {
     id: 'system1',
-    name: 'Default System',
+    name: 'Default - system1navigation',
     header: 'Header1',
     sidebar: 'Sidebar1',
     permissions: [], // Available to all users
@@ -11,7 +11,7 @@ export const LAYOUT_SYSTEMS: Record<string, LayoutSystemConfig> = {
   },
   system2: {
     id: 'system2', 
-    name: 'Admin System',
+    name: 'Admin System - system2navigation',
     header: 'Header2',
     sidebar: 'Sidebar2',
     permissions: ['is_admin'],
@@ -19,7 +19,7 @@ export const LAYOUT_SYSTEMS: Record<string, LayoutSystemConfig> = {
   },
   system3: {
     id: 'system3',
-    name: 'Advanced Admin System', 
+    name: 'Advanced Admin System - system3navigation', 
     header: 'Header3',
     sidebar: 'Sidebar3',
     permissions: ['is_admin'],
