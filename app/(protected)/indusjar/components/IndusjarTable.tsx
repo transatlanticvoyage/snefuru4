@@ -63,6 +63,10 @@ export default function IndusjarTable() {
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
   
+  // Symbol meaning editing states
+  const [editingSymbolMeaning, setEditingSymbolMeaning] = useState<string | null>(null);
+  const [symbolMeaningValues, setSymbolMeaningValues] = useState<{ [key: string]: string }>({});
+  
   // Form data for creating
   const [formData, setFormData] = useState({
     industry_name: '',
@@ -78,7 +82,7 @@ export default function IndusjarTable() {
 
   // Symbol hooks
   const { hasSymbol, toggleSymbol } = useIndustryMetadata();
-  const { getDefinition } = useSymbolDefinitions();
+  const { getDefinition, updateDefinition, definitions } = useSymbolDefinitions();
 
   // Define columns
   const columns = [
@@ -150,6 +154,17 @@ export default function IndusjarTable() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Load initial symbol meanings
+  useEffect(() => {
+    if (definitions) {
+      const meanings: { [key: string]: string } = {};
+      Object.entries(definitions).forEach(([symbolType, definition]) => {
+        meanings[symbolType] = definition.symbol_meaning || '';
+      });
+      setSymbolMeaningValues(meanings);
+    }
+  }, [definitions]);
 
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
@@ -340,6 +355,39 @@ export default function IndusjarTable() {
       taurus_prompt_2_datum: '',
       taurus_prompt_2_main_ai_model_note: ''
     });
+  };
+
+  // Handle symbol meaning editing
+  const handleSymbolMeaningClick = (symbolType: string) => {
+    setEditingSymbolMeaning(symbolType);
+  };
+
+  const handleSymbolMeaningChange = (symbolType: string, value: string) => {
+    setSymbolMeaningValues(prev => ({
+      ...prev,
+      [symbolType]: value
+    }));
+  };
+
+  const handleSymbolMeaningSave = async (symbolType: string) => {
+    try {
+      const meaning = symbolMeaningValues[symbolType] || '';
+      await updateDefinition(symbolType, { symbol_meaning: meaning });
+      setEditingSymbolMeaning(null);
+    } catch (error) {
+      console.error('Error saving symbol meaning:', error);
+      alert('Failed to save symbol meaning');
+    }
+  };
+
+  const handleSymbolMeaningCancel = (symbolType: string) => {
+    // Reset to original value
+    const originalMeaning = definitions[symbolType]?.symbol_meaning || '';
+    setSymbolMeaningValues(prev => ({
+      ...prev,
+      [symbolType]: originalMeaning
+    }));
+    setEditingSymbolMeaning(null);
   };
 
   // Render cell content
@@ -621,6 +669,71 @@ export default function IndusjarTable() {
         <div className="overflow-x-auto">
           <table className="border-collapse border border-gray-200" style={{ width: 'auto' }}>
             <thead className="bg-gray-50">
+              {/* Symbol meanings header row */}
+              <tr>
+                <th className="px-2 py-1 text-left border border-gray-200" style={{ width: 'auto', minWidth: '50px' }}>
+                  <span className="font-bold text-xs">-</span>
+                </th>
+                {columns.filter(column => visibleColumns.includes(column.key as string)).map((column) => {
+                  // Check if this is a symbol column
+                  if (column.type === 'org_symbol') {
+                    const symbolType = column.key.replace('org_is_', '') as 'starred' | 'flagged' | 'squared' | 'circled' | 'triangled';
+                    const mappedType = symbolType === 'starred' ? 'star' : symbolType === 'flagged' ? 'flag' : symbolType;
+                    const isEditing = editingSymbolMeaning === mappedType;
+                    const currentValue = symbolMeaningValues[mappedType] || '';
+                    
+                    return (
+                      <th
+                        key={`symbol-meaning-${column.key}`}
+                        className="text-left border border-gray-200 px-1 py-1 relative"
+                        style={{ width: '24px', maxWidth: '24px', minWidth: '24px' }}
+                      >
+                        {isEditing ? (
+                          <div className="absolute top-0 left-0 z-50 bg-white border-2 border-blue-500 shadow-lg" style={{ width: '200px' }}>
+                            <input
+                              type="text"
+                              value={currentValue}
+                              onChange={(e) => handleSymbolMeaningChange(mappedType, e.target.value)}
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter') handleSymbolMeaningSave(mappedType);
+                                if (e.key === 'Escape') handleSymbolMeaningCancel(mappedType);
+                              }}
+                              onBlur={() => handleSymbolMeaningSave(mappedType)}
+                              className="w-full px-2 py-1 text-xs focus:outline-none"
+                              autoFocus
+                              placeholder="Symbol meaning..."
+                            />
+                          </div>
+                        ) : (
+                          <div
+                            onClick={() => handleSymbolMeaningClick(mappedType)}
+                            className="cursor-pointer text-xs truncate hover:bg-gray-100 px-1"
+                            style={{ width: '22px', fontSize: '10px' }}
+                            title={currentValue || 'Click to edit symbol meaning'}
+                          >
+                            {currentValue ? currentValue.substring(0, 3) : '...'}
+                          </div>
+                        )}
+                      </th>
+                    );
+                  } else {
+                    // Non-symbol columns get hyphen
+                    return (
+                      <th
+                        key={`meaning-${column.key}`}
+                        className="text-left border border-gray-200 px-2 py-1"
+                        style={{ 
+                          width: 'auto', 
+                          whiteSpace: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? 'normal' : 'nowrap',
+                          minWidth: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? '200px' : 'auto'
+                        }}
+                      >
+                        <span className="font-bold text-xs">-</span>
+                      </th>
+                    );
+                  }
+                })}
+              </tr>
               {/* New table name header row */}
               <tr className="shenfur_db_table_name_tr">
                 <th className="px-2 py-1 text-left border border-gray-200" style={{ width: 'auto', minWidth: '50px' }}>
