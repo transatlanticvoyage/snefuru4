@@ -32,6 +32,8 @@ export function useIndustryMetadata() {
   const getInternalUserId = async (): Promise<number | null> => {
     if (!user?.id) return null;
     
+    console.log('Looking up internal user ID for auth_id:', user.id);
+    
     try {
       const { data, error } = await supabase
         .from('users')
@@ -44,6 +46,7 @@ export function useIndustryMetadata() {
         return null;
       }
       
+      console.log('Found internal user ID:', data?.id);
       return data?.id || null;
     } catch (error) {
       console.error('Error:', error);
@@ -100,6 +103,8 @@ export function useIndustryMetadata() {
     industryId: number, 
     symbolType: 'is_starred' | 'is_flagged' | 'is_squared' | 'is_circled' | 'is_triangled'
   ) => {
+    console.log('toggleSymbol called:', { industryId, symbolType, userIdFetched, internalUserId });
+    
     if (!userIdFetched || !internalUserId) {
       console.log('User ID not ready yet, skipping toggle');
       return;
@@ -122,9 +127,13 @@ export function useIndustryMetadata() {
         [symbolType]: newValue // Override the specific symbol being toggled
       };
 
+      console.log('Upserting metadata:', metaData);
+      
       const { data, error } = await supabase
         .from('industries_user_meta')
-        .upsert(metaData)
+        .upsert(metaData, {
+          onConflict: 'fk_industry_id,user_id'
+        })
         .select()
         .single();
 
@@ -164,9 +173,13 @@ export function useIndustryMetadata() {
         ...updates
       };
 
+      console.log('Upserting metadata:', metaData);
+      
       const { data, error } = await supabase
         .from('industries_user_meta')
-        .upsert(metaData)
+        .upsert(metaData, {
+          onConflict: 'fk_industry_id,user_id'
+        })
         .select()
         .single();
 

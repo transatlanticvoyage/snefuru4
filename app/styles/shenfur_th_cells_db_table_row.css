@@ -2,6 +2,9 @@
 /* CSS for database table row styling */
 
 
+tr.shenfur_db_table_name_tr th.for_db_table_industries {background-color:#f4e69f;}
+
+
 /*=========== GLOBAL DB Table BG Colors And Textures ======================================================*/
 tr.shenfur_db_table_name_tr th.for_db_table_addresspren {background-color:#c7d1f5;}
 tr.shenfur_db_table_name_tr th.for_db_table_addressglub {background-color:#c7f5e9;}

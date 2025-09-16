@@ -621,6 +621,26 @@ export default function IndusjarTable() {
         <div className="overflow-x-auto">
           <table className="border-collapse border border-gray-200" style={{ width: 'auto' }}>
             <thead className="bg-gray-50">
+              {/* New table name header row */}
+              <tr className="shenfur_db_table_name_tr">
+                <th className="px-2 py-1 text-left border border-gray-200" style={{ width: 'auto', minWidth: '50px' }}>
+                  <span className="font-bold text-xs">-</span>
+                </th>
+                {columns.filter(column => visibleColumns.includes(column.key as string)).map((column) => (
+                  <th
+                    key={`table-name-${column.key}`}
+                    className="text-left border border-gray-200 px-2 py-1 for_db_table_industries"
+                    style={{ 
+                      width: column.type === 'org_symbol' ? '25px' : 'auto', 
+                      whiteSpace: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? 'normal' : 'nowrap',
+                      minWidth: column.type === 'org_symbol' ? '25px' : (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? '200px' : 'auto'
+                    }}
+                  >
+                    <span className="font-bold text-xs lowercase">industries</span>
+                  </th>
+                ))}
+              </tr>
+              {/* Existing header row */}
               <tr>
                 <th className="px-2 py-3 text-left border border-gray-200" style={{ width: 'auto', minWidth: '50px' }}>
                   <div 
