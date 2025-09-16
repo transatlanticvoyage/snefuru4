@@ -43,9 +43,29 @@ export default function IndusjarTable() {
     ColumnPaginationBar2: () => JSX.Element | null;
   } | null>(null);
   
-  // Pagination states for rocket chamber
+  // Pagination states for rocket chamber  
   const [columnsPerPage, setColumnsPerPage] = useState(6);
   const [currentColumnPage, setCurrentColumnPage] = useState(1);
+  
+  // Wolf exclusion band columns (always shown leftmost like sitejar4)
+  const wolfExclusionBandColumns = ['industry_id'];
+  
+  // All columns for pagination
+  const allColumns = columns.map(col => col.key as string);
+  
+  // Paginated columns (exclude wolf band)
+  const paginatedColumns = useMemo(() => allColumns.filter(column => 
+    !wolfExclusionBandColumns.includes(column)
+  ), [allColumns]);
+  
+  const totalColumnPages = useMemo(() => Math.ceil(paginatedColumns.length / columnsPerPage), [paginatedColumns, columnsPerPage]);
+  
+  // Visible columns calculation
+  const visibleColumns = useMemo(() => {
+    const startColumnIndex = (currentColumnPage - 1) * columnsPerPage;
+    const visiblePaginatedColumns = paginatedColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+    return [...wolfExclusionBandColumns, ...visiblePaginatedColumns];
+  }, [wolfExclusionBandColumns, paginatedColumns, currentColumnPage, columnsPerPage]);
   
   // Search state for rocket chamber (using existing searchTerm)
   const handleRocketChamberSearchChange = (value: string) => {
@@ -499,37 +519,11 @@ export default function IndusjarTable() {
         onIndustryOptionsClick={handleIndustryOptionsClick}
       />
       
-      {/* Top Header Area */}
+      {/* Top Header Area - Simplified */}
       <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-6">
             <NubraTablefaceKite tableType="industries-grid" />
-            <div className="text-sm text-gray-600">
-              {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
-              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
-            </div>
-            <PaginationControls />
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search all fields..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
-              />
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setCurrentPage(1);
-                }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
-              >
-                CL
-              </button>
-            </div>
           </div>
           <div className="flex items-center space-x-2">
             <button
@@ -573,7 +567,7 @@ export default function IndusjarTable() {
                     />
                   </div>
                 </th>
-                {columns.map((column) => (
+                {columns.filter(column => visibleColumns.includes(column.key as string)).map((column) => (
                   <th
                     key={column.key}
                     className="text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1"
@@ -620,7 +614,7 @@ export default function IndusjarTable() {
                       />
                     </div>
                   </td>
-                  {columns.map((column) => (
+                  {columns.filter(column => visibleColumns.includes(column.key as string)).map((column) => (
                     <td key={column.key} className="border border-gray-200" style={{ 
                       width: 'auto', 
                       whiteSpace: column.key === 'industry_description' ? 'normal' : 'nowrap',
@@ -636,18 +630,6 @@ export default function IndusjarTable() {
         </div>
       </div>
 
-      {/* Bottom Pagination */}
-      <div className="bg-white border-t border-gray-200 px-4 py-2">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-6">
-            <div className="text-sm text-gray-600">
-              {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
-              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
-            </div>
-            <PaginationControls />
-          </div>
-        </div>
-      </div>
 
       {/* Create Modal */}
       {isCreateModalOpen && (
