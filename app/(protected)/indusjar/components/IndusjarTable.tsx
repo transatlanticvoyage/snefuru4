@@ -9,6 +9,11 @@ const NubraTablefaceKite = dynamic(
   { ssr: false }
 );
 
+const IndustryEntitiesRocketChamber = dynamic(
+  () => import('./IndustryEntitiesRocketChamber'),
+  { ssr: false }
+);
+
 interface Industry {
   industry_id: number;
   industry_name: string | null;
@@ -31,6 +36,22 @@ export default function IndusjarTable() {
   
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  
+  // Column pagination control state
+  const [columnPaginationControls, setColumnPaginationControls] = useState<{
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  } | null>(null);
+  
+  // Pagination states for rocket chamber
+  const [columnsPerPage, setColumnsPerPage] = useState(6);
+  const [currentColumnPage, setCurrentColumnPage] = useState(1);
+  
+  // Search state for rocket chamber (using existing searchTerm)
+  const handleRocketChamberSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
@@ -442,8 +463,42 @@ export default function IndusjarTable() {
     );
   }
 
+  // Handle pillar shift click
+  const handlePillarShiftClick = () => {
+    console.log('PillarShift clicked from rocket chamber - not implemented yet');
+  };
+  
+  // Handle industry options click
+  const handleIndustryOptionsClick = () => {
+    console.log('Industry options clicked from rocket chamber - not implemented yet');
+  };
+
   return (
     <div className="w-full">
+      {/* Rocket Chamber */}
+      <IndustryEntitiesRocketChamber
+        data={data}
+        onPaginationRender={setColumnPaginationControls}
+        searchValue={searchTerm}
+        onSearchChange={handleRocketChamberSearchChange}
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        onPageChange={setCurrentPage}
+        onItemsPerPageChange={(value) => {
+          setItemsPerPage(value);
+          setCurrentPage(1);
+        }}
+        columnsPerPage={columnsPerPage}
+        currentColumnPage={currentColumnPage}
+        onColumnPageChange={setCurrentColumnPage}
+        onColumnsPerPageChange={(value) => {
+          setColumnsPerPage(value);
+          setCurrentColumnPage(1);
+        }}
+        onPillarShiftClick={handlePillarShiftClick}
+        onIndustryOptionsClick={handleIndustryOptionsClick}
+      />
+      
       {/* Top Header Area */}
       <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
         <div className="flex justify-between items-center">
@@ -496,10 +551,10 @@ export default function IndusjarTable() {
       {/* Table */}
       <div className="bg-white overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-200">
+          <table className="border-collapse border border-gray-200" style={{ width: 'auto' }}>
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '50px' }}>
+                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: 'auto', minWidth: '50px' }}>
                   <div 
                     className="w-full h-full flex items-center justify-center cursor-pointer"
                     onClick={() => {
@@ -523,6 +578,11 @@ export default function IndusjarTable() {
                     key={column.key}
                     className="text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1"
                     onClick={() => handleSort(column.key)}
+                    style={{ 
+                      width: 'auto', 
+                      whiteSpace: column.key === 'industry_description' ? 'normal' : 'nowrap',
+                      minWidth: column.key === 'industry_description' ? '200px' : 'auto'
+                    }}
                   >
                     <div className="flex items-center space-x-1">
                       <span className="font-bold text-xs lowercase">{column.label}</span>
@@ -539,7 +599,7 @@ export default function IndusjarTable() {
             <tbody className="bg-white">
               {paginatedData.map((item) => (
                 <tr key={item.industry_id} className="hover:bg-gray-50">
-                  <td className="px-2 py-1 border border-gray-200">
+                  <td className="px-2 py-1 border border-gray-200" style={{ width: 'auto', minWidth: '50px' }}>
                     <div 
                       className="w-full h-full flex items-center justify-center cursor-pointer"
                       onClick={() => {
@@ -561,7 +621,11 @@ export default function IndusjarTable() {
                     </div>
                   </td>
                   {columns.map((column) => (
-                    <td key={column.key} className="border border-gray-200">
+                    <td key={column.key} className="border border-gray-200" style={{ 
+                      width: 'auto', 
+                      whiteSpace: column.key === 'industry_description' ? 'normal' : 'nowrap',
+                      minWidth: column.key === 'industry_description' ? '200px' : 'auto'
+                    }}>
                       {renderCell(item, column)}
                     </td>
                   ))}
