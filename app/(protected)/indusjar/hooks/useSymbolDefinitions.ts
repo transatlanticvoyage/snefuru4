@@ -18,21 +18,58 @@ interface SymbolDefinition {
 export function useSymbolDefinitions() {
   const [definitions, setDefinitions] = useState<{ [key: string]: SymbolDefinition }>({});
   const [loading, setLoading] = useState(true);
+  const [internalUserId, setInternalUserId] = useState<number | null>(null);
+  const [userIdFetched, setUserIdFetched] = useState(false);
   const supabase = createClientComponentClient();
   const { user } = useAuth();
+
+  // Get internal user ID from users table
+  const getInternalUserId = async (): Promise<number | null> => {
+    if (!user?.id) return null;
+    
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching internal user ID:', error);
+        return null;
+      }
+      
+      return data?.id || null;
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
+    }
+  };
 
   // Fetch user's symbol definitions
   const fetchDefinitions = async () => {
     if (!user?.id) {
       setLoading(false);
+      setUserIdFetched(true);
       return;
     }
+
+    // Get internal user ID first
+    const userId = await getInternalUserId();
+    if (!userId) {
+      setLoading(false);
+      setUserIdFetched(true);
+      return;
+    }
+    
+    setInternalUserId(userId);
+    setUserIdFetched(true);
 
     try {
       const { data, error } = await supabase
         .from('user_symbol_definitions')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('display_order');
 
       if (error) {
@@ -62,7 +99,7 @@ export function useSymbolDefinitions() {
 
   // Create default symbol definitions for new user
   const createDefaultDefinitions = async () => {
-    if (!user?.id) return;
+    if (!userIdFetched || !internalUserId) return;
 
     const defaultDefs = [
       { symbol_type: 'star', symbol_meaning: 'Important industries', symbol_emoji: '⭐', display_order: 1 },
@@ -77,7 +114,7 @@ export function useSymbolDefinitions() {
         .from('user_symbol_definitions')
         .insert(
           defaultDefs.map(def => ({
-            user_id: user.id,
+            user_id: internalUserId,
             ...def
           }))
         )
@@ -102,13 +139,13 @@ export function useSymbolDefinitions() {
 
   // Update symbol definition
   const updateDefinition = async (symbolType: string, updates: Partial<SymbolDefinition>) => {
-    if (!user?.id) return;
+    if (!userIdFetched || !internalUserId) return;
 
     try {
       const { data, error } = await supabase
         .from('user_symbol_definitions')
         .update(updates)
-        .eq('user_id', user.id)
+        .eq('user_id', internalUserId)
         .eq('symbol_type', symbolType)
         .select()
         .single();

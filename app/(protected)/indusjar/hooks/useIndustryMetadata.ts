@@ -23,21 +23,58 @@ interface IndustryMetadata {
 export function useIndustryMetadata() {
   const [metadata, setMetadata] = useState<{ [industryId: number]: IndustryMetadata }>({});
   const [loading, setLoading] = useState(true);
+  const [internalUserId, setInternalUserId] = useState<number | null>(null);
+  const [userIdFetched, setUserIdFetched] = useState(false);
   const supabase = createClientComponentClient();
   const { user } = useAuth();
+
+  // Get internal user ID from users table
+  const getInternalUserId = async (): Promise<number | null> => {
+    if (!user?.id) return null;
+    
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching internal user ID:', error);
+        return null;
+      }
+      
+      return data?.id || null;
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
+    }
+  };
 
   // Fetch all industry metadata for current user
   const fetchMetadata = async () => {
     if (!user?.id) {
       setLoading(false);
+      setUserIdFetched(true);
       return;
     }
+
+    // Get internal user ID first
+    const userId = await getInternalUserId();
+    if (!userId) {
+      setLoading(false);
+      setUserIdFetched(true);
+      return;
+    }
+    
+    setInternalUserId(userId);
+    setUserIdFetched(true);
 
     try {
       const { data, error } = await supabase
         .from('industries_user_meta')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', userId);
 
       if (error) {
         console.error('Error fetching industry metadata:', error);
@@ -63,7 +100,10 @@ export function useIndustryMetadata() {
     industryId: number, 
     symbolType: 'is_starred' | 'is_flagged' | 'is_squared' | 'is_circled' | 'is_triangled'
   ) => {
-    if (!user?.id) return;
+    if (!userIdFetched || !internalUserId) {
+      console.log('User ID not ready yet, skipping toggle');
+      return;
+    }
 
     const currentMeta = metadata[industryId];
     const currentValue = currentMeta?.[symbolType] || false;
@@ -73,7 +113,7 @@ export function useIndustryMetadata() {
       // Create the metadata object with current values or defaults
       const metaData: Partial<IndustryMetadata> = {
         fk_industry_id: industryId,
-        user_id: user.id,
+        user_id: internalUserId,
         is_starred: currentMeta?.is_starred || false,
         is_flagged: currentMeta?.is_flagged || false,
         is_squared: currentMeta?.is_squared || false,
@@ -106,14 +146,14 @@ export function useIndustryMetadata() {
 
   // Update metadata fields (notes, priority, etc.)
   const updateMetadata = async (industryId: number, updates: Partial<IndustryMetadata>) => {
-    if (!user?.internalUserId) return;
+    if (!internalUserId) return;
 
     try {
       const currentMeta = metadata[industryId];
       
       const metaData = {
         fk_industry_id: industryId,
-        user_id: user.id,
+        user_id: internalUserId,
         // Preserve existing values
         is_starred: currentMeta?.is_starred || false,
         is_flagged: currentMeta?.is_flagged || false,
