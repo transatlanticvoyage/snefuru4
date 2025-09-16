@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
+import { useSymbolDefinitions } from '../hooks/useSymbolDefinitions';
+import { useIndustryMetadata } from '../hooks/useIndustryMetadata';
 
 const NubraTablefaceKite = dynamic(
   () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
@@ -74,12 +76,23 @@ export default function IndusjarTable() {
 
   const supabase = createClientComponentClient();
 
+  // Symbol hooks
+  const { hasSymbol, toggleSymbol } = useIndustryMetadata();
+  const { getDefinition } = useSymbolDefinitions();
+
   // Define columns
   const columns = [
     { key: 'industry_id' as keyof Industry, label: 'industry_id', type: 'number', readOnly: true },
     { key: 'industry_name' as keyof Industry, label: 'industry_name', type: 'text' },
     { key: 'emd_stamp_slug' as keyof Industry, label: 'emd_stamp_slug', type: 'text' },
     { key: 'industry_description' as keyof Industry, label: 'industry_description', type: 'text' },
+    // Symbol columns
+    { key: 'org_is_starred' as keyof any, label: 'star', type: 'org_symbol', width: '25px' },
+    { key: 'org_is_flagged' as keyof any, label: 'flag', type: 'org_symbol', width: '25px' },
+    { key: 'org_is_squared' as keyof any, label: 'square', type: 'org_symbol', width: '25px' },
+    { key: 'org_is_circled' as keyof any, label: 'circle', type: 'org_symbol', width: '25px' },
+    { key: 'org_is_triangled' as keyof any, label: 'triangle', type: 'org_symbol', width: '25px' },
+    // Taurus columns
     { key: 'taurus_prompt_1_datum' as keyof Industry, label: 'taurus_prompt_1_datum', type: 'text' },
     { key: 'taurus_prompt_1_main_ai_model_note' as keyof Industry, label: 'taurus_prompt_1_main_ai_model_note', type: 'text' },
     { key: 'taurus_prompt_2_datum' as keyof Industry, label: 'taurus_prompt_2_datum', type: 'text' },
@@ -89,7 +102,14 @@ export default function IndusjarTable() {
   ];
   
   // Wolf exclusion band columns (always shown leftmost like sitejar4)
-  const wolfExclusionBandColumns = ['industry_id'];
+  const wolfExclusionBandColumns = [
+    'industry_id', 
+    'org_is_starred', 
+    'org_is_flagged', 
+    'org_is_squared', 
+    'org_is_circled', 
+    'org_is_triangled'
+  ];
   
   // All columns for pagination
   const allColumns = useMemo(() => columns.map(col => col.key as string), [columns]);
@@ -327,6 +347,36 @@ export default function IndusjarTable() {
     const value = item[column.key];
     const isEditing = editingCell?.id === item.industry_id && editingCell?.field === column.key;
     const isReadOnly = column.readOnly;
+
+    // Handle organization symbols
+    if (column.type === 'org_symbol') {
+      const symbolType = column.key.replace('org_is_', '') as 'starred' | 'flagged' | 'squared' | 'circled' | 'triangled';
+      const isActive = hasSymbol(item.industry_id, `is_${symbolType}` as any);
+      const definition = getDefinition(symbolType === 'starred' ? 'star' : symbolType === 'flagged' ? 'flag' : symbolType);
+      
+      return (
+        <div 
+          className="flex items-center justify-center cursor-pointer hover:bg-gray-100 rounded"
+          onClick={() => toggleSymbol(item.industry_id, `is_${symbolType}` as any)}
+          title={definition?.symbol_meaning || `Toggle ${symbolType}`}
+          style={{ width: '25px', height: '25px' }}
+        >
+          <span 
+            className={`text-lg transition-all duration-200 ${
+              isActive ? 'opacity-100 scale-110' : 'opacity-30 hover:opacity-60'
+            }`}
+          >
+            {definition?.symbol_emoji || (
+              symbolType === 'starred' ? '⭐' :
+              symbolType === 'flagged' ? '🚩' :
+              symbolType === 'squared' ? '⬜' :
+              symbolType === 'circled' ? '⭕' :
+              symbolType === 'triangled' ? '🔺' : ''
+            )}
+          </span>
+        </div>
+      );
+    }
 
     if (column.type === 'boolean' && !isReadOnly) {
       return (
@@ -597,9 +647,9 @@ export default function IndusjarTable() {
                     className="text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1"
                     onClick={() => handleSort(column.key)}
                     style={{ 
-                      width: 'auto', 
+                      width: column.type === 'org_symbol' ? '25px' : 'auto', 
                       whiteSpace: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? 'normal' : 'nowrap',
-                      minWidth: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? '200px' : 'auto'
+                      minWidth: column.type === 'org_symbol' ? '25px' : (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? '200px' : 'auto'
                     }}
                   >
                     <div className="flex items-center space-x-1">
@@ -640,9 +690,9 @@ export default function IndusjarTable() {
                   </td>
                   {columns.filter(column => visibleColumns.includes(column.key as string)).map((column) => (
                     <td key={column.key} className="border border-gray-200" style={{ 
-                      width: 'auto', 
+                      width: column.type === 'org_symbol' ? '25px' : 'auto', 
                       whiteSpace: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? 'normal' : 'nowrap',
-                      minWidth: (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? '200px' : 'auto'
+                      minWidth: column.type === 'org_symbol' ? '25px' : (column.key === 'industry_description' || column.key === 'taurus_prompt_1_datum' || column.key === 'taurus_prompt_1_main_ai_model_note' || column.key === 'taurus_prompt_2_datum' || column.key === 'taurus_prompt_2_main_ai_model_note') ? '200px' : 'auto'
                     }}>
                       {renderCell(item, column)}
                     </td>
