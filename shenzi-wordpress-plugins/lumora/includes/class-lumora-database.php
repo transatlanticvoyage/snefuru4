@@ -634,8 +634,8 @@ class Lumora_Database {
             $column_name
         ));
         
-        // Return friendly name if found, otherwise return formatted column name
-        return $friendly_name ? $friendly_name : ucwords(str_replace('_', ' ', $column_name));
+        // Return friendly name if found, otherwise return blank
+        return $friendly_name ? $friendly_name : '';
     }
     
     /**
