@@ -79,6 +79,10 @@ export const system1Navigation: NavItem[] = [
       {
         name: 'Fabric Page',
         path: '/fabric'
+      },
+      {
+        name: 'Atrium Services',
+        path: '/atrium_services_jar'
       }
     ]
   }
