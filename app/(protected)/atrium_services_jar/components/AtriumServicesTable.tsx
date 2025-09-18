@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/app/context/AuthContext';
@@ -53,6 +53,7 @@ export default function AtriumServicesTable() {
   const [gridData, setGridData] = useState<Array<{atrservice_name: string, suggested_url_slug: string}>>(() => 
     Array(15).fill(null).map(() => ({ atrservice_name: '', suggested_url_slug: '' }))
   );
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   // Form data for creating
   const [formData, setFormData] = useState({
@@ -63,6 +64,7 @@ export default function AtriumServicesTable() {
 
   const supabase = createClientComponentClient();
   const { user } = useAuth();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Fetch industries data from Supabase
   const fetchIndustries = async () => {
@@ -102,6 +104,31 @@ export default function AtriumServicesTable() {
     fetchData();
     fetchIndustries();
   }, []);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Calculate service counts per industry
+  const industryServiceCounts = useMemo(() => {
+    const counts: { [key: number]: number } = {};
+    data.forEach(service => {
+      if (service.fk_industry_id !== null) {
+        counts[service.fk_industry_id] = (counts[service.fk_industry_id] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [data]);
 
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
@@ -490,23 +517,80 @@ export default function AtriumServicesTable() {
         
         {/* Industry Filter Section */}
         <div className="flex items-center space-x-4">
-          <div>
+          <div ref={dropdownRef} className="relative">
             <div className="font-bold text-base mb-2">Select Industry:</div>
-            <select
-              value={selectedIndustryId || ''}
-              onChange={(e) => {
-                setSelectedIndustryId(e.target.value ? parseInt(e.target.value) : null);
-                setCurrentPage(1);
-              }}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            
+            {/* Custom Dropdown Button */}
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-between min-w-[400px] ${
+                selectedIndustryId !== null 
+                  ? 'text-white font-bold' 
+                  : 'border-gray-300 bg-white'
+              }`}
+              style={selectedIndustryId !== null ? { backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' } : {}}
             >
-              <option value="">All Industries</option>
-              {industries.map(industry => (
-                <option key={industry.industry_id} value={industry.industry_id}>
-                  ({industry.industry_id}) - {industry.industry_name}
-                </option>
-              ))}
-            </select>
+              <span>
+                {selectedIndustryId === null 
+                  ? 'All Industries' 
+                  : (() => {
+                      const industry = industries.find(i => i.industry_id === selectedIndustryId);
+                      const serviceCount = industryServiceCounts[selectedIndustryId] || 0;
+                      return industry ? `(${industry.industry_id}) - ${industry.industry_name} - (${serviceCount} ${serviceCount === 1 ? 'service' : 'services'})` : '';
+                    })()
+                }
+              </span>
+              <span className="ml-2">▼</span>
+            </button>
+
+            {/* Custom Dropdown Menu with Table */}
+            {isDropdownOpen && (
+              <div className="absolute z-50 mt-1 w-auto bg-white border border-gray-300 rounded-md shadow-lg max-h-96 overflow-y-auto">
+                <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                  <tbody>
+                    {/* All Industries Option */}
+                    <tr 
+                      className="hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setSelectedIndustryId(null);
+                        setCurrentPage(1);
+                        setIsDropdownOpen(false);
+                      }}
+                    >
+                      <td colSpan={3} className="px-3 py-2 border border-gray-300" style={{ borderWidth: '1px' }}>
+                        All Industries
+                      </td>
+                    </tr>
+                    
+                    {/* Industry Options */}
+                    {industries.map(industry => {
+                      const serviceCount = industryServiceCounts[industry.industry_id] || 0;
+                      return (
+                        <tr
+                          key={industry.industry_id}
+                          className="hover:bg-gray-100 cursor-pointer"
+                          onClick={() => {
+                            setSelectedIndustryId(industry.industry_id);
+                            setCurrentPage(1);
+                            setIsDropdownOpen(false);
+                          }}
+                        >
+                          <td className="px-3 py-2 border border-gray-300 text-center" style={{ borderWidth: '1px' }}>
+                            ({industry.industry_id})
+                          </td>
+                          <td className="px-3 py-2 border border-gray-300" style={{ borderWidth: '1px' }}>
+                            {industry.industry_name}
+                          </td>
+                          <td className="px-3 py-2 border border-gray-300 text-right" style={{ borderWidth: '1px' }}>
+                            ({serviceCount} {serviceCount === 1 ? 'service' : 'services'})
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
           <button
             onClick={() => setIsBulkCreateModalOpen(true)}
