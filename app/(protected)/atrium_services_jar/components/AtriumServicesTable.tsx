@@ -20,6 +20,11 @@ interface AtriumService {
   updated_at: string | null;
 }
 
+interface Industry {
+  industry_id: number;
+  industry_name: string | null;
+}
+
 export default function AtriumServicesTable() {
   const [data, setData] = useState<AtriumService[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,10 +38,18 @@ export default function AtriumServicesTable() {
   
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isBulkCreateModalOpen, setIsBulkCreateModalOpen] = useState(false);
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
+  
+  // Industry filter states
+  const [industries, setIndustries] = useState<Industry[]>([]);
+  const [selectedIndustryId, setSelectedIndustryId] = useState<number | null>(null);
+  
+  // Bulk creation state
+  const [bulkData, setBulkData] = useState<string>('');
   
   // Form data for creating
   const [formData, setFormData] = useState({
@@ -47,6 +60,21 @@ export default function AtriumServicesTable() {
 
   const supabase = createClientComponentClient();
   const { user } = useAuth();
+
+  // Fetch industries data from Supabase
+  const fetchIndustries = async () => {
+    try {
+      const { data: industriesData, error } = await supabase
+        .from('industries')
+        .select('*')
+        .order('industry_name', { ascending: true });
+
+      if (error) throw error;
+      setIndustries(industriesData || []);
+    } catch (err) {
+      console.error('Error fetching industries:', err);
+    }
+  };
 
   // Fetch data from Supabase
   const fetchData = async () => {
@@ -69,14 +97,21 @@ export default function AtriumServicesTable() {
 
   useEffect(() => {
     fetchData();
+    fetchIndustries();
   }, []);
 
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
     let filtered = data;
     
+    // Filter by selected industry
+    if (selectedIndustryId !== null) {
+      filtered = filtered.filter(item => item.fk_industry_id === selectedIndustryId);
+    }
+    
+    // Filter by search term
     if (searchTerm) {
-      filtered = data.filter(item => 
+      filtered = filtered.filter(item => 
         Object.values(item).some(value => 
           value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
         )
@@ -95,7 +130,7 @@ export default function AtriumServicesTable() {
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [data, searchTerm, sortField, sortOrder]);
+  }, [data, searchTerm, sortField, sortOrder, selectedIndustryId]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage));
@@ -218,6 +253,39 @@ export default function AtriumServicesTable() {
       suggested_url_slug: '',
       fk_industry_id: ''
     });
+  };
+
+  // Handle bulk creation
+  const handleBulkCreate = async () => {
+    if (!selectedIndustryId || !bulkData.trim()) return;
+    
+    try {
+      const lines = bulkData.trim().split('\n');
+      const recordsToInsert = lines.map(line => {
+        const [atrservice_name, suggested_url_slug] = line.split('\t');
+        return {
+          atrservice_name: atrservice_name?.trim() || null,
+          suggested_url_slug: suggested_url_slug?.trim() || null,
+          fk_industry_id: selectedIndustryId,
+          created_by: user?.id || null
+        };
+      });
+
+      const { data: insertedData, error } = await supabase
+        .from('atrium_services')
+        .insert(recordsToInsert)
+        .select();
+
+      if (error) throw error;
+
+      // Add to local data
+      setData([...insertedData, ...data]);
+      setIsBulkCreateModalOpen(false);
+      setBulkData('');
+    } catch (err) {
+      console.error('Error bulk creating records:', err);
+      alert('Failed to bulk create records');
+    }
   };
 
   // Render cell content
@@ -371,6 +439,42 @@ export default function AtriumServicesTable() {
 
   return (
     <div className="w-full">
+      {/* Heading and Industry Filter Section */}
+      <div className="flex items-start justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Atrium Services</h1>
+        <div className="flex items-center space-x-4">
+          <div>
+            <div className="font-bold text-base mb-2">Select Industry:</div>
+            <select
+              value={selectedIndustryId || ''}
+              onChange={(e) => {
+                setSelectedIndustryId(e.target.value ? parseInt(e.target.value) : null);
+                setCurrentPage(1);
+              }}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Industries</option>
+              {industries.map(industry => (
+                <option key={industry.industry_id} value={industry.industry_id}>
+                  ({industry.industry_id}) - {industry.industry_name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            onClick={() => setIsBulkCreateModalOpen(true)}
+            disabled={selectedIndustryId === null}
+            className={`px-4 py-2 font-medium rounded-md text-sm transition-colors ${
+              selectedIndustryId === null 
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                : 'bg-green-600 hover:bg-green-700 text-white'
+            }`}
+          >
+            Create New
+          </button>
+        </div>
+      </div>
+
       {/* Top Controls Area */}
       <div className="bg-white border border-gray-200 px-4 py-2">
         <div className="flex justify-between items-center">
@@ -640,6 +744,65 @@ export default function AtriumServicesTable() {
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
               >
                 Create Service
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Create Modal */}
+      {isBulkCreateModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl">
+            <h2 className="text-xl font-bold mb-4">Bulk Create Services</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Selected Industry: {industries.find(i => i.industry_id === selectedIndustryId)?.industry_name} ({selectedIndustryId})
+            </p>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Paste data in spreadsheet format (Tab-separated: Service Name, URL Slug):
+              </label>
+              <div className="border border-gray-300 rounded-md">
+                {/* Header row */}
+                <div className="bg-gray-50 border-b border-gray-300 px-3 py-2 grid grid-cols-2 gap-4">
+                  <div className="font-medium text-sm">Column A: atrservice_name</div>
+                  <div className="font-medium text-sm">Column B: suggested_url_slug</div>
+                </div>
+                {/* Input area */}
+                <textarea
+                  value={bulkData}
+                  onChange={(e) => setBulkData(e.target.value)}
+                  className="w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm resize-none"
+                  rows={10}
+                  placeholder="Service 1&#9;service-1-slug&#10;Service 2&#9;service-2-slug&#10;Service 3&#9;service-3-slug"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Format: Each row should contain service name and URL slug separated by a tab. You can copy from Excel/Google Sheets directly.
+              </p>
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setIsBulkCreateModalOpen(false);
+                  setBulkData('');
+                }}
+                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkCreate}
+                disabled={!bulkData.trim()}
+                className={`px-4 py-2 rounded transition-colors ${
+                  !bulkData.trim()
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-green-600 hover:bg-green-700 text-white'
+                }`}
+              >
+                Submit
               </button>
             </div>
           </div>
