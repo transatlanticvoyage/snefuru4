@@ -39,6 +39,9 @@
 		},
 		{
 			"path": "./shenzi-wordpress-plugins/fathom"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/aardvark"
 		}
 	],
 	"settings": {
