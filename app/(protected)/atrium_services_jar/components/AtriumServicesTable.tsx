@@ -13,6 +13,8 @@ const NubraTablefaceKite = dynamic(
 interface AtriumService {
   atrservice_id: number;
   atrservice_name: string | null;
+  suggested_url_slug: string | null;
+  fk_industry_id: number | null;
   created_by: string | null;
   created_at: string;
   updated_at: string | null;
@@ -38,7 +40,9 @@ export default function AtriumServicesTable() {
   
   // Form data for creating
   const [formData, setFormData] = useState({
-    atrservice_name: ''
+    atrservice_name: '',
+    suggested_url_slug: '',
+    fk_industry_id: ''
   });
 
   const supabase = createClientComponentClient();
@@ -185,6 +189,8 @@ export default function AtriumServicesTable() {
     try {
       const insertData = {
         atrservice_name: formData.atrservice_name?.trim() || null,
+        suggested_url_slug: formData.suggested_url_slug?.trim() || null,
+        fk_industry_id: formData.fk_industry_id?.trim() ? parseInt(formData.fk_industry_id) : null,
         created_by: user?.id || null
       };
       
@@ -208,7 +214,9 @@ export default function AtriumServicesTable() {
   // Reset form
   const resetForm = () => {
     setFormData({
-      atrservice_name: ''
+      atrservice_name: '',
+      suggested_url_slug: '',
+      fk_industry_id: ''
     });
   };
 
@@ -452,6 +460,24 @@ export default function AtriumServicesTable() {
                 </th>
                 <th
                   className="px-4 py-3 text-left cursor-pointer hover:bg-gray-100 border-r border-gray-200"
+                  onClick={() => handleSort('suggested_url_slug')}
+                >
+                  <span className="font-bold text-xs lowercase">suggested_url_slug</span>
+                  {sortField === 'suggested_url_slug' && (
+                    <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                  )}
+                </th>
+                <th
+                  className="px-4 py-3 text-left cursor-pointer hover:bg-gray-100 border-r border-gray-200"
+                  onClick={() => handleSort('fk_industry_id')}
+                >
+                  <span className="font-bold text-xs lowercase">fk_industry_id</span>
+                  {sortField === 'fk_industry_id' && (
+                    <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                  )}
+                </th>
+                <th
+                  className="px-4 py-3 text-left cursor-pointer hover:bg-gray-100 border-r border-gray-200"
                   onClick={() => handleSort('created_by')}
                 >
                   <span className="font-bold text-xs lowercase">created_by</span>
@@ -508,6 +534,12 @@ export default function AtriumServicesTable() {
                   </td>
                   <td className="px-4 py-2 border-r border-gray-200">
                     {renderCell(item, 'atrservice_name')}
+                  </td>
+                  <td className="px-4 py-2 border-r border-gray-200">
+                    {renderCell(item, 'suggested_url_slug')}
+                  </td>
+                  <td className="px-4 py-2 border-r border-gray-200">
+                    {renderCell(item, 'fk_industry_id')}
                   </td>
                   <td className="px-4 py-2 border-r border-gray-200">
                     {renderCell(item, 'created_by')}
@@ -569,6 +601,26 @@ export default function AtriumServicesTable() {
                   onChange={(e) => setFormData({ ...formData, atrservice_name: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="Enter service name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Suggested URL Slug</label>
+                <input
+                  type="text"
+                  value={formData.suggested_url_slug}
+                  onChange={(e) => setFormData({ ...formData, suggested_url_slug: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="Enter suggested URL slug"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Industry ID</label>
+                <input
+                  type="number"
+                  value={formData.fk_industry_id}
+                  onChange={(e) => setFormData({ ...formData, fk_industry_id: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="Enter industry ID"
                 />
               </div>
             </div>
