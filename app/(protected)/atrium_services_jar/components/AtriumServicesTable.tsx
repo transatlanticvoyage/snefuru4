@@ -50,6 +50,9 @@ export default function AtriumServicesTable() {
   
   // Bulk creation state
   const [bulkData, setBulkData] = useState<string>('');
+  const [gridData, setGridData] = useState<Array<{atrservice_name: string, suggested_url_slug: string}>>(() => 
+    Array(15).fill(null).map(() => ({ atrservice_name: '', suggested_url_slug: '' }))
+  );
   
   // Form data for creating
   const [formData, setFormData] = useState({
@@ -257,19 +260,22 @@ export default function AtriumServicesTable() {
 
   // Handle bulk creation
   const handleBulkCreate = async () => {
-    if (!selectedIndustryId || !bulkData.trim()) return;
+    if (!selectedIndustryId) return;
+    
+    // Filter out empty rows
+    const validRows = gridData.filter(row => 
+      row.atrservice_name.trim() !== '' || row.suggested_url_slug.trim() !== ''
+    );
+    
+    if (validRows.length === 0) return;
     
     try {
-      const lines = bulkData.trim().split('\n');
-      const recordsToInsert = lines.map(line => {
-        const [atrservice_name, suggested_url_slug] = line.split('\t');
-        return {
-          atrservice_name: atrservice_name?.trim() || null,
-          suggested_url_slug: suggested_url_slug?.trim() || null,
-          fk_industry_id: selectedIndustryId,
-          created_by: user?.id || null
-        };
-      });
+      const recordsToInsert = validRows.map(row => ({
+        atrservice_name: row.atrservice_name.trim() || null,
+        suggested_url_slug: row.suggested_url_slug.trim() || null,
+        fk_industry_id: selectedIndustryId,
+        created_by: user?.id || null
+      }));
 
       const { data: insertedData, error } = await supabase
         .from('atrium_services')
@@ -281,11 +287,50 @@ export default function AtriumServicesTable() {
       // Add to local data
       setData([...insertedData, ...data]);
       setIsBulkCreateModalOpen(false);
-      setBulkData('');
+      
+      // Reset grid
+      setGridData(Array(15).fill(null).map(() => ({ atrservice_name: '', suggested_url_slug: '' })));
     } catch (err) {
       console.error('Error bulk creating records:', err);
       alert('Failed to bulk create records');
     }
+  };
+
+  // Handle grid cell updates
+  const updateGridCell = (rowIndex: number, column: 'atrservice_name' | 'suggested_url_slug', value: string) => {
+    setGridData(prev => prev.map((row, index) => 
+      index === rowIndex ? { ...row, [column]: value } : row
+    ));
+  };
+
+  // Handle paste event for grid
+  const handleGridPaste = (e: React.ClipboardEvent, startRow: number, startCol: 'atrservice_name' | 'suggested_url_slug') => {
+    e.preventDefault();
+    
+    const pasteData = e.clipboardData.getData('text');
+    const rows = pasteData.split('\n').filter(row => row.trim() !== '');
+    
+    setGridData(prev => {
+      const newData = [...prev];
+      
+      rows.forEach((row, rowOffset) => {
+        const cells = row.split('\t');
+        const targetRowIndex = startRow + rowOffset;
+        
+        if (targetRowIndex < newData.length) {
+          if (startCol === 'atrservice_name' && cells[0] !== undefined) {
+            newData[targetRowIndex].atrservice_name = cells[0].trim();
+          }
+          if (cells[1] !== undefined && targetRowIndex < newData.length) {
+            newData[targetRowIndex].suggested_url_slug = cells[1].trim();
+          } else if (startCol === 'suggested_url_slug' && cells[0] !== undefined) {
+            newData[targetRowIndex].suggested_url_slug = cells[0].trim();
+          }
+        }
+      });
+      
+      return newData;
+    });
   };
 
   // Render cell content
@@ -439,9 +484,11 @@ export default function AtriumServicesTable() {
 
   return (
     <div className="w-full">
-      {/* Heading and Industry Filter Section */}
-      <div className="flex items-start justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Atrium Services</h1>
+      {/* Heading Section */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Atrium Services</h1>
+        
+        {/* Industry Filter Section */}
         <div className="flex items-center space-x-4">
           <div>
             <div className="font-bold text-base mb-2">Select Industry:</div>
@@ -761,25 +808,41 @@ export default function AtriumServicesTable() {
             
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Paste data in spreadsheet format (Tab-separated: Service Name, URL Slug):
+                Spreadsheet Grid - Copy and paste directly from Excel:
               </label>
-              <div className="border border-gray-300 rounded-md">
+              <div className="border border-gray-300 rounded-md overflow-hidden">
                 {/* Header row */}
-                <div className="bg-gray-50 border-b border-gray-300 px-3 py-2 grid grid-cols-2 gap-4">
-                  <div className="font-medium text-sm">Column A: atrservice_name</div>
-                  <div className="font-medium text-sm">Column B: suggested_url_slug</div>
+                <div className="bg-gray-50 border-b border-gray-300 grid grid-cols-2">
+                  <div className="px-3 py-2 border-r border-gray-300 font-medium text-sm">Column A: atrservice_name</div>
+                  <div className="px-3 py-2 font-medium text-sm">Column B: suggested_url_slug</div>
                 </div>
-                {/* Input area */}
-                <textarea
-                  value={bulkData}
-                  onChange={(e) => setBulkData(e.target.value)}
-                  className="w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm resize-none"
-                  rows={10}
-                  placeholder="Service 1&#9;service-1-slug&#10;Service 2&#9;service-2-slug&#10;Service 3&#9;service-3-slug"
-                />
+                
+                {/* Data rows */}
+                <div className="max-h-96 overflow-y-auto">
+                  {gridData.map((row, rowIndex) => (
+                    <div key={rowIndex} className="grid grid-cols-2 border-b border-gray-200 hover:bg-gray-50">
+                      <input
+                        type="text"
+                        value={row.atrservice_name}
+                        onChange={(e) => updateGridCell(rowIndex, 'atrservice_name', e.target.value)}
+                        onPaste={(e) => handleGridPaste(e, rowIndex, 'atrservice_name')}
+                        className="px-3 py-2 border-r border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-blue-50"
+                        placeholder={rowIndex === 0 ? "Paste here or type..." : ""}
+                      />
+                      <input
+                        type="text"
+                        value={row.suggested_url_slug}
+                        onChange={(e) => updateGridCell(rowIndex, 'suggested_url_slug', e.target.value)}
+                        onPaste={(e) => handleGridPaste(e, rowIndex, 'suggested_url_slug')}
+                        className="px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-blue-50"
+                        placeholder={rowIndex === 0 ? "Paste here or type..." : ""}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                Format: Each row should contain service name and URL slug separated by a tab. You can copy from Excel/Google Sheets directly.
+                💡 Tip: Select data in Excel (2 columns), copy (Ctrl+C), then click in the first cell and paste (Ctrl+V). The data will automatically fill the grid.
               </p>
             </div>
 
@@ -787,7 +850,7 @@ export default function AtriumServicesTable() {
               <button
                 onClick={() => {
                   setIsBulkCreateModalOpen(false);
-                  setBulkData('');
+                  setGridData(Array(15).fill(null).map(() => ({ atrservice_name: '', suggested_url_slug: '' })));
                 }}
                 className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
               >
@@ -795,9 +858,9 @@ export default function AtriumServicesTable() {
               </button>
               <button
                 onClick={handleBulkCreate}
-                disabled={!bulkData.trim()}
+                disabled={!gridData.some(row => row.atrservice_name.trim() !== '' || row.suggested_url_slug.trim() !== '')}
                 className={`px-4 py-2 rounded transition-colors ${
-                  !bulkData.trim()
+                  !gridData.some(row => row.atrservice_name.trim() !== '' || row.suggested_url_slug.trim() !== '')
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-green-600 hover:bg-green-700 text-white'
                 }`}
