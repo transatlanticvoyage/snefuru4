@@ -107,12 +107,6 @@ class AardvarkPlugin {
                 'branch_name' => 'main'
             ),
             array(
-                'plugin_slug' => 'snefuruplin',
-                'plugin_path' => 'snefuruplin-wp-plugin/snefuruplin.php',
-                'github_url' => 'https://github.com/transatlanticvoyage/snefuruplin-wp-plugin.git',
-                'branch_name' => 'main'
-            ),
-            array(
                 'plugin_slug' => 'ruplin',
                 'plugin_path' => 'ruplin/ruplin.php',
                 'github_url' => 'https://github.com/transatlanticvoyage/ruplin.git',
@@ -122,6 +116,24 @@ class AardvarkPlugin {
                 'plugin_slug' => 'beacon',
                 'plugin_path' => 'beacon/beacon.php',
                 'github_url' => 'https://github.com/transatlanticvoyage/beacon.git',
+                'branch_name' => 'main'
+            ),
+            array(
+                'plugin_slug' => 'veyra',
+                'plugin_path' => 'veyra/veyra.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/veyra.git',
+                'branch_name' => 'main'
+            ),
+            array(
+                'plugin_slug' => 'harbor',
+                'plugin_path' => 'harbor/harbor.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/harbor.git',
+                'branch_name' => 'main'
+            ),
+            array(
+                'plugin_slug' => 'klyra',
+                'plugin_path' => 'klyra/klyra.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/klyra.git',
                 'branch_name' => 'main'
             )
         );

@@ -886,10 +886,12 @@ class Aardvark_Papluginsmar_Page {
         return array(
             'aardvark/aardvark.php',
             'ruplin/ruplin.php',
-            'snefuruplin-wp-plugin/snefuruplin.php', // actual path for snefuruplin
-            'grove-wp-plugin/grove.php', // actual path for grove
+            'grove-wp-plugin/grove.php',
             'beacon/beacon.php',
-            'lumora/lumora.php'
+            'lumora/lumora.php',
+            'veyra/veyra.php',
+            'harbor/harbor.php',
+            'klyra/klyra.php'
         );
     }
     
