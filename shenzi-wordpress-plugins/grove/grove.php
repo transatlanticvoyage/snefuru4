@@ -7,6 +7,9 @@
  * Author: Grove Team
  * License: GPL v2 or later
  * Text Domain: grove
+ * 
+ * Test comment: VSCode source control test - 2025-09-19 15:33
+ * Test comment 8: Grove dual visibility test - 2025-09-19 16:48
  */
 
 // Prevent direct access

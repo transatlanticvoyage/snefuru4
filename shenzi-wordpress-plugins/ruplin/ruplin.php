@@ -10,7 +10,7 @@
  * 
  * Test comment: Git subtree setup completed successfully!
  * Test comment 2: Testing git sync at 2025-09-19
- * Test comment 3: Testing VSCode source control visibility - 15:32
+ * Test comment 7: Final VSCode dual visibility test - 2025-09-19 16:48
  */
 
 // Prevent direct access
@@ -462,5 +462,4 @@ class SnefuruPlugin {
 }
 
 // Initialize the plugin
-new SnefuruPlugin(); Test comment 4: Testing post-conversion - Fri Sep 19 16:31:10 EDT 2025
-// Test comment 5: Post-conversion test Fri Sep 19 16:33:53 EDT 2025
+new SnefuruPlugin(); 
