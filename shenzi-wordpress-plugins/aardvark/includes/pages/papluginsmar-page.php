@@ -6,53 +6,51 @@ class Aardvark_Papluginsmar_Page {
         $plugins_data = $this->get_plugins_data();
         ?>
         <div class="wrap">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">
-                <h1 style="display: flex; align-items: center; gap: 14px; margin: 0;">
-                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="flex-shrink: 0;">
-                        <!-- Aardvark body -->
-                        <ellipse cx="15" cy="18" rx="8" ry="7" fill="#8B4513" stroke="#654321" stroke-width="1"/>
-                        
-                        <!-- Aardvark head -->
-                        <ellipse cx="15" cy="10" rx="5" ry="4" fill="#8B4513" stroke="#654321" stroke-width="1"/>
-                        
-                        <!-- Long snout/nose -->
-                        <ellipse cx="15" cy="6" rx="2" ry="3" fill="#A0522D" stroke="#654321" stroke-width="0.5"/>
-                        
-                        <!-- Ears -->
-                        <ellipse cx="11" cy="8" rx="2" ry="3" fill="#8B4513" stroke="#654321" stroke-width="0.5" transform="rotate(-20 11 8)"/>
-                        <ellipse cx="19" cy="8" rx="2" ry="3" fill="#8B4513" stroke="#654321" stroke-width="0.5" transform="rotate(20 19 8)"/>
-                        
-                        <!-- Eyes -->
-                        <circle cx="12.5" cy="9" r="1" fill="#000"/>
-                        <circle cx="17.5" cy="9" r="1" fill="#000"/>
-                        <circle cx="12.8" cy="8.7" r="0.3" fill="#FFF"/>
-                        <circle cx="17.8" cy="8.7" r="0.3" fill="#FFF"/>
-                        
-                        <!-- Nose tip -->
-                        <circle cx="15" cy="4" r="0.8" fill="#000"/>
-                        
-                        <!-- Legs -->
-                        <rect x="9" y="22" width="2" height="5" fill="#654321" rx="1"/>
-                        <rect x="13" y="22" width="2" height="5" fill="#654321" rx="1"/>
-                        <rect x="17" y="22" width="2" height="5" fill="#654321" rx="1"/>
-                        <rect x="21" y="22" width="2" height="5" fill="#654321" rx="1"/>
-                        
-                        <!-- Tail -->
-                        <ellipse cx="7" y="20" rx="3" ry="1.5" fill="#8B4513" stroke="#654321" stroke-width="0.5" transform="rotate(-30 7 20)"/>
-                    </svg>
-                    Aardvark Plugins Manager - papluginsmar
-                </h1>
-                
-                <!-- Shenzi Plugins Filter -->
-                <div style="text-align: center;">
-                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">
-                        shenzi plugins filter
-                    </div>
-                    <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
-                        <button type="button" data-filter="all" class="shenzi-filter-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; background: white; color: black;">all</button>
-                        <button type="button" data-filter="shenzi" class="shenzi-filter-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">shenzi only</button>
-                        <button type="button" data-filter="non-shenzi" class="shenzi-filter-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 0 6px 6px 0; cursor: pointer; background: white; color: black;">non-shenzi only</button>
-                    </div>
+            <h1 style="display: flex; align-items: center; gap: 14px; margin: 0 0 20px 0;">
+                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="flex-shrink: 0;">
+                    <!-- Aardvark body -->
+                    <ellipse cx="15" cy="18" rx="8" ry="7" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+                    
+                    <!-- Aardvark head -->
+                    <ellipse cx="15" cy="10" rx="5" ry="4" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+                    
+                    <!-- Long snout/nose -->
+                    <ellipse cx="15" cy="6" rx="2" ry="3" fill="#A0522D" stroke="#654321" stroke-width="0.5"/>
+                    
+                    <!-- Ears -->
+                    <ellipse cx="11" cy="8" rx="2" ry="3" fill="#8B4513" stroke="#654321" stroke-width="0.5" transform="rotate(-20 11 8)"/>
+                    <ellipse cx="19" cy="8" rx="2" ry="3" fill="#8B4513" stroke="#654321" stroke-width="0.5" transform="rotate(20 19 8)"/>
+                    
+                    <!-- Eyes -->
+                    <circle cx="12.5" cy="9" r="1" fill="#000"/>
+                    <circle cx="17.5" cy="9" r="1" fill="#000"/>
+                    <circle cx="12.8" cy="8.7" r="0.3" fill="#FFF"/>
+                    <circle cx="17.8" cy="8.7" r="0.3" fill="#FFF"/>
+                    
+                    <!-- Nose tip -->
+                    <circle cx="15" cy="4" r="0.8" fill="#000"/>
+                    
+                    <!-- Legs -->
+                    <rect x="9" y="22" width="2" height="5" fill="#654321" rx="1"/>
+                    <rect x="13" y="22" width="2" height="5" fill="#654321" rx="1"/>
+                    <rect x="17" y="22" width="2" height="5" fill="#654321" rx="1"/>
+                    <rect x="21" y="22" width="2" height="5" fill="#654321" rx="1"/>
+                    
+                    <!-- Tail -->
+                    <ellipse cx="7" cy="20" rx="3" ry="1.5" fill="#8B4513" stroke="#654321" stroke-width="0.5" transform="rotate(-30 7 20)"/>
+                </svg>
+                Aardvark Plugins Manager - papluginsmar
+            </h1>
+            
+            <!-- Shenzi Plugins Filter -->
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">
+                    shenzi plugins filter
+                </div>
+                <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                    <button type="button" data-filter="all" class="shenzi-filter-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; background: white; color: black;">all</button>
+                    <button type="button" data-filter="shenzi" class="shenzi-filter-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">shenzi only</button>
+                    <button type="button" data-filter="non-shenzi" class="shenzi-filter-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 0 6px 6px 0; cursor: pointer; background: white; color: black;">non-shenzi only</button>
                 </div>
             </div>
             
@@ -253,6 +251,7 @@ class Aardvark_Papluginsmar_Page {
                             </td>
                             <td style="border: 1px solid #555; padding: 8px;">
                                 <strong><?php echo esc_html($plugin['Name']); ?></strong>
+                                <br><small style="color: #666; font-size: 11px;">Path: <?php echo esc_html($plugin['debug_path']); ?></small>
                                 <?php if (!empty($plugin['PluginURI'])): ?>
                                 <br><small><a href="<?php echo esc_url($plugin['PluginURI']); ?>" target="_blank">Visit plugin site</a></small>
                                 <?php endif; ?>
@@ -684,14 +683,16 @@ class Aardvark_Papluginsmar_Page {
                 updateDisplayCounts();
             }
             
-            // Initialize with default filter (shenzi only)
-            applyShenziFilter('shenzi');
-            
             // Initialize pagination
             updateRowPagination();
             updateColPagination();
             updateDisplayCounts();
             updateColumnVisibility();
+            
+            // Initialize with default filter (shenzi only) - after a small delay to ensure DOM is ready
+            setTimeout(function() {
+                applyShenziFilter('shenzi');
+            }, 100);
             
             function processBulkAction(action, plugins) {
                 $.post(ajaxurl, {
@@ -719,6 +720,7 @@ class Aardvark_Papluginsmar_Page {
         return array(
             'aardvark/aardvark.php',
             'ruplin/ruplin.php',
+            'snefuruplin/snefuruplin.php', // snefuruplin should be treated as ruplin
             'grove/grove.php',
             'beacon/beacon.php',
             'lumora/lumora.php'
@@ -729,7 +731,19 @@ class Aardvark_Papluginsmar_Page {
      * Check if a plugin is a shenzi plugin
      */
     private function is_shenzi_plugin($plugin_path) {
-        return in_array($plugin_path, $this->get_shenzi_plugins());
+        $shenzi_plugins = $this->get_shenzi_plugins();
+        
+        // Direct match first
+        if (in_array($plugin_path, $shenzi_plugins)) {
+            return true;
+        }
+        
+        // Special case: snefuruplin should be treated as ruplin
+        if (strpos($plugin_path, 'snefuruplin/') === 0) {
+            return true;
+        }
+        
+        return false;
     }
     
     private function get_plugins_data() {
@@ -744,6 +758,8 @@ class Aardvark_Papluginsmar_Page {
         $plugins_data = array();
         
         foreach ($all_plugins as $plugin_path => $plugin_info) {
+            $is_shenzi = $this->is_shenzi_plugin($plugin_path);
+            
             $plugins_data[$plugin_path] = array(
                 'Name' => $plugin_info['Name'],
                 'Version' => $plugin_info['Version'],
@@ -752,7 +768,8 @@ class Aardvark_Papluginsmar_Page {
                 'Author' => $plugin_info['Author'] ?? '',
                 'active' => in_array($plugin_path, $active_plugins),
                 'needs_update' => isset($plugin_updates->response[$plugin_path]),
-                'is_shenzi' => $this->is_shenzi_plugin($plugin_path)
+                'is_shenzi' => $is_shenzi,
+                'debug_path' => $plugin_path // For debugging
             );
         }
         
