@@ -56,11 +56,18 @@ class Aardvark_Papluginsmar_Page {
                     </div>
                 </div>
                 
-                <!-- WP Pusher Link -->
-                <div style="align-self: flex-end;">
+                <!-- WP Pusher Links and Database Info -->
+                <div style="align-self: flex-end; display: flex; align-items: center; gap: 10px;">
                     <a href="/wp-admin/admin.php?page=wppusher-plugins" style="display: inline-block; padding: 10px 16px; font-size: 14px; background: #2271b1; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.15s ease;" onMouseOver="this.style.background='#1e5a8a'" onMouseOut="this.style.background='#2271b1'">
                         wppusher-plugins
                     </a>
+                    <a href="/wp-admin/admin.php?page=wppusher-plugins-create" style="display: inline-block; padding: 10px 16px; font-size: 14px; background: #2271b1; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.15s ease;" onMouseOver="this.style.background='#1e5a8a'" onMouseOut="this.style.background='#2271b1'">
+                        wppusher-plugins-create
+                    </a>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <input type="text" id="db-name-display" value="<?php echo esc_attr(DB_NAME); ?>" readonly style="padding: 8px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; color: #333; font-family: monospace;">
+                        <button type="button" id="copy-db-name" style="padding: 8px 12px; font-size: 14px; background: #00a32a; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Copy database name">📋</button>
+                    </div>
                 </div>
             </div>
             
@@ -799,6 +806,23 @@ class Aardvark_Papluginsmar_Page {
                     }
                 });
             }
+            
+            // Database name copy functionality
+            $('#copy-db-name').on('click', function() {
+                const dbNameInput = document.getElementById('db-name-display');
+                dbNameInput.select();
+                dbNameInput.setSelectionRange(0, 99999); // For mobile devices
+                
+                try {
+                    document.execCommand('copy');
+                    $(this).text('✓').css('background', '#00a32a');
+                    setTimeout(() => {
+                        $(this).text('📋').css('background', '#00a32a');
+                    }, 1000);
+                } catch (err) {
+                    console.log('Copy failed');
+                }
+            });
         });
         </script>
         <?php
