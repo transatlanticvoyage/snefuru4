@@ -521,7 +521,10 @@ class Aardvark_Papluginsmar_Page {
                     }).done(function(response) {
                         if (response.success) {
                             alert('Plugin installed successfully!');
-                            location.reload();
+                            // Add small delay to ensure server-side cache clearing takes effect
+                            setTimeout(function() {
+                                location.reload();
+                            }, 500);
                         } else {
                             alert('Error: ' + response.data);
                             $button.prop('disabled', false).text('Install from GitHub');
@@ -1017,6 +1020,12 @@ class Aardvark_Papluginsmar_Page {
     private function get_plugins_data() {
         if (!function_exists('get_plugins')) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        
+        // Clear plugin cache to ensure we get fresh data
+        if (function_exists('wp_cache_delete')) {
+            wp_cache_delete('plugins', 'plugins');
+            wp_cache_delete('get_plugins', 'plugins');
         }
         
         $all_plugins = get_plugins();

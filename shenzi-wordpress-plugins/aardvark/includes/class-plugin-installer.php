@@ -52,6 +52,9 @@ class Aardvark_Plugin_Installer {
         // Record installation in database
         $this->record_installation($repo, $install_result['plugin_path'], $github_url, $branch, $github_token);
         
+        // Clear WordPress plugin cache to ensure immediate recognition
+        $this->clear_plugin_cache();
+        
         return array(
             'success' => true,
             'message' => 'Plugin installed successfully',
@@ -340,5 +343,39 @@ class Aardvark_Plugin_Installer {
         if (is_dir($temp_dir)) {
             $this->remove_directory($temp_dir);
         }
+    }
+    
+    /**
+     * Clear WordPress plugin cache to ensure immediate recognition of new plugins
+     */
+    private function clear_plugin_cache() {
+        // Clear WordPress plugin caches
+        if (function_exists('wp_cache_delete')) {
+            wp_cache_delete('plugins', 'plugins');
+            wp_cache_delete('get_plugins', 'plugins');
+        }
+        
+        // Clear the internal WordPress plugin cache
+        global $wp_plugins;
+        if (isset($wp_plugins)) {
+            unset($wp_plugins);
+        }
+        
+        // Clear any transients that might cache plugin data
+        delete_site_transient('update_plugins');
+        delete_transient('plugin_slugs');
+        
+        // Force get_plugins() to re-read from filesystem
+        if (!function_exists('get_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        
+        // Clear object cache if available
+        if (function_exists('wp_cache_flush')) {
+            wp_cache_flush();
+        }
+        
+        // Force a fresh read by calling get_plugins() once
+        get_plugins();
     }
 }

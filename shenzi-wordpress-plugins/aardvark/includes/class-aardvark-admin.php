@@ -239,6 +239,12 @@ class Aardvark_Admin {
         if (isset($result['error'])) {
             wp_send_json_error($result['error']);
         } else {
+            // Clear WordPress caches to ensure immediate UI update
+            if (function_exists('wp_cache_delete')) {
+                wp_cache_delete('plugins', 'plugins');
+            }
+            delete_site_transient('update_plugins');
+            
             wp_send_json_success($result['message']);
         }
     }
