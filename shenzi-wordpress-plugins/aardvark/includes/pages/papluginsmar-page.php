@@ -6,7 +6,41 @@ class Aardvark_Papluginsmar_Page {
         $plugins_data = $this->get_plugins_data();
         ?>
         <div class="wrap">
-            <h1>Plugins Management</h1>
+            <h1 style="display: flex; align-items: center; gap: 14px;">
+                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="flex-shrink: 0;">
+                    <!-- Aardvark body -->
+                    <ellipse cx="15" cy="18" rx="8" ry="7" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+                    
+                    <!-- Aardvark head -->
+                    <ellipse cx="15" cy="10" rx="5" ry="4" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+                    
+                    <!-- Long snout/nose -->
+                    <ellipse cx="15" cy="6" rx="2" ry="3" fill="#A0522D" stroke="#654321" stroke-width="0.5"/>
+                    
+                    <!-- Ears -->
+                    <ellipse cx="11" cy="8" rx="2" ry="3" fill="#8B4513" stroke="#654321" stroke-width="0.5" transform="rotate(-20 11 8)"/>
+                    <ellipse cx="19" cy="8" rx="2" ry="3" fill="#8B4513" stroke="#654321" stroke-width="0.5" transform="rotate(20 19 8)"/>
+                    
+                    <!-- Eyes -->
+                    <circle cx="12.5" cy="9" r="1" fill="#000"/>
+                    <circle cx="17.5" cy="9" r="1" fill="#000"/>
+                    <circle cx="12.8" cy="8.7" r="0.3" fill="#FFF"/>
+                    <circle cx="17.8" cy="8.7" r="0.3" fill="#FFF"/>
+                    
+                    <!-- Nose tip -->
+                    <circle cx="15" cy="4" r="0.8" fill="#000"/>
+                    
+                    <!-- Legs -->
+                    <rect x="9" y="22" width="2" height="5" fill="#654321" rx="1"/>
+                    <rect x="13" y="22" width="2" height="5" fill="#654321" rx="1"/>
+                    <rect x="17" y="22" width="2" height="5" fill="#654321" rx="1"/>
+                    <rect x="21" y="22" width="2" height="5" fill="#654321" rx="1"/>
+                    
+                    <!-- Tail -->
+                    <ellipse cx="7" cy="20" rx="3" ry="1.5" fill="#8B4513" stroke="#654321" stroke-width="0.5" transform="rotate(-30 7 20)"/>
+                </svg>
+                Aardvark Plugins Manager - papluginsmar
+            </h1>
             
             <!-- Rocket Chamber Div - Contains the pagination controls and search -->
             <div class="rocket_chamber_div" style="border: 1px solid black; padding: 0; margin: 20px 0; position: relative;">
@@ -69,58 +103,79 @@ class Aardvark_Papluginsmar_Page {
                                     <tr>
                                         <td style="border: 1px solid black; padding: 4px;">
                                             <div style="display: flex; align-items: end; gap: 16px;">
-                                                <!-- Row Pagination Controls -->
-                                                <div style="display: flex; align-items: center; gap: 8px;">
-                                                    <span style="font-weight: bold; font-size: 14px;">Rows/page:</span>
-                                                    <select id="rows-per-page" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; background: #4F46E5; color: white;">
-                                                        <option value="10">10</option>
-                                                        <option value="25" selected>25</option>
-                                                        <option value="50">50</option>
-                                                        <option value="100">100</option>
-                                                        <option value="all">All</option>
-                                                    </select>
+                                                <!-- Row Pagination Bar 1: Items per page selector -->
+                                                <div style="display: flex; align-items: center;">
+                                                    <span style="font-size: 12px; color: #4B5563; margin-right: 8px;">Rows/page:</span>
+                                                    <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                                                        <button type="button" data-rows="10" class="rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; background: white;">10</button>
+                                                        <button type="button" data-rows="25" class="rows-per-page-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">25</button>
+                                                        <button type="button" data-rows="50" class="rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">50</button>
+                                                        <button type="button" data-rows="100" class="rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">100</button>
+                                                        <button type="button" data-rows="200" class="rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">200</button>
+                                                        <button type="button" data-rows="all" class="rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 0 6px 6px 0; cursor: pointer; background: white;">All</button>
+                                                    </div>
                                                 </div>
-                                                <div style="display: flex; align-items: center; gap: 8px;">
-                                                    <span style="font-weight: bold; font-size: 14px;">Row page:</span>
-                                                    <button type="button" id="prev-page" style="padding: 4px 8px; background: #4F46E5; color: white; border: none; border-radius: 3px; cursor: pointer;">‹</button>
-                                                    <span id="page-info" style="font-weight: bold;">1 of 1</span>
-                                                    <button type="button" id="next-page" style="padding: 4px 8px; background: #4F46E5; color: white; border: none; border-radius: 3px; cursor: pointer;">›</button>
+                                                <!-- Row Pagination Bar 2: Page navigation -->
+                                                <div style="display: flex; align-items: center;">
+                                                    <span style="font-size: 12px; color: #4B5563; margin-right: 8px;">Row page:</span>
+                                                    <nav style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                                                        <button type="button" id="prev-page" style="position: relative; display: inline-flex; align-items: center; border-radius: 6px 0 0 6px; padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; color: #9CA3AF; border: 1px solid #D1D5DB; cursor: pointer; background: white;">
+                                                            <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                                                <path d="M8 12l8-8v16l-8-8z" transform="rotate(180 12 12)"/>
+                                                            </svg>
+                                                        </button>
+                                                        <button type="button" id="page-info-btn" style="position: relative; display: inline-flex; align-items: center; padding: 8px 12px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #D1D5DB; margin-left: -1px; cursor: pointer; background: white; font-weight: bold;">1</button>
+                                                        <button type="button" id="next-page" style="position: relative; display: inline-flex; align-items: center; border-radius: 0 6px 6px 0; padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; color: #9CA3AF; border: 1px solid #D1D5DB; margin-left: -1px; cursor: pointer; background: white;">
+                                                            <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                                                <path d="M8 12l8-8v16l-8-8z"/>
+                                                            </svg>
+                                                        </button>
+                                                    </nav>
                                                 </div>
                                             </div>
                                         </td>
                                         <td style="border: 1px solid black; padding: 4px;">
                                             <div style="display: flex; align-items: end;">
-                                                <input type="text" id="plugin-search" placeholder="Search plugins..." style="width: 200px; margin-bottom: 3px; padding: 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 14px;">
+                                                <input type="text" id="plugin-search" placeholder="Search plugins..." style="width: 200px; margin-bottom: 3px; padding: 8px 12px; border: 1px solid #D1D5DB; border-radius: 4px; font-size: 14px; background: white; outline: none; transition: all 0.15s ease;" onFocus="this.style.outline='none'; this.style.borderColor='#3B82F6'; this.style.boxShadow='0 0 0 2px rgba(59, 130, 246, 0.1)'" onBlur="this.style.borderColor='#D1D5DB'; this.style.boxShadow='none'">
                                             </div>
                                         </td>
                                         <td style="border: 1px solid black; padding: 4px;">
-                                            <button type="button" id="wolf-options" style="padding: 6px 12px; background: #2271b1; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                                            <button type="button" id="wolf-options" style="background: #2563EB; color: white; font-weight: 500; padding: 8px 16px; border-radius: 6px; font-size: 14px; transition: background-color 0.15s ease; border: none; cursor: pointer;" onMouseOver="this.style.background='#1D4ED8'" onMouseOut="this.style.background='#2563EB'">
                                                 wolf options
                                             </button>
                                         </td>
                                         <td style="border: 1px solid black; padding: 4px;">
-                                            <button type="button" id="column-templates" style="padding: 6px 12px; background: #2271b1; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                                            <button type="button" id="column-templates" style="background: #7C3AED; color: white; font-weight: 500; padding: 8px 16px; border-radius: 6px; font-size: 14px; transition: background-color 0.15s ease; border: none; cursor: pointer;" onMouseOver="this.style.background='#6D28D9'" onMouseOut="this.style.background='#7C3AED'">
                                                 use the pillarshift coltemp system
                                             </button>
                                         </td>
                                         <td style="border: 1px solid black; padding: 4px;">
                                             <div style="display: flex; align-items: end; gap: 16px;">
-                                                <!-- Column Pagination Controls -->
-                                                <div style="display: flex; align-items: center; gap: 8px;">
-                                                    <span style="font-weight: bold; font-size: 14px;">Cols/page:</span>
-                                                    <select id="cols-per-page" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; background: #EAB308; color: black;">
-                                                        <option value="5">5</option>
-                                                        <option value="7">7</option>
-                                                        <option value="10">10</option>
-                                                        <option value="11" selected>11</option>
-                                                        <option value="all">All</option>
-                                                    </select>
+                                                <!-- Column Pagination Bar 1: Columns per page quantity selector -->
+                                                <div style="display: flex; align-items: center;">
+                                                    <span style="font-size: 12px; color: #4B5563; margin-right: 8px;">Cols/page:</span>
+                                                    <button type="button" data-cols="6" class="cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; border-radius: 4px 0 0 4px; margin-right: -1px; cursor: pointer; background: white;">6</button>
+                                                    <button type="button" data-cols="8" class="cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">8</button>
+                                                    <button type="button" data-cols="11" class="cols-per-page-btn active" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; background: #f8f782; color: black; margin-right: -1px; cursor: pointer;">11</button>
+                                                    <button type="button" data-cols="15" class="cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">15</button>
+                                                    <button type="button" data-cols="all" class="cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; border-radius: 0 4px 4px 0; cursor: pointer; background: white;">All</button>
                                                 </div>
-                                                <div style="display: flex; align-items: center; gap: 8px;">
-                                                    <span style="font-weight: bold; font-size: 14px;">Col page:</span>
-                                                    <button type="button" id="prev-col-page" style="padding: 4px 8px; background: #EAB308; color: black; border: none; border-radius: 3px; cursor: pointer;">‹</button>
-                                                    <span id="col-page-info" style="font-weight: bold;">1 of 1</span>
-                                                    <button type="button" id="next-col-page" style="padding: 4px 8px; background: #EAB308; color: black; border: none; border-radius: 3px; cursor: pointer;">›</button>
+                                                <!-- Column Pagination Bar 2: Current column page selector -->
+                                                <div style="display: flex; align-items: center;">
+                                                    <span style="font-size: 12px; color: #4B5563; margin-right: 8px;">Col page:</span>
+                                                    <button type="button" id="first-col-page" style="padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; border-radius: 4px 0 0 4px; margin-right: -1px; cursor: pointer; background: white;">≪</button>
+                                                    <button type="button" id="prev-col-page" style="padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">
+                                                        <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                                            <path d="M8 12l8-8v16l-8-8z" transform="rotate(180 12 12)"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button type="button" id="col-page-display" style="padding: 8px 12px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white; font-weight: bold;">1</button>
+                                                    <button type="button" id="next-col-page" style="padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">
+                                                        <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                                            <path d="M8 12l8-8v16l-8-8z"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button type="button" id="last-col-page" style="padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; border-radius: 0 4px 4px 0; cursor: pointer; background: white;">≫</button>
                                                 </div>
                                             </div>
                                         </td>
@@ -429,13 +484,26 @@ class Aardvark_Papluginsmar_Page {
             
             function updateRowPagination() {
                 const totalPages = Math.ceil(totalRows / rowsPerPage);
-                $('#page-info').text(currentPage + ' of ' + totalPages);
+                $('#page-info-btn').text(currentPage);
                 $('#prev-page').prop('disabled', currentPage <= 1);
                 $('#next-page').prop('disabled', currentPage >= totalPages);
             }
             
-            $('#rows-per-page').on('change', function() {
-                rowsPerPage = $(this).val() === 'all' ? totalRows : parseInt($(this).val());
+            // Row pagination button handlers
+            $('.rows-per-page-btn').on('click', function() {
+                $('.rows-per-page-btn').removeClass('active').css({
+                    'background': 'white',
+                    'color': 'black',
+                    'border': '1px solid #D1D5DB'
+                });
+                $(this).addClass('active').css({
+                    'background': '#3B82F6',
+                    'color': 'white',
+                    'border': '1px solid #3B82F6'
+                });
+                
+                const rowsValue = $(this).data('rows');
+                rowsPerPage = rowsValue === 'all' ? totalRows : parseInt(rowsValue);
                 currentPage = 1;
                 updateRowPagination();
                 // Implement actual pagination logic here
@@ -465,16 +533,36 @@ class Aardvark_Papluginsmar_Page {
             
             function updateColPagination() {
                 const totalColPages = Math.ceil(totalCols / colsPerPage);
-                $('#col-page-info').text(currentColPage + ' of ' + totalColPages);
+                $('#col-page-display').text(currentColPage);
+                $('#first-col-page').prop('disabled', currentColPage <= 1);
                 $('#prev-col-page').prop('disabled', currentColPage <= 1);
                 $('#next-col-page').prop('disabled', currentColPage >= totalColPages);
+                $('#last-col-page').prop('disabled', currentColPage >= totalColPages);
             }
             
-            $('#cols-per-page').on('change', function() {
-                colsPerPage = $(this).val() === 'all' ? totalCols : parseInt($(this).val());
+            // Column pagination button handlers
+            $('.cols-per-page-btn').on('click', function() {
+                $('.cols-per-page-btn').removeClass('active').css({
+                    'background': 'white',
+                    'color': 'black',
+                    'border': '1px solid #000'
+                });
+                $(this).addClass('active').css({
+                    'background': '#f8f782',
+                    'color': 'black',
+                    'border': '1px solid #000'
+                });
+                
+                const colsValue = $(this).data('cols');
+                colsPerPage = colsValue === 'all' ? totalCols : parseInt(colsValue);
                 currentColPage = 1;
                 updateColPagination();
-                // Implement column pagination logic here
+                updateColumnVisibility();
+            });
+            
+            $('#first-col-page').on('click', function() {
+                currentColPage = 1;
+                updateColPagination();
                 updateColumnVisibility();
             });
             
@@ -516,6 +604,13 @@ class Aardvark_Papluginsmar_Page {
                     updateColPagination();
                     updateColumnVisibility();
                 }
+            });
+            
+            $('#last-col-page').on('click', function() {
+                const totalColPages = Math.ceil(totalCols / colsPerPage);
+                currentColPage = totalColPages;
+                updateColPagination();
+                updateColumnVisibility();
             });
             
             // Wolf options button (placeholder)
