@@ -3,23 +3,9 @@
 class Aardvark_Papluginsmar_Page {
     
     public function render() {
-        // Simple debug first
-        echo '<div style="background: red; color: white; padding: 10px;">AARDVARK DEBUG: Page is loading</div>';
-        
         $plugins_data = $this->get_plugins_data();
-        echo '<div style="background: green; color: white; padding: 10px;">AARDVARK DEBUG: Got ' . count($plugins_data) . ' plugins</div>';
         ?>
         <div class="wrap">
-            <!-- DEBUG INFORMATION -->
-            <div style="background: #f0f8ff; border: 1px solid #0073aa; padding: 10px; margin: 10px 0; border-radius: 4px;">
-                <strong>DEBUG INFO:</strong><br>
-                Total plugins found: <?php echo count($plugins_data); ?><br>
-                Shenzi plugins in list: <?php echo implode(', ', $this->get_shenzi_plugins()); ?><br>
-                <strong>Plugin paths and shenzi status:</strong><br>
-                <?php foreach ($plugins_data as $path => $plugin): ?>
-                    <?php echo esc_html($path); ?> - <?php echo $plugin['is_shenzi'] ? 'YES' : 'NO'; ?> - <?php echo esc_html($plugin['Name']); ?><br>
-                <?php endforeach; ?>
-            </div>
             
             <h1 style="display: flex; align-items: center; gap: 14px; margin: 0 0 20px 0;">
                 <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="flex-shrink: 0;">
@@ -266,7 +252,6 @@ class Aardvark_Papluginsmar_Page {
                             </td>
                             <td style="border: 1px solid #555; padding: 8px;">
                                 <strong><?php echo esc_html($plugin['Name']); ?></strong>
-                                <br><small style="color: #666; font-size: 11px;">Path: <?php echo esc_html($plugin['debug_path']); ?></small>
                                 <?php if (!empty($plugin['PluginURI'])): ?>
                                 <br><small><a href="<?php echo esc_url($plugin['PluginURI']); ?>" target="_blank">Visit plugin site</a></small>
                                 <?php endif; ?>
@@ -679,20 +664,10 @@ class Aardvark_Papluginsmar_Page {
             });
             
             function applyShenziFilter(filter) {
-                console.log('Applying filter:', filter);
-                let totalRows = 0;
-                let shenziRows = 0;
-                let visibleRows = 0;
-                
                 $('#plugins-table tbody tr').each(function() {
                     const $row = $(this);
                     const $shenziCell = $row.find('[data-is-shenzi]');
                     const isShenzi = $shenziCell.data('is-shenzi') === 'true';
-                    
-                    totalRows++;
-                    if (isShenzi) shenziRows++;
-                    
-                    console.log('Row:', $row.data('plugin-path'), 'isShenzi:', isShenzi, 'data-is-shenzi:', $shenziCell.data('is-shenzi'));
                     
                     let show = false;
                     if (filter === 'all') {
@@ -703,11 +678,9 @@ class Aardvark_Papluginsmar_Page {
                         show = true;
                     }
                     
-                    if (show) visibleRows++;
                     $row.toggle(show);
                 });
                 
-                console.log('Filter results - Total:', totalRows, 'Shenzi:', shenziRows, 'Visible after filter:', visibleRows);
                 updateDisplayCounts();
             }
             
@@ -742,14 +715,14 @@ class Aardvark_Papluginsmar_Page {
     }
     
     /**
-     * Get list of shenzi plugins
+     * Get list of shenzi plugins (using actual paths from debug)
      */
     private function get_shenzi_plugins() {
         return array(
             'aardvark/aardvark.php',
             'ruplin/ruplin.php',
-            'snefuruplin/snefuruplin.php', // snefuruplin should be treated as ruplin
-            'grove/grove.php',
+            'snefuruplin-wp-plugin/snefuruplin.php', // actual path for snefuruplin
+            'grove-wp-plugin/grove.php', // actual path for grove
             'beacon/beacon.php',
             'lumora/lumora.php'
         );
@@ -761,17 +734,8 @@ class Aardvark_Papluginsmar_Page {
     private function is_shenzi_plugin($plugin_path) {
         $shenzi_plugins = $this->get_shenzi_plugins();
         
-        // Direct match first
-        if (in_array($plugin_path, $shenzi_plugins)) {
-            return true;
-        }
-        
-        // Special case: snefuruplin should be treated as ruplin
-        if (strpos($plugin_path, 'snefuruplin/') === 0) {
-            return true;
-        }
-        
-        return false;
+        // Direct match using actual paths
+        return in_array($plugin_path, $shenzi_plugins);
     }
     
     private function get_plugins_data() {
@@ -797,7 +761,6 @@ class Aardvark_Papluginsmar_Page {
                 'active' => in_array($plugin_path, $active_plugins),
                 'needs_update' => isset($plugin_updates->response[$plugin_path]),
                 'is_shenzi' => $is_shenzi,
-                'debug_path' => $plugin_path // For debugging
             );
         }
         
