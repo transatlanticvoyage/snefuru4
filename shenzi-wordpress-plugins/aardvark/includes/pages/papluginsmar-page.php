@@ -3,7 +3,7 @@
 class Aardvark_Papluginsmar_Page {
     
     public function render() {
-        $plugins_data = $this->get_plugins_data();
+        $plugins_data = $this->get_combined_plugins_data();
         ?>
         <div class="wrap">
             
@@ -284,33 +284,75 @@ class Aardvark_Papluginsmar_Page {
                                 </span>
                             </td>
                             <td style="border: 1px solid #555; padding: 8px;">
-                                <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
-                                    <!-- Activate Button -->
-                                    <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="activate" 
-                                            style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; <?php echo $plugin['active'] ? 'background: #f0f0f0; color: #888; cursor: not-allowed;' : 'background: #00a32a; color: white;'; ?>"
-                                            <?php echo $plugin['active'] ? 'disabled' : ''; ?>>
-                                        Activate
-                                    </button>
-                                    
-                                    <!-- Deactivate Button -->
-                                    <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="deactivate"
-                                            style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; <?php echo !$plugin['active'] ? 'background: #f0f0f0; color: #888; cursor: not-allowed;' : 'background: #d63638; color: white;'; ?>"
-                                            <?php echo !$plugin['active'] ? 'disabled' : ''; ?>>
-                                        Deactivate
-                                    </button>
-                                    
-                                    <!-- Delete Button -->
-                                    <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="delete"
-                                            style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 0 6px 6px 0; cursor: pointer; background: #b32d2e; color: white;">
-                                        Delete
-                                    </button>
-                                </div>
+                                <?php if ($plugin['install_status'] === 'available'): ?>
+                                    <!-- Install Button for uninstalled shenzi plugins -->
+                                    <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                                        <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="install" 
+                                                style="padding: 10px 16px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px; cursor: pointer; background: #2271b1; color: white;">
+                                            Install from GitHub
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <!-- Standard buttons for installed plugins -->
+                                    <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                                        <!-- Activate Button -->
+                                        <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="activate" 
+                                                style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; <?php echo $plugin['active'] ? 'background: #f0f0f0; color: #888; cursor: not-allowed;' : 'background: #00a32a; color: white;'; ?>"
+                                                <?php echo $plugin['active'] ? 'disabled' : ''; ?>>
+                                            Activate
+                                        </button>
+                                        
+                                        <!-- Deactivate Button -->
+                                        <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="deactivate"
+                                                style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; <?php echo !$plugin['active'] ? 'background: #f0f0f0; color: #888; cursor: not-allowed;' : 'background: #d63638; color: white;'; ?>"
+                                                <?php echo !$plugin['active'] ? 'disabled' : ''; ?>>
+                                            Deactivate
+                                        </button>
+                                        
+                                        <!-- Delete Button -->
+                                        <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="delete"
+                                                style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 0 6px 6px 0; cursor: pointer; background: #b32d2e; color: white;">
+                                            Delete
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
                             </td>
-                            <td style="border: 1px solid #555; border-left: 3px solid black; padding: 8px;">-</td>
-                            <td style="border: 1px solid #555; padding: 8px;">-</td>
-                            <td style="border: 1px solid #555; padding: 8px;">-</td>
+                            <td style="border: 1px solid #555; border-left: 3px solid black; padding: 8px;">
+                                <?php if (!empty($plugin['github_url'])): ?>
+                                    <a href="<?php echo esc_url($plugin['github_url']); ?>" target="_blank" style="color: #2271b1; text-decoration: none; font-size: 12px;">
+                                        <?php echo esc_html(parse_url($plugin['github_url'], PHP_URL_PATH)); ?>
+                                    </a>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
+                            <td style="border: 1px solid #555; padding: 8px;">
+                                <?php if (!empty($plugin['branch_name'])): ?>
+                                    <span style="background: #f0f6fc; color: #0969da; padding: 2px 6px; border-radius: 3px; font-size: 12px; font-family: monospace;">
+                                        <?php echo esc_html($plugin['branch_name']); ?>
+                                    </span>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
+                            <td style="border: 1px solid #555; padding: 8px;">
+                                <?php if (!empty($plugin['remote_version']) && $plugin['install_status'] === 'installed'): ?>
+                                    <span style="font-size: 12px;">
+                                        Remote: <strong><?php echo esc_html($plugin['remote_version']); ?></strong><br>
+                                        Local: <strong><?php echo esc_html($plugin['Version']); ?></strong>
+                                    </span>
+                                <?php elseif (!empty($plugin['remote_version'])): ?>
+                                    <span style="font-size: 12px; color: #666;">
+                                        v<?php echo esc_html($plugin['remote_version']); ?>
+                                    </span>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
                             <td style="border: 1px solid #555; padding: 8px;" data-is-shenzi="<?php echo $plugin['is_shenzi'] ? 'true' : 'false'; ?>">
-                                <?php if ($plugin['is_shenzi']): ?>
+                                <?php if ($plugin['is_shenzi'] && $plugin['install_status'] === 'available'): ?>
+                                    <span style="background: #2271b1; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">AVAILABLE</span>
+                                <?php elseif ($plugin['is_shenzi']): ?>
                                     <span style="background: #00a32a; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">YES</span>
                                 <?php else: ?>
                                     <span style="background: #646970; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">NO</span>
@@ -696,9 +738,6 @@ class Aardvark_Papluginsmar_Page {
             });
             
             function applyShenziFilter(filter) {
-                console.log('=== FILTER DEBUG START ===');
-                console.log('Filter:', filter);
-                
                 let totalRows = 0;
                 let shenziCount = 0;
                 let shownCount = 0;
@@ -723,21 +762,8 @@ class Aardvark_Papluginsmar_Page {
                     
                     if (show) shownCount++;
                     
-                    // Debug first few rows
-                    if (totalRows <= 5) {
-                        console.log('Row ' + totalRows + ':', {
-                            path: $row.data('plugin-path'),
-                            dataValue: dataValue,
-                            isShenzi: isShenzi,
-                            show: show
-                        });
-                    }
-                    
                     $row.toggle(show);
                 });
-                
-                console.log('Summary - Total:', totalRows, 'Shenzi:', shenziCount, 'Shown:', shownCount);
-                console.log('=== FILTER DEBUG END ===');
                 
                 updateDisplayCounts();
             }
@@ -770,6 +796,87 @@ class Aardvark_Papluginsmar_Page {
         });
         </script>
         <?php
+    }
+    
+    /**
+     * Get shenzi plugin definitions from database
+     */
+    private function get_shenzi_plugin_definitions() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_plugins_oasis';
+        
+        $results = $wpdb->get_results(
+            "SELECT * FROM $table_name ORDER BY plugin_slug",
+            ARRAY_A
+        );
+        
+        return $results ?: array();
+    }
+    
+    /**
+     * Get combined plugins data (installed + shenzi definitions)
+     */
+    private function get_combined_plugins_data() {
+        // 1. Get installed plugins (current source)
+        $installed_plugins = $this->get_plugins_data();
+        
+        // 2. Get shenzi plugin definitions from database
+        $shenzi_definitions = $this->get_shenzi_plugin_definitions();
+        
+        // 3. Merge with no duplicates (installed takes precedence)
+        $combined = array();
+        
+        // Add all installed plugins first
+        foreach ($installed_plugins as $path => $plugin) {
+            $combined[$path] = array_merge($plugin, array(
+                'source' => 'installed',
+                'install_status' => 'installed',
+                'github_url' => '',
+                'branch_name' => '',
+                'remote_version' => '',
+                'notes' => ''
+            ));
+        }
+        
+        // Add uninstalled shenzi plugins and merge metadata for installed ones
+        foreach ($shenzi_definitions as $definition) {
+            $plugin_path = $definition['plugin_path'];
+            
+            if (!isset($combined[$plugin_path])) {
+                // Plugin not installed - add as available
+                $combined[$plugin_path] = array(
+                    'Name' => ucfirst($definition['plugin_slug']),
+                    'Version' => $definition['remote_version'] ?: 'Unknown',
+                    'Description' => 'Shenzi plugin available for installation from GitHub',
+                    'PluginURI' => $definition['github_url'],
+                    'Author' => 'Shenzi Team',
+                    'active' => false,
+                    'needs_update' => false,
+                    'is_shenzi' => true,
+                    'source' => 'shenzi_definition',
+                    'install_status' => 'available',
+                    'github_url' => $definition['github_url'],
+                    'branch_name' => $definition['branch_name'],
+                    'remote_version' => $definition['remote_version'],
+                    'notes' => $definition['notes']
+                );
+            } else {
+                // Plugin is installed - merge shenzi metadata
+                $combined[$plugin_path] = array_merge(
+                    $combined[$plugin_path], 
+                    array(
+                        'is_shenzi' => true,
+                        'github_url' => $definition['github_url'],
+                        'branch_name' => $definition['branch_name'],
+                        'remote_version' => $definition['remote_version'],
+                        'notes' => $definition['notes']
+                    )
+                );
+            }
+        }
+        
+        return $combined;
     }
     
     /**
