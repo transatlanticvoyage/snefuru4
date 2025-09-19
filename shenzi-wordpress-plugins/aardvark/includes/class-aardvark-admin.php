@@ -16,6 +16,7 @@ class Aardvark_Admin {
         add_action('wp_ajax_aardvark_update_plugin_field', array($this, 'ajax_update_plugin_field'));
         add_action('wp_ajax_aardvark_delete_plugin', array($this, 'ajax_delete_plugin'));
         add_action('wp_ajax_aardvark_install_plugin', array($this, 'ajax_install_plugin'));
+        add_action('wp_ajax_aardvark_update_github_plugin', array($this, 'ajax_update_github_plugin'));
     }
     
     public function add_admin_menu() {
@@ -204,6 +205,7 @@ class Aardvark_Admin {
         }
         
         $plugin = sanitize_text_field($_POST['plugin']);
+        $github_token = isset($_POST['github_token']) ? sanitize_text_field($_POST['github_token']) : '';
         
         // Get plugin info from database
         global $wpdb;
@@ -221,8 +223,48 @@ class Aardvark_Admin {
             wp_send_json_error('No GitHub URL available for this plugin');
         }
         
-        // For now, redirect to WP Pusher or provide instructions
-        $message = 'Plugin installation from GitHub is not yet fully automated. Please use WP Pusher to install from: ' . $plugin_info->github_url;
-        wp_send_json_error($message);
+        // Load the installer
+        require_once AARDVARK_PLUGIN_PATH . 'includes/class-plugin-installer.php';
+        
+        // Use stored token if no token provided
+        $token = !empty($github_token) ? $github_token : $plugin_info->github_token;
+        
+        $installer = new Aardvark_Plugin_Installer($token);
+        $result = $installer->install_from_github(
+            $plugin_info->github_url,
+            $plugin_info->branch_name ?: 'main',
+            $token
+        );
+        
+        if (isset($result['error'])) {
+            wp_send_json_error($result['error']);
+        } else {
+            wp_send_json_success($result['message']);
+        }
+    }
+    
+    /**
+     * AJAX handler for updating GitHub plugins
+     */
+    public function ajax_update_github_plugin() {
+        check_ajax_referer('aardvark_plugin_update', 'nonce');
+        
+        if (!current_user_can('update_plugins')) {
+            wp_die('Insufficient permissions');
+        }
+        
+        $plugin_slug = sanitize_text_field($_POST['plugin_slug']);
+        
+        // Load the installer
+        require_once AARDVARK_PLUGIN_PATH . 'includes/class-plugin-installer.php';
+        
+        $installer = new Aardvark_Plugin_Installer();
+        $result = $installer->update_plugin($plugin_slug);
+        
+        if (isset($result['error'])) {
+            wp_send_json_error($result['error']);
+        } else {
+            wp_send_json_success($result['message']);
+        }
     }
 }

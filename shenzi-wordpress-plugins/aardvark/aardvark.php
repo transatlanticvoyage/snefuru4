@@ -43,6 +43,7 @@ class AardvarkPlugin {
     
     public function activate() {
         $this->create_zen_plugins_oasis_table();
+        $this->create_zen_github_installs_table();
         $this->populate_initial_shenzi_plugins();
     }
     
@@ -73,6 +74,42 @@ class AardvarkPlugin {
             
             INDEX idx_plugin_slug (plugin_slug),
             INDEX idx_install_status (install_status)
+        ) $charset_collate;";
+        
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+    
+    /**
+     * Create the wp_zen_github_installs database table
+     */
+    private function create_zen_github_installs_table() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_github_installs';
+        
+        $charset_collate = $wpdb->get_charset_collate();
+        
+        $sql = "CREATE TABLE $table_name (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            plugin_slug VARCHAR(255) NOT NULL UNIQUE,
+            plugin_path VARCHAR(255) NOT NULL,
+            github_url VARCHAR(500) NOT NULL,
+            github_token VARCHAR(255),
+            branch_name VARCHAR(100) DEFAULT 'main',
+            installed_version VARCHAR(50),
+            remote_version VARCHAR(50),
+            last_updated DATETIME,
+            last_checked DATETIME,
+            install_status ENUM('installing', 'installed', 'updating', 'error') DEFAULT 'installing',
+            error_message TEXT,
+            auto_update TINYINT(1) DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            
+            INDEX idx_plugin_slug (plugin_slug),
+            INDEX idx_install_status (install_status),
+            INDEX idx_auto_update (auto_update)
         ) $charset_collate;";
         
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
