@@ -20,12 +20,12 @@ class Aardvark_Admin {
     public function add_admin_menu() {
         add_menu_page(
             'Aardvark Plugins Mar',
-            'papluginsmar',
+            'Aardvark',
             'manage_options',
             'papluginsmar',
             array($this, 'display_admin_page'),
             'dashicons-admin-plugins',
-            25
+            2
         );
     }
     

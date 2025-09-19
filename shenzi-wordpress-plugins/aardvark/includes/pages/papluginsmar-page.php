@@ -241,6 +241,9 @@ class Aardvark_Papluginsmar_Page {
                             <th style="border: 1px solid #555; padding: 12px; text-align: left; width: 40px;">
                                 <input type="checkbox" id="select-all-checkbox">
                             </th>
+                            <th style="border: 1px solid #555; padding: 12px; text-align: center; width: 40px;">
+                                <span style="color: darkred; font-size: 16px;">★</span>
+                            </th>
                             <th style="border: 1px solid #555; padding: 12px; text-align: left;">Plugin Name</th>
                             <th style="border: 1px solid #555; padding: 12px; text-align: left;">Version</th>
                             <th style="border: 1px solid #555; padding: 12px; text-align: left;">Status</th>
@@ -258,6 +261,9 @@ class Aardvark_Papluginsmar_Page {
                         <tr data-plugin-path="<?php echo esc_attr($plugin_path); ?>">
                             <td style="border: 1px solid #555; padding: 8px; text-align: center;">
                                 <input type="checkbox" class="plugin-checkbox" value="<?php echo esc_attr($plugin_path); ?>">
+                            </td>
+                            <td style="border: 1px solid #555; padding: 8px; text-align: center;">
+                                <span style="color: gray; font-size: 16px; -webkit-text-stroke: 1px gray; -webkit-text-fill-color: transparent;">★</span>
                             </td>
                             <td style="border: 1px solid #555; padding: 8px;">
                                 <strong><?php echo esc_html($plugin['Name']); ?></strong>
