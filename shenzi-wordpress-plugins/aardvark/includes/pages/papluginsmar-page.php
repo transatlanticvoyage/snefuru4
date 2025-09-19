@@ -330,11 +330,12 @@ class Aardvark_Papluginsmar_Page {
                                     </div>
                                 <?php endif; ?>
                             </td>
-                            <td style="border: 1px solid #555; border-left: 3px solid black; padding: 8px;">
+                            <td style="border: 1px solid #555; border-left: 3px solid black; padding: 8px; position: relative;">
                                 <?php if (!empty($plugin['github_url'])): ?>
                                     <a href="<?php echo esc_url($plugin['github_url']); ?>" target="_blank" style="color: #2271b1; text-decoration: none; font-size: 12px;">
                                         <?php echo esc_html(parse_url($plugin['github_url'], PHP_URL_PATH)); ?>
                                     </a>
+                                    <button class="copy-plume1-btn" data-copy-value="<?php echo esc_attr(ltrim(parse_url($plugin['github_url'], PHP_URL_PATH), '/')); ?>" style="position: absolute; right: 0; top: 0; height: 100%; width: 12px; border: 1px solid gray; background: white; cursor: pointer; font-size: 8px;">📋</button>
                                 <?php else: ?>
                                     -
                                 <?php endif; ?>
@@ -821,6 +822,33 @@ class Aardvark_Papluginsmar_Page {
                     }, 1000);
                 } catch (err) {
                     console.log('Copy failed');
+                }
+            });
+            
+            // Plume1 copy functionality
+            $(document).on('click', '.copy-plume1-btn', function() {
+                const copyValue = $(this).data('copy-value');
+                
+                try {
+                    navigator.clipboard.writeText(copyValue).then(() => {
+                        $(this).text('✓');
+                        setTimeout(() => {
+                            $(this).text('📋');
+                        }, 1000);
+                    });
+                } catch (err) {
+                    // Fallback for older browsers
+                    const tempInput = document.createElement('input');
+                    tempInput.value = copyValue;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    
+                    $(this).text('✓');
+                    setTimeout(() => {
+                        $(this).text('📋');
+                    }, 1000);
                 }
             });
         });
