@@ -44,14 +44,23 @@ class Aardvark_Papluginsmar_Page {
             </h1>
             
             <!-- Shenzi Plugins Filter -->
-            <div style="margin-bottom: 20px;">
-                <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">
-                    shenzi plugins filter
+            <div style="margin-bottom: 20px; display: flex; align-items: flex-start; gap: 30px;">
+                <div>
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">
+                        shenzi plugins filter
+                    </div>
+                    <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                        <button type="button" data-filter="all" class="shenzi-filter-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; background: white; color: black;">all</button>
+                        <button type="button" data-filter="shenzi" class="shenzi-filter-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">shenzi only</button>
+                        <button type="button" data-filter="non-shenzi" class="shenzi-filter-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 0 6px 6px 0; cursor: pointer; background: white; color: black;">non-shenzi only</button>
+                    </div>
                 </div>
-                <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
-                    <button type="button" data-filter="all" class="shenzi-filter-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; background: white; color: black;">all</button>
-                    <button type="button" data-filter="shenzi" class="shenzi-filter-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">shenzi only</button>
-                    <button type="button" data-filter="non-shenzi" class="shenzi-filter-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 0 6px 6px 0; cursor: pointer; background: white; color: black;">non-shenzi only</button>
+                
+                <!-- WP Pusher Link -->
+                <div style="align-self: flex-end;">
+                    <a href="/wp-admin/admin.php?page=wppusher-plugins" style="display: inline-block; padding: 10px 16px; font-size: 14px; background: #2271b1; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.15s ease;" onMouseOver="this.style.background='#1e5a8a'" onMouseOut="this.style.background='#2271b1'">
+                        wppusher-plugins
+                    </a>
                 </div>
             </div>
             
@@ -275,23 +284,27 @@ class Aardvark_Papluginsmar_Page {
                                 </span>
                             </td>
                             <td style="border: 1px solid #555; padding: 8px;">
-                                <?php if ($plugin['active']): ?>
-                                    <button class="toggle-plugin" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="deactivate" 
-                                            style="padding: 4px 8px; background: #d63638; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
-                                        Deactivate
-                                    </button>
-                                <?php else: ?>
-                                    <button class="toggle-plugin" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="activate"
-                                            style="padding: 4px 8px; background: #00a32a; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                                <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                                    <!-- Activate Button -->
+                                    <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="activate" 
+                                            style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; <?php echo $plugin['active'] ? 'background: #f0f0f0; color: #888; cursor: not-allowed;' : 'background: #00a32a; color: white;'; ?>"
+                                            <?php echo $plugin['active'] ? 'disabled' : ''; ?>>
                                         Activate
                                     </button>
-                                <?php endif; ?>
-                                <?php if ($plugin['needs_update']): ?>
-                                    <button class="update-plugin" data-plugin="<?php echo esc_attr($plugin_path); ?>"
-                                            style="padding: 4px 8px; background: #2271b1; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; margin-left: 5px;">
-                                        Update
+                                    
+                                    <!-- Deactivate Button -->
+                                    <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="deactivate"
+                                            style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; <?php echo !$plugin['active'] ? 'background: #f0f0f0; color: #888; cursor: not-allowed;' : 'background: #d63638; color: white;'; ?>"
+                                            <?php echo !$plugin['active'] ? 'disabled' : ''; ?>>
+                                        Deactivate
                                     </button>
-                                <?php endif; ?>
+                                    
+                                    <!-- Delete Button -->
+                                    <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="delete"
+                                            style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 0 6px 6px 0; cursor: pointer; background: #b32d2e; color: white;">
+                                        Delete
+                                    </button>
+                                </div>
                             </td>
                             <td style="border: 1px solid #555; border-left: 3px solid black; padding: 8px;">-</td>
                             <td style="border: 1px solid #555; padding: 8px;">-</td>
@@ -395,30 +408,49 @@ class Aardvark_Papluginsmar_Page {
             });
             
             // Individual plugin actions
-            $('.toggle-plugin').on('click', function() {
+            $('.plugin-action-btn').on('click', function() {
                 const $button = $(this);
                 const plugin = $button.data('plugin');
                 const action = $button.data('action');
                 
-                $.post(ajaxurl, {
-                    action: 'aardvark_toggle_plugin',
-                    plugin: plugin,
-                    toggle_action: action,
-                    nonce: '<?php echo wp_create_nonce('aardvark_plugin_action'); ?>'
-                }).done(function(response) {
-                    if (response.success) {
-                        location.reload();
-                    } else {
-                        alert('Error: ' + response.data);
+                // Don't process if button is disabled
+                if ($button.prop('disabled')) {
+                    return;
+                }
+                
+                // Confirm delete action
+                if (action === 'delete') {
+                    if (!confirm('Are you sure you want to delete this plugin? This action cannot be undone.')) {
+                        return;
                     }
-                });
-            });
-            
-            // Update plugin
-            $('.update-plugin').on('click', function() {
-                const plugin = $(this).data('plugin');
-                // Plugin update functionality would go here
-                alert('Update functionality would be implemented here');
+                }
+                
+                if (action === 'activate' || action === 'deactivate') {
+                    $.post(ajaxurl, {
+                        action: 'aardvark_toggle_plugin',
+                        plugin: plugin,
+                        toggle_action: action,
+                        nonce: '<?php echo wp_create_nonce('aardvark_plugin_action'); ?>'
+                    }).done(function(response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.data);
+                        }
+                    });
+                } else if (action === 'delete') {
+                    $.post(ajaxurl, {
+                        action: 'aardvark_delete_plugin',
+                        plugin: plugin,
+                        nonce: '<?php echo wp_create_nonce('aardvark_plugin_delete'); ?>'
+                    }).done(function(response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.data);
+                        }
+                    });
+                }
             });
             
             // Inline editing

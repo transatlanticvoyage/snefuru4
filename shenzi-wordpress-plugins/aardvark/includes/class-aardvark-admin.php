@@ -14,6 +14,7 @@ class Aardvark_Admin {
         add_action('wp_ajax_aardvark_toggle_plugin', array($this, 'ajax_toggle_plugin'));
         add_action('wp_ajax_aardvark_bulk_plugin_action', array($this, 'ajax_bulk_plugin_action'));
         add_action('wp_ajax_aardvark_update_plugin_field', array($this, 'ajax_update_plugin_field'));
+        add_action('wp_ajax_aardvark_delete_plugin', array($this, 'ajax_delete_plugin'));
     }
     
     public function add_admin_menu() {
@@ -164,5 +165,30 @@ class Aardvark_Admin {
         // store custom metadata in wp_options or a custom table.
         
         wp_send_json_success('Field updated (display only)');
+    }
+    
+    /**
+     * AJAX handler for deleting plugins
+     */
+    public function ajax_delete_plugin() {
+        check_ajax_referer('aardvark_plugin_delete', 'nonce');
+        
+        if (!current_user_can('delete_plugins')) {
+            wp_die('Insufficient permissions');
+        }
+        
+        $plugin = sanitize_text_field($_POST['plugin']);
+        
+        if (!function_exists('delete_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        
+        $result = delete_plugins(array($plugin));
+        
+        if (is_wp_error($result)) {
+            wp_send_json_error($result->get_error_message());
+        } else {
+            wp_send_json_success('Plugin deleted successfully');
+        }
     }
 }
