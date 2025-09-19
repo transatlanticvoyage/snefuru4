@@ -463,3 +463,4 @@ class SnefuruPlugin {
 
 // Initialize the plugin
 new SnefuruPlugin(); Test comment 4: Testing post-conversion - Fri Sep 19 16:31:10 EDT 2025
+// Test comment 5: Post-conversion test Fri Sep 19 16:33:53 EDT 2025
