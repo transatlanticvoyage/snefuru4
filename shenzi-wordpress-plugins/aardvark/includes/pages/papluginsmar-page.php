@@ -664,10 +664,21 @@ class Aardvark_Papluginsmar_Page {
             });
             
             function applyShenziFilter(filter) {
+                console.log('=== FILTER DEBUG START ===');
+                console.log('Filter:', filter);
+                
+                let totalRows = 0;
+                let shenziCount = 0;
+                let shownCount = 0;
+                
                 $('#plugins-table tbody tr').each(function() {
                     const $row = $(this);
                     const $shenziCell = $row.find('[data-is-shenzi]');
-                    const isShenzi = $shenziCell.data('is-shenzi') === 'true';
+                    const dataValue = $shenziCell.attr('data-is-shenzi');
+                    const isShenzi = dataValue === 'true';
+                    
+                    totalRows++;
+                    if (isShenzi) shenziCount++;
                     
                     let show = false;
                     if (filter === 'all') {
@@ -678,8 +689,23 @@ class Aardvark_Papluginsmar_Page {
                         show = true;
                     }
                     
+                    if (show) shownCount++;
+                    
+                    // Debug first few rows
+                    if (totalRows <= 5) {
+                        console.log('Row ' + totalRows + ':', {
+                            path: $row.data('plugin-path'),
+                            dataValue: dataValue,
+                            isShenzi: isShenzi,
+                            show: show
+                        });
+                    }
+                    
                     $row.toggle(show);
                 });
+                
+                console.log('Summary - Total:', totalRows, 'Shenzi:', shenziCount, 'Shown:', shownCount);
+                console.log('=== FILTER DEBUG END ===');
                 
                 updateDisplayCounts();
             }
