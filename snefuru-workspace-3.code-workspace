@@ -4,10 +4,6 @@
 			"path": "."
 		},
 		{
-			"path": "../localrepo-vulcanhatch",
-			"name": "🌋 VulcanHatch (WP Dev)"
-		},
-		{
 			"path": "./shenzi-wordpress-plugins/ruplin"
 		},
 		{
@@ -32,6 +28,10 @@
 			"path": "./shenzi-wordpress-plugins/klyra"
 		},
 		{
+			"path": "../localrepo-vulcanhatch",
+			"name": "🌋 VulcanHatch (WP Dev)"
+		},
+		{
 			"path": "./shenzi-wordpress-plugins/brimora"
 		},
 		{
@@ -46,10 +46,10 @@
 	],
 	"settings": {
 		"git.detectSubmodules": false,
-		"git.autoRepositoryDetection": "openEditors",
+		"git.autoRepositoryDetection": true,
 		"git.repositories": [
 			".",
-			"../localrepo-vulcanhatch",
+			"./shenzi-wordpress-plugins/ruplin",
 			"./shenzi-wordpress-plugins/grove",
 			"./shenzi-wordpress-plugins/aardvark",
 			"./shenzi-wordpress-plugins/veyra",
@@ -57,6 +57,7 @@
 			"./shenzi-wordpress-plugins/lumora",
 			"./shenzi-wordpress-plugins/harbor",
 			"./shenzi-wordpress-plugins/klyra",
+			"../localrepo-vulcanhatch",
 			"./shenzi-wordpress-plugins/brimora",
 			"./shenzi-wordpress-plugins/nivaro",
 			"./shenzi-wordpress-plugins/trillan",
