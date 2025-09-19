@@ -15,6 +15,7 @@ class Aardvark_Admin {
         add_action('wp_ajax_aardvark_bulk_plugin_action', array($this, 'ajax_bulk_plugin_action'));
         add_action('wp_ajax_aardvark_update_plugin_field', array($this, 'ajax_update_plugin_field'));
         add_action('wp_ajax_aardvark_delete_plugin', array($this, 'ajax_delete_plugin'));
+        add_action('wp_ajax_aardvark_install_plugin', array($this, 'ajax_install_plugin'));
     }
     
     public function add_admin_menu() {
@@ -190,5 +191,38 @@ class Aardvark_Admin {
         } else {
             wp_send_json_success('Plugin deleted successfully');
         }
+    }
+    
+    /**
+     * AJAX handler for installing plugins from GitHub
+     */
+    public function ajax_install_plugin() {
+        check_ajax_referer('aardvark_plugin_install', 'nonce');
+        
+        if (!current_user_can('install_plugins')) {
+            wp_die('Insufficient permissions');
+        }
+        
+        $plugin = sanitize_text_field($_POST['plugin']);
+        
+        // Get plugin info from database
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_plugins_oasis';
+        $plugin_info = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE plugin_path = %s",
+            $plugin
+        ));
+        
+        if (!$plugin_info) {
+            wp_send_json_error('Plugin not found in database');
+        }
+        
+        if (empty($plugin_info->github_url)) {
+            wp_send_json_error('No GitHub URL available for this plugin');
+        }
+        
+        // For now, redirect to WP Pusher or provide instructions
+        $message = 'Plugin installation from GitHub is not yet fully automated. Please use WP Pusher to install from: ' . $plugin_info->github_url;
+        wp_send_json_error($message);
     }
 }

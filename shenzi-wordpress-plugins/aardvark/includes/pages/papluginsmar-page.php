@@ -335,16 +335,17 @@ class Aardvark_Papluginsmar_Page {
                                     <a href="<?php echo esc_url($plugin['github_url']); ?>" target="_blank" style="color: #2271b1; text-decoration: none; font-size: 12px;">
                                         <?php echo esc_html(parse_url($plugin['github_url'], PHP_URL_PATH)); ?>
                                     </a>
-                                    <button class="copy-plume1-btn" data-copy-value="<?php echo esc_attr(ltrim(parse_url($plugin['github_url'], PHP_URL_PATH), '/')); ?>" style="position: absolute; right: 0; top: 0; height: 100%; width: 12px; border: 1px solid gray; background: white; cursor: pointer; font-size: 8px;">📋</button>
+                                    <button class="copy-plume1-btn" data-copy-value="<?php echo esc_attr(ltrim(parse_url($plugin['github_url'], PHP_URL_PATH), '/')); ?>" style="position: absolute; right: 0; top: 0; height: 100%; width: 12px; border: 1px solid gray; background: gray; cursor: pointer; font-size: 8px;" onmouseover="this.style.background='yellow'" onmouseout="this.style.background='gray'"></button>
                                 <?php else: ?>
                                     -
                                 <?php endif; ?>
                             </td>
-                            <td style="border: 1px solid #555; padding: 8px;">
+                            <td style="border: 1px solid #555; padding: 8px; position: relative;">
                                 <?php if (!empty($plugin['branch_name'])): ?>
                                     <span style="background: #f0f6fc; color: #0969da; padding: 2px 6px; border-radius: 3px; font-size: 12px; font-family: monospace;">
                                         <?php echo esc_html($plugin['branch_name']); ?>
                                     </span>
+                                    <button class="copy-plume2-btn" data-copy-value="<?php echo esc_attr($plugin['branch_name']); ?>" style="position: absolute; right: 0; top: 0; height: 100%; width: 12px; border: 1px solid gray; background: gray; cursor: pointer; font-size: 8px;" onmouseover="this.style.background='yellow'" onmouseout="this.style.background='gray'"></button>
                                 <?php else: ?>
                                     -
                                 <?php endif; ?>
@@ -505,6 +506,29 @@ class Aardvark_Papluginsmar_Page {
                         } else {
                             alert('Error: ' + response.data);
                         }
+                    });
+                } else if (action === 'install') {
+                    if (!confirm('Install this plugin from GitHub?')) {
+                        return;
+                    }
+                    
+                    $button.prop('disabled', true).text('Installing...');
+                    
+                    $.post(ajaxurl, {
+                        action: 'aardvark_install_plugin',
+                        plugin: plugin,
+                        nonce: '<?php echo wp_create_nonce('aardvark_plugin_install'); ?>'
+                    }).done(function(response) {
+                        if (response.success) {
+                            alert('Plugin installed successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.data);
+                            $button.prop('disabled', false).text('Install from GitHub');
+                        }
+                    }).fail(function() {
+                        alert('Installation failed. Please try again.');
+                        $button.prop('disabled', false).text('Install from GitHub');
                     });
                 }
             });
@@ -831,9 +855,9 @@ class Aardvark_Papluginsmar_Page {
                 
                 try {
                     navigator.clipboard.writeText(copyValue).then(() => {
-                        $(this).text('✓');
+                        $(this).css('background', 'green');
                         setTimeout(() => {
-                            $(this).text('📋');
+                            $(this).css('background', 'gray');
                         }, 1000);
                     });
                 } catch (err) {
@@ -845,9 +869,36 @@ class Aardvark_Papluginsmar_Page {
                     document.execCommand('copy');
                     document.body.removeChild(tempInput);
                     
-                    $(this).text('✓');
+                    $(this).css('background', 'green');
                     setTimeout(() => {
-                        $(this).text('📋');
+                        $(this).css('background', 'gray');
+                    }, 1000);
+                }
+            });
+            
+            // Plume2 copy functionality
+            $(document).on('click', '.copy-plume2-btn', function() {
+                const copyValue = $(this).data('copy-value');
+                
+                try {
+                    navigator.clipboard.writeText(copyValue).then(() => {
+                        $(this).css('background', 'green');
+                        setTimeout(() => {
+                            $(this).css('background', 'gray');
+                        }, 1000);
+                    });
+                } catch (err) {
+                    // Fallback for older browsers
+                    const tempInput = document.createElement('input');
+                    tempInput.value = copyValue;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    
+                    $(this).css('background', 'green');
+                    setTimeout(() => {
+                        $(this).css('background', 'gray');
                     }, 1000);
                 }
             });
