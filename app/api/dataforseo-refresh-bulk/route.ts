@@ -324,7 +324,12 @@ async function retrieveAndUpdateResults(
   password: string,
   maxRetries: number = 3
 ) {
-  console.log(`🔍 Retrieving results for ${taskIds.length} tasks...`);
+  console.log(`🔍 [BULK BACKGROUND] Retrieving results for ${taskIds.length} tasks...`);
+  console.log(`🔍 [BULK BACKGROUND] Task IDs:`, taskIds.map(t => ({ 
+    task_id: t.task_id, 
+    keywords_count: t.keywords.length,
+    keywords: t.keywords 
+  })));
   
   const MAX_CONCURRENT_RETRIEVALS = 5; // Limit concurrent result retrievals
   const pendingTasks = [...taskIds];
@@ -345,6 +350,7 @@ async function retrieveAndUpdateResults(
         try {
           console.log(`📋 Checking task ${taskInfo.task_id} (${taskInfo.keywords.length} keywords)...`);
           
+          console.log(`🟧 [BULK BACKGROUND] Fetching results for task ${taskInfo.task_id}`);
           const resultsResponse = await fetch(`https://api.dataforseo.com/v3/keywords_data/google_ads/search_volume/task_get/${taskInfo.task_id}`, {
             method: 'GET',
             headers: {
@@ -352,6 +358,7 @@ async function retrieveAndUpdateResults(
               'Content-Type': 'application/json'
             }
           });
+          console.log(`🟧 [BULK BACKGROUND] Response status for task ${taskInfo.task_id}:`, resultsResponse.status);
 
           if (!resultsResponse.ok) {
             console.error(`Results API Error for task ${taskInfo.task_id}: ${resultsResponse.status}`);
@@ -359,6 +366,12 @@ async function retrieveAndUpdateResults(
           }
 
           const resultsData = await resultsResponse.json();
+          console.log(`🟧 [BULK BACKGROUND] Task ${taskInfo.task_id} response data:`, {
+            has_tasks: !!resultsData.tasks,
+            task_status: resultsData.tasks?.[0]?.status_code,
+            has_result: !!resultsData.tasks?.[0]?.result,
+            result_count: resultsData.tasks?.[0]?.result?.length
+          });
           
           if (resultsData.tasks && resultsData.tasks[0]) {
             const task = resultsData.tasks[0];
@@ -366,12 +379,20 @@ async function retrieveAndUpdateResults(
             if (task.result && Array.isArray(task.result)) {
               const results = task.result;
               console.log(`📈 Got ${results.length} results for task ${taskInfo.task_id}`);
+              console.log(`🟧 [BULK BACKGROUND] First 3 results data:`, results.slice(0, 3));
               
               // Batch update database entries
               const updates = [];
               for (let j = 0; j < results.length && j < taskInfo.keyword_ids.length; j++) {
                 const keywordData = results[j];
                 const keywordId = taskInfo.keyword_ids[j];
+                const keyword = taskInfo.keywords[j];
+                
+                console.log(`🟧 [BULK BACKGROUND] Processing update for keyword "${keyword}" (ID: ${keywordId}):`, {
+                  search_volume: keywordData.search_volume,
+                  cpc: keywordData.cpc,
+                  competition: keywordData.competition
+                });
                 
                 const updateData = {
                   search_volume: keywordData.search_volume || null,
@@ -388,12 +409,31 @@ async function retrieveAndUpdateResults(
                     .from('keywordshub')
                     .update(updateData)
                     .eq('keyword_id', keywordId)
+                    .select()
                 );
               }
               
               // Execute all updates concurrently
-              await Promise.allSettled(updates);
-              console.log(`✅ Updated ${updates.length} keywords from task ${taskInfo.task_id}`);
+              console.log(`🟧 [BULK BACKGROUND] Executing ${updates.length} database updates...`);
+              const updateResults = await Promise.allSettled(updates);
+              
+              // Log update results
+              const successful = updateResults.filter(r => r.status === 'fulfilled' && r.value?.data).length;
+              const failed = updateResults.filter(r => r.status === 'rejected' || r.value?.error).length;
+              
+              console.log(`🟧 [BULK BACKGROUND] Database update results:`, {
+                total_updates: updates.length,
+                successful: successful,
+                failed: failed
+              });
+              
+              // Log sample of updated records
+              const successfulUpdate = updateResults.find(r => r.status === 'fulfilled' && r.value?.data);
+              if (successfulUpdate && successfulUpdate.status === 'fulfilled' && successfulUpdate.value?.data) {
+                console.log(`🟧 [BULK BACKGROUND] Sample updated record:`, successfulUpdate.value.data);
+              }
+              
+              console.log(`✅ Updated ${successful} keywords from task ${taskInfo.task_id}`);
               
               return { taskInfo, status: 'completed', updatedCount: updates.length };
             } else if (task.status_code === 20100) {
@@ -451,8 +491,12 @@ async function retrieveAndUpdateResults(
     }
   }
   
-  console.log(`🎉 Background processing complete! Updated ${completedCount}/${taskIds.length} tasks successfully.`);
+  console.log(`🎉 [BULK BACKGROUND] Processing complete! Updated ${completedCount}/${taskIds.length} tasks successfully.`);
   if (pendingTasks.length > 0) {
-    console.log(`⚠️ ${pendingTasks.length} tasks still pending after ${maxRetries + 1} attempts.`);
+    console.log(`⚠️ [BULK BACKGROUND] ${pendingTasks.length} tasks still pending after ${maxRetries + 1} attempts.`);
+    console.log(`⚠️ [BULK BACKGROUND] Pending tasks:`, pendingTasks.map(t => ({ 
+      task_id: t.task_id, 
+      keywords: t.keywords 
+    })));
   }
 }

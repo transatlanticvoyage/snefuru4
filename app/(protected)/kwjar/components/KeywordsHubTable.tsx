@@ -154,6 +154,7 @@ export default function KeywordsHubTable({
 
   // Fetch data
   const fetchData = async () => {
+    console.log('🏷️ [FETCH DATA] Called with selectedTagId:', selectedTagId);
     try {
       setLoading(true);
       
@@ -163,6 +164,7 @@ export default function KeywordsHubTable({
 
       // If a tag is selected, filter by keywords that have this tag
       if (selectedTagId) {
+        console.log('🏷️ [FETCH DATA] Filtering by tag ID:', selectedTagId);
         // Get keyword IDs that have this tag
         const { data: taggedKeywordIds, error: tagError } = await supabase
           .from('keywordshub_tag_relations')
@@ -572,9 +574,21 @@ export default function KeywordsHubTable({
 
   // DataForSEO refresh function (Live endpoint)
   const refreshDataForSEO = async (keywordId: number) => {
+    console.log('🔷 [INDIVIDUAL REFRESH] Starting refresh for keyword ID:', keywordId);
+    const keyword = data.find(k => k.keyword_id === keywordId);
+    console.log('🔷 [INDIVIDUAL REFRESH] Keyword data:', {
+      keyword_id: keywordId,
+      keyword_datum: keyword?.keyword_datum,
+      current_search_volume: keyword?.search_volume,
+      current_cpc: keyword?.cpc,
+      rel_dfs_location_code: keyword?.rel_dfs_location_code,
+      language_code: keyword?.language_code
+    });
+    
     setRefreshingKeywords(prev => new Set([...prev, keywordId]));
     
     try {
+      console.log('🔷 [INDIVIDUAL REFRESH] Calling API endpoint /api/dataforseo-refresh-live');
       const response = await fetch('/api/dataforseo-refresh-live', {
         method: 'POST',
         headers: {
@@ -583,15 +597,19 @@ export default function KeywordsHubTable({
         body: JSON.stringify({ keyword_id: keywordId }),
       });
 
+      console.log('🔷 [INDIVIDUAL REFRESH] API Response status:', response.status);
       const result = await response.json();
+      console.log('🔷 [INDIVIDUAL REFRESH] API Response data:', result);
 
       if (!response.ok) {
+        console.error('🔷 [INDIVIDUAL REFRESH] API Error:', result);
         throw new Error(result.error || 'Failed to refresh data');
       }
 
       // Update local data with refreshed values
-      setData(prevData => 
-        prevData.map(item => 
+      console.log('🔷 [INDIVIDUAL REFRESH] Updating local state with:', result.data);
+      setData(prevData => {
+        const newData = prevData.map(item => 
           item.keyword_id === keywordId 
             ? { 
                 ...item, 
@@ -599,8 +617,15 @@ export default function KeywordsHubTable({
                 updated_at: new Date().toISOString() 
               }
             : item
-        )
-      );
+        );
+        const updatedKeyword = newData.find(k => k.keyword_id === keywordId);
+        console.log('🔷 [INDIVIDUAL REFRESH] Updated keyword in state:', {
+          keyword_id: keywordId,
+          new_search_volume: updatedKeyword?.search_volume,
+          new_cpc: updatedKeyword?.cpc
+        });
+        return newData;
+      });
 
       console.log('✅ DataForSEO data refreshed for keyword:', keywordId);
     } catch (error) {
@@ -617,15 +642,30 @@ export default function KeywordsHubTable({
 
   // Bulk refresh function
   const bulkRefreshMetrics = async () => {
+    console.log('🔶 [BULK REFRESH] Starting bulk refresh function');
     setBulkRefreshing(true);
     
     try {
       // Get selected keywords
       const selectedKeywordIds = Array.from(selectedRows);
+      console.log('🔶 [BULK REFRESH] Selected keyword IDs:', selectedKeywordIds);
+      
       if (selectedKeywordIds.length === 0) {
+        console.log('🔶 [BULK REFRESH] No keywords selected, showing alert');
         alert('Please select keywords to refresh');
         return;
       }
+
+      // Get keyword details for debugging
+      const selectedKeywords = data.filter(k => selectedKeywordIds.includes(k.keyword_id));
+      console.log('🔶 [BULK REFRESH] Selected keywords details:', selectedKeywords.map(k => ({
+        keyword_id: k.keyword_id,
+        keyword_datum: k.keyword_datum,
+        current_search_volume: k.search_volume,
+        current_cpc: k.cpc,
+        rel_dfs_location_code: k.rel_dfs_location_code,
+        language_code: k.language_code
+      })));
 
       console.log(`🚀 Starting bulk refresh for ${selectedKeywordIds.length} keywords...`);
       console.log('📋 Keyword IDs:', selectedKeywordIds.slice(0, 10), selectedKeywordIds.length > 10 ? `... and ${selectedKeywordIds.length - 10} more` : '');

@@ -17,6 +17,11 @@ export default function KwjarClient() {
   // Tags plench popup state
   const [isTagsPopupOpen, setIsTagsPopupOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<{ tag_id: number; tag_name: string } | null>(null);
+  
+  // Debug selected tag changes
+  useEffect(() => {
+    console.log('🏷️ [PCLIENT] selectedTag changed:', selectedTag);
+  }, [selectedTag]);
   const [columnPaginationControls, setColumnPaginationControls] = useState<{
     ColumnPaginationBar1: () => JSX.Element | null;
     ColumnPaginationBar2: () => JSX.Element | null;
@@ -48,6 +53,7 @@ export default function KwjarClient() {
     const urlParams = new URLSearchParams(window.location.search);
     const fpop = urlParams.get('fpop');
     const kwtag = urlParams.get('kwtag');
+    console.log('🏷️ [PCLIENT] URL params effect - kwtag:', kwtag, 'URL:', window.location.href);
     const ptab1 = urlParams.get('ptab1');
     const ptab2 = urlParams.get('ptab2');
     const ptab3 = urlParams.get('ptab3');
@@ -72,7 +78,10 @@ export default function KwjarClient() {
               .single();
             
             if (!error && tagData) {
+              console.log('🏷️ [PCLIENT] Setting selectedTag from URL:', tagData);
               setSelectedTag({ tag_id: tagData.tag_id, tag_name: tagData.tag_name });
+            } else {
+              console.log('🏷️ [PCLIENT] Failed to load tag from URL. Error:', error);
             }
           } catch (err) {
             console.error('Error loading tag from URL:', err);
@@ -118,7 +127,7 @@ export default function KwjarClient() {
         setActivePopupTab('ptab7');
       }
     }
-  }, [supabase]);
+  }, [supabase, searchParams]);
 
   // Update URL when popup state, tag selection, or column pagination changes
   useEffect(() => {

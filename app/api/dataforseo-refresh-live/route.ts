@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
+  console.log('🟦 [API LIVE] Endpoint called at', new Date().toISOString());
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -9,6 +10,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const { keyword_id } = await request.json();
+    console.log('🟦 [API LIVE] Request body:', { keyword_id });
 
     if (!keyword_id) {
       return NextResponse.json(
@@ -20,13 +22,25 @@ export async function POST(request: NextRequest) {
     console.log(`🔄 Refreshing DataForSEO data (LIVE) for keyword_id: ${keyword_id}`);
 
     // Get the keyword record
+    console.log('🟦 [API LIVE] Fetching keyword from database...');
     const { data: keywordRecord, error: keywordError } = await supabase
       .from('keywordshub')
       .select('*')
       .eq('keyword_id', keyword_id)
       .single();
 
+    console.log('🟦 [API LIVE] Database query result:', {
+      found: !!keywordRecord,
+      error: keywordError,
+      keyword_datum: keywordRecord?.keyword_datum,
+      rel_dfs_location_code: keywordRecord?.rel_dfs_location_code,
+      language_code: keywordRecord?.language_code,
+      current_search_volume: keywordRecord?.search_volume,
+      current_cpc: keywordRecord?.cpc
+    });
+
     if (keywordError || !keywordRecord) {
+      console.error('🟦 [API LIVE] Keyword not found in database');
       return NextResponse.json(
         { error: 'Keyword not found' },
         { status: 404 }
@@ -58,6 +72,9 @@ export async function POST(request: NextRequest) {
     // Get DataForSEO credentials from environment (fallback method)
     let username = process.env.DFS_USERNAME;
     let password = process.env.DFS_PASSWORD;
+    console.log('🟦 [API LIVE] Checking for credentials...', {
+      env_credentials_found: !!(username && password)
+    });
 
     // Try to get credentials from clevnar3 API key system
     if (!username || !password) {
@@ -106,6 +123,12 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('📡 Making DataForSEO LIVE API request...');
+    const requestPayload = [{
+      keywords: [keywordRecord.keyword_datum],
+      location_code: keywordRecord.rel_dfs_location_code,
+      language_code: keywordRecord.language_code
+    }];
+    console.log('🟦 [API LIVE] DataForSEO request payload:', JSON.stringify(requestPayload, null, 2));
 
     // Make DataForSEO LIVE API request (synchronous)
     const dfsResponse = await fetch('https://api.dataforseo.com/v3/keywords_data/google_ads/search_volume/live', {
@@ -114,12 +137,10 @@ export async function POST(request: NextRequest) {
         'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify([{
-        keywords: [keywordRecord.keyword_datum],
-        location_code: keywordRecord.rel_dfs_location_code,
-        language_code: keywordRecord.language_code
-      }])
+      body: JSON.stringify(requestPayload)
     });
+    
+    console.log('🟦 [API LIVE] DataForSEO response status:', dfsResponse.status, dfsResponse.statusText);
 
     if (!dfsResponse.ok) {
       const errorText = await dfsResponse.text();
@@ -132,6 +153,12 @@ export async function POST(request: NextRequest) {
 
     const dfsData = await dfsResponse.json();
     console.log('📊 DataForSEO LIVE response received:', JSON.stringify(dfsData, null, 2));
+    console.log('🟦 [API LIVE] Response structure:', {
+      has_tasks: !!dfsData.tasks,
+      task_count: dfsData.tasks?.length,
+      first_task_status: dfsData.tasks?.[0]?.status_code,
+      first_task_result_count: dfsData.tasks?.[0]?.result?.length
+    });
 
     // Extract data from response
     if (!dfsData.tasks || !dfsData.tasks[0] || dfsData.tasks[0].status_code !== 20000) {
@@ -151,6 +178,7 @@ export async function POST(request: NextRequest) {
 
     if (task.result && task.result.length > 0) {
       const keywordData = task.result[0];
+      console.log('🟦 [API LIVE] Extracted keyword data from response:', keywordData);
       
       updateData = {
         search_volume: keywordData.search_volume || null,
@@ -161,22 +189,34 @@ export async function POST(request: NextRequest) {
         high_top_of_page_bid: keywordData.high_top_of_page_bid || null,
         api_fetched_at: new Date().toISOString()
       };
+      console.log('🟦 [API LIVE] Prepared update data:', updateData);
+    } else {
+      console.warn('🟦 [API LIVE] No result data found in task response');
     }
 
     // Update the keyword record
-    const { error: updateError } = await supabase
+    console.log('🟦 [API LIVE] Updating database with new data...');
+    const { data: updatedRecord, error: updateError } = await supabase
       .from('keywordshub')
       .update(updateData)
-      .eq('keyword_id', keyword_id);
+      .eq('keyword_id', keyword_id)
+      .select()
+      .single();
 
     if (updateError) {
-      console.error('Database update error:', updateError);
+      console.error('🟦 [API LIVE] Database update error:', updateError);
       return NextResponse.json(
         { error: 'Failed to update keyword data', details: updateError },
         { status: 500 }
       );
     }
 
+    console.log('🟦 [API LIVE] Database update successful. Updated record:', {
+      keyword_id: updatedRecord?.keyword_id,
+      new_search_volume: updatedRecord?.search_volume,
+      new_cpc: updatedRecord?.cpc,
+      api_fetched_at: updatedRecord?.api_fetched_at
+    });
     console.log('✅ Keyword data refreshed successfully (LIVE)');
 
     return NextResponse.json({
