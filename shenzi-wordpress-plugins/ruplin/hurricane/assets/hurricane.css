@@ -1,0 +1,682 @@
+/* Hurricane Feature Styles */
+
+/* Stellar Chamber - Above Title Bar */
+.snefuru-stellar-chamber {
+    background: #f8f9fa;
+    border: 2px solid #007cba;
+    border-radius: 8px;
+    margin: 0 0 20px 0;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 124, 186, 0.1);
+    position: relative;
+}
+
+.snefuru-stellar-chamber-header {
+    background: linear-gradient(135deg, #007cba 0%, #005a87 100%);
+    padding: 12px 20px;
+    border-radius: 6px 6px 0 0;
+    border-bottom: 2px solid #005a87;
+}
+
+.snefuru-stellar-chamber-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Tab Navigation */
+.snefuru-stellar-tabs {
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+}
+
+/* Tab Separator */
+.snefuru-stellar-tab-separator {
+    width: 4px !important;
+    background: #000 !important;
+    height: 50px !important;
+    margin: 0 8px !important;
+    border-radius: 2px !important;
+    pointer-events: none !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+    z-index: 10 !important;
+    opacity: 1 !important;
+    position: relative !important;
+}
+
+.snefuru-stellar-tab-navigation {
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #b8d4f1;
+    padding: 0 15px;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.snefuru-stellar-tab-button {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 12px 20px;
+    margin: 0 5px -2px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #005a87;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: capitalize;
+}
+
+.snefuru-stellar-tab-button:hover {
+    color: #007cba;
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+}
+
+.snefuru-stellar-tab-button.active {
+    color: #007cba;
+    border-bottom-color: #007cba;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+}
+
+.snefuru-stellar-tab-button:focus {
+    outline: 1px dotted #007cba;
+    outline-offset: -1px;
+}
+
+/* Tab Content */
+.snefuru-stellar-tab-content {
+    padding: 15px;
+    min-height: 80px;
+    background: rgba(255, 255, 255, 0.9);
+    border-top: 1px solid rgba(184, 212, 241, 0.3);
+}
+
+.snefuru-stellar-tab-panel {
+    display: none;
+}
+
+.snefuru-stellar-tab-panel.active {
+    display: block;
+}
+
+/* Kepler Titles in Services and Locations tabs */
+.snefuru-kepler-title {
+    font-size: 20px !important;
+    font-weight: 700 !important; /* Explicit 700 weight for bold */
+    color: #1d2327;
+    margin: 0 0 20px 0;
+    padding: 0;
+    line-height: 1.4;
+    display: block;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Fix all label text styling - FORCE BOLD AND 16px */
+.snefuru-header303-label,
+.snefuru-header303-db-mapping-label,
+.snefuru-elementor-data-label {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    font-weight: bold !important;
+    color: #1d2327 !important;
+    display: block !important;
+    margin-bottom: 8px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    -webkit-font-smoothing: antialiased !important;
+    text-rendering: optimizeLegibility !important;
+}
+
+/* Ensure Stellar Chamber header text stays properly styled */
+.snefuru-stellar-chamber-text {
+    font-weight: 700 !important;
+    font-weight: bold !important;
+}
+
+/* BeamRay Banner styling for Stellar Chamber */
+.beamray_banner1 {
+    background: black;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 8px 12px;
+    border: 1px solid gray;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+/* Header303 DB Mapping Display */
+.snefuru-header303-db-mapping-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.snefuru-header303-db-mapping-header {
+    position: relative;
+    width: 400px;
+    margin-bottom: 40px; /* Add space for the button */
+}
+
+.snefuru-header303-db-mapping-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 700 !important;
+    color: #1d2327;
+    margin-bottom: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.snefuru-header303-db-mapping-textbox {
+    width: 400px;
+    height: 150px;
+    padding: 16px;
+    margin-top: 0;
+    border: 2px solid #e0e5eb;
+    border-radius: 0 0 12px 12px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    resize: none;
+    background: linear-gradient(145deg, #ffffff 0%, #f7f9fc 100%);
+    color: #1d2327;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.snefuru-header303-db-mapping-textbox:focus {
+    outline: none;
+    border-color: #2271b1;
+    background: #ffffff;
+    box-shadow: 
+        0 0 0 3px rgba(34, 113, 177, 0.15),
+        inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Header303 Display */
+.snefuru-header303-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.snefuru-header303-header {
+    position: relative;
+    width: 400px;
+    margin-bottom: 40px; /* Add space for the button */
+}
+
+.snefuru-header303-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 700 !important;
+    color: #1d2327;
+    margin-bottom: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.snefuru-header303-textbox {
+    width: 400px;
+    height: 100px;
+    padding: 16px;
+    margin-top: 0;
+    border: 2px solid #e0e5eb;
+    border-radius: 0 0 12px 12px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    resize: none;
+    background: linear-gradient(145deg, #ffffff 0%, #f7f9fc 100%);
+    color: #1d2327;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.snefuru-header303-textbox:focus {
+    outline: none;
+    border-color: #2271b1;
+    background: #ffffff;
+    box-shadow: 
+        0 0 0 3px rgba(34, 113, 177, 0.15),
+        inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Elementor Data Display */
+.snefuru-elementor-data-container {
+    position: relative;
+    display: inline-block;
+}
+
+.snefuru-elementor-data-header {
+    position: relative;
+    width: 400px;
+    margin-bottom: 40px; /* Add space for the button */
+}
+
+.snefuru-elementor-data-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 700 !important;
+    color: #1d2327;
+    margin-bottom: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.snefuru-copy-btn {
+    position: absolute;
+    bottom: -40px; /* Position below the header */
+    left: 0;
+    width: 400px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #3582c4 0%, #2271b1 100%);
+    color: white;
+    border: none;
+    border-radius: 8px 8px 0 0;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+    box-shadow: 
+        0 -1px 2px rgba(0, 0, 0, 0.1),
+        0 2px 8px rgba(34, 113, 177, 0.15);
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.snefuru-copy-btn::before {
+    content: "📋";
+    margin-right: 6px;
+    font-size: 16px;
+}
+
+.snefuru-copy-btn:hover {
+    background: linear-gradient(135deg, #4b93d8 0%, #3582c4 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 -1px 2px rgba(0, 0, 0, 0.1),
+        0 4px 12px rgba(34, 113, 177, 0.25);
+}
+
+.snefuru-copy-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.snefuru-copy-btn.copied {
+    background: linear-gradient(135deg, #46b450 0%, #00a32a 100%);
+    animation: copySuccess 0.5s ease;
+}
+
+@keyframes copySuccess {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.snefuru-copy-btn.copied::before {
+    content: "✅";
+}
+
+.snefuru-elementor-data-textbox {
+    width: 400px;
+    height: 100px;
+    padding: 16px;
+    margin-top: 0;
+    border: 2px solid #e0e5eb;
+    border-radius: 0 0 12px 12px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    resize: none;
+    background: linear-gradient(145deg, #ffffff 0%, #f7f9fc 100%);
+    color: #1d2327;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.snefuru-elementor-data-textbox:focus {
+    outline: none;
+    border-color: #2271b1;
+    background: #ffffff;
+    box-shadow: 
+        0 0 0 3px rgba(34, 113, 177, 0.15),
+        inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.snefuru-elementor-data-textbox::placeholder {
+    color: #8c8f94;
+    font-style: italic;
+}
+
+/* Locations Tab Button Styling */
+.snefuru-locations-button-container {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 15px;
+}
+
+.snefuru-locations-main-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 6px 0 0 6px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    min-height: 44px;
+    user-select: none;
+}
+
+.snefuru-locations-main-btn:hover {
+    background: linear-gradient(135deg, #3582c4 0%, #1e7bb8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    color: white;
+    text-decoration: none;
+}
+
+.snefuru-locations-main-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.snefuru-locations-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 44px;
+    background: linear-gradient(135deg, #00a32a 0%, #008a20 100%);
+    color: white;
+    border: none;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    padding: 0;
+}
+
+.snefuru-locations-copy-btn:hover {
+    background: linear-gradient(135deg, #00ba37 0%, #009626 100%);
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.snefuru-locations-copy-btn:active {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.snefuru-locations-copy-btn.copied {
+    background: linear-gradient(135deg, #46b450 0%, #3a9540 100%);
+}
+
+.snefuru-locations-copy-btn.copied::after {
+    content: "✅";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+}
+
+/* Ensure it aligns with the title field width */
+@media (min-width: 600px) {
+    .snefuru-stellar-chamber {
+        max-width: calc(100% - 2px);
+    }
+}
+
+/* Block editor specific styling */
+.block-editor .snefuru-stellar-chamber {
+    margin-top: 20px;
+}
+
+.snefuru-hurricane-container {
+    background: #f8f9fa;
+    border: 2px solid #007cba;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 0;
+    position: relative;
+}
+
+.snefuru-hurricane-content {
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    color: #007cba;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 0;
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+    border-radius: 4px;
+    border: 1px solid #b8d4f1;
+    box-shadow: 0 2px 4px rgba(0, 124, 186, 0.1);
+}
+
+/* Ensure Hurricane metabox appears at the top */
+#snefuru-hurricane {
+    margin-bottom: 20px;
+}
+
+#snefuru-hurricane .hndle {
+    background: linear-gradient(135deg, #007cba 0%, #005a87 100%);
+    color: white;
+    font-weight: 600;
+    border-radius: 6px 6px 0 0;
+    padding: 12px 15px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+#snefuru-hurricane .inside {
+    padding: 0;
+    margin: 0;
+}
+
+/* Hurricane Controls */
+.snefuru-hurricane-controls {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.snefuru-lightning-popup-btn {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    border: 2px solid #ff9800;
+    color: #333;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.snefuru-lightning-popup-btn:hover {
+    background: linear-gradient(135deg, #ffca28 0%, #ffa726 100%);
+    border-color: #ffa726;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+}
+
+.snefuru-lightning-popup-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.2);
+}
+
+/* Lightning Popup Styles */
+.snefuru-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.snefuru-popup-container {
+    background: #fff;
+    width: 90%;
+    max-width: 1200px;
+    height: 90%;
+    max-height: 800px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.snefuru-popup-header {
+    background: linear-gradient(135deg, #007cba 0%, #005a87 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #005a87;
+}
+
+.snefuru-popup-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.snefuru-popup-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.snefuru-popup-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.snefuru-popup-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f9f9f9;
+}
+
+/* Prevent body scroll when popup is open */
+body.snefuru-popup-open {
+    overflow: hidden;
+}
+
+/* Ensure column div headers are properly spaced and visible */
+.snefuru-denyeep-column > span:first-child {
+    position: relative;
+    z-index: 10;
+    background: white;
+    padding: 5px 0;
+    margin-bottom: 15px !important;
+    display: block;
+    clear: both;
+}
+
+/* Other Tab Admin Links Styling */
+.snefuru-stellar-tab-panel[data-panel="other"] a:hover {
+    background: #0073aa !important;
+    color: white !important;
+    transform: translateX(2px);
+}
+
+.snefuru-stellar-tab-panel[data-panel="other"] a:active {
+    transform: translateX(0px);
+    background: #005a87 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 782px) {
+    .snefuru-hurricane-container {
+        padding: 12px;
+    }
+    
+    .snefuru-hurricane-content {
+        font-size: 14px;
+        padding: 8px 0;
+    }
+    
+    .snefuru-hurricane-controls {
+        margin-top: 12px;
+    }
+    
+    .snefuru-lightning-popup-btn {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+    
+    .snefuru-popup-container {
+        width: 95%;
+        height: 95%;
+        border-radius: 8px;
+    }
+    
+    .snefuru-popup-header {
+        padding: 15px;
+    }
+    
+    .snefuru-popup-title {
+        font-size: 14px;
+    }
+    
+    .snefuru-popup-content {
+        padding: 15px;
+    }
+}
