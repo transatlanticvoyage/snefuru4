@@ -121,13 +121,15 @@ class Aardvark_Papluginsmar_Page {
                                                     <nav style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
                                                         <button type="button" id="prev-page" style="position: relative; display: inline-flex; align-items: center; border-radius: 6px 0 0 6px; padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; color: #9CA3AF; border: 1px solid #D1D5DB; cursor: pointer; background: white;">
                                                             <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                                                <path d="M8 12l8-8v16l-8-8z" transform="rotate(180 12 12)"/>
+                                                                <path d="M1 4v6h6" />
+                                                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
                                                             </svg>
                                                         </button>
                                                         <button type="button" id="page-info-btn" style="position: relative; display: inline-flex; align-items: center; padding: 8px 12px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #D1D5DB; margin-left: -1px; cursor: pointer; background: white; font-weight: bold;">1</button>
                                                         <button type="button" id="next-page" style="position: relative; display: inline-flex; align-items: center; border-radius: 0 6px 6px 0; padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; color: #9CA3AF; border: 1px solid #D1D5DB; margin-left: -1px; cursor: pointer; background: white;">
                                                             <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                                                <path d="M8 12l8-8v16l-8-8z"/>
+                                                                <path d="M23 4v6h-6" />
+                                                                <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
                                                             </svg>
                                                         </button>
                                                     </nav>
@@ -166,13 +168,15 @@ class Aardvark_Papluginsmar_Page {
                                                     <button type="button" id="first-col-page" style="padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; border-radius: 4px 0 0 4px; margin-right: -1px; cursor: pointer; background: white;">≪</button>
                                                     <button type="button" id="prev-col-page" style="padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">
                                                         <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                                            <path d="M8 12l8-8v16l-8-8z" transform="rotate(180 12 12)"/>
+                                                            <path d="M1 4v6h6" />
+                                                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
                                                         </svg>
                                                     </button>
                                                     <button type="button" id="col-page-display" style="padding: 8px 12px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white; font-weight: bold;">1</button>
                                                     <button type="button" id="next-col-page" style="padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">
                                                         <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                                            <path d="M8 12l8-8v16l-8-8z"/>
+                                                            <path d="M23 4v6h-6" />
+                                                            <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
                                                         </svg>
                                                     </button>
                                                     <button type="button" id="last-col-page" style="padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; border-radius: 0 4px 4px 0; cursor: pointer; background: white;">≫</button>
