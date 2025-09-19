@@ -297,7 +297,13 @@ class Aardvark_Papluginsmar_Page {
                             <td style="border: 1px solid #555; border-left: 3px solid black; padding: 8px;">-</td>
                             <td style="border: 1px solid #555; padding: 8px;">-</td>
                             <td style="border: 1px solid #555; padding: 8px;">-</td>
-                            <td style="border: 1px solid #555; padding: 8px;">-</td>
+                            <td style="border: 1px solid #555; padding: 8px;" data-is-shenzi="<?php echo $plugin['is_shenzi'] ? 'true' : 'false'; ?>">
+                                <?php if ($plugin['is_shenzi']): ?>
+                                    <span style="background: #00a32a; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">YES</span>
+                                <?php else: ?>
+                                    <span style="background: #646970; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">NO</span>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -641,6 +647,46 @@ class Aardvark_Papluginsmar_Page {
                 alert('Column templates popup will be implemented later');
             });
             
+            // Shenzi filter functionality
+            $('.shenzi-filter-btn').on('click', function() {
+                $('.shenzi-filter-btn').removeClass('active').css({
+                    'background': 'white',
+                    'color': 'black',
+                    'border': '1px solid #D1D5DB'
+                });
+                $(this).addClass('active').css({
+                    'background': '#3B82F6',
+                    'color': 'white',
+                    'border': '1px solid #3B82F6'
+                });
+                
+                const filterValue = $(this).data('filter');
+                applyShenziFilter(filterValue);
+            });
+            
+            function applyShenziFilter(filter) {
+                $('#plugins-table tbody tr').each(function() {
+                    const $row = $(this);
+                    const isShenzi = $row.find('[data-is-shenzi]').data('is-shenzi') === 'true';
+                    
+                    let show = false;
+                    if (filter === 'all') {
+                        show = true;
+                    } else if (filter === 'shenzi' && isShenzi) {
+                        show = true;
+                    } else if (filter === 'non-shenzi' && !isShenzi) {
+                        show = true;
+                    }
+                    
+                    $row.toggle(show);
+                });
+                
+                updateDisplayCounts();
+            }
+            
+            // Initialize with default filter (shenzi only)
+            applyShenziFilter('shenzi');
+            
             // Initialize pagination
             updateRowPagination();
             updateColPagination();
@@ -666,6 +712,26 @@ class Aardvark_Papluginsmar_Page {
         <?php
     }
     
+    /**
+     * Get list of shenzi plugins
+     */
+    private function get_shenzi_plugins() {
+        return array(
+            'aardvark/aardvark.php',
+            'ruplin/ruplin.php',
+            'grove/grove.php',
+            'beacon/beacon.php',
+            'lumora/lumora.php'
+        );
+    }
+    
+    /**
+     * Check if a plugin is a shenzi plugin
+     */
+    private function is_shenzi_plugin($plugin_path) {
+        return in_array($plugin_path, $this->get_shenzi_plugins());
+    }
+    
     private function get_plugins_data() {
         if (!function_exists('get_plugins')) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -685,7 +751,8 @@ class Aardvark_Papluginsmar_Page {
                 'PluginURI' => $plugin_info['PluginURI'] ?? '',
                 'Author' => $plugin_info['Author'] ?? '',
                 'active' => in_array($plugin_path, $active_plugins),
-                'needs_update' => isset($plugin_updates->response[$plugin_path])
+                'needs_update' => isset($plugin_updates->response[$plugin_path]),
+                'is_shenzi' => $this->is_shenzi_plugin($plugin_path)
             );
         }
         
