@@ -3,9 +3,24 @@
 class Aardvark_Papluginsmar_Page {
     
     public function render() {
+        // Simple debug first
+        echo '<div style="background: red; color: white; padding: 10px;">AARDVARK DEBUG: Page is loading</div>';
+        
         $plugins_data = $this->get_plugins_data();
+        echo '<div style="background: green; color: white; padding: 10px;">AARDVARK DEBUG: Got ' . count($plugins_data) . ' plugins</div>';
         ?>
         <div class="wrap">
+            <!-- DEBUG INFORMATION -->
+            <div style="background: #f0f8ff; border: 1px solid #0073aa; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                <strong>DEBUG INFO:</strong><br>
+                Total plugins found: <?php echo count($plugins_data); ?><br>
+                Shenzi plugins in list: <?php echo implode(', ', $this->get_shenzi_plugins()); ?><br>
+                <strong>Plugin paths and shenzi status:</strong><br>
+                <?php foreach ($plugins_data as $path => $plugin): ?>
+                    <?php echo esc_html($path); ?> - <?php echo $plugin['is_shenzi'] ? 'YES' : 'NO'; ?> - <?php echo esc_html($plugin['Name']); ?><br>
+                <?php endforeach; ?>
+            </div>
+            
             <h1 style="display: flex; align-items: center; gap: 14px; margin: 0 0 20px 0;">
                 <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="flex-shrink: 0;">
                     <!-- Aardvark body -->
@@ -664,9 +679,20 @@ class Aardvark_Papluginsmar_Page {
             });
             
             function applyShenziFilter(filter) {
+                console.log('Applying filter:', filter);
+                let totalRows = 0;
+                let shenziRows = 0;
+                let visibleRows = 0;
+                
                 $('#plugins-table tbody tr').each(function() {
                     const $row = $(this);
-                    const isShenzi = $row.find('[data-is-shenzi]').data('is-shenzi') === 'true';
+                    const $shenziCell = $row.find('[data-is-shenzi]');
+                    const isShenzi = $shenziCell.data('is-shenzi') === 'true';
+                    
+                    totalRows++;
+                    if (isShenzi) shenziRows++;
+                    
+                    console.log('Row:', $row.data('plugin-path'), 'isShenzi:', isShenzi, 'data-is-shenzi:', $shenziCell.data('is-shenzi'));
                     
                     let show = false;
                     if (filter === 'all') {
@@ -677,9 +703,11 @@ class Aardvark_Papluginsmar_Page {
                         show = true;
                     }
                     
+                    if (show) visibleRows++;
                     $row.toggle(show);
                 });
                 
+                console.log('Filter results - Total:', totalRows, 'Shenzi:', shenziRows, 'Visible after filter:', visibleRows);
                 updateDisplayCounts();
             }
             
