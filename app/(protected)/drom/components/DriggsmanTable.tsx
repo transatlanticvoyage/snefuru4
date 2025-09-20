@@ -72,6 +72,7 @@ interface SitesprenSite {
   driggs_zip: string | null;
   driggs_state_full: string | null;
   driggs_country: string | null;
+  driggs_gmaps_widget_location_1: string | null;
   driggs_revenue_goal: number | null;
   ns_full: string | null;
   ip_address: string | null;
@@ -863,6 +864,7 @@ export default function DriggsmanTable({
     { key: 'driggs_zip', type: 'text', label: 'driggs_zip', group: 'contact', placeholder: '' },
     { key: 'driggs_state_full', type: 'text', label: 'driggs_state_full', group: 'contact', placeholder: '' },
     { key: 'driggs_country', type: 'text', label: 'driggs_country', group: 'contact', placeholder: 'United States' },
+    { key: 'driggs_gmaps_widget_location_1', type: 'text', label: 'driggs_gmaps_widget_location_1', group: 'contact', placeholder: '' },
     { key: 'backlinks_section_separator', type: 'section_header', label: 'backlinks section', group: 'separator' },
     { key: 'driggs_cgig_id', type: 'cgig_dropdown', label: 'driggs_cgig_id', group: 'contact' },
     { key: 'driggs_citations_done', type: 'boolean', label: 'driggs_citations_done', group: 'contact' },
@@ -4985,7 +4987,7 @@ export default function DriggsmanTable({
                   } ${
                     field.key === 'driggs_address_species_note' ? 'border-b-4 border-b-black' : ''
                   } ${
-                    field.key === 'driggs_country' ? 'border-b-4 border-b-black' : ''
+                    field.key === 'driggs_gmaps_widget_location_1' ? 'border-b-4 border-b-black' : ''
                   } ${
                     field.key === 'driggs_cgig_id' ? 'border-b-4 border-b-black' : ''
                   } ${
