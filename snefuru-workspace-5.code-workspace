@@ -1,0 +1,71 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/ruplin"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/grove"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/aardvark"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/veyra"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/axiom"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/beacon"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/lumora"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/harbor"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/klyra"
+		},
+		{
+			"path": "../localrepo-vulcanhatch",
+			"name": "🌋 VulcanHatch (WP Dev)"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/brimora"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/nivaro"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/trillan"
+		},
+		{
+			"path": "./shenzi-wordpress-plugins/fathom"
+		}
+	],
+	"settings": {
+		"git.detectSubmodules": false,
+		"git.autoRepositoryDetection": true,
+		"git.repositories": [
+			".",
+			"./shenzi-wordpress-plugins/ruplin",
+			"./shenzi-wordpress-plugins/grove",
+			"./shenzi-wordpress-plugins/aardvark",
+			"./shenzi-wordpress-plugins/veyra",
+			"./shenzi-wordpress-plugins/axiom",
+			"./shenzi-wordpress-plugins/beacon",
+			"./shenzi-wordpress-plugins/lumora",
+			"./shenzi-wordpress-plugins/harbor",
+			"./shenzi-wordpress-plugins/klyra",
+			"../localrepo-vulcanhatch",
+			"./shenzi-wordpress-plugins/brimora",
+			"./shenzi-wordpress-plugins/nivaro",
+			"./shenzi-wordpress-plugins/trillan",
+			"./shenzi-wordpress-plugins/fathom"
+		]
+	}
+}
