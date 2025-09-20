@@ -5,8 +5,8 @@
  * This file contains the centralized database schema definitions used by all
  * Shenzi WordPress plugins (Snefuruplin, Grove, Lumora, Beacon, etc.)
  * 
- * Version: 2.1.0
- * Last Updated: 2025-01-18
+ * Version: 2.2.0
+ * Last Updated: 2025-01-20
  */
 
 class Shenzi_Shared_Schema {
@@ -14,7 +14,7 @@ class Shenzi_Shared_Schema {
     /**
      * Schema version for tracking updates
      */
-    const SCHEMA_VERSION = '2.1.0';
+    const SCHEMA_VERSION = '2.2.0';
     
     /**
      * Get all table definitions
@@ -242,6 +242,64 @@ class Shenzi_Shared_Schema {
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (wppma_id)
         ) $charset_collate;";
+    }
+    
+    /**
+     * Create or update all tables using dbDelta
+     * This method will automatically add missing columns to existing tables
+     * 
+     * @param string $wpdb_prefix Optional table prefix (defaults to $wpdb->prefix)
+     * @return array Results from dbDelta for each table
+     */
+    public static function create_or_update_tables($wpdb_prefix = '') {
+        global $wpdb;
+        
+        // Set prefix if not provided
+        if (empty($wpdb_prefix)) {
+            $wpdb_prefix = $wpdb->prefix;
+        }
+        
+        // Include WordPress upgrade functions for dbDelta
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        
+        // Get all table definitions
+        $tables = self::get_table_definitions($wpdb_prefix);
+        
+        // Results array to track what dbDelta did
+        $results = array();
+        
+        // Run dbDelta for each table
+        foreach ($tables as $table_key => $sql) {
+            $results[$table_key] = dbDelta($sql);
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Check and update schema version
+     * 
+     * @return bool True if schema was updated, false if already current
+     */
+    public static function maybe_update_schema() {
+        $installed_version = get_option('shenzi_schema_version', '0');
+        
+        if (version_compare($installed_version, self::SCHEMA_VERSION, '<')) {
+            // Run the table updates
+            $results = self::create_or_update_tables();
+            
+            // Update the stored version
+            update_option('shenzi_schema_version', self::SCHEMA_VERSION);
+            
+            // Log the update results (optional)
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Shenzi Schema Updated to ' . self::SCHEMA_VERSION . ': ' . print_r($results, true));
+            }
+            
+            return true;
+        }
+        
+        return false;
     }
     
     /**
