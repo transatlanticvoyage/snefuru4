@@ -270,7 +270,23 @@ class Aardvark_Papluginsmar_Page {
                                 <input type="checkbox" class="plugin-checkbox" value="<?php echo esc_attr($plugin_path); ?>">
                             </td>
                             <td style="border: 1px solid #555; padding: 8px; text-align: center;">
-                                <span style="color: gray; font-size: 16px; -webkit-text-stroke: 1px gray; -webkit-text-fill-color: transparent;">★</span>
+                                <?php 
+                                // Check if this plugin should have a dark red star
+                                $plugin_name_lower = strtolower($plugin['Name']);
+                                $starred_plugins = array('aardvark', 'grove', 'ruplin');
+                                $has_star = false;
+                                foreach ($starred_plugins as $starred) {
+                                    if (strpos($plugin_name_lower, $starred) !== false) {
+                                        $has_star = true;
+                                        break;
+                                    }
+                                }
+                                ?>
+                                <?php if ($has_star): ?>
+                                    <span style="color: darkred; font-size: 16px;">★</span>
+                                <?php else: ?>
+                                    <span style="color: gray; font-size: 16px; -webkit-text-stroke: 1px gray; -webkit-text-fill-color: transparent;">★</span>
+                                <?php endif; ?>
                             </td>
                             <td style="border: 1px solid #555; padding: 8px;">
                                 <strong><?php echo esc_html($plugin['Name']); ?></strong>
@@ -308,9 +324,16 @@ class Aardvark_Papluginsmar_Page {
                                 <?php else: ?>
                                     <!-- Standard buttons for installed plugins -->
                                     <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                                        <!-- Update From Github Button -->
+                                        <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="update-github" 
+                                                style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; <?php echo empty($plugin['github_url']) ? 'background: #f0f0f0; color: #888; cursor: not-allowed;' : 'background: #2271b1; color: white;'; ?>"
+                                                <?php echo empty($plugin['github_url']) ? 'disabled' : ''; ?>>
+                                            Update From Github
+                                        </button>
+                                        
                                         <!-- Activate Button -->
                                         <button class="plugin-action-btn" data-plugin="<?php echo esc_attr($plugin_path); ?>" data-action="activate" 
-                                                style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; <?php echo $plugin['active'] ? 'background: #f0f0f0; color: #888; cursor: not-allowed;' : 'background: #00a32a; color: white;'; ?>"
+                                                style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; <?php echo $plugin['active'] ? 'background: #f0f0f0; color: #888; cursor: not-allowed;' : 'background: #00a32a; color: white;'; ?>"
                                                 <?php echo $plugin['active'] ? 'disabled' : ''; ?>>
                                             Activate
                                         </button>
@@ -532,6 +555,32 @@ class Aardvark_Papluginsmar_Page {
                     }).fail(function() {
                         alert('Installation failed. Please try again.');
                         $button.prop('disabled', false).text('Install from GitHub');
+                    });
+                } else if (action === 'update-github') {
+                    if (!confirm('Update this plugin from GitHub?')) {
+                        return;
+                    }
+                    
+                    $button.prop('disabled', true).text('Updating...');
+                    
+                    $.post(ajaxurl, {
+                        action: 'aardvark_update_plugin_github',
+                        plugin: plugin,
+                        nonce: '<?php echo wp_create_nonce('aardvark_plugin_update_github'); ?>'
+                    }).done(function(response) {
+                        if (response.success) {
+                            alert('Plugin updated successfully from GitHub!');
+                            // Add small delay to ensure server-side cache clearing takes effect
+                            setTimeout(function() {
+                                location.reload();
+                            }, 500);
+                        } else {
+                            alert('Error: ' + response.data);
+                            $button.prop('disabled', false).text('Update From Github');
+                        }
+                    }).fail(function() {
+                        alert('Update failed. Please try again.');
+                        $button.prop('disabled', false).text('Update From Github');
                     });
                 }
             });
