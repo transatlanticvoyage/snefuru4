@@ -224,6 +224,7 @@ class Shenzi_Shared_Schema {
             driggs_state_full TEXT,
             driggs_zip TEXT,
             driggs_country TEXT,
+            driggs_gmaps_widget_location_1 TEXT,
             driggs_phone_1 TEXT,
             driggs_email_1 TEXT,
             driggs_short_descr TEXT,
