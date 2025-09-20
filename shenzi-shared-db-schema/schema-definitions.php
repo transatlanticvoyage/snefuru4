@@ -14,7 +14,7 @@ class Shenzi_Shared_Schema {
     /**
      * Schema version for tracking updates
      */
-    const SCHEMA_VERSION = '2.3.0';
+    const SCHEMA_VERSION = '2.4.0';
     
     /**
      * Get all table definitions
@@ -54,9 +54,11 @@ class Shenzi_Shared_Schema {
             description1_long TEXT,
             rel_image1_id INT(11),
             service_slug_id TEXT,
+            asn_service_page_id BIGINT(20) UNSIGNED DEFAULT NULL,
             is_pinned_service BOOLEAN DEFAULT FALSE,
             position_in_custom_order INT(11),
-            PRIMARY KEY (service_id)
+            PRIMARY KEY (service_id),
+            KEY asn_service_page_id (asn_service_page_id)
         ) $charset_collate;";
     }
     
@@ -311,7 +313,7 @@ class Shenzi_Shared_Schema {
             'zen_services' => array(
                 'service_id', 'service_name', 'suggested_url_slug', 'service_placard', 'service_moniker', 
                 'service_sobriquet', 'description1_short', 'description1_long', 
-                'rel_image1_id', 'service_slug_id', 'is_pinned_service', 'position_in_custom_order'
+                'rel_image1_id', 'service_slug_id', 'asn_service_page_id', 'is_pinned_service', 'position_in_custom_order'
             ),
             'zen_locations' => array(
                 'location_id', 'location_name', 'location_placard', 'location_moniker',
