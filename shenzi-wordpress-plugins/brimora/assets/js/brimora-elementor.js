@@ -7,8 +7,13 @@
 (function($) {
     'use strict';
     
+    // Debug: Confirm script is loading
+    console.log('Brimora: Script loaded successfully');
+    console.log('Brimora: brimoraAjax object:', window.brimoraAjax);
+    
     // Initialize when DOM is ready
     $(document).ready(function() {
+        console.log('Brimora: DOM ready, initializing...');
         initBrimoraBackgrounds();
     });
     
@@ -401,6 +406,48 @@
     window.brimoraDebugMode = function(enable) {
         window.brimoraDebug = enable;
         console.log('Brimora debug mode:', enable ? 'enabled' : 'disabled');
+    };
+    
+    /**
+     * Manual test function for console debugging
+     */
+    window.brimoraTest = function() {
+        console.log('=== BRIMORA MANUAL TEST ===');
+        console.log('Script loaded:', typeof initBrimoraBackgrounds !== 'undefined');
+        console.log('jQuery available:', typeof $ !== 'undefined');
+        console.log('AJAX object:', window.brimoraAjax);
+        
+        const containers = document.querySelectorAll('[data-brimora-bg-enabled="true"]');
+        console.log('Found containers with brimora enabled:', containers.length);
+        
+        containers.forEach((container, index) => {
+            console.log(`Container ${index + 1}:`, {
+                element: container,
+                serviceId: container.getAttribute('data-brimora-service-id'),
+                serviceCode: container.getAttribute('data-brimora-service-code'),
+                classes: container.className
+            });
+        });
+        
+        if (containers.length === 0) {
+            console.warn('No containers found with data-brimora-bg-enabled="true"');
+            console.log('All containers with brimora classes:', document.querySelectorAll('.brimora-zen-service'));
+        }
+        
+        console.log('=== END BRIMORA TEST ===');
+        return containers.length;
+    };
+    
+    /**
+     * Force reinitialize (utility function)
+     */
+    window.brimoraForceInit = function() {
+        console.log('Brimora: Force initializing...');
+        if (typeof initBrimoraBackgrounds === 'function') {
+            initBrimoraBackgrounds();
+        } else {
+            console.error('Brimora: initBrimoraBackgrounds function not available');
+        }
     };
     
 })(jQuery);
