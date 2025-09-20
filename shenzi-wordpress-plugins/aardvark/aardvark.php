@@ -162,6 +162,12 @@ class AardvarkPlugin {
                 'branch_name' => 'main'
             ),
             array(
+                'plugin_slug' => 'axiom',
+                'plugin_path' => 'axiom/axiom.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/axiom.git',
+                'branch_name' => 'main'
+            ),
+            array(
                 'plugin_slug' => 'harbor',
                 'plugin_path' => 'harbor/harbor.php',
                 'github_url' => 'https://github.com/transatlanticvoyage/harbor.git',

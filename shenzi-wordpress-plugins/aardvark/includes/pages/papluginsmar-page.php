@@ -1051,6 +1051,7 @@ class Aardvark_Papluginsmar_Page {
             'beacon/beacon.php',
             'lumora/lumora.php',
             'veyra/veyra.php',
+            'axiom/axiom.php',
             'harbor/harbor.php',
             'klyra/klyra.php'
         );
