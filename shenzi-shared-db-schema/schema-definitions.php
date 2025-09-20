@@ -14,7 +14,7 @@ class Shenzi_Shared_Schema {
     /**
      * Schema version for tracking updates
      */
-    const SCHEMA_VERSION = '2.2.0';
+    const SCHEMA_VERSION = '2.3.0';
     
     /**
      * Get all table definitions
@@ -46,6 +46,7 @@ class Shenzi_Shared_Schema {
         return "CREATE TABLE $table_name (
             service_id INT(11) NOT NULL AUTO_INCREMENT,
             service_name TEXT,
+            suggested_url_slug TEXT,
             service_placard TEXT,
             service_moniker TEXT,
             service_sobriquet TEXT,
@@ -308,7 +309,7 @@ class Shenzi_Shared_Schema {
     public static function get_table_fields() {
         return array(
             'zen_services' => array(
-                'service_id', 'service_name', 'service_placard', 'service_moniker', 
+                'service_id', 'service_name', 'suggested_url_slug', 'service_placard', 'service_moniker', 
                 'service_sobriquet', 'description1_short', 'description1_long', 
                 'rel_image1_id', 'service_slug_id', 'is_pinned_service', 'position_in_custom_order'
             ),
