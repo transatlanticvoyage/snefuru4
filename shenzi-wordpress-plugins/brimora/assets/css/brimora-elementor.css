@@ -1,0 +1,168 @@
+/**
+ * Brimora Elementor Styles
+ * 
+ * CSS for zen service background containers
+ */
+
+/* Base styles for containers with zen service backgrounds */
+.brimora-zen-service {
+    position: relative;
+    background-attachment: scroll;
+    transition: background-image 0.3s ease;
+}
+
+/* Loading state */
+.brimora-loading {
+    position: relative;
+}
+
+.brimora-loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: brimora-spin 1s linear infinite;
+    z-index: 10;
+}
+
+@keyframes brimora-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Successfully loaded background */
+.brimora-bg-loaded {
+    /* Custom styles can be added here */
+}
+
+/* Error state */
+.brimora-bg-error {
+    position: relative;
+    background-color: #f8f8f8;
+    border: 1px dashed #ddd;
+}
+
+.brimora-bg-error::after {
+    content: "⚠ Background image failed to load";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Overlay styles */
+.brimora-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    transition: background-color 0.3s ease;
+}
+
+/* Responsive background adjustments */
+@media (max-width: 768px) {
+    .brimora-zen-service {
+        background-attachment: scroll; /* Better performance on mobile */
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .brimora-overlay {
+        background-color: rgba(0, 0, 0, 0.7) !important;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .brimora-zen-service,
+    .brimora-overlay {
+        transition: none;
+    }
+    
+    .brimora-loading::before {
+        animation: none;
+        border: 2px solid #3498db;
+    }
+}
+
+/* Service-specific utility classes */
+.brimora-service-id-1 {
+    /* Custom styles for service ID 1 */
+}
+
+.brimora-service-id-2 {
+    /* Custom styles for service ID 2 */
+}
+
+/* Service code utility classes */
+.brimora-service-code-hero {
+    /* Custom styles for hero service code */
+}
+
+.brimora-service-code-banner {
+    /* Custom styles for banner service code */
+}
+
+.brimora-service-code-featured {
+    /* Custom styles for featured service code */
+}
+
+/* Print styles */
+@media print {
+    .brimora-zen-service {
+        background-image: none !important;
+        background-color: transparent !important;
+    }
+    
+    .brimora-overlay {
+        display: none !important;
+    }
+    
+    .brimora-loading::before {
+        display: none !important;
+    }
+}
+
+/* Debug mode styles (when brimoraDebug is enabled) */
+body.brimora-debug .brimora-zen-service {
+    border: 2px dashed #e74c3c;
+    position: relative;
+}
+
+body.brimora-debug .brimora-zen-service::before {
+    content: "Brimora: Service " attr(data-brimora-service-id);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #e74c3c;
+    color: white;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-family: monospace;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+body.brimora-debug .brimora-bg-loaded::before {
+    background: #27ae60;
+    content: "Brimora: Loaded " attr(data-brimora-service-id);
+}
+
+body.brimora-debug .brimora-bg-error::before {
+    background: #e74c3c;
+    content: "Brimora: Error " attr(data-brimora-error);
+}
