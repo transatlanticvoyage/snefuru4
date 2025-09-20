@@ -11,6 +11,36 @@
     transition: background-image 0.3s ease;
 }
 
+/* High specificity override for Elementor containers */
+.elementor-element.brimora-zen-service.brimora-bg-loaded {
+    background-color: transparent !important;
+    background-image: var(--brimora-bg-image) !important;
+    background-size: var(--brimora-bg-size, cover) !important;
+    background-position: var(--brimora-bg-position, center center) !important;
+    background-repeat: var(--brimora-bg-repeat, no-repeat) !important;
+    background-attachment: scroll !important;
+}
+
+/* Even higher specificity for stubborn Elementor styles */
+.elementor-widget-container .elementor-element.brimora-zen-service.brimora-bg-loaded,
+.elementor-container.brimora-zen-service.brimora-bg-loaded,
+.elementor-column.brimora-zen-service.brimora-bg-loaded {
+    background-color: transparent !important;
+    background-image: var(--brimora-bg-image) !important;
+    background-size: var(--brimora-bg-size, cover) !important;
+    background-position: var(--brimora-bg-position, center center) !important;
+    background-repeat: var(--brimora-bg-repeat, no-repeat) !important;
+}
+
+/* Override any Elementor inline styles */
+[data-brimora-bg-enabled="true"].brimora-bg-loaded {
+    background-color: transparent !important;
+    background-image: var(--brimora-bg-image) !important;
+    background-size: var(--brimora-bg-size, cover) !important;
+    background-position: var(--brimora-bg-position, center center) !important;
+    background-repeat: var(--brimora-bg-repeat, no-repeat) !important;
+}
+
 /* Loading state */
 .brimora-loading {
     position: relative;
@@ -137,6 +167,29 @@
     }
 }
 
+/* Verification status classes */
+.brimora-bg-verification-success {
+    /* Successfully verified background is applied */
+}
+
+.brimora-bg-verification-failed {
+    position: relative;
+}
+
+.brimora-bg-verification-failed::after {
+    content: "⚠ CSS Override Issue";
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: #e74c3c;
+    color: white;
+    padding: 2px 6px;
+    font-size: 10px;
+    border-radius: 3px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
 /* Debug mode styles (when brimoraDebug is enabled) */
 body.brimora-debug .brimora-zen-service {
     border: 2px dashed #e74c3c;
@@ -165,4 +218,39 @@ body.brimora-debug .brimora-bg-loaded::before {
 body.brimora-debug .brimora-bg-error::before {
     background: #e74c3c;
     content: "Brimora: Error " attr(data-brimora-error);
+}
+
+body.brimora-debug .brimora-bg-verification-success::after {
+    content: "✓ CSS Success";
+    background: #27ae60;
+    bottom: 25px;
+}
+
+body.brimora-debug .brimora-bg-verification-failed::after {
+    content: "✗ CSS Failed";
+    background: #e74c3c;
+    bottom: 25px;
+}
+
+/* Enhanced error state with more detail */
+.brimora-bg-error {
+    position: relative;
+    background-color: #f8f8f8;
+    border: 1px dashed #ddd;
+    min-height: 100px;
+}
+
+.brimora-bg-error::after {
+    content: "⚠ Background image failed to load: " attr(data-brimora-error);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+    pointer-events: none;
+    z-index: 5;
+    max-width: 90%;
+    word-wrap: break-word;
 }

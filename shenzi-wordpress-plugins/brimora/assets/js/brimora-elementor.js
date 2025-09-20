@@ -39,6 +39,15 @@
         // Add loading class
         container.classList.add('brimora-loading');
         
+        // Debug logging
+        console.log('Brimora: Loading background for service', {
+            serviceId: serviceId,
+            serviceCode: serviceCode,
+            container: container,
+            ajaxUrl: brimoraAjax.ajaxUrl,
+            nonce: brimoraAjax.nonce
+        });
+        
         // Prepare AJAX data
         const ajaxData = {
             action: 'brimora_get_service_background',
@@ -51,18 +60,40 @@
             url: brimoraAjax.ajaxUrl,
             type: 'POST',
             data: ajaxData,
+            beforeSend: function() {
+                console.log('Brimora: AJAX request starting', ajaxData);
+            },
             success: function(response) {
-                if (response.success && response.data.image_url) {
+                console.log('Brimora: AJAX response received', response);
+                
+                if (response.success && response.data && response.data.image_url) {
+                    console.log('Brimora: Valid image URL received', response.data.image_url);
                     applyBackground(container, response.data);
                 } else {
-                    handleBackgroundError(container, response.data?.message || 'Unknown error');
+                    const errorMsg = response.data?.message || response.message || 'Unknown error - no image URL in response';
+                    console.error('Brimora: AJAX success but no valid image', {
+                        response: response,
+                        hasSuccess: response.success,
+                        hasData: !!response.data,
+                        hasImageUrl: !!(response.data && response.data.image_url),
+                        imageUrl: response.data ? response.data.image_url : 'no data'
+                    });
+                    handleBackgroundError(container, errorMsg);
                 }
             },
             error: function(xhr, status, error) {
-                handleBackgroundError(container, 'AJAX request failed: ' + error);
+                console.error('Brimora: AJAX request failed', {
+                    xhr: xhr,
+                    status: status,
+                    error: error,
+                    responseText: xhr.responseText,
+                    serviceId: serviceId
+                });
+                handleBackgroundError(container, 'AJAX request failed: ' + error + ' (Status: ' + status + ')');
             },
             complete: function() {
                 container.classList.remove('brimora-loading');
+                console.log('Brimora: AJAX request completed for service', serviceId);
             }
         });
     }
@@ -77,14 +108,42 @@
         const overlayEnabled = container.getAttribute('data-brimora-overlay') === 'yes';
         const overlayColor = container.getAttribute('data-brimora-overlay-color') || 'rgba(0,0,0,0.5)';
         
-        // Apply background image
-        container.style.backgroundImage = `url('${data.image_url}')`;
-        container.style.backgroundSize = bgSize;
-        container.style.backgroundPosition = bgPosition;
-        container.style.backgroundRepeat = bgRepeat;
+        // Debug logging
+        console.log('Brimora: Applying background to container', {
+            container: container,
+            imageUrl: data.image_url,
+            bgSize: bgSize,
+            bgPosition: bgPosition,
+            bgRepeat: bgRepeat,
+            serviceData: data
+        });
         
-        // Add success class
+        // Method 1: CSS Custom Properties (highest priority)
+        container.style.setProperty('--brimora-bg-image', `url('${data.image_url}')`);
+        container.style.setProperty('--brimora-bg-size', bgSize);
+        container.style.setProperty('--brimora-bg-position', bgPosition);
+        container.style.setProperty('--brimora-bg-repeat', bgRepeat);
+        
+        // Method 2: Direct inline styles with !important (fallback)
+        const importantStyles = `
+            background-image: url('${data.image_url}') !important;
+            background-size: ${bgSize} !important;
+            background-position: ${bgPosition} !important;
+            background-repeat: ${bgRepeat} !important;
+            background-color: transparent !important;
+        `;
+        
+        // Create or update style attribute
+        const existingStyle = container.getAttribute('style') || '';
+        const brimoraStylesRegex = /background-[^;]*!important;?/g;
+        const cleanedStyle = existingStyle.replace(brimoraStylesRegex, '');
+        container.setAttribute('style', cleanedStyle + importantStyles);
+        
+        // Method 3: Add success class for CSS targeting
         container.classList.add('brimora-bg-loaded');
+        
+        // Clear any conflicting Elementor background classes
+        clearElementorBackgrounds(container);
         
         // Apply overlay if enabled
         if (overlayEnabled && overlayColor) {
@@ -93,6 +152,11 @@
         
         // Add responsive handling for different screen sizes
         setupResponsiveBackground(container, data);
+        
+        // Verify background was applied
+        setTimeout(() => {
+            verifyBackgroundApplication(container, data.image_url);
+        }, 100);
         
         // Trigger custom event
         const event = new CustomEvent('brimoraBackgroundLoaded', {
@@ -103,10 +167,98 @@
         });
         container.dispatchEvent(event);
         
-        // Debug logging if enabled
-        if (window.brimoraDebug) {
-            console.log('Brimora: Background loaded for service', data.service_name, data);
+        // Debug logging
+        console.log('Brimora: Background applied successfully for service', data.service_name, {
+            finalStyle: container.getAttribute('style'),
+            computedBg: window.getComputedStyle(container).backgroundImage,
+            classes: container.className
+        });
+    }
+    
+    /**
+     * Clear conflicting Elementor background styles
+     */
+    function clearElementorBackgrounds(container) {
+        // Remove common Elementor background classes that might interfere
+        const elementorBgClasses = [
+            'elementor-bg-color',
+            'elementor-bg-image', 
+            'elementor-bg-overlay'
+        ];
+        
+        elementorBgClasses.forEach(className => {
+            container.classList.remove(className);
+        });
+        
+        // Force clear any existing background color
+        container.style.setProperty('background-color', 'transparent', 'important');
+    }
+    
+    /**
+     * Verify background was successfully applied
+     */
+    function verifyBackgroundApplication(container, expectedUrl) {
+        const computedStyle = window.getComputedStyle(container);
+        const actualBgImage = computedStyle.backgroundImage;
+        
+        console.log('Brimora: Background verification', {
+            expected: expectedUrl,
+            actualBgImage: actualBgImage,
+            hasExpectedUrl: actualBgImage.includes(expectedUrl.replace(/^https?:/, '')),
+            container: container
+        });
+        
+        if (actualBgImage === 'none' || !actualBgImage.includes(expectedUrl.replace(/^https?:/, ''))) {
+            console.warn('Brimora: Background image not applied correctly!', {
+                container: container,
+                expectedUrl: expectedUrl,
+                actualBgImage: actualBgImage,
+                elementorClasses: container.className,
+                inlineStyle: container.getAttribute('style')
+            });
+            
+            // Add error class for debugging
+            container.classList.add('brimora-bg-verification-failed');
+            
+            // Try alternative application method
+            forceBackgroundApplication(container, expectedUrl);
+        } else {
+            console.log('Brimora: Background verification successful!');
+            container.classList.add('brimora-bg-verification-success');
         }
+    }
+    
+    /**
+     * Force background application using multiple methods
+     */
+    function forceBackgroundApplication(container, imageUrl) {
+        console.log('Brimora: Forcing background application with alternative methods');
+        
+        // Method: Create a CSS rule specifically for this element
+        const elementId = container.id || 'brimora-' + Math.random().toString(36).substr(2, 9);
+        if (!container.id) {
+            container.id = elementId;
+        }
+        
+        // Create dynamic CSS
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+            #${elementId}.brimora-bg-loaded {
+                background-image: url('${imageUrl}') !important;
+                background-color: transparent !important;
+            }
+            
+            #${elementId}.brimora-bg-loaded,
+            #${elementId}.brimora-bg-loaded.elementor-element,
+            .elementor-container#${elementId}.brimora-bg-loaded {
+                background-image: url('${imageUrl}') !important;
+                background-color: transparent !important;
+            }
+        `;
+        
+        document.head.appendChild(styleElement);
+        
+        console.log('Brimora: Applied force CSS for element', elementId);
     }
     
     /**
