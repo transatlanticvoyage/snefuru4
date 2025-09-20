@@ -50,7 +50,9 @@ class Aardvark_Plugin_Installer {
         }
         
         // Record installation in database
-        $this->record_installation($repo, $install_result['plugin_path'], $github_url, $branch, $github_token);
+        // Use "ruplin" as the slug if it's the ruplin plugin
+        $plugin_slug = ($repo === 'ruplin' || strpos($repo, 'snefuruplin') !== false) ? 'ruplin' : $repo;
+        $this->record_installation($plugin_slug, $install_result['plugin_path'], $github_url, $branch, $github_token);
         
         // Clear WordPress plugin cache to ensure immediate recognition
         $this->clear_plugin_cache();
@@ -99,7 +101,13 @@ class Aardvark_Plugin_Installer {
         
         // Move to plugins directory
         $plugins_dir = WP_PLUGIN_DIR;
-        $plugin_dest = $plugins_dir . '/' . $repo_name;
+        
+        // Force ruplin to install to correct directory name
+        if ($repo_name === 'ruplin' || strpos($repo_name, 'snefuruplin') !== false) {
+            $plugin_dest = $plugins_dir . '/ruplin';
+        } else {
+            $plugin_dest = $plugins_dir . '/' . $repo_name;
+        }
         
         // Remove existing plugin if it exists
         if (is_dir($plugin_dest)) {
@@ -122,9 +130,12 @@ class Aardvark_Plugin_Installer {
         // Cleanup
         $this->cleanup_temp_files($temp_dir);
         
+        // Use the corrected directory name for ruplin
+        $final_plugin_dir = ($repo_name === 'ruplin' || strpos($repo_name, 'snefuruplin') !== false) ? 'ruplin' : $repo_name;
+        
         return array(
             'success' => true,
-            'plugin_path' => $repo_name . '/' . basename($main_plugin_file)
+            'plugin_path' => $final_plugin_dir . '/' . basename($main_plugin_file)
         );
     }
     
