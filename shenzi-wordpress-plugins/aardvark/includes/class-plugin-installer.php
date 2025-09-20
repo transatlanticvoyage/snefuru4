@@ -280,6 +280,52 @@ class Aardvark_Plugin_Installer {
     }
     
     /**
+     * Update plugin from GitHub using plugin path
+     */
+    public function update_from_github($plugin_path, $github_url, $branch = 'main', $github_token = null) {
+        // Set token if provided
+        if ($github_token) {
+            $this->github_client = new Aardvark_GitHub_Client($github_token);
+        }
+        
+        // Parse GitHub URL
+        $repo_info = Aardvark_GitHub_Client::parse_github_url($github_url);
+        if (!$repo_info) {
+            return array('error' => 'Invalid GitHub URL format');
+        }
+        
+        $owner = $repo_info['owner'];
+        $repo = $repo_info['repo'];
+        
+        // Check if repository exists and is accessible
+        $repo_data = $this->github_client->get_repository($owner, $repo);
+        if (isset($repo_data['error'])) {
+            return array('error' => 'Cannot access repository: ' . $repo_data['error']);
+        }
+        
+        // Download repository
+        $download_result = $this->github_client->download_repository($owner, $repo, $branch);
+        if (isset($download_result['error'])) {
+            return array('error' => 'Download failed: ' . $download_result['error']);
+        }
+        
+        // Extract and install (this will overwrite existing)
+        $install_result = $this->extract_and_install($download_result['data'], $repo, $branch);
+        if (isset($install_result['error'])) {
+            return $install_result;
+        }
+        
+        // Clear WordPress plugin cache to ensure immediate recognition
+        $this->clear_plugin_cache();
+        
+        return array(
+            'success' => true,
+            'message' => 'Plugin updated successfully from GitHub',
+            'plugin_path' => $install_result['plugin_path']
+        );
+    }
+    
+    /**
      * Update plugin from GitHub
      */
     public function update_plugin($plugin_slug) {

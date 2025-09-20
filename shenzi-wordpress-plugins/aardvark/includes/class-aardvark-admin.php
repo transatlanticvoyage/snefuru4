@@ -259,17 +259,47 @@ class Aardvark_Admin {
             wp_die('Insufficient permissions');
         }
         
-        $plugin_slug = sanitize_text_field($_POST['plugin_slug']);
+        $plugin = sanitize_text_field($_POST['plugin']);
+        
+        // Get plugin info from database
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_plugins_oasis';
+        $plugin_info = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE plugin_path = %s",
+            $plugin
+        ));
+        
+        if (!$plugin_info) {
+            wp_send_json_error('Plugin not found in database');
+        }
+        
+        if (empty($plugin_info->github_url)) {
+            wp_send_json_error('No GitHub URL available for this plugin');
+        }
         
         // Load the installer
         require_once AARDVARK_PLUGIN_PATH . 'includes/class-plugin-installer.php';
         
-        $installer = new Aardvark_Plugin_Installer();
-        $result = $installer->update_plugin($plugin_slug);
+        // Use stored token
+        $token = $plugin_info->github_token ?? '';
+        
+        $installer = new Aardvark_Plugin_Installer($token);
+        $result = $installer->update_from_github(
+            $plugin,
+            $plugin_info->github_url,
+            $plugin_info->branch_name ?: 'main',
+            $token
+        );
         
         if (isset($result['error'])) {
             wp_send_json_error($result['error']);
         } else {
+            // Clear WordPress caches to ensure immediate UI update
+            if (function_exists('wp_cache_delete')) {
+                wp_cache_delete('plugins', 'plugins');
+            }
+            delete_site_transient('update_plugins');
+            
             wp_send_json_success($result['message']);
         }
     }

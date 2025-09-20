@@ -564,9 +564,9 @@ class Aardvark_Papluginsmar_Page {
                     $button.prop('disabled', true).text('Updating...');
                     
                     $.post(ajaxurl, {
-                        action: 'aardvark_update_plugin_github',
+                        action: 'aardvark_update_github_plugin',
                         plugin: plugin,
-                        nonce: '<?php echo wp_create_nonce('aardvark_plugin_update_github'); ?>'
+                        nonce: '<?php echo wp_create_nonce('aardvark_plugin_update'); ?>'
                     }).done(function(response) {
                         if (response.success) {
                             alert('Plugin updated successfully from GitHub!');
