@@ -146,7 +146,7 @@ class AardvarkPlugin {
             array(
                 'plugin_slug' => 'ruplin',
                 'plugin_path' => 'ruplin/ruplin.php',
-                'github_url' => 'https://github.com/transatlanticvoyage/snefuruplin-wp-plugin.git',
+                'github_url' => 'https://github.com/transatlanticvoyage/ruplin.git',
                 'branch_name' => 'main'
             ),
             array(
