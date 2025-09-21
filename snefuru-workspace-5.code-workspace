@@ -4,6 +4,9 @@
 			"path": "."
 		},
 		{
+			"path": "./shenzi-wordpress-plugins/nivaro"
+		},
+		{
 			"path": "./shenzi-wordpress-plugins/ruplin"
 		},
 		{
@@ -38,9 +41,6 @@
 			"path": "./shenzi-wordpress-plugins/brimora"
 		},
 		{
-			"path": "./shenzi-wordpress-plugins/nivaro"
-		},
-		{
 			"path": "./shenzi-wordpress-plugins/trillan"
 		},
 		{
@@ -52,6 +52,7 @@
 		"git.autoRepositoryDetection": true,
 		"git.repositories": [
 			".",
+			"./shenzi-wordpress-plugins/nivaro",
 			"./shenzi-wordpress-plugins/ruplin",
 			"./shenzi-wordpress-plugins/grove",
 			"./shenzi-wordpress-plugins/aardvark",
@@ -63,7 +64,6 @@
 			"./shenzi-wordpress-plugins/klyra",
 			"../localrepo-vulcanhatch",
 			"./shenzi-wordpress-plugins/brimora",
-			"./shenzi-wordpress-plugins/nivaro",
 			"./shenzi-wordpress-plugins/trillan",
 			"./shenzi-wordpress-plugins/fathom"
 		]
