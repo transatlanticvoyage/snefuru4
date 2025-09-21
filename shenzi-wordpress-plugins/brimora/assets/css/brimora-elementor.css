@@ -41,6 +41,22 @@
     background-repeat: var(--brimora-bg-repeat, no-repeat) !important;
 }
 
+/* Elementor Editor Preview Specific Styles */
+.elementor-editor-preview .brimora-zen-service.brimora-bg-loaded,
+.elementor-preview .brimora-zen-service.brimora-bg-loaded,
+body.elementor-editor-active .brimora-zen-service.brimora-bg-loaded {
+    background-color: transparent !important;
+    background-image: var(--brimora-bg-image) !important;
+    background-size: var(--brimora-bg-size, cover) !important;
+    background-position: var(--brimora-bg-position, center center) !important;
+    background-repeat: var(--brimora-bg-repeat, no-repeat) !important;
+}
+
+/* Extra high priority for editor loaded backgrounds */
+.brimora-editor-loaded {
+    /* Marker class for editor-applied backgrounds */
+}
+
 /* Loading state */
 .brimora-loading {
     position: relative;

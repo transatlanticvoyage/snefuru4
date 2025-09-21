@@ -80,6 +80,9 @@ class Brimora {
         // Also enqueue in Elementor preview mode
         add_action('elementor/preview/enqueue_styles', array($this, 'enqueue_scripts'));
         add_action('elementor/editor/before_enqueue_scripts', array($this, 'enqueue_scripts'));
+        
+        // Add editor-specific scripts
+        add_action('elementor/editor/after_enqueue_scripts', array($this, 'enqueue_editor_scripts'));
     }
     
     public function enqueue_scripts() {
@@ -114,6 +117,22 @@ class Brimora {
             console.log("Brimora: Location:", window.location.href);
             console.log("Brimora: jQuery available:", typeof jQuery !== "undefined");
         ');
+    }
+    
+    public function enqueue_editor_scripts() {
+        // Script that runs in Elementor editor
+        wp_enqueue_script(
+            'brimora-editor',
+            BRIMORA_PLUGIN_URL . 'assets/js/brimora-editor.js',
+            array('jquery', 'elementor-editor'),
+            BRIMORA_PLUGIN_VERSION,
+            true
+        );
+        
+        wp_localize_script('brimora-editor', 'brimoraEditorAjax', array(
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('brimora_nonce')
+        ));
     }
     
     public function elementor_missing_notice() {
