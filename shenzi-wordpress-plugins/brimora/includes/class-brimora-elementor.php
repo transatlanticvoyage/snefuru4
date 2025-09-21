@@ -19,8 +19,9 @@ class Brimora_Elementor {
         // Add custom controls to Elementor containers
         add_action('elementor/element/container/section_layout/after_section_end', array($this, 'add_zen_service_controls'));
         
-        // Add render attributes to containers
+        // Add render attributes to containers (both frontend and editor)
         add_action('elementor/frontend/container/before_render', array($this, 'add_zen_service_attributes'));
+        add_action('elementor/element/container/before_render', array($this, 'add_zen_service_attributes'));
         
         // Add custom CSS classes
         add_filter('elementor/frontend/container/should_render_hidden', array($this, 'should_render_hidden'), 10, 2);
@@ -161,9 +162,15 @@ class Brimora_Elementor {
     public function add_zen_service_attributes($element) {
         $settings = $element->get_settings();
         
+        // Debug logging
+        error_log('Brimora: add_zen_service_attributes called with service_id: ' . ($settings['brimora_zen_service_id'] ?? 'none'));
+        
         if (!empty($settings['brimora_zen_service_id']) && $settings['brimora_zen_service_id'] != '0') {
             $service_id = $settings['brimora_zen_service_id'];
             $service_code = !empty($settings['brimora_zen_service_code']) ? $settings['brimora_zen_service_code'] : '';
+            
+            // Debug logging
+            error_log('Brimora: Adding attributes for service_id: ' . $service_id . ', service_code: ' . $service_code);
             
             // Add data attributes for JavaScript
             $element->add_render_attribute('_wrapper', array(
