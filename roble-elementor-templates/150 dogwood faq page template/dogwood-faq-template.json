@@ -1,0 +1,557 @@
+{
+  "version": "1.0.0",
+  "title": "150 Dogwood Site Template - FAQ Page",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#007cba",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "20",
+          "bottom": "80",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Frequently Asked Questions",
+                "size": "h1",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "hero-subtitle",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 20px;'>Find answers to common questions about our plumbing services</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "intro-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "intro-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "intro-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>We understand that choosing a plumbing service can raise many questions. Our experienced team has compiled answers to the most frequently asked questions to help you make informed decisions about your plumbing needs. If you don't find the answer you're looking for, please don't hesitate to contact us directly.</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "faq-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "faq-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "general-faq-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "General Questions",
+                "size": "h2",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "general-faq-accordion",
+              "elType": "widget",
+              "widgetType": "accordion",
+              "settings": {
+                "tabs": [
+                  {
+                    "tab_title": "Are you licensed and insured?",
+                    "tab_content": "Yes, we are fully licensed and insured plumbing professionals. We maintain all required licenses and carry comprehensive insurance coverage to protect both our customers and our team members during every job."
+                  },
+                  {
+                    "tab_title": "Do you offer emergency plumbing services?",
+                    "tab_content": "Absolutely! We provide 24/7 emergency plumbing services for urgent issues like burst pipes, severe leaks, or complete plumbing system failures. Our emergency team is always ready to respond quickly to minimize damage to your property."
+                  },
+                  {
+                    "tab_title": "What areas do you serve?",
+                    "tab_content": "We proudly serve your local area and all surrounding communities. Our service area includes residential and commercial properties within a 25-mile radius. Contact us to confirm service availability in your specific location."
+                  },
+                  {
+                    "tab_title": "Do you provide free estimates?",
+                    "tab_content": "Yes, we offer free, no-obligation estimates for all plumbing projects. Our experienced technicians will assess your needs and provide transparent pricing before any work begins."
+                  },
+                  {
+                    "tab_title": "How quickly can you respond to service calls?",
+                    "tab_content": "For emergency calls, we typically respond within 30-60 minutes. For scheduled appointments, we offer flexible scheduling including same-day and next-day service options based on availability."
+                  }
+                ],
+                "border_width": 1,
+                "border_color": "#e0e0e0",
+                "title_background_color": "#f8f9fa",
+                "title_color": "#333333",
+                "content_color": "#666666"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "services-faq-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "services-faq-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "services-faq-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Services & Pricing",
+                "size": "h2",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "services-faq-accordion",
+              "elType": "widget",
+              "widgetType": "accordion",
+              "settings": {
+                "tabs": [
+                  {
+                    "tab_title": "What types of plumbing services do you offer?",
+                    "tab_content": "We offer comprehensive plumbing services including drain cleaning, pipe repair and replacement, water heater installation and repair, fixture installation, leak detection, emergency repairs, and both residential and commercial plumbing solutions."
+                  },
+                  {
+                    "tab_title": "How much do your services cost?",
+                    "tab_content": "Our pricing varies depending on the specific service and complexity of the job. We provide transparent, upfront pricing with free estimates. We believe in fair, competitive rates with no hidden fees or surprise charges."
+                  },
+                  {
+                    "tab_title": "Do you work on both residential and commercial properties?",
+                    "tab_content": "Yes, we serve both residential and commercial customers. Our team has experience with everything from simple home repairs to complex commercial plumbing systems in offices, restaurants, and retail establishments."
+                  },
+                  {
+                    "tab_title": "Do you install water heaters?",
+                    "tab_content": "Absolutely! We install, repair, and maintain all types of water heaters including traditional tank units, tankless systems, and hybrid models. We can help you choose the right system for your needs and budget."
+                  },
+                  {
+                    "tab_title": "Can you help with clogged drains?",
+                    "tab_content": "Yes, drain cleaning is one of our specialties. We use professional-grade equipment including drain snakes and hydro-jetting to clear even the most stubborn clogs in sinks, toilets, showers, and main sewer lines."
+                  }
+                ],
+                "border_width": 1,
+                "border_color": "#e0e0e0",
+                "title_background_color": "#ffffff",
+                "title_color": "#333333",
+                "content_color": "#666666"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "booking-faq-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "booking-faq-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "booking-faq-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Booking & Appointments",
+                "size": "h2",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "booking-faq-accordion",
+              "elType": "widget",
+              "widgetType": "accordion",
+              "settings": {
+                "tabs": [
+                  {
+                    "tab_title": "How do I schedule an appointment?",
+                    "tab_content": "You can schedule an appointment by calling us directly, filling out our online contact form, or using our website's scheduling feature. We'll work with you to find a convenient time that fits your schedule."
+                  },
+                  {
+                    "tab_title": "Do you offer same-day service?",
+                    "tab_content": "Yes, we often have same-day availability for urgent repairs and many routine services. Emergency services are available 24/7. Contact us early in the day for the best chance of same-day scheduling."
+                  },
+                  {
+                    "tab_title": "What should I do to prepare for your visit?",
+                    "tab_content": "Please clear access to the problem area, turn off water if there's an active leak, and have any relevant information ready about the issue. Our technicians will bring all necessary tools and equipment."
+                  },
+                  {
+                    "tab_title": "Do you provide appointment time windows?",
+                    "tab_content": "Yes, we provide reasonable time windows for scheduled appointments and will call ahead to confirm our arrival time. We respect your time and strive to arrive within the scheduled window."
+                  },
+                  {
+                    "tab_title": "What forms of payment do you accept?",
+                    "tab_content": "We accept cash, checks, and all major credit cards including Visa, MasterCard, American Express, and Discover. Payment is due upon completion of work unless other arrangements are made in advance."
+                  }
+                ],
+                "border_width": 1,
+                "border_color": "#e0e0e0",
+                "title_background_color": "#f8f9fa",
+                "title_color": "#333333",
+                "content_color": "#666666"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "technical-faq-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "technical-faq-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "technical-faq-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Technical Questions",
+                "size": "h2",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "technical-faq-accordion",
+              "elType": "widget",
+              "widgetType": "accordion",
+              "settings": {
+                "tabs": [
+                  {
+                    "tab_title": "How do I know if I have a water leak?",
+                    "tab_content": "Signs of water leaks include unexpectedly high water bills, water stains on walls or ceilings, musty odors, running water sounds when fixtures are off, or wet spots in your yard. We offer professional leak detection services."
+                  },
+                  {
+                    "tab_title": "What should I do if my water heater stops working?",
+                    "tab_content": "First, check if the pilot light is lit (gas units) or if the circuit breaker has tripped (electric units). If these don't solve the problem, contact us for professional diagnosis and repair. Don't attempt complex repairs yourself."
+                  },
+                  {
+                    "tab_title": "Why is my water pressure low?",
+                    "tab_content": "Low water pressure can be caused by clogged aerators, mineral buildup in pipes, partially closed shut-off valves, or issues with the main water line. Our technicians can diagnose and resolve pressure issues."
+                  },
+                  {
+                    "tab_title": "How often should I have my drains cleaned?",
+                    "tab_content": "For preventive maintenance, we recommend professional drain cleaning annually for most homes. High-use areas like kitchens may benefit from more frequent cleaning. Regular maintenance helps prevent major clogs and backups."
+                  },
+                  {
+                    "tab_title": "What's the difference between a plumber and a drain cleaner?",
+                    "tab_content": "Licensed plumbers like our team can handle all aspects of plumbing systems including installation, repair, and compliance with building codes. We're trained to diagnose complex issues and provide comprehensive solutions."
+                  }
+                ],
+                "border_width": 1,
+                "border_color": "#e0e0e0",
+                "title_background_color": "#ffffff",
+                "title_color": "#333333",
+                "content_color": "#666666"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contact-cta-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#007cba",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "contact-cta-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "cta-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Still Have Questions?",
+                "size": "h2",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "cta-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 18px;'>Our friendly team is ready to answer any questions you have about our plumbing services. Contact us today!</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "cta-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 20
+                }
+              },
+              "elements": [
+                {
+                  "id": "call-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Call (555) 123-4567",
+                    "link": {
+                      "url": "tel:5551234567"
+                    },
+                    "size": "lg",
+                    "button_background_color": "#ffffff",
+                    "button_text_color": "#007cba",
+                    "border_border": "solid",
+                    "border_width": 2,
+                    "border_color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "contact-form-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Contact Us Online",
+                    "link": {
+                      "url": "/contact-us/"
+                    },
+                    "size": "lg",
+                    "button_background_color": "transparent",
+                    "button_text_color": "#ffffff",
+                    "border_border": "solid",
+                    "border_width": 2,
+                    "border_color": "#ffffff"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "additional-info-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "40",
+          "right": "20",
+          "bottom": "40",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "additional-info-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 40
+            }
+          },
+          "elements": [
+            {
+              "id": "service-hours",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "hours-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Service Hours",
+                    "size": "h3",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "hours-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p><strong>Regular Hours:</strong><br>Monday - Friday: 8:00 AM - 6:00 PM<br>Saturday: 9:00 AM - 5:00 PM<br>Sunday: Emergency Only</p><p><strong>Emergency Service:</strong><br>Available 24/7</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "service-guarantee",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "guarantee-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Our Guarantee",
+                    "size": "h3",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "guarantee-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p>We stand behind our work with a satisfaction guarantee. If you're not completely satisfied with our service, we'll make it right. All work comes with a warranty on parts and labor.</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

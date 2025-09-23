@@ -1,0 +1,710 @@
+{
+  "version": "1.0.0",
+  "title": "160 Dogwood Site Template - Emergency Plumber Page",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#dc3545",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "20",
+          "bottom": "80",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Emergency Plumber Your City",
+                "size": "h1",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "hero-subheading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "We offer same day emergency plumbing service!",
+                "size": "h2",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "hero-phone",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Call (555) 123-4567 NOW",
+                "link": {
+                  "url": "tel:5551234567"
+                },
+                "size": "xl",
+                "button_background_color": "#ffffff",
+                "button_text_color": "#dc3545",
+                "border_border": "solid",
+                "border_width": 3,
+                "border_color": "#ffffff"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "emergency-services-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "services-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "services-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "24-Hour Emergency Plumbing Services",
+                "size": "h2",
+                "align": "center",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "services-intro",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>When plumbing emergencies strike, you need fast, reliable service you can trust. Our experienced emergency plumbers are available 24/7 to handle any urgent plumbing situation in your home or business.</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "services-grid",
+              "elType": "container",
+              "settings": {
+                "content_width": "boxed",
+                "flex_wrap": "wrap",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 30
+                }
+              },
+              "elements": [
+                {
+                  "id": "service-drain-cleaning",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-tint",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Drain Cleaning",
+                    "description_text": "Emergency drain cleaning for severe clogs and backups that can't wait.",
+                    "position": "top",
+                    "icon_color": "#dc3545",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "service-water-heaters",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-fire",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Water Heaters",
+                    "description_text": "Emergency water heater repair and replacement when you have no hot water.",
+                    "position": "top",
+                    "icon_color": "#dc3545",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "service-sewer-line",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-wrench",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Sewer Line Repair",
+                    "description_text": "Urgent sewer line repairs to prevent property damage and health hazards.",
+                    "position": "top",
+                    "icon_color": "#dc3545",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "service-leak-detection",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-search",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Leak Detection",
+                    "description_text": "Advanced leak detection to find hidden leaks before they cause major damage.",
+                    "position": "top",
+                    "icon_color": "#dc3545",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "service-gas-line",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-exclamation-triangle",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Gas Line Repair",
+                    "description_text": "Emergency gas line repair services for safety and compliance issues.",
+                    "position": "top",
+                    "icon_color": "#dc3545",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "service-and-more",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-plus",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "And More...",
+                    "description_text": "Burst pipes, toilet repairs, faucet emergencies, and all other urgent plumbing needs.",
+                    "position": "top",
+                    "icon_color": "#dc3545",
+                    "title_color": "#333333"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "why-choose-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "why-choose-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "why-choose-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Why Choose Our Emergency Plumbing Service?",
+                "size": "h2",
+                "align": "center",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "why-choose-grid",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_wrap": "wrap",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 30
+                }
+              },
+              "elements": [
+                {
+                  "id": "feature-licensed",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-certificate",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Licensed and Insured",
+                    "description_text": "Fully licensed and insured professionals you can trust with your emergency.",
+                    "position": "top",
+                    "icon_color": "#28a745",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "feature-experienced",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-users",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Experienced Team",
+                    "description_text": "Years of experience handling emergency plumbing situations quickly and efficiently.",
+                    "position": "top",
+                    "icon_color": "#28a745",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "feature-aplus",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-star",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "A+ Rating",
+                    "description_text": "Highest quality service with an A+ rating from satisfied customers.",
+                    "position": "top",
+                    "icon_color": "#28a745",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "feature-satisfaction",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-thumbs-up",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "100% Customer Satisfaction",
+                    "description_text": "We guarantee 100% customer satisfaction on all emergency plumbing services.",
+                    "position": "top",
+                    "icon_color": "#28a745",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "feature-certified",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-award",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Certified Local Plumbers",
+                    "description_text": "Certified local plumbers who know your area and building codes.",
+                    "position": "top",
+                    "icon_color": "#28a745",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "feature-no-additional",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-clock",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "No Additional Cost for Evening/Weekend Service",
+                    "description_text": "Same fair pricing 24/7 - no extra charges for nights, weekends, or holidays.",
+                    "position": "top",
+                    "icon_color": "#28a745",
+                    "title_color": "#333333"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contact-info-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "contact-info-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "contact-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Emergency Plumbing Contact Information",
+                "size": "h2",
+                "align": "center",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "contact-grid",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 40
+                }
+              },
+              "elements": [
+                {
+                  "id": "phone-contact",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-phone",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Emergency Phone",
+                    "description_text": "(555) 123-4567",
+                    "link": {
+                      "url": "tel:5551234567"
+                    },
+                    "position": "top",
+                    "icon_color": "#dc3545",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "email-contact",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-envelope",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Email Us",
+                    "description_text": "info@yourplumber.com",
+                    "link": {
+                      "url": "mailto:info@yourplumber.com"
+                    },
+                    "position": "top",
+                    "icon_color": "#dc3545",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "address-contact",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-map-marker-alt",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Our Location",
+                    "description_text": "123 Main St, Your City, State 12345",
+                    "position": "top",
+                    "icon_color": "#dc3545",
+                    "title_color": "#333333"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "emergency-faq-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "emergency-faq-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "emergency-faq-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Emergency Plumbing FAQ",
+                "size": "h2",
+                "align": "center",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "emergency-faq-accordion",
+              "elType": "widget",
+              "widgetType": "accordion",
+              "settings": {
+                "tabs": [
+                  {
+                    "tab_title": "What qualifies as a plumbing emergency?",
+                    "tab_content": "Plumbing emergencies include burst pipes, major leaks, sewage backups, no hot water, gas leaks, overflowing toilets, and any situation that could cause property damage or pose health and safety risks."
+                  },
+                  {
+                    "tab_title": "How quickly can you respond to emergency calls?",
+                    "tab_content": "We typically respond to emergency calls within 30-60 minutes, depending on your location and current demand. Our goal is to get to you as quickly as possible to minimize damage."
+                  },
+                  {
+                    "tab_title": "Do you charge extra for emergency service?",
+                    "tab_content": "No, we don't charge additional fees for evening, weekend, or holiday emergency service calls. Our emergency rates are the same as our regular service rates."
+                  },
+                  {
+                    "tab_title": "What should I do while waiting for the emergency plumber?",
+                    "tab_content": "Turn off the main water supply if there's flooding, avoid using electrical appliances near water, clear the area of valuables, and take photos for insurance if there's damage. For gas leaks, evacuate immediately and call the gas company."
+                  },
+                  {
+                    "tab_title": "Are your emergency plumbers licensed and insured?",
+                    "tab_content": "Yes, all our emergency plumbers are fully licensed, bonded, and insured. We carry comprehensive liability insurance to protect your property during emergency repairs."
+                  },
+                  {
+                    "tab_title": "What payment methods do you accept for emergency service?",
+                    "tab_content": "We accept cash, checks, and all major credit cards for emergency services. Payment is due upon completion of the work unless other arrangements are made in advance."
+                  }
+                ],
+                "border_width": 1,
+                "border_color": "#e0e0e0",
+                "title_background_color": "#ffffff",
+                "title_color": "#333333",
+                "content_color": "#666666"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cta-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#dc3545",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "cta-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "cta-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Don't Wait - Call Now for Emergency Service!",
+                "size": "h2",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "cta-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 20px;'>Every minute counts in a plumbing emergency. Our experienced team is standing by 24/7 to help.</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "cta-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 20
+                }
+              },
+              "elements": [
+                {
+                  "id": "call-now-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Call Us Today",
+                    "link": {
+                      "url": "tel:5551234567"
+                    },
+                    "size": "xl",
+                    "button_background_color": "#ffffff",
+                    "button_text_color": "#dc3545",
+                    "border_border": "solid",
+                    "border_width": 3,
+                    "border_color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "get-appointment-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Get Appointment",
+                    "link": {
+                      "url": "#contact"
+                    },
+                    "size": "xl",
+                    "button_background_color": "transparent",
+                    "button_text_color": "#ffffff",
+                    "border_border": "solid",
+                    "border_width": 3,
+                    "border_color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "schedule-service-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule Service",
+                    "link": {
+                      "url": "#contact"
+                    },
+                    "size": "xl",
+                    "button_background_color": "transparent",
+                    "button_text_color": "#ffffff",
+                    "border_border": "solid",
+                    "border_width": 3,
+                    "border_color": "#ffffff"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "social-proof-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "40",
+          "right": "20",
+          "bottom": "40",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "social-proof-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "social-proof-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='text-align: center;'><p><strong>Google My Business Reviews</strong> | <strong>Facebook Reviews</strong> | <strong>Yelp Reviews</strong></p><p>★★★★★ 5-Star Rated Emergency Plumbing Service</p></div>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

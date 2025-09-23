@@ -1,0 +1,867 @@
+{
+  "version": "1.0.0",
+  "title": "120 Dogwood Site Template - Homepage 1",
+  "type": "page",
+  "content": [
+    {
+      "id": "header-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "10",
+          "right": "20",
+          "bottom": "10",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "header-row",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_justify_content": "space-between",
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "contact-info",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p><strong>Call Now: (555) 123-4567</strong> | Emergency Service Available</p>",
+                "align": "left"
+              }
+            },
+            {
+              "id": "logo",
+              "elType": "widget",
+              "widgetType": "image",
+              "settings": {
+                "image": {
+                  "url": "/wp-content/uploads/logo.png",
+                  "alt": "Company Logo"
+                },
+                "align": "center",
+                "width": {
+                  "unit": "px",
+                  "size": 200
+                }
+              }
+            },
+            {
+              "id": "cta-buttons",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Get Free Quote",
+                "link": {
+                  "url": "#contact",
+                  "is_external": false
+                },
+                "size": "md",
+                "button_background_color": "#007cba",
+                "button_text_color": "#ffffff"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Affordable Local Plumber",
+                "size": "h1",
+                "align": "center",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "hero-description",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Professional plumbing services for residential and commercial properties. Fast, reliable, and affordable solutions for all your plumbing needs. Licensed and insured professionals ready to help.</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 20
+                }
+              },
+              "elements": [
+                {
+                  "id": "call-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Call Now",
+                    "link": {
+                      "url": "tel:5551234567"
+                    },
+                    "size": "lg",
+                    "button_background_color": "#007cba",
+                    "button_text_color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "appointment-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule Appointment",
+                    "link": {
+                      "url": "#contact"
+                    },
+                    "size": "lg",
+                    "button_background_color": "#28a745",
+                    "button_text_color": "#ffffff"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "partners-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "40",
+          "right": "20",
+          "bottom": "40",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "partners-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Trusted Brands We Work With",
+            "size": "h3",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "partners-logos",
+          "elType": "widget",
+          "widgetType": "image-carousel",
+          "settings": {
+            "slides": [
+              {
+                "image": {
+                  "url": "/wp-content/uploads/brand-1.png",
+                  "alt": "Brand 1"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/brand-2.png",
+                  "alt": "Brand 2"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/brand-3.png",
+                  "alt": "Brand 3"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/brand-4.png",
+                  "alt": "Brand 4"
+                }
+              }
+            ],
+            "slides_to_show": 4,
+            "autoplay": "yes",
+            "autoplay_speed": 3000
+          }
+        }
+      ]
+    },
+    {
+      "id": "services-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "services-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Our Plumbing Services",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "services-grid",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_wrap": "wrap",
+            "flex_gap": {
+              "unit": "px",
+              "size": 30
+            }
+          },
+          "elements": [
+            {
+              "id": "service-1",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-tools",
+                  "library": "fa-solid"
+                },
+                "title_text": "Emergency Plumbing",
+                "description_text": "24/7 emergency plumbing services for urgent repairs and pipe bursts.",
+                "link": {
+                  "url": "#emergency-plumbing"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-2",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-home",
+                  "library": "fa-solid"
+                },
+                "title_text": "Residential Plumbing",
+                "description_text": "Complete residential plumbing services for homes and apartments.",
+                "link": {
+                  "url": "#residential-plumbing"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-3",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-building",
+                  "library": "fa-solid"
+                },
+                "title_text": "Commercial Plumbing",
+                "description_text": "Professional commercial plumbing solutions for businesses.",
+                "link": {
+                  "url": "#commercial-plumbing"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-4",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-fire",
+                  "library": "fa-solid"
+                },
+                "title_text": "Water Heater Repair",
+                "description_text": "Water heater installation, repair, and maintenance services.",
+                "link": {
+                  "url": "#water-heater"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-5",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-tint",
+                  "library": "fa-solid"
+                },
+                "title_text": "Drain Cleaning",
+                "description_text": "Professional drain cleaning and unclogging services.",
+                "link": {
+                  "url": "#drain-cleaning"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-6",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-wrench",
+                  "library": "fa-solid"
+                },
+                "title_text": "Pipe Repair",
+                "description_text": "Expert pipe repair and replacement for all types of plumbing.",
+                "link": {
+                  "url": "#pipe-repair"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-7",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-toilet",
+                  "library": "fa-solid"
+                },
+                "title_text": "Toilet Repair",
+                "description_text": "Toilet installation, repair, and replacement services.",
+                "link": {
+                  "url": "#toilet-repair"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-8",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-faucet",
+                  "library": "fa-solid"
+                },
+                "title_text": "Faucet Repair",
+                "description_text": "Faucet installation and repair for kitchens and bathrooms.",
+                "link": {
+                  "url": "#faucet-repair"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-9",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-search",
+                  "library": "fa-solid"
+                },
+                "title_text": "Leak Detection",
+                "description_text": "Advanced leak detection and repair services to prevent damage.",
+                "link": {
+                  "url": "#leak-detection"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "about-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "about-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 40
+            }
+          },
+          "elements": [
+            {
+              "id": "about-text",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "about-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "About Our Company",
+                    "size": "h2",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "about-description",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p>With over 15 years of experience in the plumbing industry, we have built a reputation for providing reliable, affordable, and professional plumbing services. Our licensed and insured team is committed to delivering exceptional results for every project.</p><p>We understand that plumbing emergencies can happen at any time, which is why we offer 24/7 emergency services. Our goal is to provide fast, efficient solutions that get your plumbing system back to working order quickly.</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "about-features",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "features-list",
+                  "elType": "widget",
+                  "widgetType": "icon-list",
+                  "settings": {
+                    "icon_list": [
+                      {
+                        "text": "Licensed & Insured",
+                        "icon": {
+                          "value": "fas fa-check",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "24/7 Emergency Service",
+                        "icon": {
+                          "value": "fas fa-check",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Free Estimates",
+                        "icon": {
+                          "value": "fas fa-check",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Satisfaction Guaranteed",
+                        "icon": {
+                          "value": "fas fa-check",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Experienced Professionals",
+                        "icon": {
+                          "value": "fas fa-check",
+                          "library": "fa-solid"
+                        }
+                      }
+                    ],
+                    "icon_color": "#28a745"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "testimonials-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "testimonials-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "What Our Customers Say",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "testimonials-carousel",
+          "elType": "widget",
+          "widgetType": "testimonial-carousel",
+          "settings": {
+            "slides": [
+              {
+                "content": "Excellent service! They arrived quickly and fixed our kitchen sink leak professionally. Highly recommend!",
+                "name": "Sarah Johnson",
+                "title": "Homeowner",
+                "rating": 5
+              },
+              {
+                "content": "Professional and affordable. They replaced our water heater and explained everything clearly. Great experience!",
+                "name": "Mike Davis",
+                "title": "Business Owner",
+                "rating": 5
+              },
+              {
+                "content": "Fast response for our emergency call. Fixed our burst pipe quickly and cleaned up afterward. Thank you!",
+                "name": "Lisa Chen",
+                "title": "Property Manager",
+                "rating": 5
+              },
+              {
+                "content": "Honest pricing and quality work. They solved our drain problem that others couldn't fix. Very satisfied!",
+                "name": "Robert Wilson",
+                "title": "Homeowner",
+                "rating": 5
+              },
+              {
+                "content": "Reliable and trustworthy plumbers. They've been maintaining our office building for two years now.",
+                "name": "Amanda Rodriguez",
+                "title": "Facility Manager",
+                "rating": 5
+              }
+            ],
+            "slides_to_show": 1,
+            "autoplay": "yes",
+            "autoplay_speed": 5000
+          }
+        }
+      ]
+    },
+    {
+      "id": "faq-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "faq-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Frequently Asked Questions",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "faq-accordion",
+          "elType": "widget",
+          "widgetType": "accordion",
+          "settings": {
+            "tabs": [
+              {
+                "tab_title": "Do you offer emergency plumbing services?",
+                "tab_content": "Yes, we provide 24/7 emergency plumbing services for urgent repairs, pipe bursts, and other plumbing emergencies."
+              },
+              {
+                "tab_title": "Are you licensed and insured?",
+                "tab_content": "Absolutely. We are fully licensed and insured plumbers with years of experience in residential and commercial plumbing."
+              },
+              {
+                "tab_title": "Do you provide free estimates?",
+                "tab_content": "Yes, we offer free estimates for all plumbing projects. Contact us to schedule your consultation."
+              },
+              {
+                "tab_title": "What areas do you serve?",
+                "tab_content": "We serve the local area and surrounding communities. Contact us to confirm service availability in your location."
+              },
+              {
+                "tab_title": "What types of payment do you accept?",
+                "tab_content": "We accept cash, checks, and all major credit cards for your convenience."
+              },
+              {
+                "tab_title": "Do you warranty your work?",
+                "tab_content": "Yes, all our work comes with a satisfaction guarantee and warranty on parts and labor."
+              }
+            ],
+            "border_width": 1,
+            "border_color": "#e0e0e0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "contact-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#333333",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "contact-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 40
+            }
+          },
+          "elements": [
+            {
+              "id": "contact-info",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "contact-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Contact Us Today",
+                    "size": "h2",
+                    "color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "contact-details",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='color: #ffffff;'><strong>Phone:</strong> (555) 123-4567</p><p style='color: #ffffff;'><strong>Email:</strong> info@yourplumber.com</p><p style='color: #ffffff;'><strong>Hours:</strong> 24/7 Emergency Service<br>Regular Hours: Mon-Fri 8AM-6PM</p><p style='color: #ffffff;'><strong>Service Area:</strong> Local area and surrounding communities</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "contact-form",
+              "elType": "widget",
+              "widgetType": "form",
+              "settings": {
+                "form_name": "Contact Form",
+                "form_fields": [
+                  {
+                    "custom_id": "name",
+                    "field_type": "text",
+                    "field_label": "Name",
+                    "placeholder": "Your Name",
+                    "required": true
+                  },
+                  {
+                    "custom_id": "phone",
+                    "field_type": "tel",
+                    "field_label": "Phone",
+                    "placeholder": "Your Phone Number",
+                    "required": true
+                  },
+                  {
+                    "custom_id": "email",
+                    "field_type": "email",
+                    "field_label": "Email",
+                    "placeholder": "Your Email",
+                    "required": true
+                  },
+                  {
+                    "custom_id": "service",
+                    "field_type": "select",
+                    "field_label": "Service Needed",
+                    "field_options": "Emergency Repair\nWater Heater\nDrain Cleaning\nPipe Repair\nOther",
+                    "required": true
+                  },
+                  {
+                    "custom_id": "message",
+                    "field_type": "textarea",
+                    "field_label": "Message",
+                    "placeholder": "Describe your plumbing issue",
+                    "rows": 4
+                  }
+                ],
+                "submit_button_text": "Request Service",
+                "button_background_color": "#007cba",
+                "button_text_color": "#ffffff"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#222222",
+        "padding": {
+          "unit": "px",
+          "top": "30",
+          "right": "20",
+          "bottom": "30",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "footer-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_justify_content": "space-between",
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "copyright",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #cccccc; margin: 0;'>© 2024 Your Plumbing Company. All rights reserved.</p>"
+              }
+            },
+            {
+              "id": "social-links",
+              "elType": "widget",
+              "widgetType": "social-icons",
+              "settings": {
+                "social_icon_list": [
+                  {
+                    "social": "facebook",
+                    "link": {
+                      "url": "#"
+                    }
+                  },
+                  {
+                    "social": "twitter",
+                    "link": {
+                      "url": "#"
+                    }
+                  },
+                  {
+                    "social": "google-plus",
+                    "link": {
+                      "url": "#"
+                    }
+                  }
+                ],
+                "icon_color_official": "yes"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

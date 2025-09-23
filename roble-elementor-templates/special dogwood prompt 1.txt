@@ -1,0 +1,38 @@
+Now please create an import template to create the container and widget structure of this page:
+
+https://elcajonplumber.net/
+
+Place it in the folder named:
+172 dogwood homepage
+
+
+———————————————————————
+Special notes:
+- Please make sure to place the exact same text content into our template (copy all the same exact content exactly so that when importing the page into an Elementor site, that page will get the exact same text content).
+- This includes all CTAs, phone numbers, etc.
+- Please try to copy all icons also (or create an approximation of the icon for us).
+
+———————————————————————
+
+please make sure to re-create the exact elementor container and widget structure
+
+pleae make sure to copy all styles to try to make it look as close to an exact replica as possible
+
+———————————————————————
+
+SUB-SECTION OF THE PAGE:
+for the page listed above to copy, please do not create a full page template at first (you do not have enough resources to accurately do this)
+
+pleae focus on creating a template for us that only includes the following sections of the page:
+
+-the header area
+-the first container which is a like a hero area
+-the next container containing trusted brands, etc. 
+
+
+———————————————————————
+DO NOT PLACE ELCAJONPLUMBER.NET IN CODE
+
+Do not place any references to "el cajon plumber" or elcajonplumber.net, etc. anywhere in our code such as in widget ids, classes, titles, etc. or inside of comments, etc.
+
+We use the code word "dogwood" as an alternate word for naming our templates that are copied from this site 

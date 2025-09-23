@@ -1,0 +1,670 @@
+{
+  "version": "1.0.0",
+  "title": "130 Dogwood Site Template - About Page",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "20",
+          "bottom": "80",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "About Our Plumbing Company",
+                "size": "h1",
+                "align": "center",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "hero-tagline",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p class='lead'>Professional plumbing services you can trust. Serving the community with excellence and reliability.</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-contact",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Call (555) 123-4567",
+                "link": {
+                  "url": "tel:5551234567"
+                },
+                "size": "lg",
+                "button_background_color": "#007cba",
+                "button_text_color": "#ffffff"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "welcome-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "welcome-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "welcome-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Welcome to Our Local Business",
+                "size": "h2",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "welcome-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>We are a locally owned and operated plumbing company dedicated to providing exceptional service to our community. Our team of experienced professionals specializes in residential, commercial, and emergency plumbing services.</p><p>From simple repairs to complex installations, we handle every job with the same level of care and attention to detail. Our commitment to quality workmanship and customer satisfaction has made us a trusted name in the plumbing industry.</p><p>Whether you need routine maintenance, emergency repairs, or new installations, our skilled technicians are equipped with the latest tools and knowledge to get the job done right the first time.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "history-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "history-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 40
+            }
+          },
+          "elements": [
+            {
+              "id": "history-text",
+              "elType": "container",
+              "settings": {
+                "flex": "2"
+              },
+              "elements": [
+                {
+                  "id": "history-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Our History",
+                    "size": "h2",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "history-description",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p>Founded in 1993, our plumbing company has been serving the local community for over 30 years. What started as a small family business has grown into a trusted name in the industry, built on a foundation of quality work and exceptional customer service.</p><p>Over the decades, we have evolved with the industry, adopting new technologies and techniques while maintaining our commitment to traditional values of honesty, reliability, and craftsmanship. Our experience spans thousands of successful projects, from simple household repairs to complex commercial installations.</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "history-image",
+              "elType": "widget",
+              "widgetType": "image",
+              "settings": {
+                "image": {
+                  "url": "/wp-content/uploads/company-history.jpg",
+                  "alt": "Company History"
+                },
+                "width": {
+                  "unit": "%",
+                  "size": 100
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "priorities-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "priorities-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 40
+            }
+          },
+          "elements": [
+            {
+              "id": "priority-column",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "priority-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Our Priority",
+                    "size": "h3",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "priority-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p>Customer satisfaction is our top priority. We believe in providing transparent pricing, reliable service, and quality workmanship that stands the test of time. Every project, big or small, receives our full attention and expertise.</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "ambition-column",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "ambition-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Our Ambition",
+                    "size": "h3",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "ambition-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p>We strive to be the most trusted plumbing company in the area by continuously improving our services, staying current with industry standards, and building lasting relationships with our customers through exceptional service delivery.</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "services-overview-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "services-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Our Plumbing Expertise",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "services-grid",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_wrap": "wrap",
+            "flex_gap": {
+              "unit": "px",
+              "size": 30
+            }
+          },
+          "elements": [
+            {
+              "id": "service-residential",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-home",
+                  "library": "fa-solid"
+                },
+                "title_text": "Residential Plumbing",
+                "description_text": "Complete home plumbing services including repairs, installations, and maintenance for all residential properties.",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-commercial",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-building",
+                  "library": "fa-solid"
+                },
+                "title_text": "Commercial Plumbing",
+                "description_text": "Professional commercial plumbing solutions for offices, restaurants, retail spaces, and industrial facilities.",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-emergency",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-exclamation-triangle",
+                  "library": "fa-solid"
+                },
+                "title_text": "Emergency Services",
+                "description_text": "24/7 emergency plumbing services for urgent repairs, burst pipes, and other plumbing emergencies.",
+                "position": "top",
+                "icon_color": "#dc3545",
+                "title_color": "#333333"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "why-choose-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "why-choose-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 40
+            }
+          },
+          "elements": [
+            {
+              "id": "why-choose-text",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "why-choose-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Why Choose Us?",
+                    "size": "h2",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "why-choose-description",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p>When you choose our plumbing services, you're choosing a company that puts your needs first. Here's what sets us apart from the competition:</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "why-choose-list",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "advantages-list",
+                  "elType": "widget",
+                  "widgetType": "icon-list",
+                  "settings": {
+                    "icon_list": [
+                      {
+                        "text": "Licensed and Insured Professionals",
+                        "icon": {
+                          "value": "fas fa-certificate",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "30+ Years of Experience",
+                        "icon": {
+                          "value": "fas fa-award",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "24/7 Emergency Service Available",
+                        "icon": {
+                          "value": "fas fa-clock",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Transparent and Fair Pricing",
+                        "icon": {
+                          "value": "fas fa-dollar-sign",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Quality Workmanship Guaranteed",
+                        "icon": {
+                          "value": "fas fa-thumbs-up",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Locally Owned and Operated",
+                        "icon": {
+                          "value": "fas fa-map-marker-alt",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Professional Association Memberships",
+                        "icon": {
+                          "value": "fas fa-users",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Latest Tools and Technology",
+                        "icon": {
+                          "value": "fas fa-tools",
+                          "library": "fa-solid"
+                        }
+                      }
+                    ],
+                    "icon_color": "#28a745",
+                    "text_color": "#333333"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "certifications-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "certifications-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Professional Certifications & Associations",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "certifications-text",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<p style='text-align: center;'>We maintain active memberships and certifications with leading industry organizations to ensure we stay current with the latest plumbing standards, techniques, and safety protocols.</p>",
+            "align": "center"
+          }
+        },
+        {
+          "id": "certifications-logos",
+          "elType": "widget",
+          "widgetType": "image-carousel",
+          "settings": {
+            "slides": [
+              {
+                "image": {
+                  "url": "/wp-content/uploads/certification-1.png",
+                  "alt": "Professional Certification 1"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/certification-2.png",
+                  "alt": "Professional Certification 2"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/certification-3.png",
+                  "alt": "Professional Certification 3"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/certification-4.png",
+                  "alt": "Professional Certification 4"
+                }
+              }
+            ],
+            "slides_to_show": 4,
+            "autoplay": "yes",
+            "autoplay_speed": 3000
+          }
+        }
+      ]
+    },
+    {
+      "id": "cta-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#007cba",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "cta-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "cta-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready to Get Started?",
+                "size": "h2",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "cta-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 18px;'>Contact us today for a free estimate on your plumbing project. Our experienced team is ready to provide you with reliable, professional service.</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "cta-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 20
+                }
+              },
+              "elements": [
+                {
+                  "id": "call-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Call Us Today",
+                    "link": {
+                      "url": "tel:5551234567"
+                    },
+                    "size": "lg",
+                    "button_background_color": "#ffffff",
+                    "button_text_color": "#007cba",
+                    "border_border": "solid",
+                    "border_width": 2,
+                    "border_color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "contact-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Get Free Estimate",
+                    "link": {
+                      "url": "#contact"
+                    },
+                    "size": "lg",
+                    "button_background_color": "transparent",
+                    "button_text_color": "#ffffff",
+                    "border_border": "solid",
+                    "border_width": 2,
+                    "border_color": "#ffffff"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

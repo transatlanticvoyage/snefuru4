@@ -1,0 +1,483 @@
+{
+  "version": "1.0.0",
+  "title": "El Cajon Plumber Homepage",
+  "type": "page",
+  "author": "Nivaro Template System",
+  "url": "https://elcajonplumber.net",
+  "content": [
+    {
+      "id": "header-top-bar",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#2c3e50",
+        "padding": {
+          "unit": "px",
+          "top": "10",
+          "right": "30",
+          "bottom": "10",
+          "left": "30"
+        }
+      },
+      "elements": [
+        {
+          "id": "contact-info",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<p style='color: white; font-size: 14px;'>📞 (619) 555-0123 | 📧 info@elcajonplumber.net | Open 24/7 Emergency Service</p>",
+            "align": "center",
+            "text_color": "#ffffff"
+          }
+        }
+      ]
+    },
+    {
+      "id": "navigation-section",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "boxed",
+        "boxed_width": {"size": 1200, "unit": "px"},
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "20",
+          "right": "30",
+          "bottom": "20",
+          "left": "30"
+        },
+        "box_shadow": {
+          "horizontal": 0,
+          "vertical": 2,
+          "blur": 10,
+          "spread": 0,
+          "color": "rgba(0,0,0,0.1)"
+        }
+      },
+      "elements": [
+        {
+          "id": "nav-container",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "row",
+            "flex_justify_content": "space-between",
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "site-logo",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "El Cajon Plumber",
+                "header_size": "h2",
+                "title_color": "#007cba",
+                "typography_typography": "custom",
+                "typography_font_family": "Roboto",
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 28, "unit": "px"}
+              }
+            },
+            {
+              "id": "nav-menu",
+              "elType": "widget",
+              "widgetType": "nav-menu",
+              "settings": {
+                "layout": "horizontal",
+                "menu": "main-menu",
+                "align_items": "center",
+                "pointer": "underline",
+                "animation_line": "fade",
+                "menu_items_color": "#333333",
+                "menu_items_hover_color": "#007cba",
+                "menu_items_typography_typography": "custom",
+                "menu_items_typography_font_family": "Roboto",
+                "menu_items_typography_font_weight": "500",
+                "menu_items_typography_font_size": {"size": 16, "unit": "px"},
+                "space_between": {"size": 25, "unit": "px"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "boxed",
+        "boxed_width": {"size": 1200, "unit": "px"},
+        "flex_direction": "column",
+        "flex_justify_content": "center",
+        "flex_align_items": "center",
+        "min_height": {"size": 500, "unit": "px"},
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "background_overlay_background": "classic",
+        "background_overlay_color": "rgba(207, 212, 219, 0.1)",
+        "padding": {
+          "unit": "px",
+          "top": "100",
+          "right": "30",
+          "bottom": "100",
+          "left": "30"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Affordable El Cajon Plumber",
+            "align": "center",
+            "title_color": "#2c3e50",
+            "typography_typography": "custom",
+            "typography_font_family": "Roboto",
+            "typography_font_weight": "700",
+            "typography_font_size": {"size": 48, "unit": "px"},
+            "typography_font_size_tablet": {"size": 36, "unit": "px"},
+            "typography_font_size_mobile": {"size": 28, "unit": "px"}
+          }
+        },
+        {
+          "id": "hero-subheading",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<p>Prompt & Budget-Friendly Plumbing Services in El Cajon<br>Available 24/7 for Emergency Repairs</p>",
+            "align": "center",
+            "text_color": "#666666",
+            "typography_typography": "custom",
+            "typography_font_family": "Roboto",
+            "typography_font_size": {"size": 20, "unit": "px"},
+            "typography_line_height": {"size": 1.6, "unit": "em"}
+          }
+        },
+        {
+          "id": "hero-buttons",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "row",
+            "flex_gap": {"size": 20, "unit": "px"},
+            "flex_justify_content": "center",
+            "margin": {"unit": "px", "top": "30"}
+          },
+          "elements": [
+            {
+              "id": "cta-button-1",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Get Appointment",
+                "align": "center",
+                "size": "lg",
+                "button_type": "warning",
+                "background_color": "#FFA500",
+                "hover_background_color": "#ff8c00",
+                "button_text_color": "#ffffff",
+                "typography_typography": "custom",
+                "typography_font_weight": "600",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "border_radius": {"size": 5, "unit": "px"},
+                "button_padding": {
+                  "unit": "px",
+                  "top": "15",
+                  "right": "30",
+                  "bottom": "15",
+                  "left": "30"
+                },
+                "button_box_shadow": {
+                  "horizontal": 0,
+                  "vertical": 3,
+                  "blur": 10,
+                  "spread": 0,
+                  "color": "rgba(255,165,0,0.3)"
+                }
+              }
+            },
+            {
+              "id": "cta-button-2",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Get Free Estimate",
+                "align": "center",
+                "size": "lg",
+                "button_type": "info",
+                "background_color": "#007cba",
+                "hover_background_color": "#005a87",
+                "button_text_color": "#ffffff",
+                "typography_typography": "custom",
+                "typography_font_weight": "600",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "border_radius": {"size": 5, "unit": "px"},
+                "button_padding": {
+                  "unit": "px",
+                  "top": "15",
+                  "right": "30",
+                  "bottom": "15",
+                  "left": "30"
+                },
+                "button_box_shadow": {
+                  "horizontal": 0,
+                  "vertical": 3,
+                  "blur": 10,
+                  "spread": 0,
+                  "color": "rgba(0,124,186,0.3)"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trust-badges-section",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "boxed",
+        "boxed_width": {"size": 1200, "unit": "px"},
+        "flex_direction": "row",
+        "flex_justify_content": "space-around",
+        "flex_align_items": "center",
+        "flex_wrap": "wrap",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "30",
+          "bottom": "60",
+          "left": "30"
+        }
+      },
+      "elements": [
+        {
+          "id": "trust-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Trusted by Leading Manufacturers",
+            "header_size": "h3",
+            "align": "center",
+            "title_color": "#2c3e50",
+            "typography_font_size": {"size": 24, "unit": "px"},
+            "width": {"unit": "%", "size": 100},
+            "margin": {"unit": "px", "bottom": "40"}
+          }
+        },
+        {
+          "id": "badge-1",
+          "elType": "widget",
+          "widgetType": "image",
+          "settings": {
+            "image": {"url": "placeholder-logo-1.png"},
+            "image_size": "medium",
+            "align": "center",
+            "width": {"size": 150, "unit": "px"},
+            "opacity": {"size": 0.7},
+            "hover_animation": "grow"
+          }
+        },
+        {
+          "id": "badge-2",
+          "elType": "widget",
+          "widgetType": "image",
+          "settings": {
+            "image": {"url": "placeholder-logo-2.png"},
+            "image_size": "medium",
+            "align": "center",
+            "width": {"size": 150, "unit": "px"},
+            "opacity": {"size": 0.7},
+            "hover_animation": "grow"
+          }
+        },
+        {
+          "id": "badge-3",
+          "elType": "widget",
+          "widgetType": "image",
+          "settings": {
+            "image": {"url": "placeholder-logo-3.png"},
+            "image_size": "medium",
+            "align": "center",
+            "width": {"size": 150, "unit": "px"},
+            "opacity": {"size": 0.7},
+            "hover_animation": "grow"
+          }
+        },
+        {
+          "id": "badge-4",
+          "elType": "widget",
+          "widgetType": "image",
+          "settings": {
+            "image": {"url": "placeholder-logo-4.png"},
+            "image_size": "medium",
+            "align": "center",
+            "width": {"size": 150, "unit": "px"},
+            "opacity": {"size": 0.7},
+            "hover_animation": "grow"
+          }
+        },
+        {
+          "id": "badge-5",
+          "elType": "widget",
+          "widgetType": "image",
+          "settings": {
+            "image": {"url": "placeholder-logo-5.png"},
+            "image_size": "medium",
+            "align": "center",
+            "width": {"size": 150, "unit": "px"},
+            "opacity": {"size": 0.7},
+            "hover_animation": "grow"
+          }
+        }
+      ]
+    },
+    {
+      "id": "about-section",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "boxed",
+        "boxed_width": {"size": 1200, "unit": "px"},
+        "flex_direction": "row",
+        "flex_gap": {"size": 50, "unit": "px"},
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "30",
+          "bottom": "80",
+          "left": "30"
+        }
+      },
+      "elements": [
+        {
+          "id": "about-content",
+          "elType": "container",
+          "settings": {
+            "width": {"unit": "%", "size": 60}
+          },
+          "elements": [
+            {
+              "id": "about-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "About Local Plumber El Cajon",
+                "header_size": "h2",
+                "title_color": "#2c3e50",
+                "typography_font_size": {"size": 36, "unit": "px"},
+                "margin": {"unit": "px", "bottom": "20"}
+              }
+            },
+            {
+              "id": "about-divider",
+              "elType": "widget",
+              "widgetType": "divider",
+              "settings": {
+                "color": "#007cba",
+                "weight": {"size": 3, "unit": "px"},
+                "width": {"size": 80, "unit": "px"},
+                "alignment": "left",
+                "margin": {"unit": "px", "bottom": "30"}
+              }
+            },
+            {
+              "id": "about-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>With over 15 years of experience serving the El Cajon community, we pride ourselves on delivering exceptional plumbing services that you can trust. Our team of licensed and insured professionals is committed to providing prompt, reliable, and affordable solutions for all your plumbing needs.</p>",
+                "text_color": "#666666",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "typography_line_height": {"size": 1.8, "unit": "em"},
+                "margin": {"unit": "px", "bottom": "30"}
+              }
+            },
+            {
+              "id": "about-features",
+              "elType": "widget",
+              "widgetType": "icon-list",
+              "settings": {
+                "icon_list": [
+                  {
+                    "text": "15+ Years of Professional Experience",
+                    "selected_icon": {"value": "fas fa-check-circle", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "Licensed & Fully Insured Technicians",
+                    "selected_icon": {"value": "fas fa-check-circle", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "24/7 Emergency Service Available",
+                    "selected_icon": {"value": "fas fa-check-circle", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "100% Satisfaction Guaranteed",
+                    "selected_icon": {"value": "fas fa-check-circle", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "Upfront Pricing - No Hidden Fees",
+                    "selected_icon": {"value": "fas fa-check-circle", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "Same Day Service Available",
+                    "selected_icon": {"value": "fas fa-check-circle", "library": "fa-solid"}
+                  }
+                ],
+                "icon_color": "#007cba",
+                "icon_size": {"size": 20, "unit": "px"},
+                "text_color": "#333333",
+                "text_indent": {"size": 10, "unit": "px"},
+                "space_between": {"size": 15, "unit": "px"},
+                "typography_font_size": {"size": 16, "unit": "px"}
+              }
+            }
+          ]
+        },
+        {
+          "id": "about-image",
+          "elType": "container",
+          "settings": {
+            "width": {"unit": "%", "size": 40}
+          },
+          "elements": [
+            {
+              "id": "plumber-image",
+              "elType": "widget",
+              "widgetType": "image",
+              "settings": {
+                "image": {"url": "plumber-at-work.jpg"},
+                "image_size": "large",
+                "align": "center",
+                "border_radius": {"size": 10, "unit": "px"},
+                "box_shadow": {
+                  "horizontal": 0,
+                  "vertical": 10,
+                  "blur": 30,
+                  "spread": 0,
+                  "color": "rgba(0,0,0,0.1)"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "page_settings": {
+    "title": "El Cajon Plumber - Professional Plumbing Services",
+    "status": "publish",
+    "template": "elementor_header_footer",
+    "hide_title": "yes"
+  }
+}

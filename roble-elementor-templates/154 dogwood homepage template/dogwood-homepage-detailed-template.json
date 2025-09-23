@@ -1,0 +1,859 @@
+{
+  "version": "1.0.0",
+  "title": "154 Dogwood Site Template - Homepage Detailed",
+  "type": "page",
+  "content": [
+    {
+      "id": "header-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "10",
+          "right": "20",
+          "bottom": "10",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "header-row",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_justify_content": "space-between",
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "contact-info",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p><strong>Call Now: (619) 853-8491</strong> | Emergency Service Available</p>",
+                "align": "left"
+              }
+            },
+            {
+              "id": "email-info",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p><a href='mailto:elcajonplumber.ca@gmail.com'>elcajonplumber.ca@gmail.com</a></p>",
+                "align": "right"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#007cba",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "20",
+          "bottom": "80",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Affordable El Cajon Plumber",
+                "size": "h1",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "hero-description",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 20px;'>We offer prompt and budget-friendly plumbing services. Our experienced team is committed to delivering top-quality solutions for all your plumbing needs.</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 20
+                }
+              },
+              "elements": [
+                {
+                  "id": "appointment-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Get Appointment",
+                    "link": {
+                      "url": "#contact"
+                    },
+                    "size": "lg",
+                    "button_background_color": "#28a745",
+                    "button_text_color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "estimate-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Get Free Estimate",
+                    "link": {
+                      "url": "#contact"
+                    },
+                    "size": "lg",
+                    "button_background_color": "#ffffff",
+                    "button_text_color": "#007cba"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "partners-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "40",
+          "right": "20",
+          "bottom": "40",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "partners-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Trusted Manufacturer Partnerships",
+            "size": "h3",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "partners-logos",
+          "elType": "widget",
+          "widgetType": "image-carousel",
+          "settings": {
+            "slides": [
+              {
+                "image": {
+                  "url": "/wp-content/uploads/american-standard.png",
+                  "alt": "American Standard"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/cl-supply.png",
+                  "alt": "C&L Supply Company"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/moen.png",
+                  "alt": "Moen"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/rheem.png",
+                  "alt": "Rheem Industries"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/zurn.png",
+                  "alt": "Zurn Industries"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/bradford-white.png",
+                  "alt": "Bradford White"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/chicago-faucet.png",
+                  "alt": "Chicago Faucet"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/delta.png",
+                  "alt": "Delta"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/danze.png",
+                  "alt": "Danze"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/kohler.png",
+                  "alt": "Kohler Co"
+                }
+              }
+            ],
+            "slides_to_show": 5,
+            "autoplay": "yes",
+            "autoplay_speed": 3000,
+            "pause_on_hover": "yes"
+          }
+        }
+      ]
+    },
+    {
+      "id": "services-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "services-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Our Plumbing Services",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "services-grid",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_wrap": "wrap",
+            "flex_gap": {
+              "unit": "px",
+              "size": 30
+            }
+          },
+          "elements": [
+            {
+              "id": "service-emergency",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-exclamation-triangle",
+                  "library": "fa-solid"
+                },
+                "title_text": "Emergency Plumbing",
+                "description_text": "24/7 emergency plumbing services for urgent repairs and pipe bursts.",
+                "link": {
+                  "url": "/emergency-plumber-el-cajon/"
+                },
+                "position": "top",
+                "icon_color": "#dc3545",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-residential",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-home",
+                  "library": "fa-solid"
+                },
+                "title_text": "Residential Plumbing",
+                "description_text": "Complete residential plumbing services for homes and apartments.",
+                "link": {
+                  "url": "/residential-plumbing/"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-commercial",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-building",
+                  "library": "fa-solid"
+                },
+                "title_text": "Commercial Plumbing",
+                "description_text": "Professional commercial plumbing solutions for businesses.",
+                "link": {
+                  "url": "/commercial-plumbing/"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-water-heater",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-fire",
+                  "library": "fa-solid"
+                },
+                "title_text": "Water Heater Repair",
+                "description_text": "Water heater installation, repair, and maintenance services.",
+                "link": {
+                  "url": "/water-heater-repair/"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-drain-cleaning",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-tint",
+                  "library": "fa-solid"
+                },
+                "title_text": "Drain Cleaning",
+                "description_text": "Professional drain cleaning and unclogging services.",
+                "link": {
+                  "url": "/drain-cleaning/"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-sewer-line",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-wrench",
+                  "library": "fa-solid"
+                },
+                "title_text": "Sewer Line Replacement",
+                "description_text": "Expert sewer line repair and replacement services.",
+                "link": {
+                  "url": "/sewer-line-replacement/"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-hydro-jetting",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-spray-can",
+                  "library": "fa-solid"
+                },
+                "title_text": "Hydro Jetting",
+                "description_text": "High-pressure water jetting for tough drain and sewer clogs.",
+                "link": {
+                  "url": "/hydro-jetting/"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-kitchen-bath",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-bath",
+                  "library": "fa-solid"
+                },
+                "title_text": "Kitchen & Bath Plumbing",
+                "description_text": "Complete kitchen and bathroom plumbing installations and repairs.",
+                "link": {
+                  "url": "/kitchen-bath-plumbing/"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-shower-faucet",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-shower",
+                  "library": "fa-solid"
+                },
+                "title_text": "Shower and Faucet Repair",
+                "description_text": "Expert shower and faucet installation and repair services.",
+                "link": {
+                  "url": "/shower-faucet-repair/"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-leak-detection",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-search",
+                  "library": "fa-solid"
+                },
+                "title_text": "Leak Detection & Repair",
+                "description_text": "Advanced leak detection and repair services to prevent damage.",
+                "link": {
+                  "url": "/leak-detection-repair/"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-piping",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-tools",
+                  "library": "fa-solid"
+                },
+                "title_text": "Piping & Repiping",
+                "description_text": "Complete piping and repiping services for old or damaged pipes.",
+                "link": {
+                  "url": "/piping-repiping/"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "about-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "about-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "about-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "El Cajon's Trusted Plumbing Experts",
+                "size": "h2",
+                "align": "center",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "about-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='text-align: center;'>With years of experience serving El Cajon and surrounding areas, we've built a reputation for reliable, affordable, and professional plumbing services. Our licensed and insured team is committed to delivering exceptional results for every project, whether it's a simple repair or a complex installation.</p><p style='text-align: center;'>We understand that plumbing issues can be stressful and disruptive to your daily life. That's why we offer prompt response times, transparent pricing, and quality workmanship that stands the test of time. When you choose El Cajon Plumber, you're choosing a team that puts your needs first.</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "testimonials-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "testimonials-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "What Our Customers Say",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "testimonials-carousel",
+          "elType": "widget",
+          "widgetType": "testimonial-carousel",
+          "settings": {
+            "slides": [
+              {
+                "content": "They did a perfect job of the water heater installation (expansion tank, new fittings, etc.). Neat, clean, and efficient.",
+                "name": "Wayne G",
+                "title": "Customer",
+                "rating": 5
+              },
+              {
+                "content": "Great service! I had a plumbing emergency and these guys came to the rescue.",
+                "name": "Kassandra C Doe",
+                "title": "Customer",
+                "rating": 5
+              },
+              {
+                "content": "Professional, prompt, and affordable. Fixed our drain problem quickly and explained everything clearly.",
+                "name": "Michael R",
+                "title": "Customer",
+                "rating": 5
+              },
+              {
+                "content": "Excellent work on our bathroom remodel. The team was skilled, courteous, and finished on time.",
+                "name": "Sarah L",
+                "title": "Customer",
+                "rating": 5
+              },
+              {
+                "content": "Best plumber in El Cajon! They've helped us multiple times and always provide outstanding service.",
+                "name": "David M",
+                "title": "Customer",
+                "rating": 5
+              }
+            ],
+            "slides_to_show": 1,
+            "autoplay": "yes",
+            "autoplay_speed": 5000
+          }
+        }
+      ]
+    },
+    {
+      "id": "faq-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "faq-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Frequently Asked Questions",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "faq-accordion",
+          "elType": "widget",
+          "widgetType": "accordion",
+          "settings": {
+            "tabs": [
+              {
+                "tab_title": "What plumbing services do you offer?",
+                "tab_content": "We offer comprehensive plumbing services including emergency repairs, residential and commercial plumbing, water heater services, drain cleaning, sewer line replacement, leak detection, and complete kitchen and bathroom plumbing solutions."
+              },
+              {
+                "tab_title": "Are you licensed and insured?",
+                "tab_content": "Yes, we are fully licensed and insured plumbers with years of experience serving El Cajon and surrounding areas. Our team maintains all required certifications and carries comprehensive insurance coverage."
+              },
+              {
+                "tab_title": "Do you offer emergency plumbing services?",
+                "tab_content": "Absolutely! We provide 24/7 emergency plumbing services for urgent issues like burst pipes, severe leaks, and sewage backups. Call (619) 853-8491 anytime for immediate assistance."
+              },
+              {
+                "tab_title": "What forms of payment do you accept?",
+                "tab_content": "We accept cash, checks, and all major credit cards including Visa, MasterCard, American Express, and Discover. Payment is due upon completion of work."
+              },
+              {
+                "tab_title": "Do you provide free estimates?",
+                "tab_content": "Yes, we offer free, no-obligation estimates for all plumbing projects. Contact us to schedule an assessment and receive transparent pricing for your plumbing needs."
+              }
+            ],
+            "border_width": 1,
+            "border_color": "#e0e0e0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "social-proof-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "40",
+          "right": "20",
+          "bottom": "40",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "social-proof-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Find Us On",
+            "size": "h3",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "social-proof-badges",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<div style='text-align: center;'><p><strong>Google My Business</strong> ★★★★★ | <strong>Facebook</strong> ★★★★★ | <strong>Yelp</strong> ★★★★★</p><p><strong>BBB</strong> Accredited | <strong>Angi</strong> Verified | <strong>YP</strong> Listed</p></div>",
+            "align": "center"
+          }
+        }
+      ]
+    },
+    {
+      "id": "contact-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#333333",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "contact-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 60
+            }
+          },
+          "elements": [
+            {
+              "id": "contact-info",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "contact-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Contact El Cajon Plumber",
+                    "size": "h2",
+                    "color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "contact-details",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='color: #ffffff;'><strong>Phone:</strong> (619) 853-8491</p><p style='color: #ffffff;'><strong>Email:</strong> elcajonplumber.ca@gmail.com</p><p style='color: #ffffff;'><strong>Address:</strong> 133 E Main St, El Cajon, CA 92020</p><p style='color: #ffffff;'><strong>Hours:</strong> 24/7 Emergency Service<br>Regular Hours: Mon-Fri 8AM-6PM, Sat 9AM-5PM</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "contact-form",
+              "elType": "widget",
+              "widgetType": "form",
+              "settings": {
+                "form_name": "Contact Form",
+                "form_fields": [
+                  {
+                    "custom_id": "name",
+                    "field_type": "text",
+                    "field_label": "Name",
+                    "placeholder": "Your Name",
+                    "required": true
+                  },
+                  {
+                    "custom_id": "phone",
+                    "field_type": "tel",
+                    "field_label": "Phone",
+                    "placeholder": "Your Phone Number",
+                    "required": true
+                  },
+                  {
+                    "custom_id": "email",
+                    "field_type": "email",
+                    "field_label": "Email",
+                    "placeholder": "Your Email",
+                    "required": true
+                  },
+                  {
+                    "custom_id": "service",
+                    "field_type": "select",
+                    "field_label": "Service Needed",
+                    "field_options": "Emergency Repair\nWater Heater\nDrain Cleaning\nLeak Detection\nOther",
+                    "required": true
+                  },
+                  {
+                    "custom_id": "message",
+                    "field_type": "textarea",
+                    "field_label": "Message",
+                    "placeholder": "Describe your plumbing issue",
+                    "rows": 4
+                  }
+                ],
+                "submit_button_text": "Get Free Estimate",
+                "button_background_color": "#007cba",
+                "button_text_color": "#ffffff"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#222222",
+        "padding": {
+          "unit": "px",
+          "top": "30",
+          "right": "20",
+          "bottom": "30",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "footer-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "copyright",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #cccccc; margin: 0;'>© 2024 El Cajon Plumber. All rights reserved. | Licensed & Insured | CA License #XXXXXX</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

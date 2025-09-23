@@ -1,0 +1,750 @@
+{
+  "version": "1.0.0",
+  "title": "162 Dogwood Site Template - Contact Page Detailed",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#007cba",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "20",
+          "bottom": "80",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Contact Us",
+                "size": "h1",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "hero-tagline",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 20px;'>Premier plumbing service in El Cajon and surrounding areas</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "intro-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "intro-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "intro-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='text-align: center; font-size: 18px;'>With over 30 years of plumbing experience, we provide prompt and reliable service for residential and commercial clients. Our skilled technicians are ready to help with all your plumbing needs - no hidden fees, just quality service you can trust.</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contact-info-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "contact-info-grid",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 40
+            }
+          },
+          "elements": [
+            {
+              "id": "phone-info",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-phone",
+                  "library": "fa-solid"
+                },
+                "title_text": "Call Us Now",
+                "description_text": "(619) 853-8491",
+                "link": {
+                  "url": "tel:6198538491"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "email-info",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-envelope",
+                  "library": "fa-solid"
+                },
+                "title_text": "Email Us",
+                "description_text": "elcajonplumber.ca@gmail.com",
+                "link": {
+                  "url": "mailto:elcajonplumber.ca@gmail.com"
+                },
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "location-info",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-map-marker-alt",
+                  "library": "fa-solid"
+                },
+                "title_text": "Our Location",
+                "description_text": "133 E Main St, El Cajon, CA 92020",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contact-form-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "form-container",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 60
+            }
+          },
+          "elements": [
+            {
+              "id": "form-content",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "form-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Request Free Estimate",
+                    "size": "h2",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "form-description",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p>Fill out the form below for immediate appointment scheduling or to receive a free estimate for your plumbing needs.</p>"
+                  }
+                },
+                {
+                  "id": "contact-form",
+                  "elType": "widget",
+                  "widgetType": "form",
+                  "settings": {
+                    "form_name": "Contact Form",
+                    "form_fields": [
+                      {
+                        "custom_id": "name",
+                        "field_type": "text",
+                        "field_label": "Full Name",
+                        "placeholder": "Your Full Name",
+                        "required": true,
+                        "width": "100"
+                      },
+                      {
+                        "custom_id": "phone",
+                        "field_type": "tel",
+                        "field_label": "Phone Number",
+                        "placeholder": "Your Phone Number",
+                        "required": true,
+                        "width": "50"
+                      },
+                      {
+                        "custom_id": "email",
+                        "field_type": "email",
+                        "field_label": "Email Address",
+                        "placeholder": "Your Email Address",
+                        "required": true,
+                        "width": "50"
+                      },
+                      {
+                        "custom_id": "service",
+                        "field_type": "select",
+                        "field_label": "Service Needed",
+                        "field_options": "Emergency Plumbing\nDrain Cleaning\nWater Heater Service\nSewer Line Repair\nLeak Detection\nKitchen Plumbing\nBathroom Plumbing\nCommercial Plumbing\nOther",
+                        "required": true,
+                        "width": "100"
+                      },
+                      {
+                        "custom_id": "address",
+                        "field_type": "text",
+                        "field_label": "Property Address",
+                        "placeholder": "Address where service is needed",
+                        "width": "100"
+                      },
+                      {
+                        "custom_id": "message",
+                        "field_type": "textarea",
+                        "field_label": "Description of Problem",
+                        "placeholder": "Please describe your plumbing issue",
+                        "rows": 5,
+                        "width": "100"
+                      }
+                    ],
+                    "submit_button_text": "Get Appointment",
+                    "button_background_color": "#007cba",
+                    "button_text_color": "#ffffff",
+                    "button_size": "lg"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "service-steps",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "steps-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "How We Work",
+                    "size": "h3",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "step-1",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-calendar-alt",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "1. Set Up Appointment",
+                    "description_text": "Contact us to schedule your service appointment at a time that works for you.",
+                    "position": "left",
+                    "icon_color": "#007cba",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "step-2",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-running",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "2. We Come ASAP",
+                    "description_text": "Our professional plumbers arrive promptly, ready to solve your plumbing issues.",
+                    "position": "left",
+                    "icon_color": "#007cba",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "step-3",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-wrench",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "3. Resolve Your Problem",
+                    "description_text": "We diagnose and fix your plumbing problems with quality workmanship guaranteed.",
+                    "position": "left",
+                    "icon_color": "#007cba",
+                    "title_color": "#333333"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "business-hours-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hours-container",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 60
+            }
+          },
+          "elements": [
+            {
+              "id": "hours-content",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "hours-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Business Hours",
+                    "size": "h2",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "hours-table",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<table style='width: 100%; border-collapse: collapse;'><tr style='border-bottom: 1px solid #ddd;'><td style='padding: 10px 0; font-weight: bold;'>Monday</td><td style='padding: 10px 0; text-align: right;'>09:00 AM - 7:00 PM</td></tr><tr style='border-bottom: 1px solid #ddd;'><td style='padding: 10px 0; font-weight: bold;'>Tuesday</td><td style='padding: 10px 0; text-align: right;'>09:00 AM - 7:00 PM</td></tr><tr style='border-bottom: 1px solid #ddd;'><td style='padding: 10px 0; font-weight: bold;'>Wednesday</td><td style='padding: 10px 0; text-align: right;'>09:00 AM - 7:00 PM</td></tr><tr style='border-bottom: 1px solid #ddd;'><td style='padding: 10px 0; font-weight: bold;'>Thursday</td><td style='padding: 10px 0; text-align: right;'>10:00 AM - 7:00 PM</td></tr><tr style='border-bottom: 1px solid #ddd;'><td style='padding: 10px 0; font-weight: bold;'>Friday</td><td style='padding: 10px 0; text-align: right;'>09:00 AM - 7:00 PM</td></tr><tr style='border-bottom: 1px solid #ddd;'><td style='padding: 10px 0; font-weight: bold;'>Saturday</td><td style='padding: 10px 0; text-align: right;'>10:00 AM - 7:00 PM</td></tr><tr style='border-bottom: 1px solid #ddd;'><td style='padding: 10px 0; font-weight: bold;'>Sunday</td><td style='padding: 10px 0; text-align: right;'>10:00 AM - 4:00 PM</td></tr></table>"
+                  }
+                },
+                {
+                  "id": "emergency-note",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p><strong>Emergency Service:</strong> Available 24/7 for urgent plumbing issues. Call (619) 853-8491 anytime!</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "service-area-content",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "service-area-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Service Areas",
+                    "size": "h2",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "service-areas-list",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p><strong>El Cajon & Surrounding Areas including:</strong></p><ul style='columns: 2; list-style: none; padding: 0;'><li style='padding: 5px 0;'>• El Cajon</li><li style='padding: 5px 0;'>• San Diego</li><li style='padding: 5px 0;'>• San Marcos</li><li style='padding: 5px 0;'>• La Mesa</li><li style='padding: 5px 0;'>• Santee</li><li style='padding: 5px 0;'>• Spring Valley</li><li style='padding: 5px 0;'>• Lemon Grove</li><li style='padding: 5px 0;'>• Lakeside</li><li style='padding: 5px 0;'>• Poway</li><li style='padding: 5px 0;'>• Escondido</li><li style='padding: 5px 0;'>• Chula Vista</li><li style='padding: 5px 0;'>• National City</li><li style='padding: 5px 0;'>• La Jolla</li><li style='padding: 5px 0;'>• Del Mar</li><li style='padding: 5px 0;'>• Coronado</li><li style='padding: 5px 0;'>• And more!</li></ul>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ratings-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "ratings-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Why Customers Choose El Cajon Plumber",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "rating-highlight",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<div style='text-align: center; margin: 30px 0;'><span style='font-size: 36px; color: #ffc107;'>★★★★★</span><br><strong style='font-size: 24px;'>5-Star Rated Service</strong><br><p style='font-size: 18px; margin-top: 10px;'>Over 30 Years of Excellence</p></div>",
+            "align": "center"
+          }
+        },
+        {
+          "id": "features-grid",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_wrap": "wrap",
+            "flex_justify_content": "center",
+            "flex_gap": {
+              "unit": "px",
+              "size": 30
+            }
+          },
+          "elements": [
+            {
+              "id": "feature-1",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-check-circle",
+                  "library": "fa-solid"
+                },
+                "title_text": "No Hidden Fees",
+                "description_text": "Transparent, upfront pricing on all services",
+                "position": "left",
+                "icon_color": "#28a745",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "feature-2",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-clock",
+                  "library": "fa-solid"
+                },
+                "title_text": "Prompt Service",
+                "description_text": "Same-day and emergency services available",
+                "position": "left",
+                "icon_color": "#28a745",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "feature-3",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-users",
+                  "library": "fa-solid"
+                },
+                "title_text": "Skilled Technicians",
+                "description_text": "Licensed, insured, and experienced professionals",
+                "position": "left",
+                "icon_color": "#28a745",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "feature-4",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-award",
+                  "library": "fa-solid"
+                },
+                "title_text": "Quality Guaranteed",
+                "description_text": "100% satisfaction on all plumbing services",
+                "position": "left",
+                "icon_color": "#28a745",
+                "title_color": "#333333"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "0",
+          "bottom": "0",
+          "left": "0"
+        }
+      },
+      "elements": [
+        {
+          "id": "map-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Find Us in El Cajon",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "map-address",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<p style='text-align: center; margin-bottom: 30px;'><strong>133 E Main St, El Cajon, CA 92020</strong></p>",
+            "align": "center"
+          }
+        },
+        {
+          "id": "map-widget",
+          "elType": "widget",
+          "widgetType": "google_maps",
+          "settings": {
+            "address": "133 E Main St, El Cajon, CA 92020",
+            "zoom": 15,
+            "height": {
+              "unit": "px",
+              "size": 400
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "final-cta-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#007cba",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "final-cta-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "final-cta-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Need Plumbing Service Today?",
+                "size": "h2",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "final-cta-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 18px;'>Don't wait - contact El Cajon Plumber now for fast, reliable service!</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "final-cta-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 20
+                }
+              },
+              "elements": [
+                {
+                  "id": "final-call-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Call (619) 853-8491 Now",
+                    "link": {
+                      "url": "tel:6198538491"
+                    },
+                    "size": "xl",
+                    "button_background_color": "#ffffff",
+                    "button_text_color": "#007cba",
+                    "border_border": "solid",
+                    "border_width": 3,
+                    "border_color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "final-email-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Email Us Today",
+                    "link": {
+                      "url": "mailto:elcajonplumber.ca@gmail.com"
+                    },
+                    "size": "xl",
+                    "button_background_color": "transparent",
+                    "button_text_color": "#ffffff",
+                    "border_border": "solid",
+                    "border_width": 3,
+                    "border_color": "#ffffff"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer-info",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#333333",
+        "padding": {
+          "unit": "px",
+          "top": "30",
+          "right": "20",
+          "bottom": "30",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "footer-content",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<p style='color: #ffffff; text-align: center;'>El Cajon Plumber | (619) 853-8491 | elcajonplumber.ca@gmail.com<br>133 E Main St, El Cajon, CA 92020<br>Serving El Cajon & Surrounding Areas Since 1993</p>",
+            "align": "center"
+          }
+        }
+      ]
+    }
+  ]
+}

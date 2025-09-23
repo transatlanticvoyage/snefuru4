@@ -1,0 +1,580 @@
+{
+  "version": "1.0.0",
+  "title": "172 Dogwood Homepage - Header Hero Brands",
+  "type": "page",
+  "content": [
+    {
+      "id": "top-header-bar",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "border_border": "solid",
+        "border_width": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "1",
+          "left": "0"
+        },
+        "border_color": "#e5e5e5",
+        "padding": {
+          "unit": "px",
+          "top": "10",
+          "right": "20",
+          "bottom": "10",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "top-header-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_justify_content": "space-between",
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "contact-info-left",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_align_items": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 30
+                }
+              },
+              "elements": [
+                {
+                  "id": "phone-info",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='margin: 0; font-size: 14px; color: #333333;'><i class='fas fa-phone' style='margin-right: 8px; color: #007cba;'></i> <strong>(619) 853-8491</strong></p>",
+                    "align": "left"
+                  }
+                },
+                {
+                  "id": "email-info",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='margin: 0; font-size: 14px; color: #333333;'><i class='fas fa-envelope' style='margin-right: 8px; color: #007cba;'></i> <a href='mailto:elcajonplumber.ca@gmail.com' style='color: #333333; text-decoration: none;'>elcajonplumber.ca@gmail.com</a></p>",
+                    "align": "left"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "social-links",
+              "elType": "widget",
+              "widgetType": "social-icons",
+              "settings": {
+                "social_icon_list": [
+                  {
+                    "social": "facebook",
+                    "link": {
+                      "url": "#"
+                    }
+                  },
+                  {
+                    "social": "instagram",
+                    "link": {
+                      "url": "#"
+                    }
+                  },
+                  {
+                    "social": "custom",
+                    "link": {
+                      "url": "#"
+                    },
+                    "social_icon": {
+                      "value": "fab fa-tiktok",
+                      "library": "fa-brands"
+                    }
+                  }
+                ],
+                "shape": "circle",
+                "size": {
+                  "unit": "px",
+                  "size": 30
+                },
+                "icon_color_official": "no",
+                "icon_primary_color": "#007cba",
+                "icon_secondary_color": "#ffffff"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "main-header",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "border_border": "solid",
+        "border_width": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "1",
+          "left": "0"
+        },
+        "border_color": "#e5e5e5",
+        "padding": {
+          "unit": "px",
+          "top": "15",
+          "right": "20",
+          "bottom": "15",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "main-header-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_justify_content": "space-between",
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "logo-area",
+              "elType": "widget",
+              "widgetType": "image",
+              "settings": {
+                "image": {
+                  "url": "/wp-content/uploads/logo.png",
+                  "alt": "El Cajon Plumber Logo"
+                },
+                "width": {
+                  "unit": "px",
+                  "size": 200
+                },
+                "align": "left"
+              }
+            },
+            {
+              "id": "navigation-menu",
+              "elType": "widget",
+              "widgetType": "nav-menu",
+              "settings": {
+                "layout": "horizontal",
+                "submenu_icon": {
+                  "value": "fas fa-caret-down",
+                  "library": "fa-solid"
+                },
+                "pointer": "underline",
+                "animation_line": "fade",
+                "color_text": "#333333",
+                "color_text_hover": "#007cba",
+                "color_text_active": "#007cba",
+                "typography_typography": "custom",
+                "typography_font_weight": "500",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 16
+                }
+              }
+            },
+            {
+              "id": "header-cta",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Get Free Quote",
+                "link": {
+                  "url": "#contact"
+                },
+                "size": "md",
+                "button_background_color": "#007cba",
+                "button_text_color": "#ffffff",
+                "border_radius": {
+                  "unit": "px",
+                  "top": "5",
+                  "right": "5",
+                  "bottom": "5",
+                  "left": "5"
+                },
+                "button_padding": {
+                  "unit": "px",
+                  "top": "12",
+                  "right": "24",
+                  "bottom": "12",
+                  "left": "24"
+                },
+                "typography_typography": "custom",
+                "typography_font_weight": "600",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 14
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "background_image": {
+          "url": "/wp-content/uploads/plumber-hero-bg.jpg",
+          "alt": "Plumber Background"
+        },
+        "background_position": "center center",
+        "background_attachment": "scroll",
+        "background_repeat": "no-repeat",
+        "background_size": "cover",
+        "background_overlay_background": "classic",
+        "background_overlay_color": "rgba(0, 124, 186, 0.85)",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "20",
+          "bottom": "80",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Affordable El Cajon Plumber",
+                "size": "h1",
+                "align": "center",
+                "color": "#ffffff",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 48
+                },
+                "typography_font_weight": "700",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.2
+                },
+                "text_shadow_text_shadow_type": "yes",
+                "text_shadow_text_shadow": {
+                  "horizontal": 1,
+                  "vertical": 1,
+                  "blur": 3,
+                  "color": "rgba(0,0,0,0.3)"
+                }
+              }
+            },
+            {
+              "id": "hero-subheading",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 20px; line-height: 1.5; margin: 20px 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);'>Are we looking for an El Cajon plumber near me or a top-notch plumber in El Cajon and the suburbs? Look no further!</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 20
+                },
+                "margin": {
+                  "unit": "px",
+                  "top": "30",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0"
+                }
+              },
+              "elements": [
+                {
+                  "id": "appointment-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Get Appointment",
+                    "link": {
+                      "url": "#contact"
+                    },
+                    "size": "lg",
+                    "button_background_color": "#28a745",
+                    "button_text_color": "#ffffff",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "5",
+                      "right": "5",
+                      "bottom": "5",
+                      "left": "5"
+                    },
+                    "button_padding": {
+                      "unit": "px",
+                      "top": "15",
+                      "right": "30",
+                      "bottom": "15",
+                      "left": "30"
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "600",
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 16
+                    },
+                    "button_box_shadow_box_shadow_type": "yes",
+                    "button_box_shadow_box_shadow": {
+                      "horizontal": 0,
+                      "vertical": 3,
+                      "blur": 6,
+                      "spread": 0,
+                      "color": "rgba(0,0,0,0.2)"
+                    }
+                  }
+                },
+                {
+                  "id": "estimate-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "GET FREE ESTIMATE",
+                    "link": {
+                      "url": "#contact"
+                    },
+                    "size": "lg",
+                    "button_background_color": "#ffffff",
+                    "button_text_color": "#007cba",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2"
+                    },
+                    "border_color": "#ffffff",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "5",
+                      "right": "5",
+                      "bottom": "5",
+                      "left": "5"
+                    },
+                    "button_padding": {
+                      "unit": "px",
+                      "top": "15",
+                      "right": "30",
+                      "bottom": "15",
+                      "left": "30"
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "600",
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 16
+                    },
+                    "button_box_shadow_box_shadow_type": "yes",
+                    "button_box_shadow_box_shadow": {
+                      "horizontal": 0,
+                      "vertical": 3,
+                      "blur": 6,
+                      "spread": 0,
+                      "color": "rgba(0,0,0,0.2)"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trusted-brands-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "border_border": "solid",
+        "border_width": {
+          "unit": "px",
+          "top": "1",
+          "right": "0",
+          "bottom": "1",
+          "left": "0"
+        },
+        "border_color": "#e5e5e5",
+        "padding": {
+          "unit": "px",
+          "top": "40",
+          "right": "20",
+          "bottom": "40",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "brands-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "brands-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Trusted Brand Partners",
+                "size": "h3",
+                "align": "center",
+                "color": "#333333",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 24
+                },
+                "typography_font_weight": "600",
+                "margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "30",
+                  "left": "0"
+                }
+              }
+            },
+            {
+              "id": "brands-logos",
+              "elType": "widget",
+              "widgetType": "image-carousel",
+              "settings": {
+                "slides": [
+                  {
+                    "image": {
+                      "url": "/wp-content/uploads/american-standard-logo.png",
+                      "alt": "American Standard"
+                    }
+                  },
+                  {
+                    "image": {
+                      "url": "/wp-content/uploads/cl-supply-logo.png",
+                      "alt": "C&L Supply Company, Inc"
+                    }
+                  },
+                  {
+                    "image": {
+                      "url": "/wp-content/uploads/moen-logo.png",
+                      "alt": "Moen"
+                    }
+                  },
+                  {
+                    "image": {
+                      "url": "/wp-content/uploads/rheem-logo.png",
+                      "alt": "Rheem Industries"
+                    }
+                  },
+                  {
+                    "image": {
+                      "url": "/wp-content/uploads/zurn-logo.png",
+                      "alt": "Zurn Industries"
+                    }
+                  },
+                  {
+                    "image": {
+                      "url": "/wp-content/uploads/bradford-white-logo.png",
+                      "alt": "Bradford White"
+                    }
+                  },
+                  {
+                    "image": {
+                      "url": "/wp-content/uploads/chicago-faucet-logo.png",
+                      "alt": "Chicago Faucet"
+                    }
+                  },
+                  {
+                    "image": {
+                      "url": "/wp-content/uploads/delta-logo.png",
+                      "alt": "Delta"
+                    }
+                  },
+                  {
+                    "image": {
+                      "url": "/wp-content/uploads/danze-logo.png",
+                      "alt": "Danze"
+                    }
+                  },
+                  {
+                    "image": {
+                      "url": "/wp-content/uploads/kohler-logo.png",
+                      "alt": "Kohler Co"
+                    }
+                  }
+                ],
+                "slides_to_show": {
+                  "desktop": 5,
+                  "tablet": 3,
+                  "mobile": 2
+                },
+                "slides_to_scroll": 1,
+                "autoplay": "yes",
+                "autoplay_speed": 3000,
+                "pause_on_hover": "yes",
+                "infinite": "yes",
+                "navigation": "none",
+                "pagination": "none",
+                "image_spacing_custom": {
+                  "unit": "px",
+                  "size": 20
+                },
+                "image_fit": "contain",
+                "image_border_radius": {
+                  "unit": "px",
+                  "top": "5",
+                  "right": "5",
+                  "bottom": "5",
+                  "left": "5"
+                }
+              }
+            },
+            {
+              "id": "brands-subtitle",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='text-align: center; color: #666666; font-size: 14px; margin-top: 20px; font-style: italic;'>We work with industry-leading manufacturers to ensure quality installations and repairs</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

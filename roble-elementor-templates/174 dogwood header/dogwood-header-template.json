@@ -1,0 +1,383 @@
+{
+  "version": "1.0.0",
+  "title": "174 Dogwood Header Template",
+  "type": "header",
+  "content": [
+    {
+      "id": "top-header-bar",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "border_border": "solid",
+        "border_width": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "1",
+          "left": "0"
+        },
+        "border_color": "#e5e5e5",
+        "padding": {
+          "unit": "px",
+          "top": "8",
+          "right": "20",
+          "bottom": "8",
+          "left": "20"
+        },
+        "z_index": 999
+      },
+      "elements": [
+        {
+          "id": "top-header-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_justify_content": "space-between",
+            "flex_align_items": "center",
+            "max_width": {
+              "unit": "px",
+              "size": 1200
+            }
+          },
+          "elements": [
+            {
+              "id": "contact-info-group",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_align_items": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 25
+                }
+              },
+              "elements": [
+                {
+                  "id": "phone-info",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "selected_icon": {
+                      "value": "fas fa-phone",
+                      "library": "fa-solid"
+                    },
+                    "view": "default",
+                    "position": "left",
+                    "title_text": "(619) 853-8491",
+                    "link": {
+                      "url": "tel:6198538491",
+                      "is_external": false,
+                      "nofollow": false
+                    },
+                    "icon_color": "#007cba",
+                    "icon_size": {
+                      "unit": "px",
+                      "size": 14
+                    },
+                    "title_color": "#333333",
+                    "title_typography_typography": "custom",
+                    "title_typography_font_size": {
+                      "unit": "px",
+                      "size": 14
+                    },
+                    "title_typography_font_weight": "600",
+                    "icon_space": {
+                      "unit": "px",
+                      "size": 8
+                    }
+                  }
+                },
+                {
+                  "id": "email-info",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "selected_icon": {
+                      "value": "fas fa-envelope",
+                      "library": "fa-solid"
+                    },
+                    "view": "default",
+                    "position": "left",
+                    "title_text": "elcajonplumber.ca@gmail.com",
+                    "link": {
+                      "url": "mailto:elcajonplumber.ca@gmail.com",
+                      "is_external": false,
+                      "nofollow": false
+                    },
+                    "icon_color": "#007cba",
+                    "icon_size": {
+                      "unit": "px",
+                      "size": 14
+                    },
+                    "title_color": "#333333",
+                    "title_typography_typography": "custom",
+                    "title_typography_font_size": {
+                      "unit": "px",
+                      "size": 14
+                    },
+                    "title_typography_font_weight": "400",
+                    "icon_space": {
+                      "unit": "px",
+                      "size": 8
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "social-links",
+              "elType": "widget",
+              "widgetType": "social-icons",
+              "settings": {
+                "social_icon_list": [
+                  {
+                    "social": "facebook",
+                    "link": {
+                      "url": "#",
+                      "is_external": true,
+                      "nofollow": false
+                    }
+                  },
+                  {
+                    "social": "instagram",
+                    "link": {
+                      "url": "#",
+                      "is_external": true,
+                      "nofollow": false
+                    }
+                  },
+                  {
+                    "social": "custom",
+                    "social_icon": {
+                      "value": "fab fa-tiktok",
+                      "library": "fa-brands"
+                    },
+                    "link": {
+                      "url": "#",
+                      "is_external": true,
+                      "nofollow": false
+                    }
+                  }
+                ],
+                "shape": "circle",
+                "size": {
+                  "unit": "px",
+                  "size": 28
+                },
+                "icon_color_official": "no",
+                "icon_primary_color": "#007cba",
+                "icon_secondary_color": "#ffffff",
+                "border_color": "#e5e5e5",
+                "border_width": {
+                  "unit": "px",
+                  "size": 1
+                },
+                "icon_padding": {
+                  "unit": "px",
+                  "size": 0.5
+                },
+                "align": "right",
+                "columns": {
+                  "unit": "%",
+                  "size": 16.66
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "main-header",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "border_border": "solid",
+        "border_width": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "1",
+          "left": "0"
+        },
+        "border_color": "#e5e5e5",
+        "padding": {
+          "unit": "px",
+          "top": "12",
+          "right": "20",
+          "bottom": "12",
+          "left": "20"
+        },
+        "z_index": 998,
+        "position": "relative",
+        "box_shadow_box_shadow_type": "yes",
+        "box_shadow_box_shadow": {
+          "horizontal": 0,
+          "vertical": 1,
+          "blur": 3,
+          "spread": 0,
+          "color": "rgba(0,0,0,0.1)"
+        }
+      },
+      "elements": [
+        {
+          "id": "main-header-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_justify_content": "space-between",
+            "flex_align_items": "center",
+            "max_width": {
+              "unit": "px",
+              "size": 1200
+            }
+          },
+          "elements": [
+            {
+              "id": "logo-area",
+              "elType": "widget",
+              "widgetType": "image",
+              "settings": {
+                "image": {
+                  "url": "/wp-content/uploads/elcajon-plumber-logo.png",
+                  "alt": "El Cajon Plumber - Professional Plumbing Services"
+                },
+                "image_size": "medium",
+                "width": {
+                  "unit": "px",
+                  "size": 180
+                },
+                "max_width": {
+                  "unit": "px",
+                  "size": 220
+                },
+                "align": "left",
+                "link": {
+                  "url": "/",
+                  "is_external": false,
+                  "nofollow": false
+                }
+              }
+            },
+            {
+              "id": "navigation-menu",
+              "elType": "widget",
+              "widgetType": "nav-menu",
+              "settings": {
+                "layout": "horizontal",
+                "pointer": "underline",
+                "animation_line": "fade",
+                "submenu_indicator": "classic",
+                "submenu_icon": {
+                  "value": "fas fa-caret-down",
+                  "library": "fa-solid"
+                },
+                "heading_mobile_menu": "Menu",
+                "toggle": "burger",
+                "dropdown": "slide_down",
+                "full_width": "stretch",
+                "text_align": "aside",
+                "toggle_align": "center",
+                "hamburger": "elastic",
+                "color_text": "#333333",
+                "color_text_hover": "#007cba",
+                "color_text_active": "#007cba",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 15
+                },
+                "typography_font_weight": "500",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.4
+                },
+                "border_radius_menu_item": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0"
+                },
+                "padding_horizontal_menu_item": {
+                  "unit": "px",
+                  "size": 15
+                },
+                "padding_vertical_menu_item": {
+                  "unit": "px",
+                  "size": 10
+                },
+                "menu_space_between": {
+                  "unit": "px",
+                  "size": 5
+                },
+                "dropdown_description_typography_typography": "custom",
+                "dropdown_description_typography_font_size": {
+                  "unit": "px",
+                  "size": 13
+                }
+              }
+            },
+            {
+              "id": "header-cta-button",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Get Free Quote",
+                "link": {
+                  "url": "#contact",
+                  "is_external": false,
+                  "nofollow": false
+                },
+                "size": "md",
+                "button_background_color": "#007cba",
+                "hover_color": "#ffffff",
+                "background_hover_color": "#005a8a",
+                "border_radius": {
+                  "unit": "px",
+                  "top": "4",
+                  "right": "4",
+                  "bottom": "4",
+                  "left": "4"
+                },
+                "text_padding": {
+                  "unit": "px",
+                  "top": "12",
+                  "right": "20",
+                  "bottom": "12",
+                  "left": "20"
+                },
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 14
+                },
+                "typography_font_weight": "600",
+                "typography_text_transform": "uppercase",
+                "typography_letter_spacing": {
+                  "unit": "px",
+                  "size": 0.5
+                },
+                "box_shadow_box_shadow_type": "yes",
+                "box_shadow_box_shadow": {
+                  "horizontal": 0,
+                  "vertical": 2,
+                  "blur": 4,
+                  "spread": 0,
+                  "color": "rgba(0, 124, 186, 0.3)"
+                },
+                "hover_animation": "grow"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,829 @@
+{
+  "version": "1.0.0",
+  "title": "158 Dogwood Site Template - About Page Detailed",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#007cba",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "20",
+          "bottom": "80",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "About El Cajon Plumber",
+                "size": "h1",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "hero-tagline",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 20px;'>Professional Plumbing Services Since 1993</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-contact",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Call (619) 853-8491",
+                "link": {
+                  "url": "tel:6198538491"
+                },
+                "size": "lg",
+                "button_background_color": "#ffffff",
+                "button_text_color": "#007cba"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "welcome-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "welcome-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "welcome-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Welcome to our local business: plumber in El Cajon, CA",
+                "size": "h2",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "welcome-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>We're your trusted local plumbing experts, proudly serving El Cajon and surrounding communities since 1993. Our team specializes in Residential, Commercial, and Emergency Plumbing services, delivering reliable solutions for all your plumbing needs.</p><p>With over 30 years of experience in the industry, we've built our reputation on quality workmanship, honest pricing, and exceptional customer service. Our fully licensed and insured plumbers are equipped with the latest tools and technology to handle any plumbing challenge, from simple repairs to complex installations.</p><p>We understand that plumbing problems don't follow a schedule, which is why we offer 24/7 emergency services to ensure you're never left dealing with a plumbing crisis alone. Our commitment to same-day service means we'll be there when you need us most.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "history-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "history-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "history-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Our History",
+                "size": "h2",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "history-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Founded in 1993, El Cajon Plumber has been a cornerstone of the local community for over three decades. What began as a small family-owned business has grown into one of the most trusted plumbing companies in the San Diego area, while maintaining the personal touch and dedication to service that defined us from day one.</p><p>Over the years, we've witnessed significant changes in plumbing technology and techniques, and we've stayed at the forefront of these advancements. Our team continuously undergoes comprehensive on-the-job training to ensure we're equipped with the knowledge and skills to handle modern plumbing systems while honoring time-tested craftsmanship.</p><p>Throughout our 30+ years in business, we've successfully completed thousands of projects, from emergency repairs to major commercial installations. Each job has strengthened our expertise and reinforced our commitment to excellence.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "priorities-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "priorities-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_gap": {
+              "unit": "px",
+              "size": 60
+            }
+          },
+          "elements": [
+            {
+              "id": "priority-column",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "priority-icon",
+                  "elType": "widget",
+                  "widgetType": "icon",
+                  "settings": {
+                    "selected_icon": {
+                      "value": "fas fa-star",
+                      "library": "fa-solid"
+                    },
+                    "size": {
+                      "unit": "px",
+                      "size": 40
+                    },
+                    "primary_color": "#007cba",
+                    "align": "center"
+                  }
+                },
+                {
+                  "id": "priority-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Our Priority",
+                    "size": "h3",
+                    "align": "center",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "priority-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='text-align: center;'>Customer satisfaction is at the heart of everything we do. Our ultimate goal is to provide exceptional service, ensuring that every plumbing issue in your home is promptly resolved and guaranteeing 100% satisfaction. We believe in building lasting relationships with our customers through trust, reliability, and superior workmanship.</p>",
+                    "align": "center"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "ambition-column",
+              "elType": "container",
+              "settings": {
+                "flex": "1"
+              },
+              "elements": [
+                {
+                  "id": "ambition-icon",
+                  "elType": "widget",
+                  "widgetType": "icon",
+                  "settings": {
+                    "selected_icon": {
+                      "value": "fas fa-rocket",
+                      "library": "fa-solid"
+                    },
+                    "size": {
+                      "unit": "px",
+                      "size": 40
+                    },
+                    "primary_color": "#007cba",
+                    "align": "center"
+                  }
+                },
+                {
+                  "id": "ambition-heading",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Our Ambition",
+                    "size": "h3",
+                    "align": "center",
+                    "color": "#333333"
+                  }
+                },
+                {
+                  "id": "ambition-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='text-align: center;'>We strive to be the leading plumbing service provider in El Cajon and beyond. Our ambition drives us to continuously improve our services, adopt innovative technologies, and maintain the highest standards of professionalism. We're committed to setting the benchmark for quality plumbing services in our community.</p>",
+                    "align": "center"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "services-overview-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "services-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Same Day Plumbing Service",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "services-intro",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<p style='text-align: center;'>We understand that plumbing problems need immediate attention. That's why we offer same-day service for most plumbing issues. Our comprehensive services include:</p>",
+            "align": "center"
+          }
+        },
+        {
+          "id": "services-grid",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_wrap": "wrap",
+            "flex_gap": {
+              "unit": "px",
+              "size": 30
+            }
+          },
+          "elements": [
+            {
+              "id": "service-emergency",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-exclamation-triangle",
+                  "library": "fa-solid"
+                },
+                "title_text": "Emergency Plumbing",
+                "description_text": "24/7 emergency response for urgent plumbing crises",
+                "position": "top",
+                "icon_color": "#dc3545",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-drain",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-tint",
+                  "library": "fa-solid"
+                },
+                "title_text": "Drain Cleaning",
+                "description_text": "Professional drain cleaning and clog removal services",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-water-heater",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-fire",
+                  "library": "fa-solid"
+                },
+                "title_text": "Water Heater Installation/Repair",
+                "description_text": "Expert water heater services for all types and brands",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-sewer",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-wrench",
+                  "library": "fa-solid"
+                },
+                "title_text": "Sewer Line Services",
+                "description_text": "Complete sewer line repair and replacement solutions",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-kitchen-bath",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-bath",
+                  "library": "fa-solid"
+                },
+                "title_text": "Kitchen and Bathroom Plumbing",
+                "description_text": "Complete kitchen and bathroom plumbing installations",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-leak",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-search",
+                  "library": "fa-solid"
+                },
+                "title_text": "Leak Detection",
+                "description_text": "Advanced leak detection to prevent water damage",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-hydro",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-spray-can",
+                  "library": "fa-solid"
+                },
+                "title_text": "Hydro Jetting",
+                "description_text": "High-pressure water jetting for tough blockages",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "service-piping",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-tools",
+                  "library": "fa-solid"
+                },
+                "title_text": "Piping and Repiping",
+                "description_text": "Complete pipe replacement and installation services",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "why-choose-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "why-choose-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "why-choose-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Why Choose El Cajon Plumber?",
+                "size": "h2",
+                "align": "center",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "why-choose-grid",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_wrap": "wrap",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 30
+                }
+              },
+              "elements": [
+                {
+                  "id": "advantage-1",
+                  "elType": "widget",
+                  "widgetType": "icon-list",
+                  "settings": {
+                    "icon_list": [
+                      {
+                        "text": "Over 30 Years of Experience Since 1993",
+                        "icon": {
+                          "value": "fas fa-check-circle",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Fully Licensed and Insured - Class A Contractors License",
+                        "icon": {
+                          "value": "fas fa-check-circle",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "24/7 Emergency Plumbing Services",
+                        "icon": {
+                          "value": "fas fa-check-circle",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Free Estimates and Transparent Pricing",
+                        "icon": {
+                          "value": "fas fa-check-circle",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Same Day Service Available",
+                        "icon": {
+                          "value": "fas fa-check-circle",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "100% Satisfaction Guarantee",
+                        "icon": {
+                          "value": "fas fa-check-circle",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Comprehensive On-The-Job Training for All Technicians",
+                        "icon": {
+                          "value": "fas fa-check-circle",
+                          "library": "fa-solid"
+                        }
+                      },
+                      {
+                        "text": "Latest Tools and Technology",
+                        "icon": {
+                          "value": "fas fa-check-circle",
+                          "library": "fa-solid"
+                        }
+                      }
+                    ],
+                    "icon_color": "#28a745",
+                    "text_color": "#333333"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "certifications-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "certifications-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Professional Credentials & Associations",
+            "size": "h2",
+            "align": "center",
+            "color": "#333333"
+          }
+        },
+        {
+          "id": "certifications-text",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<p style='text-align: center;'>We maintain active memberships and certifications with leading industry organizations:</p>",
+            "align": "center"
+          }
+        },
+        {
+          "id": "certifications-list",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "flex_direction": "row",
+            "flex_wrap": "wrap",
+            "flex_justify_content": "center",
+            "flex_gap": {
+              "unit": "px",
+              "size": 40
+            }
+          },
+          "elements": [
+            {
+              "id": "cert-1",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-certificate",
+                  "library": "fa-solid"
+                },
+                "title_text": "Class A Contractors License",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "cert-2",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-building",
+                  "library": "fa-solid"
+                },
+                "title_text": "Better Business Bureau (BBB) Member",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "cert-3",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-wind",
+                  "library": "fa-solid"
+                },
+                "title_text": "National Air Duct Cleaners Association",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            },
+            {
+              "id": "cert-4",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-briefcase",
+                  "library": "fa-solid"
+                },
+                "title_text": "National Federation of Independent Business",
+                "position": "top",
+                "icon_color": "#007cba",
+                "title_color": "#333333"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cta-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#007cba",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "cta-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "cta-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready to Experience the El Cajon Plumber Difference?",
+                "size": "h2",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "cta-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 18px;'>Contact us today for a free estimate on your plumbing project. With over 30 years of experience, we're ready to solve your plumbing challenges.</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "cta-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 20
+                }
+              },
+              "elements": [
+                {
+                  "id": "call-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Call (619) 853-8491",
+                    "link": {
+                      "url": "tel:6198538491"
+                    },
+                    "size": "lg",
+                    "button_background_color": "#ffffff",
+                    "button_text_color": "#007cba",
+                    "border_border": "solid",
+                    "border_width": 2,
+                    "border_color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "email-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Email Us Today",
+                    "link": {
+                      "url": "mailto:elcajonplumber.ca@gmail.com"
+                    },
+                    "size": "lg",
+                    "button_background_color": "transparent",
+                    "button_text_color": "#ffffff",
+                    "border_border": "solid",
+                    "border_width": 2,
+                    "border_color": "#ffffff"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contact-info-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#333333",
+        "padding": {
+          "unit": "px",
+          "top": "40",
+          "right": "20",
+          "bottom": "40",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "contact-info-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "contact-details",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; text-align: center;'><strong>El Cajon Plumber</strong><br>133 E Main St, El Cajon, CA 92020<br>Phone: (619) 853-8491<br>Email: elcajonplumber.ca@gmail.com<br><br>Serving El Cajon and surrounding areas since 1993</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

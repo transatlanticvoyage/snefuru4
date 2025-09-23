@@ -1,0 +1,516 @@
+{
+  "version": "1.0.0",
+  "title": "164 Dogwood Site Template - FAQ Page Detailed",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#007cba",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "20",
+          "bottom": "80",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "FAQ - El Cajon Plumber",
+                "size": "h1",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "hero-subtitle",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 20px;'>Your Questions Answered About Our Plumbing Services</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "intro-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "intro-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "intro-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='text-align: center; font-size: 18px;'>With over 30 years of experience, El Cajon Plumber is the go-to source for residential and commercial plumbing needs. Our team of experts is dedicated to providing the highest quality service and addressing all your frequently asked questions.</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "faq-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "faq-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "faq-accordion",
+              "elType": "widget",
+              "widgetType": "accordion",
+              "settings": {
+                "tabs": [
+                  {
+                    "tab_title": "Why is choosing an El Cajon plumber the best option?",
+                    "tab_content": "Swift Solutions, Expert Craftsmanship, El Cajon Plumber Deliver Rapid Response, Seasoned Expertise, Competitive Pricing, and Comprehensive Services. Equipped with cutting-edge technology, our highly trained technicians swiftly diagnose and resolve issues of any scale, ensuring excellence from minor fixes to major projects."
+                  },
+                  {
+                    "tab_title": "What types of services does Plumber El Cajon offer?",
+                    "tab_content": "We specialize in every aspect of plumbing, providing complete solutions for your residential, commercial, and emergency needs. Our services include repairs, maintenance, installations, and remodeling. Our skilled Technicians handle a variety of projects, from clogged drain repairs or drain cleaning and repair or replacing a leaking faucet or hot water heater."
+                  },
+                  {
+                    "tab_title": "Is El Cajon Plumber offering estimates free of cost?",
+                    "tab_content": "Certainly YES! Our skilled technicians are eager to provide you free estimate. Additionally, they are ready to guide you through the available options, ensuring that you get a service that fits your needs and preferences."
+                  },
+                  {
+                    "tab_title": "How many years have El Cajon plumbers been working in El Cajon CA?",
+                    "tab_content": "Since 1993, El Cajon Plumber has been a trusted provider of professional and dependable plumbing services in El Cajon and the surrounding areas. With over 30 years of experience, Affordable Plumbing in El Cajon, CA, comprehends the importance of a job well done."
+                  },
+                  {
+                    "tab_title": "Are Plumber El Cajon CA technicians licensed and insured for their services?",
+                    "tab_content": "Absolutely YES! We carry full licensing and insurance staff, ensuring the delivery of exceptional plumbing services with confidence. Our seasoned plumbers utilize the latest tools for your utmost satisfaction."
+                  },
+                  {
+                    "tab_title": "Do you provide emergency plumbing services?",
+                    "tab_content": "Yes, we offer 24/7 emergency plumbing services for urgent issues like burst pipes, major leaks, sewage backups, and other plumbing emergencies that can't wait. Our emergency response team is always ready to help minimize damage to your property."
+                  },
+                  {
+                    "tab_title": "What areas do you serve?",
+                    "tab_content": "We proudly serve El Cajon and all surrounding communities including San Diego, La Mesa, Santee, Spring Valley, Lemon Grove, Lakeside, and the greater San Diego County area. Contact us to confirm service availability in your specific location."
+                  },
+                  {
+                    "tab_title": "Do you offer warranties on your work?",
+                    "tab_content": "Yes, all our work comes with a satisfaction guarantee and warranty on parts and labor. We stand behind our workmanship and are committed to ensuring your complete satisfaction with every service we provide."
+                  },
+                  {
+                    "tab_title": "What payment methods do you accept?",
+                    "tab_content": "We accept cash, checks, and all major credit cards including Visa, MasterCard, American Express, and Discover. Payment is due upon completion of work unless other arrangements are made in advance."
+                  },
+                  {
+                    "tab_title": "How quickly can you respond to service calls?",
+                    "tab_content": "For emergency calls, we typically respond within 30-60 minutes. For scheduled appointments, we offer flexible scheduling including same-day and next-day service options based on availability."
+                  },
+                  {
+                    "tab_title": "Do you handle both residential and commercial plumbing?",
+                    "tab_content": "Yes, we serve both residential and commercial customers. Our team has extensive experience with everything from simple home repairs to complex commercial plumbing systems in offices, restaurants, retail establishments, and industrial facilities."
+                  },
+                  {
+                    "tab_title": "Can you help with water heater issues?",
+                    "tab_content": "Absolutely! We install, repair, and maintain all types of water heaters including traditional tank units, tankless systems, and hybrid models. We can help you choose the right system for your needs and budget, and provide expert installation and service."
+                  },
+                  {
+                    "tab_title": "What should I do in a plumbing emergency?",
+                    "tab_content": "First, shut off the main water supply to prevent further damage. If it's a gas leak, evacuate immediately and call the gas company. For all plumbing emergencies, call us at (619) 853-8491 for immediate assistance. Clear the area of valuables and take photos for insurance if needed."
+                  },
+                  {
+                    "tab_title": "Do you offer preventive maintenance services?",
+                    "tab_content": "Yes, we offer comprehensive preventive maintenance services to help avoid costly repairs and extend the life of your plumbing system. Regular maintenance can identify potential issues before they become major problems."
+                  },
+                  {
+                    "tab_title": "How do I know if I have a water leak?",
+                    "tab_content": "Signs of water leaks include unexpectedly high water bills, water stains on walls or ceilings, musty odors, the sound of running water when fixtures are off, or wet spots in your yard. We offer professional leak detection services to locate and repair hidden leaks."
+                  },
+                  {
+                    "tab_title": "Do you provide drain cleaning services?",
+                    "tab_content": "Yes, drain cleaning is one of our specialties. We use professional-grade equipment including drain snakes and hydro-jetting to clear even the most stubborn clogs in sinks, toilets, showers, and main sewer lines."
+                  },
+                  {
+                    "tab_title": "Can you help with bathroom or kitchen remodeling?",
+                    "tab_content": "Absolutely! We provide complete plumbing services for kitchen and bathroom remodeling projects, including fixture installation, pipe rerouting, and ensuring all plumbing meets current building codes."
+                  },
+                  {
+                    "tab_title": "How often should I have my plumbing inspected?",
+                    "tab_content": "We recommend annual plumbing inspections for most homes to catch potential problems early. Older homes or properties with a history of plumbing issues may benefit from more frequent inspections."
+                  }
+                ],
+                "border_width": 1,
+                "border_color": "#e0e0e0",
+                "title_background_color": "#f8f9fa",
+                "title_color": "#333333",
+                "content_color": "#666666",
+                "title_padding": {
+                  "unit": "px",
+                  "top": "15",
+                  "right": "20",
+                  "bottom": "15",
+                  "left": "20"
+                },
+                "content_padding": {
+                  "unit": "px",
+                  "top": "15",
+                  "right": "20",
+                  "bottom": "15",
+                  "left": "20"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "additional-questions-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "additional-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "additional-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Have More Questions?",
+                "size": "h2",
+                "align": "center",
+                "color": "#333333"
+              }
+            },
+            {
+              "id": "additional-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='text-align: center;'>If you don't see your question answered above, don't hesitate to reach out. Our friendly team is always ready to provide the information you need.</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "contact-info-grid",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 40
+                }
+              },
+              "elements": [
+                {
+                  "id": "phone-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-phone",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Call Us",
+                    "description_text": "(619) 853-8491",
+                    "link": {
+                      "url": "tel:6198538491"
+                    },
+                    "position": "top",
+                    "icon_color": "#007cba",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "email-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-envelope",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Email Us",
+                    "description_text": "elcajonplumber.ca@gmail.com",
+                    "link": {
+                      "url": "mailto:elcajonplumber.ca@gmail.com"
+                    },
+                    "position": "top",
+                    "icon_color": "#007cba",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "hours-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-clock",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "24/7 Emergency",
+                    "description_text": "Always Available",
+                    "position": "top",
+                    "icon_color": "#007cba",
+                    "title_color": "#333333"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cta-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#007cba",
+        "padding": {
+          "unit": "px",
+          "top": "60",
+          "right": "20",
+          "bottom": "60",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "cta-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed",
+            "text_align": "center"
+          },
+          "elements": [
+            {
+              "id": "cta-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready to Schedule Service?",
+                "size": "h2",
+                "align": "center",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "id": "cta-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='color: #ffffff; font-size: 18px;'>Contact El Cajon Plumber today for fast, reliable plumbing services. Free estimates available!</p>",
+                "align": "center"
+              }
+            },
+            {
+              "id": "cta-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 20
+                }
+              },
+              "elements": [
+                {
+                  "id": "call-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Call (619) 853-8491",
+                    "link": {
+                      "url": "tel:6198538491"
+                    },
+                    "size": "lg",
+                    "button_background_color": "#ffffff",
+                    "button_text_color": "#007cba",
+                    "border_border": "solid",
+                    "border_width": 2,
+                    "border_color": "#ffffff"
+                  }
+                },
+                {
+                  "id": "schedule-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule Online",
+                    "link": {
+                      "url": "/contact-us/"
+                    },
+                    "size": "lg",
+                    "button_background_color": "transparent",
+                    "button_text_color": "#ffffff",
+                    "border_border": "solid",
+                    "border_width": 2,
+                    "border_color": "#ffffff"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trust-section",
+      "elType": "container",
+      "settings": {
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "40",
+          "right": "20",
+          "bottom": "40",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "trust-content",
+          "elType": "container",
+          "settings": {
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "trust-badges",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_justify_content": "center",
+                "flex_align_items": "center",
+                "flex_gap": {
+                  "unit": "px",
+                  "size": 40
+                }
+              },
+              "elements": [
+                {
+                  "id": "experience-badge",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-award",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "30+ Years Experience",
+                    "position": "left",
+                    "icon_color": "#007cba",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "licensed-badge",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-certificate",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "Licensed & Insured",
+                    "position": "left",
+                    "icon_color": "#007cba",
+                    "title_color": "#333333"
+                  }
+                },
+                {
+                  "id": "rating-badge",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": {
+                      "value": "fas fa-star",
+                      "library": "fa-solid"
+                    },
+                    "title_text": "5-Star Rated",
+                    "position": "left",
+                    "icon_color": "#ffc107",
+                    "title_color": "#333333"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
