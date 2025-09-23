@@ -1,0 +1,704 @@
+{
+  "version": "1.0.0",
+  "title": "111e Exasperating Dogwood Homepage Template",
+  "type": "page",
+  "author": "Nivaro Template System",
+  "content": [
+    {
+      "id": "header-top-bar",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "full",
+        "background_background": "classic",
+        "background_color": "#2c3e50",
+        "padding": {
+          "unit": "px",
+          "top": "10",
+          "right": "30",
+          "bottom": "10",
+          "left": "30"
+        }
+      },
+      "elements": [
+        {
+          "id": "contact-info",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<p style='color: white; font-size: 14px;'>📞 (619) 853-8491 | 📧 elcajonplumber.ca@gmail.com | Open 24/7 Emergency Service | 133 E Main St, El Cajon, CA 92020</p>",
+            "align": "center",
+            "text_color": "#ffffff"
+          }
+        }
+      ]
+    },
+    {
+      "id": "navigation-section",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "boxed",
+        "boxed_width": {"size": 1200, "unit": "px"},
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "20",
+          "right": "30",
+          "bottom": "20",
+          "left": "30"
+        },
+        "box_shadow": {
+          "horizontal": 0,
+          "vertical": 2,
+          "blur": 10,
+          "spread": 0,
+          "color": "rgba(0,0,0,0.1)"
+        }
+      },
+      "elements": [
+        {
+          "id": "nav-container",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "row",
+            "flex_justify_content": "space-between",
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "site-logo",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "El Cajon Plumber",
+                "header_size": "h2",
+                "title_color": "#007cba",
+                "typography_typography": "custom",
+                "typography_font_family": "Roboto",
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 28, "unit": "px"}
+              }
+            },
+            {
+              "id": "nav-menu",
+              "elType": "widget",
+              "widgetType": "nav-menu",
+              "settings": {
+                "layout": "horizontal",
+                "menu": "main-menu",
+                "align_items": "center",
+                "pointer": "underline",
+                "animation_line": "fade",
+                "menu_items_color": "#333333",
+                "menu_items_hover_color": "#007cba",
+                "menu_items_typography_typography": "custom",
+                "menu_items_typography_font_family": "Roboto",
+                "menu_items_typography_font_weight": "500",
+                "menu_items_typography_font_size": {"size": 16, "unit": "px"},
+                "space_between": {"size": 25, "unit": "px"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hero-section",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "boxed",
+        "boxed_width": {"size": 1200, "unit": "px"},
+        "flex_direction": "row",
+        "flex_justify_content": "center",
+        "flex_align_items": "center",
+        "min_height": {"size": 500, "unit": "px"},
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "background_overlay_background": "classic",
+        "background_overlay_color": "rgba(207, 212, 219, 0.1)",
+        "padding": {
+          "unit": "px",
+          "top": "100",
+          "right": "30",
+          "bottom": "100",
+          "left": "30"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-heart-area",
+          "elType": "container",
+          "settings": {
+            "width": {"unit": "%", "size": 60},
+            "flex_direction": "column",
+            "flex_justify_content": "center",
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Affordable El Cajon Plumber",
+                "align": "center",
+                "title_color": "#2c3e50",
+                "typography_typography": "custom",
+                "typography_font_family": "Roboto",
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 48, "unit": "px"},
+                "typography_font_size_tablet": {"size": 36, "unit": "px"},
+                "typography_font_size_mobile": {"size": 28, "unit": "px"}
+              }
+            },
+            {
+              "id": "hero-subheading",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Are we looking for an El Cajon plumber near me or a top-notch plumber in El Cajon and the suburbs? Look no further! We offer prompt and budget-friendly El Cajon plumbing services. Our experienced staff is equipped to handle all plumbing needs, such as routine maintenance, plumbing fixture repairs, drain cleaning, leak detection, pipe repair, and water heater repair. Our skilled and professional plumbers are ready to fix all your plumbing problems with optimal solutions. <strong><em>Give us a call today.</em></strong></p>",
+                "align": "center",
+                "text_color": "#666666",
+                "typography_typography": "custom",
+                "typography_font_family": "Roboto",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "typography_line_height": {"size": 1.6, "unit": "em"}
+              }
+            },
+            {
+              "id": "hero-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_gap": {"size": 20, "unit": "px"},
+                "flex_justify_content": "center",
+                "margin": {"unit": "px", "top": "30"}
+              },
+              "elements": [
+                {
+                  "id": "cta-button-1",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "(619) 853-8491",
+                    "link": {"url": "tel:(619) 853-8491"},
+                    "align": "center",
+                    "size": "lg",
+                    "button_type": "warning",
+                    "background_color": "#007cba",
+                    "hover_background_color": "#005a87",
+                    "button_text_color": "#ffffff",
+                    "typography_typography": "custom",
+                    "typography_font_weight": "600",
+                    "typography_font_size": {"size": 16, "unit": "px"},
+                    "border_radius": {"size": 5, "unit": "px"},
+                    "button_padding": {
+                      "unit": "px",
+                      "top": "15",
+                      "right": "30",
+                      "bottom": "15",
+                      "left": "30"
+                    },
+                    "button_box_shadow": {
+                      "horizontal": 0,
+                      "vertical": 3,
+                      "blur": 10,
+                      "spread": 0,
+                      "color": "rgba(0,124,186,0.3)"
+                    }
+                  }
+                },
+                {
+                  "id": "cta-button-2",
+                  "elType": "widget",
+                  "widgetType": "html",
+                  "settings": {
+                    "html": "<a href=\"//leads.leadsmartinc.com/?api_key=eb7353a561f876a7c03543787a0cd05ac8a926d3&affiliate_source=msjbhvgas1&category=1&funnel=3&buttons=btn-warning&step=1\" class=\"polyares-quote-button btn btn-warning btn-large\" style=\"background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 100%); color: white; padding: 15px 30px; border-radius: 5px; text-decoration: none; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 3px 10px rgba(255, 107, 0, 0.3); transition: all 0.3s ease; border: none; cursor: pointer;\">Get Appointment</a>"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hero-lung-area",
+          "elType": "container",
+          "settings": {
+            "width": {"unit": "%", "size": 40},
+            "flex_direction": "column",
+            "flex_justify_content": "center",
+            "flex_align_items": "center",
+            "background_background": "classic",
+            "background_color": "#ffffff",
+            "border_radius": {"size": 10, "unit": "px"},
+            "padding": {
+              "unit": "px",
+              "top": "30",
+              "right": "25",
+              "bottom": "30",
+              "left": "25"
+            },
+            "box_shadow": {
+              "horizontal": 0,
+              "vertical": 5,
+              "blur": 15,
+              "spread": 0,
+              "color": "rgba(0,0,0,0.1)"
+            }
+          },
+          "elements": [
+            {
+              "id": "form-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "GET FREE ESTIMATE",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#2c3e50",
+                "typography_typography": "custom",
+                "typography_font_family": "Roboto",
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 24, "unit": "px"},
+                "margin": {"unit": "px", "bottom": "20"}
+              }
+            },
+            {
+              "id": "lead-form-iframe",
+              "elType": "widget",
+              "widgetType": "html",
+              "settings": {
+                "html": "<div id=\"polyares_form_container\" style=\"margin:0px;padding:0px;\"><div id=\"polyares_form\" style=\"width: 244px; height: 377px;\"><iframe src=\"//leads.leadsmartinc.com/?api_key=eb7353a561f876a7c03543787a0cd05ac8a926d3&affiliate_source=msjbhvgas1&funnel=5&category=1&buttons=btn-warning\" height=\"100%\" width=\"100%\" frameborder=\"no\" scrolling=\"yes\" noresize=\"true\" vspace=\"0\" hspace=\"0\" style=\"border-radius: 10px; border: 1px solid #333;\"></iframe></div></div>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "brand-partners-section",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "boxed",
+        "boxed_width": {"size": 1200, "unit": "px"},
+        "flex_direction": "column",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "border_border": "solid",
+        "border_width": {
+          "unit": "px",
+          "top": "1",
+          "right": "0",
+          "bottom": "1",
+          "left": "0"
+        },
+        "border_color": "#e5e5e5",
+        "padding": {
+          "unit": "px",
+          "top": "40",
+          "right": "20",
+          "bottom": "40",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "brand-partners-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "El Cajon Plumber collaborates with the following companies",
+            "header_size": "h3",
+            "align": "center",
+            "title_color": "#333333",
+            "typography_typography": "custom",
+            "typography_font_size": {"size": 24, "unit": "px"},
+            "typography_font_weight": "600",
+            "margin": {"unit": "px", "bottom": "30"}
+          }
+        },
+        {
+          "id": "brand-carousel",
+          "elType": "widget",
+          "widgetType": "image-carousel",
+          "settings": {
+            "slides": [
+              {
+                "image": {
+                  "url": "/wp-content/uploads/american-standard-logo.png",
+                  "alt": "American Standard"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/cl-supply-logo.png",
+                  "alt": "C&L Supply Company, Inc"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/moen-logo.png",
+                  "alt": "Moen"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/rheem-logo.png",
+                  "alt": "Rheem Industries"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/zurn-logo.png",
+                  "alt": "Zurn Industries"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/bradford-white-logo.png",
+                  "alt": "Bradford White"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/chicago-faucet-logo.png",
+                  "alt": "Chicago Faucet"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/delta-logo.png",
+                  "alt": "Delta"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/danze-logo.png",
+                  "alt": "Danze"
+                }
+              },
+              {
+                "image": {
+                  "url": "/wp-content/uploads/kohler-logo.png",
+                  "alt": "Kohler Co"
+                }
+              }
+            ],
+            "slides_to_show": {
+              "desktop": 5,
+              "tablet": 4,
+              "mobile": 2
+            },
+            "slides_to_scroll": 1,
+            "autoplay": "yes",
+            "autoplay_speed": 5000,
+            "pause_on_hover": "yes",
+            "infinite": "yes",
+            "navigation": "none",
+            "pagination": "none",
+            "image_spacing_custom": {
+              "unit": "px",
+              "size": 20
+            },
+            "image_fit": "contain"
+          }
+        }
+      ]
+    },
+    {
+      "id": "about-local-plumber-section",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "boxed",
+        "boxed_width": {"size": 1200, "unit": "px"},
+        "flex_direction": "row",
+        "flex_gap": {"size": 50, "unit": "px"},
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "30",
+          "bottom": "80",
+          "left": "30"
+        }
+      },
+      "elements": [
+        {
+          "id": "about-local-content",
+          "elType": "container",
+          "settings": {
+            "width": {"unit": "%", "size": 70},
+            "flex_direction": "column"
+          },
+          "elements": [
+            {
+              "id": "about-local-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "About local plumber el cajon",
+                "header_size": "h2",
+                "align": "left",
+                "title_color": "#2c3e50",
+                "typography_typography": "custom",
+                "typography_font_size": {"size": 36, "unit": "px"},
+                "typography_font_weight": "700",
+                "margin": {"unit": "px", "bottom": "20"}
+              }
+            },
+            {
+              "id": "about-local-intro",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Welcome to <strong>El Cajon</strong> Plumber, your trusted local plumbing company in El Cajon with over 30 years of industry experience. We take pride in serving El Cajon and the surrounding neighborhoods. Whether you are looking for residential or commercial Plumber, we offer a comprehensive range of <em><strong>Plumbing</strong></em> services (water heater repair or installation, drain cleaning, trenchless sewer replacement, garbage disposal repairs, washer repair, and sprinkler systems) to meet your needs. We also provide emergency plumbing services to ensure you're never left in a bind, read more about <em><strong>El Cajon Plumbing Company</strong></em></p><p><em><strong>Choose us for your plumbing needs and experience the reasons countless customers have trusted us:</strong></em></p>",
+                "text_color": "#666666",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "typography_line_height": {"size": 1.6, "unit": "em"},
+                "margin": {"unit": "px", "bottom": "20"}
+              }
+            },
+            {
+              "id": "about-local-features",
+              "elType": "widget",
+              "widgetType": "icon-list",
+              "settings": {
+                "icon_list": [
+                  {
+                    "text": "Accessible 24/7",
+                    "selected_icon": {"value": "icon icon-check", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "Transparent and fair pricing",
+                    "selected_icon": {"value": "icon icon-check", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "Affordable Pricing",
+                    "selected_icon": {"value": "icon icon-check", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "Skilled and experienced technicians",
+                    "selected_icon": {"value": "fas fa-check", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "Equipped with state-of-the-art tools",
+                    "selected_icon": {"value": "fas fa-check", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "Committed to excellent customer service",
+                    "selected_icon": {"value": "fas fa-check", "library": "fa-solid"}
+                  },
+                  {
+                    "text": "100% Customer Satisfaction",
+                    "selected_icon": {"value": "fas fa-check", "library": "fa-solid"}
+                  }
+                ],
+                "layout": "inline",
+                "icon_color": "#007cba",
+                "icon_size": {"size": 16, "unit": "px"},
+                "text_color": "#333333",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "space_between": {"size": 10, "unit": "px"}
+              }
+            },
+            {
+              "id": "about-local-buttons",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "flex_gap": {"size": 15, "unit": "px"},
+                "margin": {"unit": "px", "top": "30"}
+              },
+              "elements": [
+                {
+                  "id": "about-phone-button",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "(619) 853-8491",
+                    "link": {"url": "tel:(619) 853-8491"},
+                    "size": "lg",
+                    "background_color": "#007cba",
+                    "hover_background_color": "#005a87",
+                    "button_text_color": "#ffffff",
+                    "typography_typography": "custom",
+                    "typography_font_weight": "600",
+                    "typography_font_size": {"size": 16, "unit": "px"},
+                    "border_radius": {"size": 5, "unit": "px"},
+                    "button_padding": {
+                      "unit": "px",
+                      "top": "15",
+                      "right": "30",
+                      "bottom": "15",
+                      "left": "30"
+                    }
+                  }
+                },
+                {
+                  "id": "about-appointment-button",
+                  "elType": "widget",
+                  "widgetType": "html",
+                  "settings": {
+                    "html": "<a href=\"//leads.leadsmartinc.com/?api_key=eb7353a561f876a7c03543787a0cd05ac8a926d3&affiliate_source=msjbhvgas1&category=1&funnel=3&buttons=btn-warning&step=1\" class=\"polyares-quote-button btn btn-warning btn-large\" style=\"background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 100%); color: white; padding: 15px 30px; border-radius: 5px; text-decoration: none; font-weight: 600; font-size: 16px; display: inline-block;\">Get Appointment</a>"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "about-local-stats",
+          "elType": "container",
+          "settings": {
+            "width": {"unit": "%", "size": 30},
+            "flex_direction": "column",
+            "flex_align_items": "center",
+            "flex_justify_content": "center"
+          },
+          "elements": [
+            {
+              "id": "satisfaction-counter",
+              "elType": "widget",
+              "widgetType": "counter",
+              "settings": {
+                "ending_number": 100,
+                "suffix": "%",
+                "title": "Satisfaction Guarantee",
+                "number_color": "#007cba",
+                "title_color": "#333333",
+                "number_typography_typography": "custom",
+                "number_typography_font_size": {"size": 48, "unit": "px"},
+                "number_typography_font_weight": "700",
+                "title_typography_typography": "custom",
+                "title_typography_font_size": {"size": 18, "unit": "px"},
+                "title_typography_font_weight": "600"
+              }
+            },
+            {
+              "id": "about-local-image",
+              "elType": "widget",
+              "widgetType": "image",
+              "settings": {
+                "image": {"url": "/wp-content/uploads/el-cajon-plumber-services-near-me.jpg"},
+                "image_size": "medium",
+                "align": "center",
+                "border_radius": {"size": 10, "unit": "px"},
+                "margin": {"unit": "px", "top": "30"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plumbing-services-section",
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "boxed",
+        "boxed_width": {"size": 1200, "unit": "px"},
+        "flex_direction": "column",
+        "background_background": "classic",
+        "background_color": "#f8f9fa",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "30",
+          "bottom": "80",
+          "left": "30"
+        }
+      },
+      "elements": [
+        {
+          "id": "services-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "Our El Cajon Plumbing Services",
+            "header_size": "h2",
+            "align": "center",
+            "title_color": "#2c3e50",
+            "typography_typography": "custom",
+            "typography_font_size": {"size": 36, "unit": "px"},
+            "typography_font_weight": "700",
+            "margin": {"unit": "px", "bottom": "20"}
+          }
+        },
+        {
+          "id": "services-intro",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<p>When it comes to affordable plumber services near me? Your search ends here at Plumber El Cajon CA! We provide comprehensive residential, commercial, and emergency plumbing solutions tailored to your needs. Our flexible <em><strong>Appointments</strong></em> accommodate your busy schedule without any hassle.</p><p>Concerned about pricing and plan details? No worries! El Cajon Plumber LLC offers <em><strong>Free Estimates</strong></em> to address your concerns. Our expert technicians will visit your location to assess the situation themselves.<br />Why wait any longer? <strong><em>Call us @ (619) 853-8491,</em></strong> and let us handle all your plumbing needs professionally and efficiently!</p>",
+            "align": "center",
+            "text_color": "#666666",
+            "typography_font_size": {"size": 16, "unit": "px"},
+            "typography_line_height": {"size": 1.6, "unit": "em"},
+            "margin": {"unit": "px", "bottom": "40"}
+          }
+        }
+      ]
+    },
+    {
+      "id": "affordable-services-section", 
+      "elType": "container",
+      "settings": {
+        "container_type": "flex",
+        "content_width": "boxed",
+        "boxed_width": {"size": 1200, "unit": "px"},
+        "flex_direction": "column",
+        "background_background": "classic",
+        "background_color": "#ffffff",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "right": "30",
+          "bottom": "80",
+          "left": "30"
+        }
+      },
+      "elements": [
+        {
+          "id": "affordable-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "top-notch affordable plumbing services el cajon",
+            "header_size": "h2",
+            "align": "center",
+            "title_color": "#2c3e50",
+            "typography_typography": "custom",
+            "typography_font_size": {"size": 36, "unit": "px"},
+            "typography_font_weight": "700",
+            "margin": {"unit": "px", "bottom": "20"}
+          }
+        },
+        {
+          "id": "affordable-content",
+          "elType": "widget",
+          "widgetType": "text-editor",
+          "settings": {
+            "editor": "<p>Reliable and budget-friendly El Cajon plumbing services. Look no further than El Cajon Plumber LLC, which has extensive experience providing emergency plumbing services to residential and commercial customers. We are here to serve you, and our team of experts has you covered. Whether you are dealing with a clogged drain or a leaking slab or require assistance with your water heater, do not hesitate to contact us. We provide free estimates, so why delay? Get in touch with us today!</p>",
+            "align": "center",
+            "text_color": "#666666",
+            "typography_font_size": {"size": 16, "unit": "px"},
+            "typography_line_height": {"size": 1.6, "unit": "em"},
+            "margin": {"unit": "px", "bottom": "40"}
+          }
+        }
+      ]
+    }
+  ],
+  "page_settings": {
+    "title": "Affordable El Cajon Plumber - Professional Plumbing Services",
+    "status": "publish",
+    "template": "elementor_header_footer",
+    "hide_title": "yes"
+  }
+}

@@ -132,21 +132,9 @@ class AardvarkPlugin {
                 'branch_name' => 'main'
             ),
             array(
-                'plugin_slug' => 'grove',
-                'plugin_path' => 'grove-wp-plugin/grove.php',
-                'github_url' => 'https://github.com/transatlanticvoyage/grove-wp-plugin.git',
-                'branch_name' => 'main'
-            ),
-            array(
-                'plugin_slug' => 'lumora',
-                'plugin_path' => 'lumora/lumora.php',
-                'github_url' => 'https://github.com/transatlanticvoyage/lumora.git',
-                'branch_name' => 'main'
-            ),
-            array(
-                'plugin_slug' => 'ruplin',
-                'plugin_path' => 'ruplin/ruplin.php',
-                'github_url' => 'https://github.com/transatlanticvoyage/ruplin.git',
+                'plugin_slug' => 'axiom',
+                'plugin_path' => 'axiom/axiom.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/axiom.git',
                 'branch_name' => 'main'
             ),
             array(
@@ -156,15 +144,21 @@ class AardvarkPlugin {
                 'branch_name' => 'main'
             ),
             array(
-                'plugin_slug' => 'veyra',
-                'plugin_path' => 'veyra/veyra.php',
-                'github_url' => 'https://github.com/transatlanticvoyage/veyra.git',
+                'plugin_slug' => 'brimora',
+                'plugin_path' => 'brimora/brimora.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/brimora.git',
                 'branch_name' => 'main'
             ),
             array(
-                'plugin_slug' => 'axiom',
-                'plugin_path' => 'axiom/axiom.php',
-                'github_url' => 'https://github.com/transatlanticvoyage/axiom.git',
+                'plugin_slug' => 'fathom',
+                'plugin_path' => 'fathom/fathom.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/fathom.git',
+                'branch_name' => 'main'
+            ),
+            array(
+                'plugin_slug' => 'grove',
+                'plugin_path' => 'grove-wp-plugin/grove.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/grove-wp-plugin.git',
                 'branch_name' => 'main'
             ),
             array(
@@ -177,6 +171,36 @@ class AardvarkPlugin {
                 'plugin_slug' => 'klyra',
                 'plugin_path' => 'klyra/klyra.php',
                 'github_url' => 'https://github.com/transatlanticvoyage/klyra.git',
+                'branch_name' => 'main'
+            ),
+            array(
+                'plugin_slug' => 'lumora',
+                'plugin_path' => 'lumora/lumora.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/lumora.git',
+                'branch_name' => 'main'
+            ),
+            array(
+                'plugin_slug' => 'nivaro',
+                'plugin_path' => 'nivaro/nivaro-simple.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/nivaro.git',
+                'branch_name' => 'main'
+            ),
+            array(
+                'plugin_slug' => 'ruplin',
+                'plugin_path' => 'ruplin/ruplin.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/ruplin.git',
+                'branch_name' => 'main'
+            ),
+            array(
+                'plugin_slug' => 'trillan',
+                'plugin_path' => 'trillan/trillan.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/trillan.git',
+                'branch_name' => 'main'
+            ),
+            array(
+                'plugin_slug' => 'veyra',
+                'plugin_path' => 'veyra/veyra.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/veyra.git',
                 'branch_name' => 'main'
             )
         );
