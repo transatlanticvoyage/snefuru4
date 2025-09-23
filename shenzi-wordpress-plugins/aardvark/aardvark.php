@@ -181,7 +181,7 @@ class AardvarkPlugin {
             ),
             array(
                 'plugin_slug' => 'nivaro',
-                'plugin_path' => 'nivaro/nivaro-simple.php',
+                'plugin_path' => 'nivaro/nivaro.php',
                 'github_url' => 'https://github.com/transatlanticvoyage/nivaro.git',
                 'branch_name' => 'main'
             ),
