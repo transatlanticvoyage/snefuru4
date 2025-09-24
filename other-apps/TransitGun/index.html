@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransitGun</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>TransitGun</h1>
+            <p class="subtitle">Grove Plugin Development Sync Tool</p>
+        </header>
+        
+        <main>
+            <div class="sync-section">
+                <button id="syncButton" class="sync-button">
+                    <span class="button-text">Run Blumenthal Grove Sync</span>
+                    <div class="spinner" id="spinner" style="display: none;"></div>
+                </button>
+                
+                <div id="status" class="status ready">Ready</div>
+                
+                <div id="result" class="result" style="display: none;"></div>
+            </div>
+            
+            <div class="info-section">
+                <h3>Directory Information</h3>
+                <div class="directory-info">
+                    <div class="path-item">
+                        <strong>Source:</strong>
+                        <span id="sourcePath" class="path">Loading...</span>
+                        <span id="sourceStatus" class="status-icon">●</span>
+                    </div>
+                    <div class="path-item">
+                        <strong>Target:</strong>
+                        <span id="targetPath" class="path">Loading...</span>
+                        <span id="targetStatus" class="status-icon">●</span>
+                    </div>
+                </div>
+                
+                <div class="description">
+                    <p>This process copies all Grove plugin files from your development folder to your local WordPress site, overwriting existing files.</p>
+                    <p>The sync uses rsync to efficiently transfer only changed files while preserving file permissions.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="renderer.js"></script>
+</body>
+</html>
