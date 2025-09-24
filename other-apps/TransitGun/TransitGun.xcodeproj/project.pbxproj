@@ -3,28 +3,66 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		6B0123451234567890ABCDEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0123441234567890ABCDEF /* AppDelegate.swift */; };
-		6B0123471234567890ABCDEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B0123461234567890ABCDEF /* Assets.xcassets */; };
-		6B01234A1234567890ABCDEF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B0123481234567890ABCDEF /* MainMenu.xib */; };
-		6B0123521234567890ABCDEF /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0123511234567890ABCDEF /* SyncManager.swift */; };
-/* End PBXBuildFile section */
+/* Begin PBXContainerItemProxy section */
+		544D1E132E844A5600A48FC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 544D1DF92E844A5400A48FC3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 544D1E002E844A5400A48FC3;
+			remoteInfo = TransitGun;
+		};
+		544D1E1D2E844A5600A48FC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 544D1DF92E844A5400A48FC3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 544D1E002E844A5400A48FC3;
+			remoteInfo = TransitGun;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		6B0123411234567890ABCDEF /* TransitGun.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TransitGun.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6B0123441234567890ABCDEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		6B0123461234567890ABCDEF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		6B0123491234567890ABCDEF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		6B01234B1234567890ABCDEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6B01234C1234567890ABCDEF /* TransitGun.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TransitGun.entitlements; sourceTree = "<group>"; };
-		6B0123511234567890ABCDEF /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
+		544D1E012E844A5400A48FC3 /* TransitGun.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TransitGun.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		544D1E122E844A5600A48FC3 /* TransitGunTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TransitGunTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		544D1E1C2E844A5600A48FC3 /* TransitGunUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TransitGunUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		544D1E032E844A5400A48FC3 /* TransitGun */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TransitGun;
+			sourceTree = "<group>";
+		};
+		544D1E152E844A5600A48FC3 /* TransitGunTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TransitGunTests;
+			sourceTree = "<group>";
+		};
+		544D1E1F2E844A5600A48FC3 /* TransitGunUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TransitGunUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
-		6B01233E1234567890ABCDEF /* Frameworks */ = {
+		544D1DFE2E844A5400A48FC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		544D1E0F2E844A5600A48FC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		544D1E192E844A5600A48FC3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -34,125 +72,204 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		6B0123381234567890ABCDEF = {
+		544D1DF82E844A5400A48FC3 = {
 			isa = PBXGroup;
 			children = (
-				6B0123431234567890ABCDEF /* TransitGun */,
-				6B0123421234567890ABCDEF /* Products */,
+				544D1E032E844A5400A48FC3 /* TransitGun */,
+				544D1E152E844A5600A48FC3 /* TransitGunTests */,
+				544D1E1F2E844A5600A48FC3 /* TransitGunUITests */,
+				544D1E022E844A5400A48FC3 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		6B0123421234567890ABCDEF /* Products */ = {
+		544D1E022E844A5400A48FC3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6B0123411234567890ABCDEF /* TransitGun.app */,
+				544D1E012E844A5400A48FC3 /* TransitGun.app */,
+				544D1E122E844A5600A48FC3 /* TransitGunTests.xctest */,
+				544D1E1C2E844A5600A48FC3 /* TransitGunUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		6B0123431234567890ABCDEF /* TransitGun */ = {
-			isa = PBXGroup;
-			children = (
-				6B0123441234567890ABCDEF /* AppDelegate.swift */,
-				6B0123511234567890ABCDEF /* SyncManager.swift */,
-				6B0123461234567890ABCDEF /* Assets.xcassets */,
-				6B0123481234567890ABCDEF /* MainMenu.xib */,
-				6B01234B1234567890ABCDEF /* Info.plist */,
-				6B01234C1234567890ABCDEF /* TransitGun.entitlements */,
-			);
-			path = TransitGun;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6B0123401234567890ABCDEF /* TransitGun */ = {
+		544D1E002E844A5400A48FC3 /* TransitGun */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6B01234F1234567890ABCDEF /* Build configuration list for PBXNativeTarget "TransitGun" */;
+			buildConfigurationList = 544D1E262E844A5600A48FC3 /* Build configuration list for PBXNativeTarget "TransitGun" */;
 			buildPhases = (
-				6B01233D1234567890ABCDEF /* Sources */,
-				6B01233E1234567890ABCDEF /* Frameworks */,
-				6B01233F1234567890ABCDEF /* Resources */,
+				544D1DFD2E844A5400A48FC3 /* Sources */,
+				544D1DFE2E844A5400A48FC3 /* Frameworks */,
+				544D1DFF2E844A5400A48FC3 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				544D1E032E844A5400A48FC3 /* TransitGun */,
+			);
 			name = TransitGun;
+			packageProductDependencies = (
+			);
 			productName = TransitGun;
-			productReference = 6B0123411234567890ABCDEF /* TransitGun.app */;
+			productReference = 544D1E012E844A5400A48FC3 /* TransitGun.app */;
 			productType = "com.apple.product-type.application";
+		};
+		544D1E112E844A5600A48FC3 /* TransitGunTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 544D1E292E844A5600A48FC3 /* Build configuration list for PBXNativeTarget "TransitGunTests" */;
+			buildPhases = (
+				544D1E0E2E844A5600A48FC3 /* Sources */,
+				544D1E0F2E844A5600A48FC3 /* Frameworks */,
+				544D1E102E844A5600A48FC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				544D1E142E844A5600A48FC3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				544D1E152E844A5600A48FC3 /* TransitGunTests */,
+			);
+			name = TransitGunTests;
+			packageProductDependencies = (
+			);
+			productName = TransitGunTests;
+			productReference = 544D1E122E844A5600A48FC3 /* TransitGunTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		544D1E1B2E844A5600A48FC3 /* TransitGunUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 544D1E2C2E844A5600A48FC3 /* Build configuration list for PBXNativeTarget "TransitGunUITests" */;
+			buildPhases = (
+				544D1E182E844A5600A48FC3 /* Sources */,
+				544D1E192E844A5600A48FC3 /* Frameworks */,
+				544D1E1A2E844A5600A48FC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				544D1E1E2E844A5600A48FC3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				544D1E1F2E844A5600A48FC3 /* TransitGunUITests */,
+			);
+			name = TransitGunUITests;
+			packageProductDependencies = (
+			);
+			productName = TransitGunUITests;
+			productReference = 544D1E1C2E844A5600A48FC3 /* TransitGunUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		6B0123391234567890ABCDEF /* Project object */ = {
+		544D1DF92E844A5400A48FC3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
-					6B0123401234567890ABCDEF = {
-						CreatedOnToolsVersion = 15.0;
+					544D1E002E844A5400A48FC3 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					544D1E112E844A5600A48FC3 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 544D1E002E844A5400A48FC3;
+					};
+					544D1E1B2E844A5600A48FC3 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 544D1E002E844A5400A48FC3;
 					};
 				};
 			};
-			buildConfigurationList = 6B01233C1234567890ABCDEF /* Build configuration list for PBXProject "TransitGun" */;
-			compatibilityVersion = "Xcode 14.0";
+			buildConfigurationList = 544D1DFC2E844A5400A48FC3 /* Build configuration list for PBXProject "TransitGun" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 6B0123381234567890ABCDEF;
-			productRefGroup = 6B0123421234567890ABCDEF /* Products */;
+			mainGroup = 544D1DF82E844A5400A48FC3;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 544D1E022E844A5400A48FC3 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6B0123401234567890ABCDEF /* TransitGun */,
+				544D1E002E844A5400A48FC3 /* TransitGun */,
+				544D1E112E844A5600A48FC3 /* TransitGunTests */,
+				544D1E1B2E844A5600A48FC3 /* TransitGunUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		6B01233F1234567890ABCDEF /* Resources */ = {
+		544D1DFF2E844A5400A48FC3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B0123471234567890ABCDEF /* Assets.xcassets in Resources */,
-				6B01234A1234567890ABCDEF /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		544D1E102E844A5600A48FC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		544D1E1A2E844A5600A48FC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		6B01233D1234567890ABCDEF /* Sources */ = {
+		544D1DFD2E844A5400A48FC3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B0123451234567890ABCDEF /* AppDelegate.swift in Sources */,
-				6B0123521234567890ABCDEF /* SyncManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		544D1E0E2E844A5600A48FC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		544D1E182E844A5600A48FC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXVariantGroup section */
-		6B0123481234567890ABCDEF /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6B0123491234567890ABCDEF /* Base */,
-			);
-			name = MainMenu.xib;
-			sourceTree = "<group>";
+/* Begin PBXTargetDependency section */
+		544D1E142E844A5600A48FC3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 544D1E002E844A5400A48FC3 /* TransitGun */;
+			targetProxy = 544D1E132E844A5600A48FC3 /* PBXContainerItemProxy */;
 		};
-/* End PBXVariantGroup section */
+		544D1E1E2E844A5600A48FC3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 544D1E002E844A5400A48FC3 /* TransitGun */;
+			targetProxy = 544D1E1D2E844A5600A48FC3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		6B01234D1234567890ABCDEF /* Debug */ = {
+		544D1E242E844A5600A48FC3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -187,6 +304,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 643MMTHJUQ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -205,7 +323,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -215,7 +333,7 @@
 			};
 			name = Debug;
 		};
-		6B01234E1234567890ABCDEF /* Release */ = {
+		544D1E252E844A5600A48FC3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -250,6 +368,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 643MMTHJUQ;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -262,7 +381,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -270,7 +389,7 @@
 			};
 			name = Release;
 		};
-		6B0123501234567890ABCDEF /* Debug */ = {
+		544D1E272E844A5600A48FC3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -279,24 +398,26 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 643MMTHJUQ;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = TransitGun/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMainNibFile = MainMenu;
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.yourname.TransitGun;
+				PRODUCT_BUNDLE_IDENTIFIER = oceanblue.TransitGun;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
-		6B0123511234567890ABCDEF /* Release */ = {
+		544D1E282E844A5600A48FC3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -305,45 +426,133 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 643MMTHJUQ;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = TransitGun/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMainNibFile = MainMenu;
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.yourname.TransitGun;
+				PRODUCT_BUNDLE_IDENTIFIER = oceanblue.TransitGun;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		544D1E2A2E844A5600A48FC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 643MMTHJUQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = oceanblue.TransitGunTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TransitGun.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TransitGun";
+			};
+			name = Debug;
+		};
+		544D1E2B2E844A5600A48FC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 643MMTHJUQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = oceanblue.TransitGunTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TransitGun.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TransitGun";
+			};
+			name = Release;
+		};
+		544D1E2D2E844A5600A48FC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 643MMTHJUQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = oceanblue.TransitGunUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = TransitGun;
+			};
+			name = Debug;
+		};
+		544D1E2E2E844A5600A48FC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 643MMTHJUQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = oceanblue.TransitGunUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = TransitGun;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6B01233C1234567890ABCDEF /* Build configuration list for PBXProject "TransitGun" */ = {
+		544D1DFC2E844A5400A48FC3 /* Build configuration list for PBXProject "TransitGun" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				6B01234D1234567890ABCDEF /* Debug */,
-				6B01234E1234567890ABCDEF /* Release */,
+				544D1E242E844A5600A48FC3 /* Debug */,
+				544D1E252E844A5600A48FC3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6B01234F1234567890ABCDEF /* Build configuration list for PBXNativeTarget "TransitGun" */ = {
+		544D1E262E844A5600A48FC3 /* Build configuration list for PBXNativeTarget "TransitGun" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				6B0123501234567890ABCDEF /* Debug */,
-				6B0123511234567890ABCDEF /* Release */,
+				544D1E272E844A5600A48FC3 /* Debug */,
+				544D1E282E844A5600A48FC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		544D1E292E844A5600A48FC3 /* Build configuration list for PBXNativeTarget "TransitGunTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				544D1E2A2E844A5600A48FC3 /* Debug */,
+				544D1E2B2E844A5600A48FC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		544D1E2C2E844A5600A48FC3 /* Build configuration list for PBXNativeTarget "TransitGunUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				544D1E2D2E844A5600A48FC3 /* Debug */,
+				544D1E2E2E844A5600A48FC3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 6B0123391234567890ABCDEF /* Project object */;
+	rootObject = 544D1DF92E844A5400A48FC3 /* Project object */;
 }
