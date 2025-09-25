@@ -34,7 +34,8 @@ class Shenzi_Shared_Schema {
             'zen_cache_reports' => self::get_zen_cache_reports_table($wpdb_prefix, $charset_collate),
             'zen_lighthouse_friendly_names' => self::get_zen_friendly_names_table($wpdb_prefix, $charset_collate),
             'zen_general_shortcodes' => self::get_zen_general_shortcodes_table($wpdb_prefix, $charset_collate),
-            'zen_sitespren' => self::get_zen_sitespren_table($wpdb_prefix, $charset_collate)
+            'zen_sitespren' => self::get_zen_sitespren_table($wpdb_prefix, $charset_collate),
+            'zen_earth_page_designations' => self::get_zen_earth_page_designations_table($wpdb_prefix, $charset_collate)
         );
     }
     
@@ -244,6 +245,23 @@ class Shenzi_Shared_Schema {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (wppma_id)
+        ) $charset_collate;";
+    }
+    
+    /**
+     * Earth page designations table definition
+     */
+    private static function get_zen_earth_page_designations_table($prefix, $charset_collate) {
+        $table_name = $prefix . 'zen_earth_page_designations';
+        return "CREATE TABLE $table_name (
+            id INT(11) NOT NULL AUTO_INCREMENT,
+            oshabi BIGINT(20) UNSIGNED DEFAULT NULL,
+            venshabi BIGINT(20) UNSIGNED DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY oshabi (oshabi),
+            KEY venshabi (venshabi)
         ) $charset_collate;";
     }
     
