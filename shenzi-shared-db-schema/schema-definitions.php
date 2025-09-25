@@ -280,6 +280,7 @@ class Shenzi_Shared_Schema {
             assigned_service_id INT(11) DEFAULT NULL,
             assigned_service_name TEXT DEFAULT NULL,
             operation_type VARCHAR(50) DEFAULT 'oshabi_duplication',
+            method VARCHAR(100) DEFAULT 'Main Quilter Method 1',
             is_elementor_page BOOLEAN DEFAULT FALSE,
             duplication_args JSON DEFAULT NULL,
             user_id BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -289,6 +290,7 @@ class Shenzi_Shared_Schema {
             KEY duplicated_page_id (duplicated_page_id),
             KEY assigned_service_id (assigned_service_id),
             KEY operation_type (operation_type),
+            KEY method (method),
             KEY user_id (user_id),
             KEY created_at (created_at)
         ) $charset_collate;";
