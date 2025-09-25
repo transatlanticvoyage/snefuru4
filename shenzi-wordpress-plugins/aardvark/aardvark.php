@@ -157,8 +157,8 @@ class AardvarkPlugin {
             ),
             array(
                 'plugin_slug' => 'grove',
-                'plugin_path' => 'grove-wp-plugin/grove.php',
-                'github_url' => 'https://github.com/transatlanticvoyage/grove-wp-plugin.git',
+                'plugin_path' => 'grove/grove.php',
+                'github_url' => 'https://github.com/transatlanticvoyage/grove.git',
                 'branch_name' => 'main'
             ),
             array(

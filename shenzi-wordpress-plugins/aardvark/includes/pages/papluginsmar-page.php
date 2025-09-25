@@ -1047,7 +1047,7 @@ class Aardvark_Papluginsmar_Page {
         return array(
             'aardvark/aardvark.php',
             'ruplin/ruplin.php',
-            'grove-wp-plugin/grove.php',
+            'grove/grove.php',
             'beacon/beacon.php',
             'lumora/lumora.php',
             'veyra/veyra.php',
