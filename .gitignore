@@ -77,3 +77,9 @@ next-env.d.ts
 wordpress-sites/*/wp-content/ai1wm-backups/
 wordpress-sites/*/wp-content/backups/
 wordpress-sites/*/wp-content/plugins/snefuruplin*/
+
+# Ignore all WordPress site files under shiplavich-wp-sites
+shiplavich-wp-sites/
+
+# But allow the specific grove plugin repository
+!shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/grove/
