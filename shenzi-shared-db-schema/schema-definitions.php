@@ -35,7 +35,8 @@ class Shenzi_Shared_Schema {
             'zen_lighthouse_friendly_names' => self::get_zen_friendly_names_table($wpdb_prefix, $charset_collate),
             'zen_general_shortcodes' => self::get_zen_general_shortcodes_table($wpdb_prefix, $charset_collate),
             'zen_sitespren' => self::get_zen_sitespren_table($wpdb_prefix, $charset_collate),
-            'zen_earth_page_designations' => self::get_zen_earth_page_designations_table($wpdb_prefix, $charset_collate)
+            'zen_earth_page_designations' => self::get_zen_earth_page_designations_table($wpdb_prefix, $charset_collate),
+            'zen_quilter_page_duplication_history' => self::get_zen_quilter_page_duplication_history_table($wpdb_prefix, $charset_collate)
         );
     }
     
@@ -262,6 +263,34 @@ class Shenzi_Shared_Schema {
             PRIMARY KEY (id),
             KEY oshabi (oshabi),
             KEY venshabi (venshabi)
+        ) $charset_collate;";
+    }
+    
+    /**
+     * Quilter page duplication history table definition
+     */
+    private static function get_zen_quilter_page_duplication_history_table($prefix, $charset_collate) {
+        $table_name = $prefix . 'zen_quilter_page_duplication_history';
+        return "CREATE TABLE $table_name (
+            history_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            source_page_id BIGINT(20) UNSIGNED NOT NULL,
+            source_page_title TEXT NOT NULL,
+            duplicated_page_id BIGINT(20) UNSIGNED NOT NULL,
+            duplicated_page_title TEXT NOT NULL,
+            assigned_service_id INT(11) DEFAULT NULL,
+            assigned_service_name TEXT DEFAULT NULL,
+            operation_type VARCHAR(50) DEFAULT 'oshabi_duplication',
+            is_elementor_page BOOLEAN DEFAULT FALSE,
+            duplication_args JSON DEFAULT NULL,
+            user_id BIGINT(20) UNSIGNED DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (history_id),
+            KEY source_page_id (source_page_id),
+            KEY duplicated_page_id (duplicated_page_id),
+            KEY assigned_service_id (assigned_service_id),
+            KEY operation_type (operation_type),
+            KEY user_id (user_id),
+            KEY created_at (created_at)
         ) $charset_collate;";
     }
     
