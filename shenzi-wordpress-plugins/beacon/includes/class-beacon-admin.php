@@ -44,7 +44,7 @@ class Beacon_Admin {
             'beaconhub',
             array($this, 'beaconhub_page'),
             'dashicons-lighthouse',
-            31
+            3.2
         );
         
         // Child menu pages (mirroring Grove structure)

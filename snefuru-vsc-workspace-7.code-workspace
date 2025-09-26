@@ -4,6 +4,13 @@
 			"path": "."
 		},
 		{
+			"path": "./shenzi-wordpress-plugins/klyra"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/klyra",
+			"name": "🌊 Klyra (saltwater.local)"
+		},
+		{
 			"path": "./shenzi-wordpress-plugins/nivaro"
 		},
 		{
@@ -39,13 +46,6 @@
 			"path": "./shenzi-wordpress-plugins/harbor"
 		},
 		{
-			"path": "./shenzi-wordpress-plugins/klyra"
-		},
-		{
-			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/klyra",
-			"name": "🌊 Klyra (saltwater.local)"
-		},
-		{
 			"path": "../localrepo-vulcanhatch",
 			"name": "🌋 VulcanHatch (WP Dev)"
 		},
@@ -64,6 +64,8 @@
 		"git.autoRepositoryDetection": true,
 		"git.repositories": [
 			".",
+			"./shenzi-wordpress-plugins/klyra",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/klyra",
 			"./shenzi-wordpress-plugins/nivaro",
 			"./shenzi-wordpress-plugins/ruplin",
 			"./shenzi-wordpress-plugins/grove",
@@ -75,8 +77,6 @@
 			"./shenzi-wordpress-plugins/beacon",
 			"./shenzi-wordpress-plugins/lumora",
 			"./shenzi-wordpress-plugins/harbor",
-			"./shenzi-wordpress-plugins/klyra",
-			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/klyra",
 			"../localrepo-vulcanhatch",
 			"./shenzi-wordpress-plugins/brimora",
 			"./shenzi-wordpress-plugins/trillan",

@@ -27,7 +27,7 @@ class Aardvark_Admin {
             'papluginsmar',
             array($this, 'display_admin_page'),
             'dashicons-admin-plugins',
-            2
+            3.1
         );
     }
     
