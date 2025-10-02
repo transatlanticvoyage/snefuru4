@@ -916,12 +916,20 @@ function initializeSiloLStreamSelect() {
   
   streamSelect.addEventListener('change', (e) => {
     const selectedStreamId = e.target.value;
-    if (selectedStreamId && streamData[selectedStreamId]) {
-      renderSiloLStreamItems(selectedStreamId);
-      addBtn.disabled = false; // Enable button when stream is selected
+    if (selectedStreamId) {
+      // Enable button when any stream is selected (even empty ones)
+      addBtn.disabled = false;
+      
+      // Render items if stream has data, otherwise show empty state
+      if (streamData[selectedStreamId] && streamData[selectedStreamId].length > 0) {
+        renderSiloLStreamItems(selectedStreamId);
+      } else {
+        siloLContent.innerHTML = '<div style="padding: 8px; font-size: 10px; color: #666;">No items in this stream</div>';
+      }
     } else {
+      // Disable button only when no stream is selected
       siloLContent.innerHTML = '';
-      addBtn.disabled = true; // Disable button when no stream selected
+      addBtn.disabled = true;
     }
   });
   
