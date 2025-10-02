@@ -65,10 +65,16 @@ function initializeAddFolderButton() {
     if (folders) {
       const activeStream = getActiveStream();
       if (activeStream) {
+        let hasNewItems = false;
         folders.forEach(folderPath => {
-          addFolderToStream(activeStream, folderPath);
+          const result = addFolderToStream(activeStream, folderPath);
+          if (result.success) {
+            hasNewItems = true;
+          }
         });
-        await saveConfiguration();
+        if (hasNewItems) {
+          await saveConfiguration();
+        }
       }
     }
   });
@@ -113,12 +119,18 @@ function initializeDragAndDrop() {
       const files = Array.from(e.dataTransfer.files);
       const streamId = stream.dataset.streamId;
       
+      let hasNewItems = false;
       for (const file of files) {
         if (file.path && file.type === '') {
-          addFolderToStream(streamId, file.path);
+          const result = addFolderToStream(streamId, file.path);
+          if (result.success) {
+            hasNewItems = true;
+          }
         }
       }
-      await saveConfiguration();
+      if (hasNewItems) {
+        await saveConfiguration();
+      }
     }, false);
   });
 }
@@ -131,6 +143,9 @@ function addFolderToStream(streamId, folderPath) {
   if (!streamData[streamId].includes(folderPath)) {
     streamData[streamId].push(folderPath);
     renderStream(streamId);
+    return { success: true, message: 'Added successfully' };
+  } else {
+    return { success: false, message: 'Item already exists in this stream' };
   }
 }
 
@@ -758,18 +773,31 @@ function initializeStreamManagement() {
     if (!isDirectory) return;
     
     // Add the folder to the chosen stream
-    addFolderToStream(selectedStreamId, firstSelectedPath);
-    await saveConfiguration();
+    const result = addFolderToStream(selectedStreamId, firstSelectedPath);
     
-    // Show success feedback
-    const originalText = addToStreamBtn.textContent;
-    addToStreamBtn.textContent = 'Added!';
-    addToStreamBtn.style.background = '#28a745';
-    
-    setTimeout(() => {
-      addToStreamBtn.textContent = originalText;
-      addToStreamBtn.style.background = '#007AFF';
-    }, 1500);
+    if (result.success) {
+      await saveConfiguration();
+      
+      // Show success feedback
+      const originalText = addToStreamBtn.textContent;
+      addToStreamBtn.textContent = 'Added!';
+      addToStreamBtn.style.background = '#28a745';
+      
+      setTimeout(() => {
+        addToStreamBtn.textContent = originalText;
+        addToStreamBtn.style.background = '#007AFF';
+      }, 1500);
+    } else {
+      // Show duplicate warning
+      const originalText = addToStreamBtn.textContent;
+      addToStreamBtn.textContent = 'Already exists';
+      addToStreamBtn.style.background = '#ff6b6b';
+      
+      setTimeout(() => {
+        addToStreamBtn.textContent = originalText;
+        addToStreamBtn.style.background = '#007AFF';
+      }, 2000);
+    }
     
     // Reset selection
     streamSelect.value = '';
@@ -913,22 +941,36 @@ function initializeSiloLStreamSelect() {
       }
       
       // Add to stream
-      addFolderToStream(selectedStreamId, folderPath);
-      await saveConfiguration();
+      const result = addFolderToStream(selectedStreamId, folderPath);
       
-      // Refresh the stream items display
-      renderSiloLStreamItems(selectedStreamId);
-      
-      // Clear the input and show success feedback
-      pathInput.value = '';
-      const originalText = addBtn.textContent;
-      addBtn.textContent = 'Added!';
-      addBtn.style.background = '#28a745';
-      
-      setTimeout(() => {
-        addBtn.textContent = originalText;
-        addBtn.style.background = '#007AFF';
-      }, 1500);
+      if (result.success) {
+        await saveConfiguration();
+        
+        // Refresh the stream items display
+        renderSiloLStreamItems(selectedStreamId);
+        
+        // Clear the input and show success feedback
+        pathInput.value = '';
+        const originalText = addBtn.textContent;
+        addBtn.textContent = 'Added!';
+        addBtn.style.background = '#28a745';
+        
+        setTimeout(() => {
+          addBtn.textContent = originalText;
+          addBtn.style.background = '#007AFF';
+        }, 1500);
+      } else {
+        // Show duplicate warning
+        alert(`Cannot add item: ${result.message}`);
+        const originalText = addBtn.textContent;
+        addBtn.textContent = 'Already exists';
+        addBtn.style.background = '#ff6b6b';
+        
+        setTimeout(() => {
+          addBtn.textContent = originalText;
+          addBtn.style.background = '#007AFF';
+        }, 2000);
+      }
       
     } catch (error) {
       console.error('Error adding path to stream:', error);
