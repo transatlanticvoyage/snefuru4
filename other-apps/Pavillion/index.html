@@ -8,6 +8,9 @@
 </head>
 <body>
   <div class="app-container">
+    <div class="silo-container">
+      <div class="silo-a">silo a</div>
+      <div class="main-content">
     <div class="tab-bar">
       <div class="app-title">Pavilion</div>
       <div class="tabs">
@@ -17,6 +20,24 @@
       </div>
       <div class="tab-actions">
         <button id="add-folder-btn" class="action-button">+ Add Folder</button>
+        
+        <div class="sidebar-management" id="sidebar-management" style="display: none;">
+          <select id="sidebar-select" class="sidebar-select">
+            <option value="">Select Sidebar</option>
+            <option value="1">Sidebar 1</option>
+            <option value="2">Sidebar 2</option>
+            <option value="3">Sidebar 3</option>
+            <option value="4">Sidebar 4</option>
+            <option value="5">Sidebar 5</option>
+            <option value="6">Sidebar 6</option>
+            <option value="7">Sidebar 7</option>
+            <option value="8">Sidebar 8</option>
+            <option value="9">Sidebar 9</option>
+            <option value="10">Sidebar 10</option>
+          </select>
+          
+          <button id="add-to-sidebar-btn" class="action-button" disabled>Add Selected Folder To Sidebar</button>
+        </div>
       </div>
     </div>
 
@@ -224,6 +245,7 @@
           <div class="finder-columns-container">
             <div class="finder-columns" id="finder-columns">
             </div>
+            <div class="finder-resize-handle" id="finder-resize-handle"></div>
             <div class="finder-preview" id="finder-preview">
               <div class="preview-content">
                 <div class="preview-icon"></div>
@@ -235,13 +257,15 @@
         </div>
       </div>
     </div>
+      </div>
+    </div>
   </div>
 
   <div class="context-menu" id="folder-context-menu">
     <div class="context-menu-item" data-action="open">Open</div>
     <div class="context-menu-item" data-action="reveal">Reveal in Finder</div>
     <div class="context-menu-separator"></div>
-    <div class="context-menu-item" data-action="remove">Remove from Sidebar</div>
+    <div class="context-menu-item" data-action="remove">Remove from Stream</div>
   </div>
 
   <script src="renderer.js"></script>

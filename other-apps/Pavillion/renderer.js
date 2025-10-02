@@ -1,5 +1,5 @@
-let sidebarData = {};
-let currentSidebar = null;
+let streamData = {};
+let currentStream = null;
 let selectedFolder = null;
 let finderHistory = [];
 let finderHistoryIndex = -1;
@@ -10,6 +10,7 @@ let finderSortBy = 'name';
 let finderViewMode = 'column';
 let finderSearchTerm = '';
 let recentPaths = [];
+let currentSelectedFolderPath = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   initializeTabs();
@@ -17,6 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeDragAndDrop();
   initializeContextMenu();
   initializeFinderView();
+  initializeStreamManagement();
+  initializeFinderResize();
   await initializeCloudStorage();
   await loadConfiguration();
 });
@@ -30,20 +33,24 @@ function initializeTabs() {
       document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
       button.classList.add('active');
       
-      document.querySelectorAll('.sidebar-group').forEach(group => {
+      document.querySelectorAll('.stream-group').forEach(group => {
         group.classList.remove('active');
       });
       document.getElementById(`group-${groupId}`).classList.add('active');
       
       const addFolderBtn = document.getElementById('add-folder-btn');
+      const streamManagement = document.getElementById('stream-management');
+      
       if (groupId === 'finder') {
         addFolderBtn.style.display = 'none';
+        streamManagement.style.display = 'flex';
         if (finderColumns.length === 0) {
           const downloadsPath = await window.electronAPI.getDownloadsPath();
           navigateToFolder(downloadsPath);
         }
       } else {
         addFolderBtn.style.display = 'block';
+        streamManagement.style.display = 'none';
       }
     });
   });
@@ -54,10 +61,10 @@ function initializeAddFolderButton() {
   addFolderBtn.addEventListener('click', async () => {
     const folders = await window.electronAPI.selectFolder();
     if (folders) {
-      const activeSidebar = getActiveSidebar();
-      if (activeSidebar) {
+      const activeStream = getActiveStream();
+      if (activeStream) {
         folders.forEach(folderPath => {
-          addFolderToSidebar(activeSidebar, folderPath);
+          addFolderToStream(activeStream, folderPath);
         });
         await saveConfiguration();
       }
@@ -65,22 +72,22 @@ function initializeAddFolderButton() {
   });
 }
 
-function getActiveSidebar() {
-  const activeGroup = document.querySelector('.sidebar-group.active');
-  const firstEmptySidebar = activeGroup.querySelector('.sidebar:has(.folder-list:empty)');
-  if (firstEmptySidebar) {
-    return firstEmptySidebar.dataset.sidebarId;
+function getActiveStream() {
+  const activeGroup = document.querySelector('.stream-group.active');
+  const firstEmptyStream = activeGroup.querySelector('.stream:has(.folder-list:empty)');
+  if (firstEmptyStream) {
+    return firstEmptyStream.dataset.streamId;
   }
-  return activeGroup.querySelector('.sidebar').dataset.sidebarId;
+  return activeGroup.querySelector('.stream').dataset.streamId;
 }
 
 function initializeDragAndDrop() {
-  document.querySelectorAll('.sidebar').forEach(sidebar => {
-    const dropZone = sidebar.querySelector('.drop-zone');
-    const sidebarContent = sidebar.querySelector('.sidebar-content');
+  document.querySelectorAll('.stream').forEach(stream => {
+    const dropZone = stream.querySelector('.drop-zone');
+    const streamContent = stream.querySelector('.stream-content');
     
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      sidebarContent.addEventListener(eventName, preventDefaults, false);
+      streamContent.addEventListener(eventName, preventDefaults, false);
     });
     
     function preventDefaults(e) {
@@ -89,24 +96,24 @@ function initializeDragAndDrop() {
     }
     
     ['dragenter', 'dragover'].forEach(eventName => {
-      sidebarContent.addEventListener(eventName, () => {
+      streamContent.addEventListener(eventName, () => {
         dropZone.classList.add('drag-over');
       }, false);
     });
     
     ['dragleave', 'drop'].forEach(eventName => {
-      sidebarContent.addEventListener(eventName, () => {
+      streamContent.addEventListener(eventName, () => {
         dropZone.classList.remove('drag-over');
       }, false);
     });
     
-    sidebarContent.addEventListener('drop', async (e) => {
+    streamContent.addEventListener('drop', async (e) => {
       const files = Array.from(e.dataTransfer.files);
-      const sidebarId = sidebar.dataset.sidebarId;
+      const streamId = stream.dataset.streamId;
       
       for (const file of files) {
         if (file.path && file.type === '') {
-          addFolderToSidebar(sidebarId, file.path);
+          addFolderToStream(streamId, file.path);
         }
       }
       await saveConfiguration();
@@ -114,28 +121,28 @@ function initializeDragAndDrop() {
   });
 }
 
-function addFolderToSidebar(sidebarId, folderPath) {
-  if (!sidebarData[sidebarId]) {
-    sidebarData[sidebarId] = [];
+function addFolderToStream(streamId, folderPath) {
+  if (!streamData[streamId]) {
+    streamData[streamId] = [];
   }
   
-  if (!sidebarData[sidebarId].includes(folderPath)) {
-    sidebarData[sidebarId].push(folderPath);
-    renderSidebar(sidebarId);
+  if (!streamData[streamId].includes(folderPath)) {
+    streamData[streamId].push(folderPath);
+    renderStream(streamId);
   }
 }
 
-function renderSidebar(sidebarId) {
-  const sidebar = document.querySelector(`[data-sidebar-id="${sidebarId}"]`);
-  const folderList = sidebar.querySelector('.folder-list');
+function renderStream(streamId) {
+  const stream = document.querySelector(`[data-stream-id="${streamId}"]`);
+  const folderList = stream.querySelector('.folder-list');
   
   folderList.innerHTML = '';
   
-  if (!sidebarData[sidebarId] || sidebarData[sidebarId].length === 0) {
+  if (!streamData[streamId] || streamData[streamId].length === 0) {
     return;
   }
   
-  sidebarData[sidebarId].forEach(folderPath => {
+  streamData[streamId].forEach(folderPath => {
     const folderName = folderPath.split('/').pop() || folderPath;
     const li = document.createElement('li');
     li.className = 'folder-item';
@@ -157,7 +164,7 @@ function renderSidebar(sidebarId) {
     
     li.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      showContextMenu(e.clientX, e.clientY, sidebarId, folderPath);
+      showContextMenu(e.clientX, e.clientY, streamId, folderPath);
     });
     
     folderList.appendChild(li);
@@ -232,8 +239,8 @@ function initializeContextMenu() {
         await window.electronAPI.openFolder(selectedFolder);
       } else if (action === 'reveal' && selectedFolder) {
         await window.electronAPI.openInFinder(selectedFolder);
-      } else if (action === 'remove' && currentSidebar && selectedFolder) {
-        removeFolderFromSidebar(currentSidebar, selectedFolder);
+      } else if (action === 'remove' && currentStream && selectedFolder) {
+        removeFolderFromStream(currentStream, selectedFolder);
         await saveConfiguration();
       }
       
@@ -242,9 +249,9 @@ function initializeContextMenu() {
   });
 }
 
-function showContextMenu(x, y, sidebarId, folderPath) {
+function showContextMenu(x, y, streamId, folderPath) {
   const contextMenu = document.getElementById('folder-context-menu');
-  currentSidebar = sidebarId;
+  currentStream = streamId;
   selectedFolder = folderPath;
   
   contextMenu.style.left = `${x}px`;
@@ -252,26 +259,26 @@ function showContextMenu(x, y, sidebarId, folderPath) {
   contextMenu.classList.add('visible');
 }
 
-function removeFolderFromSidebar(sidebarId, folderPath) {
-  if (sidebarData[sidebarId]) {
-    const index = sidebarData[sidebarId].indexOf(folderPath);
+function removeFolderFromStream(streamId, folderPath) {
+  if (streamData[streamId]) {
+    const index = streamData[streamId].indexOf(folderPath);
     if (index > -1) {
-      sidebarData[sidebarId].splice(index, 1);
-      renderSidebar(sidebarId);
+      streamData[streamId].splice(index, 1);
+      renderStream(streamId);
     }
   }
 }
 
 async function saveConfiguration() {
-  await window.electronAPI.saveConfig(sidebarData);
+  await window.electronAPI.saveConfig(streamData);
 }
 
 async function loadConfiguration() {
   const config = await window.electronAPI.loadConfig();
   if (config) {
-    sidebarData = config;
-    Object.keys(sidebarData).forEach(sidebarId => {
-      renderSidebar(sidebarId);
+    streamData = config;
+    Object.keys(streamData).forEach(streamId => {
+      renderStream(streamId);
     });
   }
 }
@@ -609,6 +616,7 @@ function renderFinderColumns() {
           }
         }
         updateDeleteButton();
+        updateStreamManagementButton();
       });
       
       itemDiv.addEventListener('dblclick', async () => {
@@ -723,4 +731,108 @@ async function initializeCloudStorage() {
     console.error('Error initializing cloud storage:', error);
     document.getElementById('cloud-storage-section').style.display = 'none';
   }
+}
+
+function initializeStreamManagement() {
+  const streamSelect = document.getElementById('stream-select');
+  const addToStreamBtn = document.getElementById('add-to-stream-btn');
+  
+  // Enable/disable button based on selection
+  streamSelect.addEventListener('change', () => {
+    updateStreamManagementButton();
+  });
+  
+  // Handle add to stream button click
+  addToStreamBtn.addEventListener('click', async () => {
+    const selectedStreamId = streamSelect.value;
+    
+    if (!selectedStreamId || finderSelectedFiles.size === 0) return;
+    
+    // Get the first selected item and check if it's a directory
+    const firstSelectedPath = Array.from(finderSelectedFiles)[0];
+    
+    // Check if the selected item is a directory
+    const isDirectory = await window.electronAPI.checkPathExists(firstSelectedPath);
+    if (!isDirectory) return;
+    
+    // Add the folder to the chosen stream
+    addFolderToStream(selectedStreamId, firstSelectedPath);
+    await saveConfiguration();
+    
+    // Show success feedback
+    const originalText = addToStreamBtn.textContent;
+    addToStreamBtn.textContent = 'Added!';
+    addToStreamBtn.style.background = '#28a745';
+    
+    setTimeout(() => {
+      addToStreamBtn.textContent = originalText;
+      addToStreamBtn.style.background = '#007AFF';
+    }, 1500);
+    
+    // Reset selection
+    streamSelect.value = '';
+    updateStreamManagementButton();
+  });
+}
+
+function updateStreamManagementButton() {
+  const streamSelect = document.getElementById('stream-select');
+  const addToStreamBtn = document.getElementById('add-to-stream-btn');
+  
+  // Check if we have a stream selected and at least one item selected
+  const hasSelectedStream = streamSelect.value !== '';
+  const hasSelectedItems = finderSelectedFiles.size > 0;
+  
+  const shouldEnable = hasSelectedStream && hasSelectedItems;
+  addToStreamBtn.disabled = !shouldEnable;
+  
+  // Update button text based on selection count
+  if (hasSelectedItems) {
+    const itemCount = finderSelectedFiles.size;
+    addToStreamBtn.textContent = `Add Selected ${itemCount > 1 ? 'Items' : 'Item'} To Stream`;
+  } else {
+    addToStreamBtn.textContent = 'Add Selected Folder To Stream';
+  }
+}
+
+function initializeFinderResize() {
+  const resizeHandle = document.getElementById('finder-resize-handle');
+  const finderPreview = document.getElementById('finder-preview');
+  const finderColumns = document.getElementById('finder-columns');
+  let isResizing = false;
+  let startX = 0;
+  let startWidth = 0;
+  
+  resizeHandle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    startX = e.clientX;
+    startWidth = finderPreview.offsetWidth;
+    
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    
+    e.preventDefault();
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    
+    const deltaX = startX - e.clientX; // Reverse direction since we're resizing from the right
+    const newWidth = Math.max(200, Math.min(500, startWidth + deltaX));
+    
+    finderPreview.style.width = newWidth + 'px';
+  });
+  
+  document.addEventListener('mouseup', () => {
+    if (isResizing) {
+      isResizing = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+  });
+  
+  // Handle double-click to auto-resize
+  resizeHandle.addEventListener('dblclick', () => {
+    finderPreview.style.width = '300px'; // Reset to default width
+  });
 }

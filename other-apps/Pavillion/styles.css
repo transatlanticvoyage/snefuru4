@@ -17,6 +17,33 @@ body {
   height: 100vh;
 }
 
+.silo-container {
+  display: flex;
+  height: 100vh;
+}
+
+.silo-a {
+  width: 100px;
+  background: #e8e8e8;
+  border-right: 1px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  writing-mode: horizontal-tb;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .tab-bar {
   background: linear-gradient(180deg, #f8f8f8 0%, #e8e8e8 100%);
   border-bottom: 1px solid #d1d1d1;
@@ -64,6 +91,30 @@ body {
 
 .tab-actions {
   -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stream-management {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stream-select {
+  padding: 6px 12px;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  background: white;
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.stream-select:focus {
+  outline: none;
+  border-color: #007AFF;
 }
 
 .action-button {
@@ -81,20 +132,20 @@ body {
   background: #0051D5;
 }
 
-.sidebars-container {
+.streams-container {
   flex: 1;
   overflow: hidden;
   position: relative;
 }
 
-.sidebar-group {
+.stream-group {
   display: none;
   height: 100%;
   padding: 20px;
   gap: 20px;
 }
 
-.sidebar-group.active {
+.stream-group.active {
   display: flex;
 }
 
@@ -109,7 +160,7 @@ body {
   border-radius: 0;
 }
 
-.sidebar {
+.stream {
   flex: 1;
   background: white;
   border-radius: 8px;
@@ -120,7 +171,7 @@ body {
   overflow: hidden;
 }
 
-.sidebar-header {
+.stream-header {
   padding: 15px;
   background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
   border-bottom: 1px solid #e0e0e0;
@@ -129,13 +180,13 @@ body {
   align-items: center;
 }
 
-.sidebar-header h3 {
+.stream-header h3 {
   font-size: 14px;
   font-weight: 600;
   color: #333;
 }
 
-.sidebar-menu-btn {
+.stream-menu-btn {
   background: none;
   border: none;
   font-size: 18px;
@@ -146,11 +197,11 @@ body {
   transition: background 0.2s;
 }
 
-.sidebar-menu-btn:hover {
+.stream-menu-btn:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
-.sidebar-content {
+.stream-content {
   flex: 1;
   overflow-y: auto;
   position: relative;
@@ -168,7 +219,7 @@ body {
   transition: all 0.2s;
 }
 
-.sidebar-content:has(.folder-list:empty) .drop-zone {
+.stream-content:has(.folder-list:empty) .drop-zone {
   display: block;
 }
 
@@ -535,6 +586,7 @@ body {
   display: flex;
   overflow: hidden;
   background: #f5f5f5;
+  position: relative;
 }
 
 .finder-columns {
@@ -545,6 +597,7 @@ body {
   gap: 1px;
   padding: 1px;
   background: #d1d1d1;
+  min-width: 200px;
 }
 
 .finder-column {
@@ -619,11 +672,36 @@ body {
 
 .finder-preview {
   width: 300px;
+  min-width: 200px;
+  max-width: 500px;
   background: white;
   border-left: 1px solid #d1d1d1;
   padding: 20px;
   display: none;
   overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.finder-resize-handle {
+  width: 4px;
+  background: #d1d1d1;
+  cursor: col-resize;
+  flex-shrink: 0;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.finder-resize-handle:hover {
+  background: #007AFF;
+}
+
+.finder-resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -2px;
+  right: -2px;
+  bottom: 0;
 }
 
 .finder-preview.show {
