@@ -14,14 +14,14 @@
     <div class="tab-bar">
       <div class="app-title">Pavilion</div>
       <div class="tabs">
-        <button class="tab-button active" data-group="1">Streams 1-5</button>
+        <button class="tab-button active" data-group="finder">Finder-like View</button>
+        <button class="tab-button" data-group="1">Streams 1-5</button>
         <button class="tab-button" data-group="2">Streams 6-10</button>
-        <button class="tab-button" data-group="finder">Finder-like View</button>
       </div>
       <div class="tab-actions">
-        <button id="add-folder-btn" class="action-button">+ Add Folder</button>
+        <button id="add-folder-btn" class="action-button" style="display: none;">+ Add Folder</button>
         
-        <div class="stream-management" id="stream-management" style="display: none;">
+        <div class="stream-management" id="stream-management" style="display: flex;">
           <select id="stream-select" class="stream-select">
             <option value="">Select Stream</option>
             <option value="1">Stream 1</option>
@@ -42,7 +42,7 @@
     </div>
 
     <div class="streams-container">
-      <div class="stream-group active" id="group-1">
+      <div class="stream-group" id="group-1">
         <div class="stream" data-stream-id="1">
           <div class="stream-header">
             <h3>Stream 1</h3>
@@ -176,7 +176,7 @@
         </div>
       </div>
 
-      <div class="sidebar-group" id="group-finder">
+      <div class="stream-group active" id="group-finder">
         <div class="finder-container">
           <div class="finder-toolbar">
             <div class="finder-nav-buttons">
@@ -243,6 +243,8 @@
           </div>
           
           <div class="finder-columns-container">
+            <div class="silo-i">silo i</div>
+            <div class="silo-j">silo j</div>
             <div class="silo-k">silo k</div>
             <div class="finder-columns" id="finder-columns">
             </div>
