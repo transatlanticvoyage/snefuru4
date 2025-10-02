@@ -666,26 +666,139 @@ body {
 }
 
 .silo-l {
-  width: 60px;
-  min-width: 60px;
-  max-width: 60px;
+  width: 200px;
+  min-width: 100px;
+  max-width: 400px;
   background: #e8e8e8;
   border-right: 1px solid #c0c0c0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.silo-l-header {
+  width: 100%;
+  padding: 8px 4px;
   font-size: 16px;
   font-weight: bold;
   color: #333;
   text-align: center;
+  border-bottom: 1px solid #c0c0c0;
+  background: #e8e8e8;
   flex-shrink: 0;
   word-wrap: break-word;
   word-break: break-all;
   overflow-wrap: break-word;
   hyphens: auto;
-  padding: 4px;
-  box-sizing: border-box;
   line-height: 1.2;
+}
+
+.silo-l-select {
+  width: 90%;
+  margin: 4px auto;
+  padding: 2px;
+  font-size: 10px;
+  border: 1px solid #c0c0c0;
+  border-radius: 3px;
+  background: white;
+  display: block;
+}
+
+.silo-l-path-input {
+  width: 90%;
+  margin: 4px auto;
+  padding: 4px;
+  font-size: 10px;
+  border: 1px solid #c0c0c0;
+  border-radius: 3px;
+  background: white;
+  display: block;
+  font-family: monospace;
+}
+
+.silo-l-path-input:focus {
+  outline: none;
+  border-color: #007AFF;
+}
+
+.silo-l-add-btn {
+  width: 90%;
+  margin: 4px auto;
+  padding: 4px;
+  font-size: 10px;
+  border: 1px solid #c0c0c0;
+  border-radius: 3px;
+  background: #007AFF;
+  color: white;
+  cursor: pointer;
+  display: block;
+  transition: all 0.2s;
+}
+
+.silo-l-add-btn:hover:not(:disabled) {
+  background: #0051D5;
+}
+
+.silo-l-add-btn:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  border-color: #ccc;
+}
+
+.silo-l-content {
+  flex: 1;
+  overflow-y: auto;
+  background: #f0f0f0;
+  padding: 4px;
+}
+
+.silo-l-stream-item {
+  padding: 6px 4px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background 0.2s;
+  word-wrap: break-word;
+  word-break: break-all;
+  line-height: 1.1;
+}
+
+.silo-l-stream-item:hover {
+  background: #e0e0e0;
+}
+
+.silo-l-stream-item:last-child {
+  border-bottom: none;
+}
+
+.silo-l-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  width: 4px;
+  height: 100%;
+  background: transparent;
+  cursor: col-resize;
+  z-index: 10;
+  transition: background-color 0.2s;
+}
+
+.silo-l-resize-handle:hover {
+  background: #007AFF;
+}
+
+.silo-l-resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -2px;
+  right: -2px;
+  bottom: 0;
 }
 
 .silo-m {

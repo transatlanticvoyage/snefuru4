@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeFinderView();
   initializeStreamManagement();
   initializeFinderResize();
+  initializeSiloLResize();
+  initializeSiloLStreamSelect();
   await initializeCloudStorage();
   await loadConfiguration();
 });
@@ -406,7 +408,7 @@ async function navigateToFolder(folderPath, addToHistory = true) {
     // Add to recent paths
     if (!recentPaths.includes(folderPath)) {
       recentPaths.unshift(folderPath);
-      recentPaths = recentPaths.slice(0, 5);
+      recentPaths = recentPaths.slice(0, 12);
       updateRecentPaths();
     }
   }
@@ -834,5 +836,128 @@ function initializeFinderResize() {
   // Handle double-click to auto-resize
   resizeHandle.addEventListener('dblclick', () => {
     finderPreview.style.width = '300px'; // Reset to default width
+  });
+}
+
+function initializeSiloLResize() {
+  const resizeHandle = document.getElementById('silo-l-resize-handle');
+  const siloL = document.getElementById('silo-l');
+  let isResizing = false;
+  let startX = 0;
+  let startWidth = 0;
+  
+  resizeHandle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    startX = e.clientX;
+    startWidth = siloL.offsetWidth;
+    
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    
+    e.preventDefault();
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    
+    const deltaX = e.clientX - startX;
+    const newWidth = Math.max(100, Math.min(400, startWidth + deltaX));
+    
+    siloL.style.width = newWidth + 'px';
+  });
+  
+  document.addEventListener('mouseup', () => {
+    if (isResizing) {
+      isResizing = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+  });
+  
+  // Handle double-click to reset to default width
+  resizeHandle.addEventListener('dblclick', () => {
+    siloL.style.width = '200px';
+  });
+}
+
+function initializeSiloLStreamSelect() {
+  const streamSelect = document.getElementById('silo-l-stream-select');
+  const siloLContent = document.getElementById('silo-l-content');
+  const addBtn = document.getElementById('silo-l-add-btn');
+  const pathInput = document.getElementById('silo-l-path-input');
+  
+  streamSelect.addEventListener('change', (e) => {
+    const selectedStreamId = e.target.value;
+    if (selectedStreamId && streamData[selectedStreamId]) {
+      renderSiloLStreamItems(selectedStreamId);
+      addBtn.disabled = false; // Enable button when stream is selected
+    } else {
+      siloLContent.innerHTML = '';
+      addBtn.disabled = true; // Disable button when no stream selected
+    }
+  });
+  
+  // Handle add to stream button click
+  addBtn.addEventListener('click', async () => {
+    const selectedStreamId = streamSelect.value;
+    const folderPath = pathInput.value.trim();
+    
+    if (!selectedStreamId || !folderPath) return;
+    
+    // Validate that the path exists
+    try {
+      const pathExists = await window.electronAPI.checkPathExists(folderPath);
+      if (!pathExists) {
+        alert('The specified path does not exist. Please check the path and try again.');
+        return;
+      }
+      
+      // Add to stream
+      addFolderToStream(selectedStreamId, folderPath);
+      await saveConfiguration();
+      
+      // Refresh the stream items display
+      renderSiloLStreamItems(selectedStreamId);
+      
+      // Clear the input and show success feedback
+      pathInput.value = '';
+      const originalText = addBtn.textContent;
+      addBtn.textContent = 'Added!';
+      addBtn.style.background = '#28a745';
+      
+      setTimeout(() => {
+        addBtn.textContent = originalText;
+        addBtn.style.background = '#007AFF';
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error adding path to stream:', error);
+      alert('Error adding path to stream. Please try again.');
+    }
+  });
+}
+
+function renderSiloLStreamItems(streamId) {
+  const siloLContent = document.getElementById('silo-l-content');
+  siloLContent.innerHTML = '';
+  
+  if (!streamData[streamId] || streamData[streamId].length === 0) {
+    siloLContent.innerHTML = '<div style="padding: 8px; font-size: 10px; color: #666;">No items in this stream</div>';
+    return;
+  }
+  
+  streamData[streamId].forEach(folderPath => {
+    const folderName = folderPath.split('/').pop() || folderPath;
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'silo-l-stream-item';
+    itemDiv.textContent = folderName;
+    itemDiv.title = folderPath; // Show full path on hover
+    
+    itemDiv.addEventListener('click', () => {
+      // Navigate to the folder in the finder view
+      navigateToFolder(folderPath);
+    });
+    
+    siloLContent.appendChild(itemDiv);
   });
 }
