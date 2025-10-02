@@ -1,0 +1,30 @@
+{
+  "name": "pavilion",
+  "version": "1.0.0",
+  "description": "A multi-sidebar file manager for macOS",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "package": "electron-packager . Pavilion --platform=darwin --arch=x64 --out=dist/ --overwrite",
+    "build": "electron-builder"
+  },
+  "author": "Kyle Campbell",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4",
+    "electron-packager": "^17.1.1"
+  },
+  "build": {
+    "appId": "com.pavilion.app",
+    "productName": "Pavilion",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.icns"
+    }
+  }
+}

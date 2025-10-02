@@ -1,0 +1,296 @@
+const { app, BrowserWindow, ipcMain, dialog, Menu, shell } = require('electron');
+const path = require('path');
+const fs = require('fs');
+
+let mainWindow;
+let userDataPath;
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1400,
+    height: 900,
+    minWidth: 1200,
+    minHeight: 600,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
+    },
+    titleBarStyle: 'hiddenInset',
+    backgroundColor: '#f5f5f5',
+    icon: path.join(__dirname, 'assets/icon.png')
+  });
+
+  mainWindow.loadFile('index.html');
+
+  if (process.argv.includes('--dev')) {
+    mainWindow.webContents.openDevTools();
+  }
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+}
+
+app.whenReady().then(() => {
+  userDataPath = path.join(app.getPath('userData'), 'pavilion-config.json');
+  
+  // Set dock icon for development
+  if (process.platform === 'darwin') {
+    const iconPath = path.join(__dirname, 'assets/icon.png');
+    try {
+      app.dock.setIcon(iconPath);
+    } catch (error) {
+      console.log('Could not set dock icon:', error.message);
+    }
+  }
+  
+  createWindow();
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+});
+
+app.on('window-all-closed', () => {
+  // Quit app completely when window closes (even on macOS)
+  app.quit();
+});
+
+ipcMain.handle('select-folder', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory', 'multiSelections']
+  });
+  
+  if (!result.canceled) {
+    return result.filePaths;
+  }
+  return null;
+});
+
+ipcMain.handle('get-folder-contents', async (event, folderPath) => {
+  try {
+    const items = await fs.promises.readdir(folderPath, { withFileTypes: true });
+    return items
+      .filter(item => item.isDirectory())
+      .map(item => ({
+        name: item.name,
+        path: path.join(folderPath, item.name)
+      }));
+  } catch (error) {
+    console.error('Error reading folder:', error);
+    return [];
+  }
+});
+
+ipcMain.handle('open-in-finder', async (event, folderPath) => {
+  shell.showItemInFolder(folderPath);
+});
+
+ipcMain.handle('open-folder', async (event, folderPath) => {
+  shell.openPath(folderPath);
+});
+
+ipcMain.handle('save-config', async (event, config) => {
+  try {
+    await fs.promises.writeFile(userDataPath, JSON.stringify(config, null, 2));
+    return true;
+  } catch (error) {
+    console.error('Error saving config:', error);
+    return false;
+  }
+});
+
+ipcMain.handle('load-config', async () => {
+  try {
+    if (fs.existsSync(userDataPath)) {
+      const data = await fs.promises.readFile(userDataPath, 'utf-8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error('Error loading config:', error);
+  }
+  return null;
+});
+
+ipcMain.handle('remove-folder', async (event, { sidebarId, folderPath }) => {
+  return true;
+});
+
+ipcMain.handle('get-folder-info', async (event, folderPath) => {
+  try {
+    const stats = await fs.promises.stat(folderPath);
+    const items = await fs.promises.readdir(folderPath);
+    return {
+      itemCount: items.length,
+      modified: stats.mtime
+    };
+  } catch (error) {
+    console.error('Error getting folder info:', error);
+    return null;
+  }
+});
+
+ipcMain.handle('get-downloads-path', async () => {
+  return app.getPath('downloads');
+});
+
+ipcMain.handle('get-directory-contents', async (event, dirPath) => {
+  try {
+    const items = await fs.promises.readdir(dirPath, { withFileTypes: true });
+    const contents = await Promise.all(
+      items.map(async (item) => {
+        const itemPath = path.join(dirPath, item.name);
+        try {
+          const stats = await fs.promises.stat(itemPath);
+          return {
+            name: item.name,
+            path: itemPath,
+            isDirectory: item.isDirectory(),
+            size: stats.size,
+            modified: stats.mtime,
+            created: stats.birthtime
+          };
+        } catch (error) {
+          return {
+            name: item.name,
+            path: itemPath,
+            isDirectory: item.isDirectory(),
+            size: 0,
+            modified: new Date(),
+            created: new Date()
+          };
+        }
+      })
+    );
+    
+    contents.sort((a, b) => {
+      if (a.isDirectory === b.isDirectory) {
+        return a.name.localeCompare(b.name);
+      }
+      return a.isDirectory ? -1 : 1;
+    });
+    
+    return contents;
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    return [];
+  }
+});
+
+ipcMain.handle('get-file-info', async (event, filePath) => {
+  try {
+    const stats = await fs.promises.stat(filePath);
+    return {
+      size: stats.size,
+      modified: stats.mtime,
+      created: stats.birthtime,
+      isDirectory: stats.isDirectory()
+    };
+  } catch (error) {
+    console.error('Error getting file info:', error);
+    return null;
+  }
+});
+
+ipcMain.handle('open-file', async (event, filePath) => {
+  shell.openPath(filePath);
+});
+
+ipcMain.handle('get-special-path', async (event, pathType) => {
+  const homePath = app.getPath('home');
+  
+  switch(pathType) {
+    case 'home':
+      return homePath;
+    case 'desktop':
+      return app.getPath('desktop');
+    case 'documents':
+      return app.getPath('documents');
+    case 'downloads':
+      return app.getPath('downloads');
+    case 'applications':
+      return '/Applications';
+    case 'dropbox':
+      return path.join(homePath, 'Dropbox');
+    case 'google-drive':
+      return path.join(homePath, 'Google Drive');
+    case 'onedrive':
+      return path.join(homePath, 'OneDrive');
+    case 'icloud':
+      return path.join(homePath, 'Library/Mobile Documents/com~apple~CloudDocs');
+    default:
+      return homePath;
+  }
+});
+
+ipcMain.handle('create-folder', async (event, parentPath, folderName) => {
+  try {
+    const newPath = path.join(parentPath, folderName);
+    await fs.promises.mkdir(newPath);
+    return { success: true, path: newPath };
+  } catch (error) {
+    console.error('Error creating folder:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('delete-file', async (event, filePath) => {
+  try {
+    const stats = await fs.promises.stat(filePath);
+    if (stats.isDirectory()) {
+      await fs.promises.rmdir(filePath, { recursive: true });
+    } else {
+      await fs.promises.unlink(filePath);
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('confirm-delete', async (event, count) => {
+  const result = await dialog.showMessageBox(mainWindow, {
+    type: 'warning',
+    buttons: ['Delete', 'Cancel'],
+    defaultId: 1,
+    message: `Are you sure you want to delete ${count} item${count > 1 ? 's' : ''}?`,
+    detail: 'This action cannot be undone.'
+  });
+  return result.response === 0;
+});
+
+ipcMain.handle('check-path-exists', async (event, pathToCheck) => {
+  try {
+    await fs.promises.access(pathToCheck);
+    return true;
+  } catch (error) {
+    return false;
+  }
+});
+
+ipcMain.handle('get-available-cloud-storage', async () => {
+  const homePath = app.getPath('home');
+  const cloudServices = [
+    { id: 'dropbox', name: '📦 Dropbox', path: path.join(homePath, 'Dropbox') },
+    { id: 'google-drive', name: '🔵 Google Drive', path: path.join(homePath, 'Google Drive') },
+    { id: 'onedrive', name: '☁️ OneDrive', path: path.join(homePath, 'OneDrive') },
+    { id: 'icloud', name: '☁️ iCloud Drive', path: path.join(homePath, 'Library/Mobile Documents/com~apple~CloudDocs') }
+  ];
+  
+  const availableServices = [];
+  
+  for (const service of cloudServices) {
+    try {
+      await fs.promises.access(service.path);
+      availableServices.push(service);
+    } catch (error) {
+      // Service not available, skip it
+    }
+  }
+  
+  return availableServices;
+});

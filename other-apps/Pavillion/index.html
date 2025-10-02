@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pavilion</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="tab-bar">
+      <div class="app-title">Pavilion</div>
+      <div class="tabs">
+        <button class="tab-button active" data-group="1">Sidebars 1-5</button>
+        <button class="tab-button" data-group="2">Sidebars 6-10</button>
+        <button class="tab-button" data-group="finder">Finder-like View</button>
+      </div>
+      <div class="tab-actions">
+        <button id="add-folder-btn" class="action-button">+ Add Folder</button>
+      </div>
+    </div>
+
+    <div class="sidebars-container">
+      <div class="sidebar-group active" id="group-1">
+        <div class="sidebar" data-sidebar-id="1">
+          <div class="sidebar-header">
+            <h3>Sidebar 1</h3>
+            <button class="sidebar-menu-btn">⋮</button>
+          </div>
+          <div class="sidebar-content">
+            <div class="drop-zone">
+              <p>Drop folders here or click + to add</p>
+            </div>
+            <ul class="folder-list"></ul>
+          </div>
+        </div>
+
+        <div class="sidebar" data-sidebar-id="2">
+          <div class="sidebar-header">
+            <h3>Sidebar 2</h3>
+            <button class="sidebar-menu-btn">⋮</button>
+          </div>
+          <div class="sidebar-content">
+            <div class="drop-zone">
+              <p>Drop folders here or click + to add</p>
+            </div>
+            <ul class="folder-list"></ul>
+          </div>
+        </div>
+
+        <div class="sidebar" data-sidebar-id="3">
+          <div class="sidebar-header">
+            <h3>Sidebar 3</h3>
+            <button class="sidebar-menu-btn">⋮</button>
+          </div>
+          <div class="sidebar-content">
+            <div class="drop-zone">
+              <p>Drop folders here or click + to add</p>
+            </div>
+            <ul class="folder-list"></ul>
+          </div>
+        </div>
+
+        <div class="sidebar" data-sidebar-id="4">
+          <div class="sidebar-header">
+            <h3>Sidebar 4</h3>
+            <button class="sidebar-menu-btn">⋮</button>
+          </div>
+          <div class="sidebar-content">
+            <div class="drop-zone">
+              <p>Drop folders here or click + to add</p>
+            </div>
+            <ul class="folder-list"></ul>
+          </div>
+        </div>
+
+        <div class="sidebar" data-sidebar-id="5">
+          <div class="sidebar-header">
+            <h3>Sidebar 5</h3>
+            <button class="sidebar-menu-btn">⋮</button>
+          </div>
+          <div class="sidebar-content">
+            <div class="drop-zone">
+              <p>Drop folders here or click + to add</p>
+            </div>
+            <ul class="folder-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-group" id="group-2">
+        <div class="sidebar" data-sidebar-id="6">
+          <div class="sidebar-header">
+            <h3>Sidebar 6</h3>
+            <button class="sidebar-menu-btn">⋮</button>
+          </div>
+          <div class="sidebar-content">
+            <div class="drop-zone">
+              <p>Drop folders here or click + to add</p>
+            </div>
+            <ul class="folder-list"></ul>
+          </div>
+        </div>
+
+        <div class="sidebar" data-sidebar-id="7">
+          <div class="sidebar-header">
+            <h3>Sidebar 7</h3>
+            <button class="sidebar-menu-btn">⋮</button>
+          </div>
+          <div class="sidebar-content">
+            <div class="drop-zone">
+              <p>Drop folders here or click + to add</p>
+            </div>
+            <ul class="folder-list"></ul>
+          </div>
+        </div>
+
+        <div class="sidebar" data-sidebar-id="8">
+          <div class="sidebar-header">
+            <h3>Sidebar 8</h3>
+            <button class="sidebar-menu-btn">⋮</button>
+          </div>
+          <div class="sidebar-content">
+            <div class="drop-zone">
+              <p>Drop folders here or click + to add</p>
+            </div>
+            <ul class="folder-list"></ul>
+          </div>
+        </div>
+
+        <div class="sidebar" data-sidebar-id="9">
+          <div class="sidebar-header">
+            <h3>Sidebar 9</h3>
+            <button class="sidebar-menu-btn">⋮</button>
+          </div>
+          <div class="sidebar-content">
+            <div class="drop-zone">
+              <p>Drop folders here or click + to add</p>
+            </div>
+            <ul class="folder-list"></ul>
+          </div>
+        </div>
+
+        <div class="sidebar" data-sidebar-id="10">
+          <div class="sidebar-header">
+            <h3>Sidebar 10</h3>
+            <button class="sidebar-menu-btn">⋮</button>
+          </div>
+          <div class="sidebar-content">
+            <div class="drop-zone">
+              <p>Drop folders here or click + to add</p>
+            </div>
+            <ul class="folder-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-group" id="group-finder">
+        <div class="finder-container">
+          <div class="finder-toolbar">
+            <div class="finder-nav-buttons">
+              <button id="finder-back" class="finder-nav-btn" disabled title="Back">‹</button>
+              <button id="finder-forward" class="finder-nav-btn" disabled title="Forward">›</button>
+            </div>
+            
+            <div class="finder-quick-access">
+              <button class="finder-quick-btn" data-path="home" title="Home">🏠</button>
+              <button class="finder-quick-btn" data-path="desktop" title="Desktop">🖥</button>
+              <button class="finder-quick-btn" data-path="documents" title="Documents">📄</button>
+              <button class="finder-quick-btn" data-path="downloads" title="Downloads">⬇</button>
+            </div>
+            
+            <div class="finder-path-bar">
+              <div id="finder-breadcrumb" class="breadcrumb-nav"></div>
+            </div>
+            
+            <div class="finder-search-box">
+              <input type="text" id="finder-search" placeholder="Search" class="finder-search-input">
+            </div>
+            
+            <div class="finder-actions">
+              <button id="finder-new-folder" class="finder-action-btn" title="New Folder">📁+</button>
+              <button id="finder-delete" class="finder-action-btn" disabled title="Delete">🗑</button>
+            </div>
+            
+            <div class="finder-sort-options">
+              <select id="finder-sort" class="finder-sort-select">
+                <option value="name">Name</option>
+                <option value="date">Date Modified</option>
+                <option value="size">Size</option>
+                <option value="kind">Kind</option>
+              </select>
+            </div>
+            
+            <div class="finder-view-buttons">
+              <button class="finder-view-btn active" data-view="column" title="Column View">⊞</button>
+              <button class="finder-view-btn" data-view="list" title="List View">☰</button>
+              <button class="finder-view-btn" data-view="icon" title="Icon View">⊡</button>
+            </div>
+          </div>
+          <div class="finder-sidebar">
+            <div class="finder-sidebar-section">
+              <div class="sidebar-section-title">Favorites</div>
+              <div class="sidebar-favorites">
+                <div class="sidebar-item" data-path="home">🏠 Home</div>
+                <div class="sidebar-item" data-path="desktop">🖥 Desktop</div>
+                <div class="sidebar-item" data-path="documents">📄 Documents</div>
+                <div class="sidebar-item" data-path="downloads">⬇ Downloads</div>
+                <div class="sidebar-item" data-path="applications">📱 Applications</div>
+              </div>
+            </div>
+            <div class="finder-sidebar-section" id="cloud-storage-section">
+              <div class="sidebar-section-title">Cloud Storage</div>
+              <div class="sidebar-cloud-storage" id="sidebar-cloud-storage">
+              </div>
+            </div>
+            <div class="finder-sidebar-section">
+              <div class="sidebar-section-title">Recents</div>
+              <div class="sidebar-recents" id="sidebar-recents">
+              </div>
+            </div>
+          </div>
+          
+          <div class="finder-columns-container">
+            <div class="finder-columns" id="finder-columns">
+            </div>
+            <div class="finder-preview" id="finder-preview">
+              <div class="preview-content">
+                <div class="preview-icon"></div>
+                <div class="preview-name"></div>
+                <div class="preview-details"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="context-menu" id="folder-context-menu">
+    <div class="context-menu-item" data-action="open">Open</div>
+    <div class="context-menu-item" data-action="reveal">Reveal in Finder</div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item" data-action="remove">Remove from Sidebar</div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
