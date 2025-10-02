@@ -14,41 +14,41 @@
     <div class="tab-bar">
       <div class="app-title">Pavilion</div>
       <div class="tabs">
-        <button class="tab-button active" data-group="1">Sidebars 1-5</button>
-        <button class="tab-button" data-group="2">Sidebars 6-10</button>
+        <button class="tab-button active" data-group="1">Streams 1-5</button>
+        <button class="tab-button" data-group="2">Streams 6-10</button>
         <button class="tab-button" data-group="finder">Finder-like View</button>
       </div>
       <div class="tab-actions">
         <button id="add-folder-btn" class="action-button">+ Add Folder</button>
         
-        <div class="sidebar-management" id="sidebar-management" style="display: none;">
-          <select id="sidebar-select" class="sidebar-select">
-            <option value="">Select Sidebar</option>
-            <option value="1">Sidebar 1</option>
-            <option value="2">Sidebar 2</option>
-            <option value="3">Sidebar 3</option>
-            <option value="4">Sidebar 4</option>
-            <option value="5">Sidebar 5</option>
-            <option value="6">Sidebar 6</option>
-            <option value="7">Sidebar 7</option>
-            <option value="8">Sidebar 8</option>
-            <option value="9">Sidebar 9</option>
-            <option value="10">Sidebar 10</option>
+        <div class="stream-management" id="stream-management" style="display: none;">
+          <select id="stream-select" class="stream-select">
+            <option value="">Select Stream</option>
+            <option value="1">Stream 1</option>
+            <option value="2">Stream 2</option>
+            <option value="3">Stream 3</option>
+            <option value="4">Stream 4</option>
+            <option value="5">Stream 5</option>
+            <option value="6">Stream 6</option>
+            <option value="7">Stream 7</option>
+            <option value="8">Stream 8</option>
+            <option value="9">Stream 9</option>
+            <option value="10">Stream 10</option>
           </select>
           
-          <button id="add-to-sidebar-btn" class="action-button" disabled>Add Selected Folder To Sidebar</button>
+          <button id="add-to-stream-btn" class="action-button" disabled>Add Selected Folder To Stream</button>
         </div>
       </div>
     </div>
 
-    <div class="sidebars-container">
-      <div class="sidebar-group active" id="group-1">
-        <div class="sidebar" data-sidebar-id="1">
-          <div class="sidebar-header">
-            <h3>Sidebar 1</h3>
-            <button class="sidebar-menu-btn">⋮</button>
+    <div class="streams-container">
+      <div class="stream-group active" id="group-1">
+        <div class="stream" data-stream-id="1">
+          <div class="stream-header">
+            <h3>Stream 1</h3>
+            <button class="stream-menu-btn">⋮</button>
           </div>
-          <div class="sidebar-content">
+          <div class="stream-content">
             <div class="drop-zone">
               <p>Drop folders here or click + to add</p>
             </div>
@@ -56,12 +56,12 @@
           </div>
         </div>
 
-        <div class="sidebar" data-sidebar-id="2">
-          <div class="sidebar-header">
-            <h3>Sidebar 2</h3>
-            <button class="sidebar-menu-btn">⋮</button>
+        <div class="stream" data-stream-id="2">
+          <div class="stream-header">
+            <h3>Stream 2</h3>
+            <button class="stream-menu-btn">⋮</button>
           </div>
-          <div class="sidebar-content">
+          <div class="stream-content">
             <div class="drop-zone">
               <p>Drop folders here or click + to add</p>
             </div>
@@ -69,12 +69,12 @@
           </div>
         </div>
 
-        <div class="sidebar" data-sidebar-id="3">
-          <div class="sidebar-header">
-            <h3>Sidebar 3</h3>
-            <button class="sidebar-menu-btn">⋮</button>
+        <div class="stream" data-stream-id="3">
+          <div class="stream-header">
+            <h3>Stream 3</h3>
+            <button class="stream-menu-btn">⋮</button>
           </div>
-          <div class="sidebar-content">
+          <div class="stream-content">
             <div class="drop-zone">
               <p>Drop folders here or click + to add</p>
             </div>
@@ -82,12 +82,12 @@
           </div>
         </div>
 
-        <div class="sidebar" data-sidebar-id="4">
-          <div class="sidebar-header">
-            <h3>Sidebar 4</h3>
-            <button class="sidebar-menu-btn">⋮</button>
+        <div class="stream" data-stream-id="4">
+          <div class="stream-header">
+            <h3>Stream 4</h3>
+            <button class="stream-menu-btn">⋮</button>
           </div>
-          <div class="sidebar-content">
+          <div class="stream-content">
             <div class="drop-zone">
               <p>Drop folders here or click + to add</p>
             </div>
@@ -95,12 +95,12 @@
           </div>
         </div>
 
-        <div class="sidebar" data-sidebar-id="5">
-          <div class="sidebar-header">
-            <h3>Sidebar 5</h3>
-            <button class="sidebar-menu-btn">⋮</button>
+        <div class="stream" data-stream-id="5">
+          <div class="stream-header">
+            <h3>Stream 5</h3>
+            <button class="stream-menu-btn">⋮</button>
           </div>
-          <div class="sidebar-content">
+          <div class="stream-content">
             <div class="drop-zone">
               <p>Drop folders here or click + to add</p>
             </div>
@@ -109,13 +109,13 @@
         </div>
       </div>
 
-      <div class="sidebar-group" id="group-2">
-        <div class="sidebar" data-sidebar-id="6">
-          <div class="sidebar-header">
-            <h3>Sidebar 6</h3>
-            <button class="sidebar-menu-btn">⋮</button>
+      <div class="stream-group" id="group-2">
+        <div class="stream" data-stream-id="6">
+          <div class="stream-header">
+            <h3>Stream 6</h3>
+            <button class="stream-menu-btn">⋮</button>
           </div>
-          <div class="sidebar-content">
+          <div class="stream-content">
             <div class="drop-zone">
               <p>Drop folders here or click + to add</p>
             </div>
@@ -123,12 +123,12 @@
           </div>
         </div>
 
-        <div class="sidebar" data-sidebar-id="7">
-          <div class="sidebar-header">
-            <h3>Sidebar 7</h3>
-            <button class="sidebar-menu-btn">⋮</button>
+        <div class="stream" data-stream-id="7">
+          <div class="stream-header">
+            <h3>Stream 7</h3>
+            <button class="stream-menu-btn">⋮</button>
           </div>
-          <div class="sidebar-content">
+          <div class="stream-content">
             <div class="drop-zone">
               <p>Drop folders here or click + to add</p>
             </div>
@@ -136,12 +136,12 @@
           </div>
         </div>
 
-        <div class="sidebar" data-sidebar-id="8">
-          <div class="sidebar-header">
-            <h3>Sidebar 8</h3>
-            <button class="sidebar-menu-btn">⋮</button>
+        <div class="stream" data-stream-id="8">
+          <div class="stream-header">
+            <h3>Stream 8</h3>
+            <button class="stream-menu-btn">⋮</button>
           </div>
-          <div class="sidebar-content">
+          <div class="stream-content">
             <div class="drop-zone">
               <p>Drop folders here or click + to add</p>
             </div>
@@ -149,12 +149,12 @@
           </div>
         </div>
 
-        <div class="sidebar" data-sidebar-id="9">
-          <div class="sidebar-header">
-            <h3>Sidebar 9</h3>
-            <button class="sidebar-menu-btn">⋮</button>
+        <div class="stream" data-stream-id="9">
+          <div class="stream-header">
+            <h3>Stream 9</h3>
+            <button class="stream-menu-btn">⋮</button>
           </div>
-          <div class="sidebar-content">
+          <div class="stream-content">
             <div class="drop-zone">
               <p>Drop folders here or click + to add</p>
             </div>
@@ -162,12 +162,12 @@
           </div>
         </div>
 
-        <div class="sidebar" data-sidebar-id="10">
-          <div class="sidebar-header">
-            <h3>Sidebar 10</h3>
-            <button class="sidebar-menu-btn">⋮</button>
+        <div class="stream" data-stream-id="10">
+          <div class="stream-header">
+            <h3>Stream 10</h3>
+            <button class="stream-menu-btn">⋮</button>
           </div>
-          <div class="sidebar-content">
+          <div class="stream-content">
             <div class="drop-zone">
               <p>Drop folders here or click + to add</p>
             </div>
@@ -243,6 +243,7 @@
           </div>
           
           <div class="finder-columns-container">
+            <div class="silo-k">silo k</div>
             <div class="finder-columns" id="finder-columns">
             </div>
             <div class="finder-resize-handle" id="finder-resize-handle"></div>
