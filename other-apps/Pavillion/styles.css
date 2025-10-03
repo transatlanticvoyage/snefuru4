@@ -700,7 +700,7 @@ body {
   width: 90%;
   margin: 4px auto;
   padding: 2px;
-  font-size: 10px;
+  font-size: 16px;
   border: 1px solid #c0c0c0;
   border-radius: 3px;
   background: white;
@@ -711,7 +711,7 @@ body {
   width: 90%;
   margin: 4px auto;
   padding: 4px;
-  font-size: 10px;
+  font-size: 16px;
   border: 1px solid #c0c0c0;
   border-radius: 3px;
   background: white;
@@ -728,7 +728,7 @@ body {
   width: 90%;
   margin: 4px auto;
   padding: 4px;
-  font-size: 10px;
+  font-size: 16px;
   border: 1px solid #c0c0c0;
   border-radius: 3px;
   background: #007AFF;
@@ -752,29 +752,11 @@ body {
 .silo-l-content {
   flex: 1;
   overflow-y: auto;
-  background: #f0f0f0;
-  padding: 4px;
+  background: white;
+  padding: 0;
 }
 
-.silo-l-stream-item {
-  padding: 6px 4px;
-  cursor: pointer;
-  font-size: 11px;
-  color: #333;
-  border-bottom: 1px solid #e0e0e0;
-  transition: background 0.2s;
-  word-wrap: break-word;
-  word-break: break-all;
-  line-height: 1.1;
-}
-
-.silo-l-stream-item:hover {
-  background: #e0e0e0;
-}
-
-.silo-l-stream-item:last-child {
-  border-bottom: none;
-}
+/* Old styling removed - using finder-style below */
 
 .silo-l-resize-handle {
   position: absolute;
@@ -983,4 +965,66 @@ body {
   display: inline-block;
   width: 80px;
   color: #333;
+}
+
+/* Silo L Stream Item Styling (based on finder-item) */
+.silo-l-stream-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid transparent;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.silo-l-stream-item:hover {
+  background: #f0f0f0;
+}
+
+.silo-l-stream-item.selected {
+  background: #007AFF;
+  color: white;
+}
+
+.silo-l-item-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.silo-l-stream-item.folder .silo-l-item-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23007AFF" viewBox="0 0 24 24"><path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/></svg>') center/contain no-repeat;
+}
+
+.silo-l-stream-item.folder.selected .silo-l-item-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/></svg>') center/contain no-repeat;
+}
+
+.silo-l-stream-item.file .silo-l-item-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23666" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,9V3.5L18.5,9H13Z"/></svg>') center/contain no-repeat;
+}
+
+.silo-l-stream-item.file.selected .silo-l-item-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,9V3.5L18.5,9H13Z"/></svg>') center/contain no-repeat;
+}
+
+.silo-l-item-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.silo-l-stream-item.folder::after {
+  content: '▶';
+  margin-left: auto;
+  font-size: 10px;
+  color: #999;
+}
+
+.silo-l-stream-item.folder.selected::after {
+  color: white;
 }

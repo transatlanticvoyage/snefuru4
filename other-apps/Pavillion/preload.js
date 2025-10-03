@@ -18,5 +18,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   deleteFile: (filePath) => ipcRenderer.invoke('delete-file', filePath),
   confirmDelete: (count) => ipcRenderer.invoke('confirm-delete', count),
   checkPathExists: (pathToCheck) => ipcRenderer.invoke('check-path-exists', pathToCheck),
-  getAvailableCloudStorage: () => ipcRenderer.invoke('get-available-cloud-storage')
+  getAvailableCloudStorage: () => ipcRenderer.invoke('get-available-cloud-storage'),
+  copyFiles: (filePaths) => ipcRenderer.invoke('copy-files', filePaths),
+  pasteFiles: (destinationPath) => ipcRenderer.invoke('paste-files', destinationPath),
+  moveFiles: (filePaths, destinationPath) => ipcRenderer.invoke('move-files', filePaths, destinationPath)
 });

@@ -83,3 +83,4 @@ shiplavich-wp-sites/
 
 # But allow the specific grove plugin repository
 !shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/grove/
+*.xcuserstate

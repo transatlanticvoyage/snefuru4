@@ -294,3 +294,74 @@ ipcMain.handle('get-available-cloud-storage', async () => {
   
   return availableServices;
 });
+
+ipcMain.handle('copy-files', async (event, filePaths) => {
+  try {
+    const { spawn } = require('child_process');
+    const script = `
+      set filePaths to {${filePaths.map(p => `"${p}"`).join(', ')}}
+      set fileList to {}
+      repeat with filePath in filePaths
+        set fileList to fileList & (POSIX file filePath)
+      end repeat
+      set the clipboard to fileList
+    `;
+    
+    return new Promise((resolve) => {
+      const osascript = spawn('osascript', ['-e', script]);
+      osascript.on('close', (code) => {
+        resolve({ success: code === 0 });
+      });
+    });
+  } catch (error) {
+    console.error('Error copying files:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('paste-files', async (event, destinationPath) => {
+  try {
+    const { spawn } = require('child_process');
+    const script = `
+      set destinationPath to "${destinationPath}"
+      tell application "Finder"
+        duplicate (the clipboard) to POSIX file destinationPath
+      end tell
+    `;
+    
+    return new Promise((resolve) => {
+      const osascript = spawn('osascript', ['-e', script]);
+      osascript.on('close', (code) => {
+        resolve({ success: code === 0 });
+      });
+    });
+  } catch (error) {
+    console.error('Error pasting files:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('move-files', async (event, filePaths, destinationPath) => {
+  try {
+    const { spawn } = require('child_process');
+    const script = `
+      set filePaths to {${filePaths.map(p => `"${p}"`).join(', ')}}
+      set destinationPath to "${destinationPath}"
+      tell application "Finder"
+        repeat with filePath in filePaths
+          move (POSIX file filePath) to POSIX file destinationPath
+        end repeat
+      end tell
+    `;
+    
+    return new Promise((resolve) => {
+      const osascript = spawn('osascript', ['-e', script]);
+      osascript.on('close', (code) => {
+        resolve({ success: code === 0 });
+      });
+    });
+  } catch (error) {
+    console.error('Error moving files:', error);
+    return { success: false, error: error.message };
+  }
+});

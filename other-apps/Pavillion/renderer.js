@@ -11,6 +11,8 @@ let finderViewMode = 'column';
 let finderSearchTerm = '';
 let recentPaths = [];
 let currentSelectedFolderPath = null;
+let clipboardFiles = [];
+let clipboardOperation = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   initializeTabs();
@@ -22,6 +24,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeFinderResize();
   initializeSiloLResize();
   initializeSiloLStreamSelect();
+  initializeClipboardOperations();
+  initializeRefreshHandler();
   await initializeCloudStorage();
   await loadConfiguration();
 });
@@ -287,13 +291,59 @@ function removeFolderFromStream(streamId, folderPath) {
 }
 
 async function saveConfiguration() {
-  await window.electronAPI.saveConfig(streamData);
+  const config = {
+    streamData,
+    finderCurrentPath,
+    selectedSiloLStream: document.getElementById('silo-l-stream-select')?.value || '',
+    finderHistory: finderHistory.slice(-10), // Keep last 10 history items
+    finderHistoryIndex,
+    finderViewMode,
+    finderSortBy,
+    siloLWidth: document.getElementById('silo-l')?.style.width || '200px',
+    finderPreviewWidth: document.getElementById('finder-preview')?.style.width || '300px'
+  };
+  await window.electronAPI.saveConfig(config);
 }
 
 async function loadConfiguration() {
   const config = await window.electronAPI.loadConfig();
   if (config) {
-    streamData = config;
+    // Handle legacy config format (just streamData)
+    if (config.streamData) {
+      streamData = config.streamData;
+      finderCurrentPath = config.finderCurrentPath || '';
+      finderHistory = config.finderHistory || [];
+      finderHistoryIndex = config.finderHistoryIndex || -1;
+      finderViewMode = config.finderViewMode || 'column';
+      finderSortBy = config.finderSortBy || 'name';
+      
+      // Restore UI state
+      const siloLSelect = document.getElementById('silo-l-stream-select');
+      if (siloLSelect && config.selectedSiloLStream) {
+        siloLSelect.value = config.selectedSiloLStream;
+        handleSiloLStreamChange(config.selectedSiloLStream);
+      }
+      
+      // Restore panel widths
+      if (config.siloLWidth) {
+        const siloL = document.getElementById('silo-l');
+        if (siloL) siloL.style.width = config.siloLWidth;
+      }
+      
+      if (config.finderPreviewWidth) {
+        const finderPreview = document.getElementById('finder-preview');
+        if (finderPreview) finderPreview.style.width = config.finderPreviewWidth;
+      }
+      
+      // Restore finder current path if it exists
+      if (finderCurrentPath) {
+        setTimeout(() => navigateToFolder(finderCurrentPath), 100);
+      }
+    } else {
+      // Legacy format
+      streamData = config;
+    }
+    
     Object.keys(streamData).forEach(streamId => {
       renderStream(streamId);
     });
@@ -916,21 +966,8 @@ function initializeSiloLStreamSelect() {
   
   streamSelect.addEventListener('change', (e) => {
     const selectedStreamId = e.target.value;
-    if (selectedStreamId) {
-      // Enable button when any stream is selected (even empty ones)
-      addBtn.disabled = false;
-      
-      // Render items if stream has data, otherwise show empty state
-      if (streamData[selectedStreamId] && streamData[selectedStreamId].length > 0) {
-        renderSiloLStreamItems(selectedStreamId);
-      } else {
-        siloLContent.innerHTML = '<div style="padding: 8px; font-size: 10px; color: #666;">No items in this stream</div>';
-      }
-    } else {
-      // Disable button only when no stream is selected
-      siloLContent.innerHTML = '';
-      addBtn.disabled = true;
-    }
+    handleSiloLStreamChange(selectedStreamId);
+    saveConfiguration(); // Save state when stream selection changes
   });
   
   // Handle add to stream button click
@@ -955,7 +992,7 @@ function initializeSiloLStreamSelect() {
         await saveConfiguration();
         
         // Refresh the stream items display
-        renderSiloLStreamItems(selectedStreamId);
+        await renderSiloLStreamItems(selectedStreamId);
         
         // Clear the input and show success feedback
         pathInput.value = '';
@@ -987,27 +1024,192 @@ function initializeSiloLStreamSelect() {
   });
 }
 
-function renderSiloLStreamItems(streamId) {
+async function renderSiloLStreamItems(streamId) {
   const siloLContent = document.getElementById('silo-l-content');
   siloLContent.innerHTML = '';
   
   if (!streamData[streamId] || streamData[streamId].length === 0) {
-    siloLContent.innerHTML = '<div style="padding: 8px; font-size: 10px; color: #666;">No items in this stream</div>';
+    siloLContent.innerHTML = '<div style="padding: 8px; font-size: 16px; color: #666;">No items in this stream</div>';
     return;
   }
   
-  streamData[streamId].forEach(folderPath => {
-    const folderName = folderPath.split('/').pop() || folderPath;
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'silo-l-stream-item';
-    itemDiv.textContent = folderName;
-    itemDiv.title = folderPath; // Show full path on hover
+  for (const itemPath of streamData[streamId]) {
+    const itemName = itemPath.split('/').pop() || itemPath;
     
-    itemDiv.addEventListener('click', () => {
-      // Navigate to the folder in the finder view
-      navigateToFolder(folderPath);
+    // Check if item is a directory
+    let isDirectory = false;
+    try {
+      const fileInfo = await window.electronAPI.getFileInfo(itemPath);
+      isDirectory = fileInfo?.isDirectory || false;
+    } catch (error) {
+      // Default to folder if we can't determine type
+      isDirectory = true;
+    }
+    
+    const itemDiv = document.createElement('div');
+    itemDiv.className = `silo-l-stream-item ${isDirectory ? 'folder' : 'file'}`;
+    itemDiv.title = itemPath; // Show full path on hover
+    
+    // Create icon
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'silo-l-item-icon';
+    
+    // Create name span
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'silo-l-item-name';
+    nameSpan.textContent = itemName;
+    
+    itemDiv.appendChild(iconSpan);
+    itemDiv.appendChild(nameSpan);
+    
+    itemDiv.addEventListener('click', (e) => {
+      // Handle selection
+      const allItems = siloLContent.querySelectorAll('.silo-l-stream-item');
+      allItems.forEach(item => item.classList.remove('selected'));
+      itemDiv.classList.add('selected');
+      
+      // Navigate to the item in the finder view
+      navigateToFolder(itemPath);
     });
     
     siloLContent.appendChild(itemDiv);
+  }
+}
+
+function initializeClipboardOperations() {
+  document.addEventListener('keydown', async (event) => {
+    // Only handle shortcuts when in finder view
+    const finderGroup = document.getElementById('group-finder');
+    if (!finderGroup.classList.contains('active')) {
+      return;
+    }
+    
+    // Cmd+C (Copy)
+    if (event.metaKey && event.key === 'c' && finderSelectedFiles.size > 0) {
+      event.preventDefault();
+      await copySelectedFiles();
+    }
+    
+    // Cmd+V (Paste)
+    if (event.metaKey && event.key === 'v' && clipboardFiles.length > 0) {
+      event.preventDefault();
+      await pasteFiles();
+    }
+    
+    // Cmd+X (Cut)
+    if (event.metaKey && event.key === 'x' && finderSelectedFiles.size > 0) {
+      event.preventDefault();
+      await cutSelectedFiles();
+    }
+  });
+}
+
+async function copySelectedFiles() {
+  if (finderSelectedFiles.size === 0) return;
+  
+  const filePaths = Array.from(finderSelectedFiles);
+  clipboardFiles = filePaths;
+  clipboardOperation = 'copy';
+  
+  try {
+    const result = await window.electronAPI.copyFiles(filePaths);
+    if (result.success) {
+      console.log(`Copied ${filePaths.length} files to clipboard`);
+      // Visual feedback could be added here
+    }
+  } catch (error) {
+    console.error('Error copying files:', error);
+  }
+}
+
+async function cutSelectedFiles() {
+  if (finderSelectedFiles.size === 0) return;
+  
+  const filePaths = Array.from(finderSelectedFiles);
+  clipboardFiles = filePaths;
+  clipboardOperation = 'cut';
+  
+  try {
+    const result = await window.electronAPI.copyFiles(filePaths);
+    if (result.success) {
+      console.log(`Cut ${filePaths.length} files to clipboard`);
+      // Visual feedback - maybe dim the cut files
+      filePaths.forEach(path => {
+        const fileElement = document.querySelector(`[data-path="${path}"]`);
+        if (fileElement) {
+          fileElement.style.opacity = '0.5';
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error cutting files:', error);
+  }
+}
+
+async function pasteFiles() {
+  if (clipboardFiles.length === 0 || !finderCurrentPath) return;
+  
+  try {
+    let result;
+    if (clipboardOperation === 'cut') {
+      result = await window.electronAPI.moveFiles(clipboardFiles, finderCurrentPath);
+      if (result.success) {
+        // Clear cut files from display
+        clipboardFiles.forEach(path => {
+          const fileElement = document.querySelector(`[data-path="${path}"]`);
+          if (fileElement) {
+            fileElement.remove();
+          }
+        });
+        clipboardFiles = [];
+        clipboardOperation = null;
+      }
+    } else {
+      result = await window.electronAPI.pasteFiles(finderCurrentPath);
+    }
+    
+    if (result.success) {
+      console.log(`Pasted files to ${finderCurrentPath}`);
+      // Refresh the current directory view
+      await navigateToFolder(finderCurrentPath);
+    }
+  } catch (error) {
+    console.error('Error pasting files:', error);
+  }
+}
+
+async function handleSiloLStreamChange(selectedStreamId) {
+  const siloLContent = document.getElementById('silo-l-content');
+  const addBtn = document.getElementById('silo-l-add-btn');
+  
+  if (selectedStreamId) {
+    // Enable button when any stream is selected (even empty ones)
+    addBtn.disabled = false;
+    
+    // Render items if stream has data, otherwise show empty state
+    if (streamData[selectedStreamId] && streamData[selectedStreamId].length > 0) {
+      await renderSiloLStreamItems(selectedStreamId);
+    } else {
+      siloLContent.innerHTML = '<div style="padding: 8px; font-size: 16px; color: #666;">No items in this stream</div>';
+    }
+  } else {
+    // Disable button only when no stream is selected
+    siloLContent.innerHTML = '';
+    addBtn.disabled = true;
+  }
+}
+
+function initializeRefreshHandler() {
+  document.addEventListener('keydown', async (event) => {
+    // Cmd+R refresh
+    if (event.metaKey && event.key === 'r') {
+      event.preventDefault();
+      
+      // Save current state before refresh
+      await saveConfiguration();
+      
+      // Reload the page
+      window.location.reload();
+    }
   });
 }
