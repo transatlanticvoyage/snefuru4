@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Check for Gazebo file selection on startup
   checkForGazeboFileSelection();
+  
+  // Initialize Jupiter action buttons
+  initializeJupiterActions();
 });
 
 function initializeTabs() {
@@ -1261,7 +1264,10 @@ async function checkForGazeboFileSelection() {
   }
 }
 
-function updateJupiterFileDisplay(filePath) {
+async function updateJupiterFileDisplay(filePath) {
+  // Store the current file path for actions
+  currentSelectedFilePath = filePath;
+  
   const fileNameElement = document.getElementById('jupiter-file-name');
   const filePathElement = document.getElementById('jupiter-file-path');
   const fileIconElement = document.querySelector('.selected-file-display .file-icon');
@@ -1298,5 +1304,73 @@ function updateJupiterFileDisplay(filePath) {
       selectedFileDisplay.style.borderColor = '#007AFF';
       selectedFileDisplay.style.backgroundColor = '#f0f8ff';
     }
+    
+    // Check file status
+    await updateFileStatus(filePath);
+  }
+}
+
+async function updateFileStatus(filePath) {
+  const statusIndicator = document.getElementById('file-status-indicator');
+  const statusIcon = document.getElementById('status-icon');
+  const statusText = document.getElementById('status-text');
+  
+  if (!statusIndicator || !statusIcon || !statusText) return;
+  
+  // Show indicator and set checking state
+  statusIndicator.style.display = 'flex';
+  statusIcon.className = 'status-icon checking';
+  statusText.textContent = 'Checking file status...';
+  
+  try {
+    const status = await window.electronAPI.checkFileStatus(filePath);
+    
+    if (status.isOpen === true) {
+      statusIcon.className = 'status-icon open';
+      statusText.textContent = status.details;
+    } else if (status.isOpen === false) {
+      statusIcon.className = 'status-icon closed';
+      statusText.textContent = status.details;
+    } else {
+      statusIcon.className = 'status-icon checking';
+      statusText.textContent = status.details;
+    }
+  } catch (error) {
+    console.error('Error checking file status:', error);
+    statusIcon.className = 'status-icon checking';
+    statusText.textContent = 'Could not check file status';
+  }
+}
+
+let currentSelectedFilePath = null;
+
+function initializeJupiterActions() {
+  const openBtn = document.getElementById('jupiter-open-btn');
+  const showInFinderBtn = document.getElementById('jupiter-show-in-finder-btn');
+  
+  if (openBtn) {
+    openBtn.addEventListener('click', async () => {
+      if (currentSelectedFilePath) {
+        try {
+          await window.electronAPI.openFile(currentSelectedFilePath);
+          console.log('Opened file:', currentSelectedFilePath);
+        } catch (error) {
+          console.error('Error opening file:', error);
+        }
+      }
+    });
+  }
+  
+  if (showInFinderBtn) {
+    showInFinderBtn.addEventListener('click', async () => {
+      if (currentSelectedFilePath) {
+        try {
+          await window.electronAPI.openInFinder(currentSelectedFilePath);
+          console.log('Showed file in Finder:', currentSelectedFilePath);
+        } catch (error) {
+          console.error('Error showing file in Finder:', error);
+        }
+      }
+    });
   }
 }

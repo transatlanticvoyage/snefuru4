@@ -29,8 +29,40 @@
   border: 2px dashed #dee2e6;
   border-radius: 12px;
   padding: 30px;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   min-height: 120px;
+}
+
+.file-status-indicator {
+  display: flex;
+  align-items: center;
+  background: #f1f3f4;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.status-icon {
+  margin-right: 8px;
+  font-size: 12px;
+}
+
+.status-icon.open {
+  color: #dc3545; /* Red for open */
+}
+
+.status-icon.closed {
+  color: #28a745; /* Green for available */
+}
+
+.status-icon.checking {
+  color: #ffc107; /* Yellow for checking */
+}
+
+.status-text {
+  color: #333;
+  font-weight: 500;
 }
 
 .file-icon {

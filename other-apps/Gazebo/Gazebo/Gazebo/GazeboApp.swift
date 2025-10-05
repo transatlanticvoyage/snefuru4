@@ -26,17 +26,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var hotKeyRef: EventHotKeyRef?
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Hide the app window and run in background
-        NSApp.setActivationPolicy(.accessory)
+        // Keep normal dock icon (remove the .accessory policy)
+        // Just register the hotkey, keep the app visible
         
-        // Hide all windows
-        for window in NSApp.windows {
-            window.orderOut(nil)
-        }
-        
-        // Register global hotkey (Cmd+Control+J)
+        // Register global hotkey (Cmd+Control+K)
         registerGlobalHotkey()
-        NSLog("Gazebo: Global hotkey registered (Cmd+Control+J)")
+        NSLog("Gazebo: Global hotkey registered (Cmd+Control+K)")
     }
     
     func registerGlobalHotkey() {
@@ -55,7 +50,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         let hotKeyID = EventHotKeyID(signature: fourCharCodeFrom("GZBO"), id: 1)
-        let keyCode = UInt32(kVK_ANSI_J) // J key
+        let keyCode = UInt32(kVK_ANSI_K) // K key
         let modifiers = UInt32(cmdKey | controlKey)
         
         status = RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef)
@@ -78,8 +73,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             launchPavilionWithFile(filePath: selectedFile)
         } else {
             NSLog("Gazebo: No file selected in Finder")
-            // Still show alert for no selection, but only this case
-            showAlert(title: "No Selection", message: "Please select a file in Finder first, then use Cmd+Control+J")
+            showAlert(title: "No Selection", message: "Please select a file in Finder first, then use Cmd+Control+K")
         }
         
         return noErr
@@ -125,18 +119,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSLog("Gazebo: Failed to write temp file: %@", error.localizedDescription)
         }
         
-        // Launch Pavilion directly
-        let pavilionPath = "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/other-apps/Pavillion"
-        let task = Process()
-        task.currentDirectoryPath = pavilionPath
-        task.launchPath = "/usr/bin/open"
-        task.arguments = ["-a", "Terminal", "-n", pavilionPath]
+        // Launch Pavilion using AppleScript (more reliable)
+        let script = """
+        tell application "Terminal"
+            activate
+            do script "cd /Users/kylecampbell/Documents/repos/localrepo-snefuru4/other-apps/Pavillion && npm start"
+        end tell
+        """
         
-        do {
-            try task.run()
-            NSLog("Gazebo: Launched Pavilion")
-        } catch {
-            NSLog("Gazebo: Failed to launch Pavilion: %@", error.localizedDescription)
+        var error: NSDictionary?
+        if let scriptObject = NSAppleScript(source: script) {
+            let result = scriptObject.executeAndReturnError(&error)
+            if error == nil {
+                NSLog("Gazebo: Launched Pavilion successfully")
+            } else {
+                NSLog("Gazebo: Failed to launch Pavilion: %@", error?.description ?? "unknown error")
+            }
         }
     }
     

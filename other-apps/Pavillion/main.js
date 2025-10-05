@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu, shell, globalShortcut } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -49,6 +49,19 @@ app.whenReady().then(() => {
   }
   
   createWindow();
+  
+  // Register F9 global hotkey for Jupiter file selection
+  setTimeout(() => {
+    const success = globalShortcut.register('F9', () => {
+      handleJupiterHotkey();
+    });
+    
+    if (success) {
+      console.log('Global shortcut F9 registered successfully for Jupiter');
+    } else {
+      console.log('Failed to register global shortcut F9');
+    }
+  }, 1000);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -58,9 +71,54 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
+  // Unregister global shortcuts
+  globalShortcut.unregisterAll();
   // Quit app completely when window closes (even on macOS)
   app.quit();
 });
+
+function handleJupiterHotkey() {
+  console.log('Jupiter hotkey triggered!');
+  
+  // Get selected file from Finder using AppleScript
+  const { exec } = require('child_process');
+  const script = `
+    tell application "Finder"
+      try
+        set selectedItems to selection
+        if (count of selectedItems) > 0 then
+          set firstItem to item 1 of selectedItems
+          return POSIX path of (firstItem as alias)
+        else
+          return ""
+        end if
+      on error
+        return ""
+      end try
+    end tell
+  `;
+  
+  exec(`osascript -e '${script}'`, (error, stdout, stderr) => {
+    if (error) {
+      console.error('Error getting Finder selection:', error);
+      return;
+    }
+    
+    const filePath = stdout.trim();
+    if (filePath && mainWindow) {
+      console.log('Selected file:', filePath);
+      // Switch to Jupiter tab and set the file
+      mainWindow.webContents.send('jupiter-file-selected', filePath);
+      
+      // Bring Pavilion to front
+      mainWindow.show();
+      mainWindow.focus();
+      app.focus();
+    } else {
+      console.log('No file selected in Finder');
+    }
+  });
+}
 
 // Handle custom protocol (from Gazebo helper)
 app.on('open-url', (event, url) => {
@@ -400,5 +458,48 @@ ipcMain.handle('check-gazebo-temp-file', async () => {
   } catch (error) {
     console.error('Error reading Gazebo temp file:', error);
     return null;
+  }
+});
+
+ipcMain.handle('check-file-status', async (event, filePath) => {
+  try {
+    const { exec } = require('child_process');
+    const util = require('util');
+    const execAsync = util.promisify(exec);
+    
+    // Use lsof to check if file is open
+    const { stdout } = await execAsync(`lsof "${filePath}" 2>/dev/null || echo "NOT_OPEN"`);
+    
+    if (stdout.trim() === 'NOT_OPEN') {
+      return {
+        isOpen: false,
+        status: 'Available',
+        details: 'File is not currently open by any application'
+      };
+    } else {
+      // Parse lsof output to get application names
+      const lines = stdout.trim().split('\n');
+      const apps = new Set();
+      
+      for (let i = 1; i < lines.length; i++) { // Skip header line
+        const parts = lines[i].split(/\s+/);
+        if (parts[0] && parts[0] !== 'COMMAND') {
+          apps.add(parts[0]);
+        }
+      }
+      
+      return {
+        isOpen: true,
+        status: 'In Use',
+        details: `File is open in: ${Array.from(apps).join(', ')}`
+      };
+    }
+  } catch (error) {
+    console.error('Error checking file status:', error);
+    return {
+      isOpen: null,
+      status: 'Unknown',
+      details: 'Could not determine file status'
+    };
   }
 });
