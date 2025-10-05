@@ -2,13 +2,22 @@
 //  FinderSync.swift
 //  GazeboFinderExtension
 //
-//  Created by Kyle Campbell on 10/3/25.
+//  Created by Kyle Campbell on 10/5/25.
 //
 
 import Cocoa
 import FinderSync
 
 class FinderSync: FIFinderSync {
+    
+    private var menuIcon: NSImage? {
+        if let imagePath = Bundle.main.path(forResource: "gazebo_menu_icon", ofType: "png"),
+           let image = NSImage(contentsOfFile: imagePath) {
+            image.size = NSSize(width: 16, height: 16)
+            return image
+        }
+        return nil
+    }
     
     override init() {
         super.init()
@@ -22,11 +31,13 @@ class FinderSync: FIFinderSync {
     // MARK: - Primary Finder Sync protocol methods
     
     override func beginObservingDirectory(at url: URL) {
-        NSLog("Gazebo beginObservingDirectoryAtURL: %@", url.path as NSString)
+        // The user is now seeing the container's contents.
+        NSLog("Gazebo beginObservingDirectory: %@", url.path as NSString)
     }
     
     override func endObservingDirectory(at url: URL) {
-        NSLog("Gazebo endObservingDirectoryAtURL: %@", url.path as NSString)
+        // The user is no longer seeing the container's contents.
+        NSLog("Gazebo endObservingDirectory: %@", url.path as NSString)
     }
     
     // MARK: - Menu and toolbar item support
@@ -37,13 +48,19 @@ class FinderSync: FIFinderSync {
         switch menuKind {
         case .contextualMenuForItems:
             // This is the right-click menu on files/folders
-            let gazeboItem = NSMenuItem(title: "Gazebo Options", action: nil, keyEquivalent: "")
+            let gazeboItem = NSMenuItem(title: "GAZEBO OPTIONS", action: nil, keyEquivalent: "")
+            gazeboItem.image = menuIcon
             
             // Create submenu for future stream actions
-            let submenu = NSMenu(title: "Gazebo Options")
+            let submenu = NSMenu(title: "GAZEBO OPTIONS")
             gazeboItem.submenu = submenu
             
-            // Add placeholder submenu items
+            // Add placeholder submenu items for testing
+            let testItem = NSMenuItem(title: "Test Action", action: #selector(testAction(_:)), keyEquivalent: "")
+            submenu.addItem(testItem)
+            
+            submenu.addItem(NSMenuItem.separator())
+            
             let streamItem1 = NSMenuItem(title: "Add to Stream 1", action: #selector(addToStream1(_:)), keyEquivalent: "")
             let streamItem2 = NSMenuItem(title: "Add to Stream 2", action: #selector(addToStream2(_:)), keyEquivalent: "")
             let streamItem3 = NSMenuItem(title: "Add to Stream 3", action: #selector(addToStream3(_:)), keyEquivalent: "")
@@ -51,21 +68,18 @@ class FinderSync: FIFinderSync {
             submenu.addItem(streamItem1)
             submenu.addItem(streamItem2)
             submenu.addItem(streamItem3)
-            submenu.addItem(NSMenuItem.separator())
-            
-            let moreItem = NSMenuItem(title: "More Options...", action: #selector(showMoreOptions(_:)), keyEquivalent: "")
-            submenu.addItem(moreItem)
             
             menu.addItem(gazeboItem)
             
         case .contextualMenuForContainer:
-            // This is the right-click menu on folders (when not selecting items inside)
-            let gazeboItem = NSMenuItem(title: "Gazebo Options", action: nil, keyEquivalent: "")
+            // This is the right-click menu on folder backgrounds
+            let gazeboItem = NSMenuItem(title: "GAZEBO OPTIONS", action: nil, keyEquivalent: "")
+            gazeboItem.image = menuIcon
             
-            let submenu = NSMenu(title: "Gazebo Options")
+            let submenu = NSMenu(title: "GAZEBO OPTIONS")
             gazeboItem.submenu = submenu
             
-            let addFolderItem = NSMenuItem(title: "Add This Folder to Stream...", action: #selector(addFolderToStream(_:)), keyEquivalent: "")
+            let addFolderItem = NSMenuItem(title: "Add This Folder to Stream", action: #selector(addFolderToStream(_:)), keyEquivalent: "")
             submenu.addItem(addFolderItem)
             
             menu.addItem(gazeboItem)
@@ -87,52 +101,58 @@ class FinderSync: FIFinderSync {
     
     // MARK: - Action Methods
     
+    @objc func testAction(_ sender: AnyObject?) {
+        let items = FIFinderSyncController.default().selectedItemURLs() ?? []
+        
+        NSLog("Gazebo Test Action triggered!")
+        NSLog("Selected items count: %d", items.count)
+        for item in items {
+            NSLog("  - %@", item.path as NSString)
+        }
+        
+        showAlert(title: "Gazebo Options", 
+                 message: "Test successful! Extension is working.\n\nSelected \(items.count) item(s)")
+    }
+    
     @objc func addToStream1(_ sender: AnyObject?) {
-        handleStreamAction(streamNumber: 1, sender: sender)
+        handleStreamAction(streamNumber: 1)
     }
     
     @objc func addToStream2(_ sender: AnyObject?) {
-        handleStreamAction(streamNumber: 2, sender: sender)
+        handleStreamAction(streamNumber: 2)
     }
     
     @objc func addToStream3(_ sender: AnyObject?) {
-        handleStreamAction(streamNumber: 3, sender: sender)
+        handleStreamAction(streamNumber: 3)
     }
     
     @objc func addFolderToStream(_ sender: AnyObject?) {
         let target = FIFinderSyncController.default().targetedURL()
         
-        NSLog("Gazebo: Add folder to stream - target: %@", target?.path as NSString? ?? "none")
-        
-        showAlert(title: "Add to Stream", 
-                 message: "Folder: \(target?.lastPathComponent ?? "Unknown")\n\nThis will communicate with Pavilion to add the folder to a stream.")
-    }
-    
-    @objc func showMoreOptions(_ sender: AnyObject?) {
-        showAlert(title: "Gazebo Options", 
-                 message: "More stream management options will be available here.\n\nThis will open the full Pavilion interface.")
-    }
-    
-    private func handleStreamAction(streamNumber: Int, sender: AnyObject?) {
-        let items = FIFinderSyncController.default().selectedItemURLs() ?? []
-        let target = FIFinderSyncController.default().targetedURL()
-        
-        var message = "Stream \(streamNumber)\n\n"
-        
-        if !items.isEmpty {
-            message += "Selected items:\n"
-            for item in items {
-                message += "• \(item.lastPathComponent)\n"
-            }
-        } else if let target = target {
-            message += "Target: \(target.lastPathComponent)\n"
+        if let targetPath = target?.path {
+            NSLog("Gazebo: Add folder to stream - %@", targetPath as NSString)
+        } else {
+            NSLog("Gazebo: Add folder to stream - no target")
         }
         
-        message += "\nThis will communicate with Pavilion to add these items to Stream \(streamNumber)."
+        showAlert(title: "Add Folder to Stream", 
+                 message: "Folder: \(target?.lastPathComponent ?? "Unknown")\n\nThis will be connected to Pavilion.")
+    }
+    
+    private func handleStreamAction(streamNumber: Int) {
+        let items = FIFinderSyncController.default().selectedItemURLs() ?? []
         
-        NSLog("Gazebo: Add to Stream %d - items: %@", streamNumber, items.map { $0.path })
+        var message = "Adding to Stream \(streamNumber):\n\n"
         
-        showAlert(title: "Add to Stream \(streamNumber)", message: message)
+        for item in items {
+            message += "• \(item.lastPathComponent)\n"
+        }
+        
+        message += "\nThis will communicate with Pavilion."
+        
+        NSLog("Gazebo: Add to Stream %d - %d items", streamNumber, items.count)
+        
+        showAlert(title: "Stream \(streamNumber)", message: message)
     }
     
     private func showAlert(title: String, message: String) {

@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeSiloLStreamSelect();
   initializeClipboardOperations();
   initializeRefreshHandler();
+  initializeJupiterFileHandler();
   await initializeCloudStorage();
   await loadConfiguration();
 });
@@ -54,6 +55,9 @@ function initializeTabs() {
           const downloadsPath = await window.electronAPI.getDownloadsPath();
           navigateToFolder(downloadsPath);
         }
+      } else if (groupId === 'jupiter') {
+        addFolderBtn.style.display = 'none';
+        streamManagement.style.display = 'none';
       } else {
         addFolderBtn.style.display = 'block';
         streamManagement.style.display = 'none';
@@ -1212,4 +1216,60 @@ function initializeRefreshHandler() {
       window.location.reload();
     }
   });
+}
+
+function initializeJupiterFileHandler() {
+  // Listen for file selections from Gazebo helper
+  window.electronAPI?.onJupiterFileSelected?.((filePath) => {
+    console.log('Jupiter file selected:', filePath);
+    
+    // Switch to Jupiter tab
+    const jupiterTab = document.querySelector('[data-group="jupiter"]');
+    if (jupiterTab) {
+      jupiterTab.click();
+    }
+    
+    // Update the file display
+    updateJupiterFileDisplay(filePath);
+  });
+}
+
+function updateJupiterFileDisplay(filePath) {
+  const fileNameElement = document.getElementById('jupiter-file-name');
+  const filePathElement = document.getElementById('jupiter-file-path');
+  const fileIconElement = document.querySelector('.selected-file-display .file-icon');
+  
+  if (fileNameElement && filePathElement && fileIconElement) {
+    const fileName = filePath.split('/').pop();
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+    
+    // Update display elements
+    fileNameElement.textContent = fileName;
+    filePathElement.textContent = filePath;
+    
+    // Set appropriate icon based on file type
+    let icon = '📄'; // Default document icon
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+      icon = '🖼️';
+    } else if (['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(fileExtension)) {
+      icon = '🎬';
+    } else if (['mp3', 'wav', 'aac', 'flac', 'm4a'].includes(fileExtension)) {
+      icon = '🎵';
+    } else if (['pdf'].includes(fileExtension)) {
+      icon = '📕';
+    } else if (['doc', 'docx', 'txt', 'rtf'].includes(fileExtension)) {
+      icon = '📝';
+    } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(fileExtension)) {
+      icon = '📦';
+    }
+    
+    fileIconElement.textContent = icon;
+    
+    // Update selected file display styling
+    const selectedFileDisplay = document.querySelector('.selected-file-display');
+    if (selectedFileDisplay) {
+      selectedFileDisplay.style.borderColor = '#007AFF';
+      selectedFileDisplay.style.backgroundColor = '#f0f8ff';
+    }
+  }
 }

@@ -17,6 +17,7 @@
         <button class="tab-button active" data-group="finder">Finder-like View</button>
         <button class="tab-button" data-group="1">Streams 1-5</button>
         <button class="tab-button" data-group="2">Streams 6-10</button>
+        <button class="tab-button" data-group="jupiter">jupiter</button>
       </div>
       <div class="tab-actions">
         <button id="add-folder-btn" class="action-button" style="display: none;">+ Add Folder</button>
@@ -179,6 +180,34 @@
               <p>Drop folders here or click + to add</p>
             </div>
             <ul class="folder-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="stream-group" id="group-jupiter">
+        <div class="jupiter-container">
+          <div class="jupiter-header">
+            <h2>Jupiter - File Actions</h2>
+          </div>
+          
+          <div class="selected-file-display">
+            <div class="file-icon">📄</div>
+            <div class="file-info">
+              <div class="file-name" id="jupiter-file-name">No file selected</div>
+              <div class="file-path" id="jupiter-file-path">Use keyboard shortcut to select a file</div>
+            </div>
+          </div>
+          
+          <div class="jupiter-actions">
+            <h3>Available Actions</h3>
+            <div class="action-buttons">
+              <button class="jupiter-action-btn">Add to Stream</button>
+              <button class="jupiter-action-btn">Copy to Clipboard</button>
+              <button class="jupiter-action-btn">Move to Folder</button>
+              <button class="jupiter-action-btn">Archive File</button>
+              <button class="jupiter-action-btn">Generate Thumbnail</button>
+              <button class="jupiter-action-btn">Share Link</button>
+            </div>
           </div>
         </div>
       </div>

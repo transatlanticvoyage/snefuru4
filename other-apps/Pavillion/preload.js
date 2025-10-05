@@ -21,5 +21,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getAvailableCloudStorage: () => ipcRenderer.invoke('get-available-cloud-storage'),
   copyFiles: (filePaths) => ipcRenderer.invoke('copy-files', filePaths),
   pasteFiles: (destinationPath) => ipcRenderer.invoke('paste-files', destinationPath),
-  moveFiles: (filePaths, destinationPath) => ipcRenderer.invoke('move-files', filePaths, destinationPath)
+  moveFiles: (filePaths, destinationPath) => ipcRenderer.invoke('move-files', filePaths, destinationPath),
+  
+  // Jupiter file handler
+  onJupiterFileSelected: (callback) => ipcRenderer.on('jupiter-file-selected', (event, filePath) => callback(filePath))
 });

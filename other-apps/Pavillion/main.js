@@ -35,6 +35,9 @@ function createWindow() {
 app.whenReady().then(() => {
   userDataPath = path.join(app.getPath('userData'), 'pavilion-config.json');
   
+  // Register custom protocol for Gazebo helper
+  app.setAsDefaultProtocolClient('pavilion');
+  
   // Set dock icon for development
   if (process.platform === 'darwin') {
     const iconPath = path.join(__dirname, 'assets/icon.png');
@@ -57,6 +60,22 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   // Quit app completely when window closes (even on macOS)
   app.quit();
+});
+
+// Handle custom protocol (from Gazebo helper)
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  console.log('Received URL:', url);
+  
+  if (url.startsWith('pavilion://jupiter-file')) {
+    const urlParams = new URL(url);
+    const filePath = urlParams.searchParams.get('path');
+    
+    if (filePath && mainWindow) {
+      // Switch to Jupiter tab and set the file
+      mainWindow.webContents.send('jupiter-file-selected', filePath);
+    }
+  }
 });
 
 ipcMain.handle('select-folder', async () => {
