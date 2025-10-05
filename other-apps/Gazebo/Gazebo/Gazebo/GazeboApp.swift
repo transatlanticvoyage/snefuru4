@@ -17,6 +17,8 @@ struct GazeboApp: App {
         WindowGroup {
             ContentView()
         }
+        .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
     }
 }
 
@@ -24,23 +26,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var hotKeyRef: EventHotKeyRef?
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Register global hotkey (Cmd+Shift+J)
+        // Hide the app window and run in background
+        NSApp.setActivationPolicy(.accessory)
+        
+        // Hide all windows
+        for window in NSApp.windows {
+            window.orderOut(nil)
+        }
+        
+        // Register global hotkey (Cmd+Control+J)
         registerGlobalHotkey()
-        NSLog("Gazebo: Global hotkey registered (Cmd+Shift+J)")
+        NSLog("Gazebo: Global hotkey registered (Cmd+Control+J)")
     }
     
     func registerGlobalHotkey() {
-        let hotKeyID = EventHotKeyID(signature: OSType(fourCharCodeFrom: "GZBO"), id: 1)
-        let keyCode = UInt32(kVK_ANSI_J) // J key
-        let modifiers = UInt32(cmdKey | shiftKey)
-        
-        var eventHandler = EventHandlerUPP { (nextHandler, theEvent, userData) -> OSStatus in
+        // Install event handler first
+        var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: OSType(kEventHotKeyPressed))
+        let eventHandler: EventHandlerUPP = { (nextHandler, theEvent, userData) -> OSStatus in
             return AppDelegate.handleHotkey(nextHandler: nextHandler, theEvent: theEvent, userData: userData)
         }
         
-        let status = RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef)
+        var handlerRef: EventHandlerRef?
+        var status = InstallEventHandler(GetApplicationEventTarget(), eventHandler, 1, &eventType, nil, &handlerRef)
         
         if status != noErr {
+            NSLog("Gazebo: Failed to install event handler, status: %d", status)
+            return
+        }
+        
+        let hotKeyID = EventHotKeyID(signature: fourCharCodeFrom("GZBO"), id: 1)
+        let keyCode = UInt32(kVK_ANSI_J) // J key
+        let modifiers = UInt32(cmdKey | controlKey)
+        
+        status = RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef)
+        
+        if status == noErr {
+            NSLog("Gazebo: Hotkey registration SUCCESS")
+        } else {
             NSLog("Gazebo: Failed to register hotkey, status: %d", status)
         }
     }
@@ -56,7 +78,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             launchPavilionWithFile(filePath: selectedFile)
         } else {
             NSLog("Gazebo: No file selected in Finder")
-            showAlert(title: "No Selection", message: "Please select a file in Finder first, then use Cmd+Shift+J")
+            // Still show alert for no selection, but only this case
+            showAlert(title: "No Selection", message: "Please select a file in Finder first, then use Cmd+Control+J")
         }
         
         return noErr
@@ -91,14 +114,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     static func launchPavilionWithFile(filePath: String) {
-        // Create custom URL scheme to open Pavilion with file
-        let urlString = "pavilion://jupiter-file?path=\(filePath.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
+        // Write file path to a temp file that Pavilion can read
+        let tempDir = NSTemporaryDirectory()
+        let tempFile = tempDir.appending("gazebo-selected-file.txt")
         
-        if let url = URL(string: urlString) {
-            NSWorkspace.shared.open(url)
-            NSLog("Gazebo: Launched Pavilion with file")
-        } else {
-            NSLog("Gazebo: Failed to create URL for Pavilion")
+        do {
+            try filePath.write(toFile: tempFile, atomically: true, encoding: .utf8)
+            NSLog("Gazebo: Wrote file path to %@", tempFile)
+        } catch {
+            NSLog("Gazebo: Failed to write temp file: %@", error.localizedDescription)
+        }
+        
+        // Launch Pavilion directly
+        let pavilionPath = "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/other-apps/Pavillion"
+        let task = Process()
+        task.currentDirectoryPath = pavilionPath
+        task.launchPath = "/usr/bin/open"
+        task.arguments = ["-a", "Terminal", "-n", pavilionPath]
+        
+        do {
+            try task.run()
+            NSLog("Gazebo: Launched Pavilion")
+        } catch {
+            NSLog("Gazebo: Failed to launch Pavilion: %@", error.localizedDescription)
         }
     }
     

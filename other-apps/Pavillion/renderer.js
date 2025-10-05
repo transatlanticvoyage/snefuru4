@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeJupiterFileHandler();
   await initializeCloudStorage();
   await loadConfiguration();
+  
+  // Check for Gazebo file selection on startup
+  checkForGazeboFileSelection();
 });
 
 function initializeTabs() {
@@ -1220,18 +1223,42 @@ function initializeRefreshHandler() {
 
 function initializeJupiterFileHandler() {
   // Listen for file selections from Gazebo helper
-  window.electronAPI?.onJupiterFileSelected?.((filePath) => {
-    console.log('Jupiter file selected:', filePath);
-    
-    // Switch to Jupiter tab
-    const jupiterTab = document.querySelector('[data-group="jupiter"]');
-    if (jupiterTab) {
-      jupiterTab.click();
+  if (window.electronAPI?.onJupiterFileSelected) {
+    window.electronAPI.onJupiterFileSelected((filePath) => {
+      console.log('Jupiter file selected:', filePath);
+      
+      // Switch to Jupiter tab
+      const jupiterTab = document.querySelector('[data-group="jupiter"]');
+      if (jupiterTab) {
+        jupiterTab.click();
+      }
+      
+      // Update the file display
+      updateJupiterFileDisplay(filePath);
+    });
+  } else {
+    console.log('Jupiter file handler: electronAPI not available');
+  }
+}
+
+async function checkForGazeboFileSelection() {
+  try {
+    const tempFilePath = await window.electronAPI.checkGazeboTempFile();
+    if (tempFilePath) {
+      console.log('Found Gazebo file selection:', tempFilePath);
+      
+      // Switch to Jupiter tab
+      const jupiterTab = document.querySelector('[data-group="jupiter"]');
+      if (jupiterTab) {
+        jupiterTab.click();
+      }
+      
+      // Update the file display
+      updateJupiterFileDisplay(tempFilePath);
     }
-    
-    // Update the file display
-    updateJupiterFileDisplay(filePath);
-  });
+  } catch (error) {
+    console.log('No Gazebo file selection found');
+  }
 }
 
 function updateJupiterFileDisplay(filePath) {

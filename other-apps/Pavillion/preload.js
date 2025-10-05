@@ -24,5 +24,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   moveFiles: (filePaths, destinationPath) => ipcRenderer.invoke('move-files', filePaths, destinationPath),
   
   // Jupiter file handler
-  onJupiterFileSelected: (callback) => ipcRenderer.on('jupiter-file-selected', (event, filePath) => callback(filePath))
+  onJupiterFileSelected: (callback) => ipcRenderer.on('jupiter-file-selected', (event, filePath) => callback(filePath)),
+  checkGazeboTempFile: () => ipcRenderer.invoke('check-gazebo-temp-file')
 });

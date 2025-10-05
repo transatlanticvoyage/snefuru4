@@ -384,3 +384,21 @@ ipcMain.handle('move-files', async (event, filePaths, destinationPath) => {
     return { success: false, error: error.message };
   }
 });
+
+ipcMain.handle('check-gazebo-temp-file', async () => {
+  const os = require('os');
+  const tempFilePath = path.join(os.tmpdir(), 'gazebo-selected-file.txt');
+  
+  try {
+    if (fs.existsSync(tempFilePath)) {
+      const filePath = fs.readFileSync(tempFilePath, 'utf8').trim();
+      // Delete the temp file after reading
+      fs.unlinkSync(tempFilePath);
+      return filePath;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error reading Gazebo temp file:', error);
+    return null;
+  }
+});
