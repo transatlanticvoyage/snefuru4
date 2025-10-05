@@ -55,19 +55,12 @@ class FinderSync: FIFinderSync {
             let submenu = NSMenu(title: "GAZEBO OPTIONS")
             gazeboItem.submenu = submenu
             
-            // Add placeholder submenu items for testing
-            let testItem = NSMenuItem(title: "Test Action", action: #selector(testAction(_:)), keyEquivalent: "")
-            submenu.addItem(testItem)
-            
-            submenu.addItem(NSMenuItem.separator())
-            
-            let streamItem1 = NSMenuItem(title: "Add to Stream 1", action: #selector(addToStream1(_:)), keyEquivalent: "")
-            let streamItem2 = NSMenuItem(title: "Add to Stream 2", action: #selector(addToStream2(_:)), keyEquivalent: "")
-            let streamItem3 = NSMenuItem(title: "Add to Stream 3", action: #selector(addToStream3(_:)), keyEquivalent: "")
-            
-            submenu.addItem(streamItem1)
-            submenu.addItem(streamItem2)
-            submenu.addItem(streamItem3)
+            // Add all 10 stream options
+            for streamNumber in 1...10 {
+                let streamItem = NSMenuItem(title: "Add to Stream \(streamNumber)", action: #selector(addToStream(_:)), keyEquivalent: "")
+                streamItem.tag = streamNumber
+                submenu.addItem(streamItem)
+            }
             
             menu.addItem(gazeboItem)
             
@@ -110,20 +103,12 @@ class FinderSync: FIFinderSync {
             NSLog("  - %@", item.path as NSString)
         }
         
-        showAlert(title: "Gazebo Options", 
-                 message: "Test successful! Extension is working.\n\nSelected \(items.count) item(s)")
+        NSLog("Gazebo: Test successful! Extension is working. Selected %d item(s)", items.count)
     }
     
-    @objc func addToStream1(_ sender: AnyObject?) {
-        handleStreamAction(streamNumber: 1)
-    }
-    
-    @objc func addToStream2(_ sender: AnyObject?) {
-        handleStreamAction(streamNumber: 2)
-    }
-    
-    @objc func addToStream3(_ sender: AnyObject?) {
-        handleStreamAction(streamNumber: 3)
+    @objc func addToStream(_ sender: NSMenuItem) {
+        let streamNumber = sender.tag
+        handleStreamAction(streamNumber: streamNumber)
     }
     
     @objc func addFolderToStream(_ sender: AnyObject?) {
@@ -134,36 +119,51 @@ class FinderSync: FIFinderSync {
         } else {
             NSLog("Gazebo: Add folder to stream - no target")
         }
-        
-        showAlert(title: "Add Folder to Stream", 
-                 message: "Folder: \(target?.lastPathComponent ?? "Unknown")\n\nThis will be connected to Pavilion.")
     }
     
     private func handleStreamAction(streamNumber: Int) {
         let items = FIFinderSyncController.default().selectedItemURLs() ?? []
         
-        var message = "Adding to Stream \(streamNumber):\n\n"
-        
-        for item in items {
-            message += "• \(item.lastPathComponent)\n"
+        guard !items.isEmpty else {
+            NSLog("Gazebo: No items selected for stream %d", streamNumber)
+            return
         }
-        
-        message += "\nThis will communicate with Pavilion."
         
         NSLog("Gazebo: Add to Stream %d - %d items", streamNumber, items.count)
+        for item in items {
+            NSLog("Gazebo: Adding item: %@", item.path as NSString)
+        }
         
-        showAlert(title: "Stream \(streamNumber)", message: message)
+        // Send data to Pavilion via temp file
+        addItemsToStreamInPavilion(streamNumber: streamNumber, items: items)
     }
     
-    private func showAlert(title: String, message: String) {
-        DispatchQueue.main.async {
-            let alert = NSAlert()
-            alert.messageText = title
-            alert.informativeText = message
-            alert.alertStyle = .informational
-            alert.addButton(withTitle: "OK")
-            alert.runModal()
+    private func addItemsToStreamInPavilion(streamNumber: Int, items: [URL]) {
+        let tempDir = NSTemporaryDirectory()
+        let tempFile = tempDir.appending("gazebo-stream-data.json")
+        
+        // Create data structure for Pavilion
+        let streamData: [String: Any] = [
+            "streamNumber": streamNumber,
+            "action": "addToStream",
+            "items": items.map { [
+                "name": $0.lastPathComponent,
+                "path": $0.path
+            ]}
+        ]
+        
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: streamData, options: .prettyPrinted)
+            try jsonData.write(to: URL(fileURLWithPath: tempFile))
+            NSLog("Gazebo: Wrote stream data to %@", tempFile)
+            
+            // Data written successfully - Pavilion will check periodically
+            NSLog("Gazebo: Stream data written successfully for stream %d", streamNumber)
+        } catch {
+            NSLog("Gazebo: Failed to write stream data: %@", error.localizedDescription)
         }
     }
+    
+    
 }
 
