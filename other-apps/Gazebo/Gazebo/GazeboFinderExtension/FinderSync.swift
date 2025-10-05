@@ -134,33 +134,23 @@ class FinderSync: FIFinderSync {
             NSLog("Gazebo: Adding item: %@", item.path as NSString)
         }
         
-        // Send data to Pavilion via temp file
+        // Send data to Pavilion via URL scheme
         addItemsToStreamInPavilion(streamNumber: streamNumber, items: items)
     }
     
     private func addItemsToStreamInPavilion(streamNumber: Int, items: [URL]) {
-        let tempDir = NSTemporaryDirectory()
-        let tempFile = tempDir.appending("gazebo-stream-data.json")
+        // Create URL scheme communication
+        let itemPaths = items.map { $0.path }.joined(separator: "|")
+        let encodedPaths = itemPaths.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "pavilion://add-to-stream?stream=\(streamNumber)&items=\(encodedPaths)"
         
-        // Create data structure for Pavilion
-        let streamData: [String: Any] = [
-            "streamNumber": streamNumber,
-            "action": "addToStream",
-            "items": items.map { [
-                "name": $0.lastPathComponent,
-                "path": $0.path
-            ]}
-        ]
+        NSLog("Gazebo: Opening URL: %@", urlString)
         
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: streamData, options: .prettyPrinted)
-            try jsonData.write(to: URL(fileURLWithPath: tempFile))
-            NSLog("Gazebo: Wrote stream data to %@", tempFile)
-            
-            // Data written successfully - Pavilion will check periodically
-            NSLog("Gazebo: Stream data written successfully for stream %d", streamNumber)
-        } catch {
-            NSLog("Gazebo: Failed to write stream data: %@", error.localizedDescription)
+        if let url = URL(string: urlString) {
+            NSWorkspace.shared.open(url)
+            NSLog("Gazebo: Successfully sent stream data via URL scheme for stream %d with %d items", streamNumber, items.count)
+        } else {
+            NSLog("Gazebo: Failed to create URL for stream communication")
         }
     }
     

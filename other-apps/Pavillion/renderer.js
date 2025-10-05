@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeClipboardOperations();
   initializeRefreshHandler();
   initializeJupiterFileHandler();
+  initializeGazeboStreamHandler();
   await initializeCloudStorage();
   await loadConfiguration();
   
@@ -1265,15 +1266,13 @@ function initializeRefreshHandler() {
       window.location.reload();
     }
     
-    // Cmd+Shift+R - Check for Gazebo stream data
+    // Cmd+Shift+R - Manual trigger for testing (kept for debugging)
     if (event.metaKey && event.shiftKey && event.key === 'R') {
       event.preventDefault();
-      await checkForGazeboStreamData();
+      console.log('Manual Gazebo stream check triggered');
+      showNotification('Manual Gazebo check triggered', 'info');
     }
   });
-  
-  // Also check for stream data periodically
-  setInterval(checkForGazeboStreamData, 2000);
 }
 
 function initializeJupiterFileHandler() {
@@ -1293,6 +1292,36 @@ function initializeJupiterFileHandler() {
     });
   } else {
     console.log('Jupiter file handler: electronAPI not available');
+  }
+}
+
+function initializeGazeboStreamHandler() {
+  // Listen for stream data from Gazebo
+  if (window.electronAPI?.onGazeboAddToStream) {
+    window.electronAPI.onGazeboAddToStream((streamData) => {
+      console.log('Received stream data from Gazebo:', streamData);
+      processGazeboStreamData(streamData);
+    });
+  } else {
+    console.log('Gazebo stream handler: electronAPI not available');
+  }
+}
+
+function processGazeboStreamData(streamData) {
+  const { streamNumber, action, items } = streamData;
+  
+  if (action === 'addToStream' && items && items.length > 0) {
+    console.log(`Adding ${items.length} items to stream ${streamNumber}`);
+    
+    items.forEach(item => {
+      addItemToStream(streamNumber, item.path, item.name);
+    });
+    
+    showNotification(`Added ${items.length} item(s) to Stream ${streamNumber}`, 'success');
+    
+    if (currentStream === streamNumber) {
+      renderSiloLStreamItems(streamNumber);
+    }
   }
 }
 
@@ -1316,38 +1345,6 @@ async function checkForGazeboFileSelection() {
   }
 }
 
-async function checkForGazeboStreamData() {
-  try {
-    console.log('Checking for Gazebo stream data...');
-    const streamData = await window.electronAPI.checkGazeboStreamData();
-    if (streamData) {
-      console.log('Found Gazebo stream data:', streamData);
-      
-      const { streamNumber, action, items } = streamData;
-      
-      if (action === 'addToStream' && items && items.length > 0) {
-        console.log(`Adding ${items.length} items to stream ${streamNumber}`);
-        
-        // Add items to the specified stream
-        items.forEach(item => {
-          addItemToStream(streamNumber, item.path, item.name);
-        });
-        
-        // Show notification
-        showNotification(`Added ${items.length} item(s) to Stream ${streamNumber}`, 'success');
-        
-        // Update the stream display if that stream is currently selected
-        if (currentStream === streamNumber) {
-          await renderSiloLStreamItems(streamNumber);
-        }
-      }
-    } else {
-      console.log('No Gazebo stream data found');
-    }
-  } catch (error) {
-    console.error('Error checking Gazebo stream data:', error);
-  }
-}
 
 async function updateJupiterFileDisplay(filePath) {
   // Store the current file path for actions
@@ -1432,6 +1429,8 @@ let currentSelectedFilePath = null;
 function initializeJupiterActions() {
   const openBtn = document.getElementById('jupiter-open-btn');
   const showInFinderBtn = document.getElementById('jupiter-show-in-finder-btn');
+  const addToStreamBtn = document.getElementById('jupiter-add-to-stream-btn');
+  const streamDropdown = document.getElementById('jupiter-stream-dropdown');
   
   if (openBtn) {
     openBtn.addEventListener('click', async () => {
@@ -1455,6 +1454,55 @@ function initializeJupiterActions() {
         } catch (error) {
           console.error('Error showing file in Finder:', error);
         }
+      }
+    });
+  }
+  
+  // Add to Stream dropdown functionality
+  if (addToStreamBtn && streamDropdown) {
+    addToStreamBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      if (!currentSelectedFilePath) {
+        showNotification('No file selected', 'error');
+        return;
+      }
+      
+      // Toggle dropdown visibility
+      const isVisible = streamDropdown.style.display !== 'none';
+      streamDropdown.style.display = isVisible ? 'none' : 'block';
+    });
+    
+    // Handle stream option clicks
+    const streamOptions = streamDropdown.querySelectorAll('.jupiter-stream-option');
+    streamOptions.forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const streamNumber = parseInt(option.dataset.stream);
+        
+        if (currentSelectedFilePath) {
+          // Add file to the selected stream
+          const fileName = currentSelectedFilePath.split('/').pop();
+          addItemToStream(streamNumber, currentSelectedFilePath, fileName);
+          
+          // Show success notification
+          showNotification(`Added "${fileName}" to Stream ${streamNumber}`, 'success');
+          
+          // Hide dropdown
+          streamDropdown.style.display = 'none';
+          
+          // Update stream display if currently viewing that stream
+          if (currentStream === streamNumber) {
+            renderSiloLStreamItems(streamNumber);
+          }
+        }
+      });
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!addToStreamBtn.contains(e.target) && !streamDropdown.contains(e.target)) {
+        streamDropdown.style.display = 'none';
       }
     });
   }

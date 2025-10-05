@@ -4,9 +4,6 @@
 			"path": "."
 		},
 		{
-			"path": "./shenzi-wordpress-plugins/klyra"
-		},
-		{
 			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/klyra",
 			"name": "🌊 Klyra (saltwater.local)"
 		},
@@ -64,7 +61,6 @@
 		"git.autoRepositoryDetection": true,
 		"git.repositories": [
 			".",
-			"./shenzi-wordpress-plugins/klyra",
 			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/klyra",
 			"./shenzi-wordpress-plugins/nivaro",
 			"./shenzi-wordpress-plugins/ruplin",

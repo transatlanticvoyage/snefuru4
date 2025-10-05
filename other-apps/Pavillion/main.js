@@ -133,6 +133,30 @@ app.on('open-url', (event, url) => {
       // Switch to Jupiter tab and set the file
       mainWindow.webContents.send('jupiter-file-selected', filePath);
     }
+  } else if (url.startsWith('pavilion://add-to-stream')) {
+    const urlObj = new URL(url);
+    const streamNumber = parseInt(urlObj.searchParams.get('stream'));
+    const itemsParam = urlObj.searchParams.get('items');
+    
+    console.log('Gazebo stream request - Stream:', streamNumber, 'Items param:', itemsParam);
+    
+    if (streamNumber && itemsParam) {
+      const items = decodeURIComponent(itemsParam).split('|').map(path => ({
+        name: path.split('/').pop(),
+        path: path
+      }));
+      
+      console.log('Processed items:', items);
+      
+      // Send to renderer
+      if (mainWindow) {
+        mainWindow.webContents.send('gazebo-add-to-stream', {
+          streamNumber,
+          action: 'addToStream',
+          items
+        });
+      }
+    }
   }
 });
 
@@ -504,21 +528,3 @@ ipcMain.handle('check-file-status', async (event, filePath) => {
   }
 });
 
-ipcMain.handle('check-gazebo-stream-data', async () => {
-  const os = require('os');
-  const tempFilePath = path.join(os.tmpdir(), 'gazebo-stream-data.json');
-  
-  try {
-    if (fs.existsSync(tempFilePath)) {
-      const jsonData = fs.readFileSync(tempFilePath, 'utf8');
-      const streamData = JSON.parse(jsonData);
-      // Delete the temp file after reading
-      fs.unlinkSync(tempFilePath);
-      return streamData;
-    }
-    return null;
-  } catch (error) {
-    console.error('Error reading Gazebo stream data:', error);
-    return null;
-  }
-});
