@@ -503,3 +503,22 @@ ipcMain.handle('check-file-status', async (event, filePath) => {
     };
   }
 });
+
+ipcMain.handle('check-gazebo-stream-data', async () => {
+  const os = require('os');
+  const tempFilePath = path.join(os.tmpdir(), 'gazebo-stream-data.json');
+  
+  try {
+    if (fs.existsSync(tempFilePath)) {
+      const jsonData = fs.readFileSync(tempFilePath, 'utf8');
+      const streamData = JSON.parse(jsonData);
+      // Delete the temp file after reading
+      fs.unlinkSync(tempFilePath);
+      return streamData;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error reading Gazebo stream data:', error);
+    return null;
+  }
+});

@@ -163,6 +163,49 @@ function addFolderToStream(streamId, folderPath) {
   }
 }
 
+function addItemToStream(streamId, itemPath, itemName) {
+  if (!streamData[streamId]) {
+    streamData[streamId] = [];
+  }
+  
+  if (!streamData[streamId].includes(itemPath)) {
+    streamData[streamId].push(itemPath);
+    renderStream(streamId);
+    return { success: true, message: 'Added successfully' };
+  } else {
+    return { success: false, message: 'Item already exists in this stream' };
+  }
+}
+
+function showNotification(message, type = 'info') {
+  console.log(`${type.toUpperCase()}: ${message}`);
+  
+  // Create a simple notification element
+  const notification = document.createElement('div');
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 4px;
+    z-index: 10000;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification);
+    }
+  }, 3000);
+}
+
 function renderStream(streamId) {
   const stream = document.querySelector(`[data-stream-id="${streamId}"]`);
   const folderList = stream.querySelector('.folder-list');
@@ -1221,7 +1264,16 @@ function initializeRefreshHandler() {
       // Reload the page
       window.location.reload();
     }
+    
+    // Cmd+Shift+R - Check for Gazebo stream data
+    if (event.metaKey && event.shiftKey && event.key === 'R') {
+      event.preventDefault();
+      await checkForGazeboStreamData();
+    }
   });
+  
+  // Also check for stream data periodically
+  setInterval(checkForGazeboStreamData, 2000);
 }
 
 function initializeJupiterFileHandler() {
@@ -1261,6 +1313,39 @@ async function checkForGazeboFileSelection() {
     }
   } catch (error) {
     console.log('No Gazebo file selection found');
+  }
+}
+
+async function checkForGazeboStreamData() {
+  try {
+    console.log('Checking for Gazebo stream data...');
+    const streamData = await window.electronAPI.checkGazeboStreamData();
+    if (streamData) {
+      console.log('Found Gazebo stream data:', streamData);
+      
+      const { streamNumber, action, items } = streamData;
+      
+      if (action === 'addToStream' && items && items.length > 0) {
+        console.log(`Adding ${items.length} items to stream ${streamNumber}`);
+        
+        // Add items to the specified stream
+        items.forEach(item => {
+          addItemToStream(streamNumber, item.path, item.name);
+        });
+        
+        // Show notification
+        showNotification(`Added ${items.length} item(s) to Stream ${streamNumber}`, 'success');
+        
+        // Update the stream display if that stream is currently selected
+        if (currentStream === streamNumber) {
+          await renderSiloLStreamItems(streamNumber);
+        }
+      }
+    } else {
+      console.log('No Gazebo stream data found');
+    }
+  } catch (error) {
+    console.error('Error checking Gazebo stream data:', error);
   }
 }
 
