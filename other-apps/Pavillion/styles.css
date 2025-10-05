@@ -132,6 +132,34 @@ body {
   background: #0051D5;
 }
 
+.copy-paste-methods {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 10px;
+}
+
+.method-button {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #d1d1d1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.method-button:hover {
+  background: #e0e0e0;
+  border-color: #b0b0b0;
+}
+
+.method-button:active {
+  background: #d0d0d0;
+}
+
 .streams-container {
   flex: 1;
   overflow: hidden;
