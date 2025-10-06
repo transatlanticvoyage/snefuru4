@@ -1,0 +1,70 @@
+{
+	"folders": [
+		{
+			"path": ".",
+			"name": "🏠 Main Repo (snefuru4)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/grove",
+			"name": "🌊 Grove (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/klyra",
+			"name": "🌊 Klyra (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/ruplin",
+			"name": "🌊 Ruplin (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/veyra",
+			"name": "🌊 Veyra (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/brimora",
+			"name": "🌊 Brimora (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/nivaro",
+			"name": "🌊 Nivaro (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/aardvark",
+			"name": "🌊 Aardvark (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/axiom",
+			"name": "🌊 Axiom (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/beacon",
+			"name": "🌊 Beacon (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/harbor",
+			"name": "🌊 Harbor (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/lumora",
+			"name": "🌊 Lumora (saltwater)"
+		}
+	],
+	"settings": {
+		"git.detectSubmodules": false,
+		"git.autoRepositoryDetection": true,
+		"git.repositories": [
+			".",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/grove",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/klyra",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/ruplin",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/veyra",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/brimora",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/nivaro",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/aardvark",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/axiom",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/beacon",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/harbor",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/lumora"
+		]
+	}
+}
