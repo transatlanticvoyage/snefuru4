@@ -28,6 +28,7 @@ interface SerpResult {
 interface SerpResultsTableProps {
   keywordId?: number | null;
   keywordData?: {keyword_id: number, keyword_datum: string} | null;
+  onTableControlsRender?: (controls: { PaginationControls: () => JSX.Element } | null) => void;
 }
 
 interface PendingFetch {
@@ -38,7 +39,7 @@ interface PendingFetch {
   created_at: string;
 }
 
-export default function SerpResultsTable({ keywordId, keywordData }: SerpResultsTableProps) {
+export default function SerpResultsTable({ keywordId, keywordData, onTableControlsRender }: SerpResultsTableProps) {
   const [data, setData] = useState<SerpResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,6 +87,13 @@ export default function SerpResultsTable({ keywordId, keywordData }: SerpResults
     fetchData();
   }, [keywordId]);
   
+  // Expose pagination controls to parent
+  useEffect(() => {
+    if (onTableControlsRender) {
+      onTableControlsRender({ PaginationControls });
+    }
+  }, [onTableControlsRender]);
+
   // Auto-refresh for pending fetches
   useEffect(() => {
     if (!pendingFetch) return;

@@ -36,6 +36,14 @@ export default function SerpjarClient() {
   // Chamber visibility states
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
   const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
+  const [protozoicChamberVisible, setProtozoicChamberVisible] = useState(true);
+  const [mesozoicChamberVisible, setMesozoicChamberVisible] = useState(true);
+  
+  // Table controls state
+  const [tableControls, setTableControls] = useState<{
+    PaginationInfo: () => JSX.Element;
+    PaginationControls: () => JSX.Element;
+  } | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -55,6 +63,16 @@ export default function SerpjarClient() {
     if (savedSinus !== null) {
       setSinusChamberVisible(JSON.parse(savedSinus));
     }
+    
+    const savedProtozoic = localStorage.getItem('serpjar_protozoicChamberVisible');
+    if (savedProtozoic !== null) {
+      setProtozoicChamberVisible(JSON.parse(savedProtozoic));
+    }
+    
+    const savedMesozoic = localStorage.getItem('serpjar_mesozoicChamberVisible');
+    if (savedMesozoic !== null) {
+      setMesozoicChamberVisible(JSON.parse(savedMesozoic));
+    }
   }, []);
 
   // Listen for bezel system visibility changes
@@ -66,13 +84,25 @@ export default function SerpjarClient() {
     const handleSinusChange = (event: CustomEvent) => {
       setSinusChamberVisible(event.detail.visible);
     };
+    
+    const handleProtozoicChange = (event: CustomEvent) => {
+      setProtozoicChamberVisible(event.detail.visible);
+    };
+    
+    const handleMesozoicChange = (event: CustomEvent) => {
+      setMesozoicChamberVisible(event.detail.visible);
+    };
 
     window.addEventListener('mandibleChamberVisibilityChange', handleMandibleChange as EventListener);
     window.addEventListener('sinusChamberVisibilityChange', handleSinusChange as EventListener);
+    window.addEventListener('serpjarProtozoicChamberVisibilityChange', handleProtozoicChange as EventListener);
+    window.addEventListener('serpjarMesozoicChamberVisibilityChange', handleMesozoicChange as EventListener);
     
     return () => {
       window.removeEventListener('mandibleChamberVisibilityChange', handleMandibleChange as EventListener);
       window.removeEventListener('sinusChamberVisibilityChange', handleSinusChange as EventListener);
+      window.removeEventListener('serpjarProtozoicChamberVisibilityChange', handleProtozoicChange as EventListener);
+      window.removeEventListener('serpjarMesozoicChamberVisibilityChange', handleMesozoicChange as EventListener);
     };
   }, []);
 
@@ -315,7 +345,7 @@ export default function SerpjarClient() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Mandible Chamber - New div above existing content */}
       {mandibleChamberVisible && (
-        <div className="border border-black m-4 p-4">
+        <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
           <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
             mandible_chamber
           </div>
@@ -413,7 +443,7 @@ export default function SerpjarClient() {
 
       {/* Sinus Chamber - Wraps existing header content */}
       {sinusChamberVisible && (
-        <div className="border border-black m-4 p-4">
+        <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
           <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
             sinus_chamber
           </div>
@@ -529,9 +559,39 @@ export default function SerpjarClient() {
       </div>
       )}
 
+      {/* Protozoic Chamber */}
+      {protozoicChamberVisible && (
+        <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px' }}>
+            protozoic_chamber
+          </div>
+        </div>
+      )}
+
+      {/* Mesozoic Chamber */}
+      {mesozoicChamberVisible && (
+        <div className="border border-black p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            mesozoic_chamber
+          </div>
+          
+          {/* Table Pagination Controls */}
+          {tableControls && tableControls.PaginationControls && (
+            <div className="mt-2">
+              {tableControls.PaginationControls()}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Main Content - Full Width SerpResultsTable */}
       <div className="flex-1 overflow-hidden">
-        <SerpResultsTable key={keywordId} keywordId={keywordId} keywordData={keywordData} />
+        <SerpResultsTable 
+          key={keywordId} 
+          keywordId={keywordId} 
+          keywordData={keywordData} 
+          onTableControlsRender={setTableControls}
+        />
       </div>
 
       {/* First Warning Modal */}

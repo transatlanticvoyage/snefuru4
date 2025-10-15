@@ -33,6 +33,8 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   // Chamber visibility states for /serpjar (default to true/visible)
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
   const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
+  const [serpjarProtozoicChamberVisible, setSerpjarProtozoicChamberVisible] = useState(true);
+  const [serpjarMesozoicChamberVisible, setSerpjarMesozoicChamberVisible] = useState(true);
   
   // Chamber visibility states for /kwjar (default to true/visible)
   const [kwjarMandibleChamberVisible, setKwjarMandibleChamberVisible] = useState(true);
@@ -277,6 +279,34 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     }
   }, [pathname]);
 
+  // Initialize protozoic chamber visibility from localStorage for /serpjar
+  useEffect(() => {
+    if (pathname === '/serpjar') {
+      const savedVisibility = localStorage.getItem('serpjar_protozoicChamberVisible');
+      if (savedVisibility !== null) {
+        setSerpjarProtozoicChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setSerpjarProtozoicChamberVisible(true);
+        localStorage.setItem('serpjar_protozoicChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize mesozoic chamber visibility from localStorage for /serpjar
+  useEffect(() => {
+    if (pathname === '/serpjar') {
+      const savedVisibility = localStorage.getItem('serpjar_mesozoicChamberVisible');
+      if (savedVisibility !== null) {
+        setSerpjarMesozoicChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setSerpjarMesozoicChamberVisible(true);
+        localStorage.setItem('serpjar_mesozoicChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
   // Handle mandible chamber toggle
   const handleMandibleChamberToggle = (checked: boolean) => {
     setMandibleChamberVisible(checked);
@@ -295,6 +325,28 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     
     // Dispatch custom event to notify other components
     window.dispatchEvent(new CustomEvent('sinusChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Handle serpjar protozoic chamber toggle
+  const handleSerpjarProtozoicChamberToggle = (checked: boolean) => {
+    setSerpjarProtozoicChamberVisible(checked);
+    localStorage.setItem('serpjar_protozoicChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('serpjarProtozoicChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Handle serpjar mesozoic chamber toggle
+  const handleSerpjarMesozoicChamberToggle = (checked: boolean) => {
+    setSerpjarMesozoicChamberVisible(checked);
+    localStorage.setItem('serpjar_mesozoicChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('serpjarMesozoicChamberVisibilityChange', { 
       detail: { visible: checked } 
     }));
   };
@@ -808,6 +860,52 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
                       <p>Toggle visibility of the sinus chamber on the SERP page.</p>
                       <p>This controls the SERP Results header and keyword data table.</p>
                       <p>Current state: <strong>{sinusChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Protozoic Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={serpjarProtozoicChamberVisible}
+                          onChange={(e) => handleSerpjarProtozoicChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        protozoic_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the protozoic chamber on the SERP page.</p>
+                      <p>Current state: <strong>{serpjarProtozoicChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                    </div>
+
+                    {/* Mesozoic Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={serpjarMesozoicChamberVisible}
+                          onChange={(e) => handleSerpjarMesozoicChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        mesozoic_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the mesozoic chamber on the SERP page.</p>
+                      <p>This controls the pagination info and controls section.</p>
+                      <p>Current state: <strong>{serpjarMesozoicChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
                       <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
                     </div>
                   </div>
