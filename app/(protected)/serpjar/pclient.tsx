@@ -31,6 +31,11 @@ export default function SerpjarClient() {
   const [completeLoading, setCompleteLoading] = useState(false);
   const [showFirstWarning, setShowFirstWarning] = useState(false);
   const [showSecondWarning, setShowSecondWarning] = useState(false);
+  const [f400Mode, setF400Mode] = useState<'live' | 'queued'>('live'); // Default to live mode
+  
+  // Chamber visibility states
+  const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
+  const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -38,6 +43,38 @@ export default function SerpjarClient() {
       return;
     }
   }, [user, router]);
+
+  // Initialize chamber visibility from localStorage
+  useEffect(() => {
+    const savedMandible = localStorage.getItem('serpjar_mandibleChamberVisible');
+    if (savedMandible !== null) {
+      setMandibleChamberVisible(JSON.parse(savedMandible));
+    }
+    
+    const savedSinus = localStorage.getItem('serpjar_sinusChamberVisible');
+    if (savedSinus !== null) {
+      setSinusChamberVisible(JSON.parse(savedSinus));
+    }
+  }, []);
+
+  // Listen for bezel system visibility changes
+  useEffect(() => {
+    const handleMandibleChange = (event: CustomEvent) => {
+      setMandibleChamberVisible(event.detail.visible);
+    };
+    
+    const handleSinusChange = (event: CustomEvent) => {
+      setSinusChamberVisible(event.detail.visible);
+    };
+
+    window.addEventListener('mandibleChamberVisibilityChange', handleMandibleChange as EventListener);
+    window.addEventListener('sinusChamberVisibilityChange', handleSinusChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('mandibleChamberVisibilityChange', handleMandibleChange as EventListener);
+      window.removeEventListener('sinusChamberVisibilityChange', handleSinusChange as EventListener);
+    };
+  }, []);
 
   // Get keyword_id from URL parameters
   useEffect(() => {
@@ -123,7 +160,10 @@ export default function SerpjarClient() {
     setF400Loading(true);
 
     try {
-      const response = await fetch('/api/f400', {
+      // Use the appropriate endpoint based on selected mode
+      const endpoint = f400Mode === 'live' ? '/api/f400-live' : '/api/f400';
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,8 +179,15 @@ export default function SerpjarClient() {
         throw new Error(result.error || 'Failed to fetch SERP results');
       }
 
-      // Show success message based on status
-      if (result.status === 'pending') {
+      // Show success message based on status and mode
+      if (f400Mode === 'live') {
+        // Live mode returns immediately with results
+        alert(`✅ F400 LIVE Fetch Complete!\n\nKeyword: ${keywordData?.keyword_datum}\nResults stored: ${result.organic_results_stored || 0}\nTotal items: ${result.total_items || 0}\n\nRefreshing page to show results...`);
+        
+        // Refresh the page to show new results
+        setTimeout(() => window.location.reload(), 1000);
+      } else if (result.status === 'pending') {
+        // Queued mode with pending status
         alert(`${result.message}\n\n${result.note}\n\nDataForSEO Task ID: ${result.dataforseo_task_id}\nFetch ID: ${result.fetch_id}\n\nThe page will automatically refresh to check for results.`);
         
         // Refresh the page to show pending status
@@ -266,19 +313,125 @@ export default function SerpjarClient() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <h1 className="text-2xl font-bold text-gray-800">🎯 SERP Results</h1>
-            <ZhedoriButtonBar />
-            <div className="border border-black px-3 py-2">
-              <div className="font-bold text-base">keywordshub.cached_cncglub_ids</div>
-            </div>
+      {/* Mandible Chamber - New div above existing content */}
+      {mandibleChamberVisible && (
+        <div className="border border-black m-4 p-4">
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            mandible_chamber
           </div>
-          <div className="text-right">
-            <div className="text-sm text-gray-500">Search Engine Results</div>
-            <div className="text-xs text-gray-400">Project: DataForSEO Integration</div>
+        
+        {/* Button Controls Section */}
+        <div className="flex flex-wrap items-start gap-3">
+          {/* F400 SERP Fetch Button */}
+          <button
+            onClick={() => keywordId && handleF400SerpFetch()}
+            disabled={!keywordId || f400Loading}
+            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
+              !keywordId || f400Loading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+            }`}
+          >
+            {f400Loading ? 'Processing...' : `Run F400 ${f400Mode === 'live' ? 'LIVE' : 'QUEUED'} SERP Fetch`}
+          </button>
+
+          {/* Complete Pending Fetches Button */}
+          <button
+            onClick={() => keywordId && handleCompletePendingFetches()}
+            disabled={!keywordId || completeLoading}
+            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
+              !keywordId || completeLoading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
+            }`}
+          >
+            {completeLoading ? 'Checking...' : 'Complete Pending Fetch'}
+          </button>
+
+          {/* F410 Stamp EMD Match Button */}
+          <button
+            onClick={() => {
+              // TODO: Add F410 functionality
+              console.log('F410 Stamp EMD Match button clicked for keyword_id:', keywordId);
+            }}
+            disabled={!keywordId}
+            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
+              !keywordId
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-orange-500 text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2'
+            }`}
+          >
+            Run F410 Stamp EMD Match 1
+          </button>
+        </div>
+        
+        {/* F400 Mode Toggle */}
+        <div className="mt-3 flex items-center space-x-4 bg-gray-100 rounded-lg p-3">
+          <span className="text-sm font-medium text-gray-700">F400 Mode:</span>
+          <label className="inline-flex items-center cursor-pointer">
+            <input
+              type="radio"
+              value="live"
+              checked={f400Mode === 'live'}
+              onChange={() => setF400Mode('live')}
+              className="sr-only peer"
+            />
+            <div className={`px-3 py-1 rounded-l-lg border-2 transition-colors ${
+              f400Mode === 'live' 
+                ? 'bg-green-500 text-white border-green-500' 
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}>
+              <span className="font-medium">Live</span>
+              <span className="text-xs block">Instant (~$0.015)</span>
+            </div>
+          </label>
+          <label className="inline-flex items-center cursor-pointer -ml-1">
+            <input
+              type="radio"
+              value="queued"
+              checked={f400Mode === 'queued'}
+              onChange={() => setF400Mode('queued')}
+              className="sr-only peer"
+            />
+            <div className={`px-3 py-1 rounded-r-lg border-2 transition-colors ${
+              f400Mode === 'queued' 
+                ? 'bg-blue-500 text-white border-blue-500' 
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}>
+              <span className="font-medium">Queued</span>
+              <span className="text-xs block">Delayed (~$0.002)</span>
+            </div>
+          </label>
+          <div className="ml-3 text-xs text-gray-500">
+            {f400Mode === 'live' 
+              ? '⚡ Results in 2-3 seconds' 
+              : '⏱️ Results in 2-10 minutes'}
+          </div>
+        </div>
+        </div>
+      )}
+
+      {/* Sinus Chamber - Wraps existing header content */}
+      {sinusChamberVisible && (
+        <div className="border border-black m-4 p-4">
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            sinus_chamber
+          </div>
+        
+        {/* Original Header Content */}
+        <div className="bg-white border-b px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <h1 className="text-2xl font-bold text-gray-800">🎯 SERP Results</h1>
+              <ZhedoriButtonBar />
+              <div className="border border-black px-3 py-2">
+                <div className="font-bold text-base">keywordshub.cached_cncglub_ids</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-gray-500">Search Engine Results</div>
+              <div className="text-xs text-gray-400">Project: DataForSEO Integration</div>
+            </div>
           </div>
         </div>
         
@@ -371,50 +524,10 @@ export default function SerpjarClient() {
               </tr>
             </tbody>
           </table>
-          
-          {/* F400 SERP Fetch Button */}
-          <button
-            onClick={() => keywordId && handleF400SerpFetch()}
-            disabled={!keywordId || f400Loading}
-            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
-              !keywordId || f400Loading
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-            }`}
-          >
-            {f400Loading ? 'Processing...' : 'Run F400 ZHE SERP Fetch'}
-          </button>
-
-          {/* Complete Pending Fetches Button */}
-          <button
-            onClick={() => keywordId && handleCompletePendingFetches()}
-            disabled={!keywordId || completeLoading}
-            className={`ml-3 px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
-              !keywordId || completeLoading
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
-            }`}
-          >
-            {completeLoading ? 'Checking...' : 'Complete Pending Fetch'}
-          </button>
-
-          {/* F410 Stamp EMD Match Button */}
-          <button
-            onClick={() => {
-              // TODO: Add F410 functionality
-              console.log('F410 Stamp EMD Match button clicked for keyword_id:', keywordId);
-            }}
-            disabled={!keywordId}
-            className={`ml-3 px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
-              !keywordId
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-orange-500 text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2'
-            }`}
-          >
-            Run F410 Stamp EMD Match 1
-          </button>
         </div>
+        {/* End of sinus_chamber */}
       </div>
+      )}
 
       {/* Main Content - Full Width SerpResultsTable */}
       <div className="flex-1 overflow-hidden">

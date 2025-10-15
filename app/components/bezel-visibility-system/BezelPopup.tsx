@@ -29,10 +29,26 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   const [missileChamberVisible, setMissileChamberVisible] = useState(true);
   const [vesicleChamberVisible, setVesicleChamberVisible] = useState(true);
   const [rocketChamberVisible, setRocketChamberVisible] = useState(true);
+  
+  // Chamber visibility states for /serpjar (default to true/visible)
+  const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
+  const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
+  
+  // Chamber visibility states for /kwjar (default to true/visible)
+  const [kwjarMandibleChamberVisible, setKwjarMandibleChamberVisible] = useState(true);
+  const [kwjarSinusChamberVisible, setKwjarSinusChamberVisible] = useState(true);
+  const [kwjarProtozoicChamberVisible, setKwjarProtozoicChamberVisible] = useState(true);
+  const [kwjarMesozoicChamberVisible, setKwjarMesozoicChamberVisible] = useState(true);
+  
+  // Chamber visibility states for /cnjar1 (default to true/visible)
+  const [cnjar1MandibleChamberVisible, setCnjar1MandibleChamberVisible] = useState(true);
+  const [cnjar1SinusChamberVisible, setCnjar1SinusChamberVisible] = useState(true);
+  const [cnjar1ProtozoicChamberVisible, setCnjar1ProtozoicChamberVisible] = useState(true);
+  const [cnjar1MesozoicChamberVisible, setCnjar1MesozoicChamberVisible] = useState(true);
 
   useEffect(() => {
     // Check if current page has bezel configuration
-    const pagesWithConfig = ['/sitejar4', '/bin34/tebnar2'];
+    const pagesWithConfig = ['/sitejar4', '/bin34/tebnar2', '/serpjar', '/kwjar', '/cnjar1'];
     setHasConfig(pagesWithConfig.includes(pathname));
   }, [pathname]);
 
@@ -230,6 +246,256 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     // Dispatch custom event to notify other components
     window.dispatchEvent(new CustomEvent('rocketChamberVisibilityChange', { 
       detail: { visible: checked } 
+    }));
+  };
+
+  // Initialize mandible chamber visibility from localStorage for /serpjar
+  useEffect(() => {
+    if (pathname === '/serpjar') {
+      const savedVisibility = localStorage.getItem('serpjar_mandibleChamberVisible');
+      if (savedVisibility !== null) {
+        setMandibleChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setMandibleChamberVisible(true);
+        localStorage.setItem('serpjar_mandibleChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize sinus chamber visibility from localStorage for /serpjar
+  useEffect(() => {
+    if (pathname === '/serpjar') {
+      const savedVisibility = localStorage.getItem('serpjar_sinusChamberVisible');
+      if (savedVisibility !== null) {
+        setSinusChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setSinusChamberVisible(true);
+        localStorage.setItem('serpjar_sinusChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Handle mandible chamber toggle
+  const handleMandibleChamberToggle = (checked: boolean) => {
+    setMandibleChamberVisible(checked);
+    localStorage.setItem('serpjar_mandibleChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('mandibleChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Handle sinus chamber toggle
+  const handleSinusChamberToggle = (checked: boolean) => {
+    setSinusChamberVisible(checked);
+    localStorage.setItem('serpjar_sinusChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('sinusChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Initialize kwjar mandible chamber visibility from localStorage
+  useEffect(() => {
+    if (pathname === '/kwjar') {
+      const savedVisibility = localStorage.getItem('kwjar_mandibleChamberVisible');
+      if (savedVisibility !== null) {
+        setKwjarMandibleChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setKwjarMandibleChamberVisible(true);
+        localStorage.setItem('kwjar_mandibleChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize kwjar sinus chamber visibility from localStorage
+  useEffect(() => {
+    if (pathname === '/kwjar') {
+      const savedVisibility = localStorage.getItem('kwjar_sinusChamberVisible');
+      if (savedVisibility !== null) {
+        setKwjarSinusChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setKwjarSinusChamberVisible(true);
+        localStorage.setItem('kwjar_sinusChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize kwjar protozoic chamber visibility from localStorage
+  useEffect(() => {
+    if (pathname === '/kwjar') {
+      const savedVisibility = localStorage.getItem('kwjar_protozoicChamberVisible');
+      if (savedVisibility !== null) {
+        setKwjarProtozoicChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setKwjarProtozoicChamberVisible(true);
+        localStorage.setItem('kwjar_protozoicChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize kwjar mesozoic chamber visibility from localStorage
+  useEffect(() => {
+    if (pathname === '/kwjar') {
+      const savedVisibility = localStorage.getItem('kwjar_mesozoicChamberVisible');
+      if (savedVisibility !== null) {
+        setKwjarMesozoicChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setKwjarMesozoicChamberVisible(true);
+        localStorage.setItem('kwjar_mesozoicChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize cnjar1 mandible chamber visibility from localStorage
+  useEffect(() => {
+    if (pathname === '/cnjar1') {
+      const savedVisibility = localStorage.getItem('cnjar1_mandibleChamberVisible');
+      if (savedVisibility !== null) {
+        setCnjar1MandibleChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setCnjar1MandibleChamberVisible(true);
+        localStorage.setItem('cnjar1_mandibleChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize cnjar1 sinus chamber visibility from localStorage
+  useEffect(() => {
+    if (pathname === '/cnjar1') {
+      const savedVisibility = localStorage.getItem('cnjar1_sinusChamberVisible');
+      if (savedVisibility !== null) {
+        setCnjar1SinusChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setCnjar1SinusChamberVisible(true);
+        localStorage.setItem('cnjar1_sinusChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize cnjar1 protozoic chamber visibility from localStorage
+  useEffect(() => {
+    if (pathname === '/cnjar1') {
+      const savedVisibility = localStorage.getItem('cnjar1_protozoicChamberVisible');
+      if (savedVisibility !== null) {
+        setCnjar1ProtozoicChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setCnjar1ProtozoicChamberVisible(true);
+        localStorage.setItem('cnjar1_protozoicChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Initialize cnjar1 mesozoic chamber visibility from localStorage
+  useEffect(() => {
+    if (pathname === '/cnjar1') {
+      const savedVisibility = localStorage.getItem('cnjar1_mesozoicChamberVisible');
+      if (savedVisibility !== null) {
+        setCnjar1MesozoicChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setCnjar1MesozoicChamberVisible(true);
+        localStorage.setItem('cnjar1_mesozoicChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Handle kwjar mandible chamber toggle
+  const handleKwjarMandibleChamberToggle = (checked: boolean) => {
+    setKwjarMandibleChamberVisible(checked);
+    localStorage.setItem('kwjar_mandibleChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('kwjarMandibleChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Handle kwjar sinus chamber toggle
+  const handleKwjarSinusChamberToggle = (checked: boolean) => {
+    setKwjarSinusChamberVisible(checked);
+    localStorage.setItem('kwjar_sinusChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('kwjarSinusChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Handle kwjar protozoic chamber toggle
+  const handleKwjarProtozoicChamberToggle = (checked: boolean) => {
+    setKwjarProtozoicChamberVisible(checked);
+    localStorage.setItem('kwjar_protozoicChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('kwjarProtozoicChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Handle kwjar mesozoic chamber toggle
+  const handleKwjarMesozoicChamberToggle = (checked: boolean) => {
+    setKwjarMesozoicChamberVisible(checked);
+    localStorage.setItem('kwjar_mesozoicChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('kwjarMesozoicChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  // Handle cnjar1 mandible chamber toggle
+  const handleCnjar1MandibleChamberToggle = (checked: boolean) => {
+    setCnjar1MandibleChamberVisible(checked);
+    localStorage.setItem('cnjar1_mandibleChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('cnjar1-chamber-toggle', { 
+      detail: { chamber: 'mandible_chamber', visible: checked } 
+    }));
+  };
+
+  // Handle cnjar1 sinus chamber toggle
+  const handleCnjar1SinusChamberToggle = (checked: boolean) => {
+    setCnjar1SinusChamberVisible(checked);
+    localStorage.setItem('cnjar1_sinusChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('cnjar1-chamber-toggle', { 
+      detail: { chamber: 'sinus_chamber', visible: checked } 
+    }));
+  };
+
+  // Handle cnjar1 protozoic chamber toggle
+  const handleCnjar1ProtozoicChamberToggle = (checked: boolean) => {
+    setCnjar1ProtozoicChamberVisible(checked);
+    localStorage.setItem('cnjar1_protozoicChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('cnjar1-chamber-toggle', { 
+      detail: { chamber: 'protozoic_chamber', visible: checked } 
+    }));
+  };
+
+  // Handle cnjar1 mesozoic chamber toggle
+  const handleCnjar1MesozoicChamberToggle = (checked: boolean) => {
+    setCnjar1MesozoicChamberVisible(checked);
+    localStorage.setItem('cnjar1_mesozoicChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('cnjar1-chamber-toggle', { 
+      detail: { chamber: 'mesozoic_chamber', visible: checked } 
     }));
   };
 
@@ -481,6 +747,266 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
                       <p>Toggle visibility of the rocket chamber on the tebnar2 page.</p>
                       <p>This controls the main table control interface with pagination, search, and column management.</p>
                       <p>Current state: <strong>{rocketChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* /serpjar page specific controls */}
+              {pathname === '/serpjar' && (
+                <div className="space-y-6">
+                  <div className="bg-gray-50 p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800">SERP Page Visibility Controls</h3>
+                    
+                    {/* Mandible Chamber Toggle */}
+                    <div className="flex items-center space-x-4">
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={mandibleChamberVisible}
+                          onChange={(e) => handleMandibleChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      {/* Label Text */}
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        mandible_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the mandible chamber on the SERP page.</p>
+                      <p>This controls the F400/F410 buttons and mode toggle section.</p>
+                      <p>Current state: <strong>{mandibleChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Sinus Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={sinusChamberVisible}
+                          onChange={(e) => handleSinusChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      {/* Label Text */}
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        sinus_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the sinus chamber on the SERP page.</p>
+                      <p>This controls the SERP Results header and keyword data table.</p>
+                      <p>Current state: <strong>{sinusChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* /kwjar page specific controls */}
+              {pathname === '/kwjar' && (
+                <div className="space-y-6">
+                  <div className="bg-gray-50 p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Keywords Hub Page Visibility Controls</h3>
+                    
+                    {/* Mandible Chamber Toggle */}
+                    <div className="flex items-center space-x-4">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={kwjarMandibleChamberVisible}
+                          onChange={(e) => handleKwjarMandibleChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        mandible_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the mandible chamber on the Keywords Hub page.</p>
+                      <p>Current state: <strong>{kwjarMandibleChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Sinus Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={kwjarSinusChamberVisible}
+                          onChange={(e) => handleKwjarSinusChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        sinus_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the sinus chamber on the Keywords Hub page.</p>
+                      <p>Current state: <strong>{kwjarSinusChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Protozoic Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={kwjarProtozoicChamberVisible}
+                          onChange={(e) => handleKwjarProtozoicChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        protozoic_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the protozoic chamber on the Keywords Hub page.</p>
+                      <p>Current state: <strong>{kwjarProtozoicChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Mesozoic Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={kwjarMesozoicChamberVisible}
+                          onChange={(e) => handleKwjarMesozoicChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        mesozoic_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the mesozoic chamber on the Keywords Hub page.</p>
+                      <p>Current state: <strong>{kwjarMesozoicChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* /cnjar1 page specific controls */}
+              {pathname === '/cnjar1' && (
+                <div className="space-y-6">
+                  <div className="bg-gray-50 p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800">CNJar1 Page Visibility Controls</h3>
+                    
+                    {/* Mandible Chamber Toggle */}
+                    <div className="flex items-center space-x-4">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={cnjar1MandibleChamberVisible}
+                          onChange={(e) => handleCnjar1MandibleChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        mandible_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the mandible chamber on the CNJar1 page.</p>
+                      <p>Current state: <strong>{cnjar1MandibleChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                    </div>
+
+                    {/* Sinus Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={cnjar1SinusChamberVisible}
+                          onChange={(e) => handleCnjar1SinusChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        sinus_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the sinus chamber on the CNJar1 page.</p>
+                      <p>Current state: <strong>{cnjar1SinusChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                    </div>
+
+                    {/* Protozoic Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={cnjar1ProtozoicChamberVisible}
+                          onChange={(e) => handleCnjar1ProtozoicChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        protozoic_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the protozoic chamber on the CNJar1 page.</p>
+                      <p>Current state: <strong>{cnjar1ProtozoicChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                    </div>
+
+                    {/* Mesozoic Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={cnjar1MesozoicChamberVisible}
+                          onChange={(e) => handleCnjar1MesozoicChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        mesozoic_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the mesozoic chamber on the CNJar1 page.</p>
+                      <p>Current state: <strong>{cnjar1MesozoicChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
                       <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
                     </div>
                   </div>

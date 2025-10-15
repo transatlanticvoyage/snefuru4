@@ -299,7 +299,11 @@ export default function FilegunPageComplete2() {
       {/* Mead Control Panel */}
       {chambersVisible.meadLake && (
         <div className="px-6 py-4 bg-white">
-          <MeadControl />
+          <MeadControl 
+            currentPath={currentPath}
+            selectedItemPath={selectedItemPath}
+            selectedItemIsFile={selectedItemIsFile}
+          />
         </div>
       )}
 

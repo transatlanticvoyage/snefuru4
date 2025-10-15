@@ -26,6 +26,15 @@ export default function KwjarClient() {
     ColumnPaginationBar1: () => JSX.Element | null;
     ColumnPaginationBar2: () => JSX.Element | null;
   } | null>(null);
+  const [mainPaginationControls, setMainPaginationControls] = useState<{
+    PaginationControls: () => JSX.Element;
+    SearchField: () => JSX.Element;
+  } | null>(null);
+  
+  // Table actions state for mesozoic chamber
+  const [tableActions, setTableActions] = useState<{
+    DataForSEOActions: () => JSX.Element;
+  } | null>(null);
 
   // Column pagination URL parameter states
   const [columnsPerPage, setColumnsPerPage] = useState(8);
@@ -39,6 +48,11 @@ export default function KwjarClient() {
   const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [currentUrl, setCurrentUrl] = useState<string>('');
+  
+  // Chamber visibility states
+  const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
+  const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
+  const [protozoicChamberVisible, setProtozoicChamberVisible] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -46,6 +60,55 @@ export default function KwjarClient() {
       return;
     }
   }, [user, router]);
+
+  // Initialize chamber visibility from localStorage
+  useEffect(() => {
+    const savedMandible = localStorage.getItem('kwjar_mandibleChamberVisible');
+    if (savedMandible !== null) {
+      setMandibleChamberVisible(JSON.parse(savedMandible));
+    }
+    
+    const savedSinus = localStorage.getItem('kwjar_sinusChamberVisible');
+    if (savedSinus !== null) {
+      setSinusChamberVisible(JSON.parse(savedSinus));
+    }
+    
+    const savedProtozoic = localStorage.getItem('kwjar_protozoicChamberVisible');
+    if (savedProtozoic !== null) {
+      setProtozoicChamberVisible(JSON.parse(savedProtozoic));
+    }
+  }, []);
+
+  // Listen for bezel system visibility changes
+  useEffect(() => {
+    const handleMandibleChange = (event: CustomEvent) => {
+      setMandibleChamberVisible(event.detail.visible);
+    };
+    
+    const handleSinusChange = (event: CustomEvent) => {
+      setSinusChamberVisible(event.detail.visible);
+    };
+    
+    const handleProtozoicChange = (event: CustomEvent) => {
+      setProtozoicChamberVisible(event.detail.visible);
+    };
+    
+    const handleMesozoicChange = (event: CustomEvent) => {
+      setMesozoicChamberVisible(event.detail.visible);
+    };
+
+    window.addEventListener('kwjarMandibleChamberVisibilityChange', handleMandibleChange as EventListener);
+    window.addEventListener('kwjarSinusChamberVisibilityChange', handleSinusChange as EventListener);
+    window.addEventListener('kwjarProtozoicChamberVisibilityChange', handleProtozoicChange as EventListener);
+    window.addEventListener('kwjarMesozoicChamberVisibilityChange', handleMesozoicChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('kwjarMandibleChamberVisibilityChange', handleMandibleChange as EventListener);
+      window.removeEventListener('kwjarSinusChamberVisibilityChange', handleSinusChange as EventListener);
+      window.removeEventListener('kwjarProtozoicChamberVisibilityChange', handleProtozoicChange as EventListener);
+      window.removeEventListener('kwjarMesozoicChamberVisibilityChange', handleMesozoicChange as EventListener);
+    };
+  }, []);
 
 
   // Handle URL parameters for popup, tab state, tag filtering, and column pagination
@@ -303,9 +366,14 @@ export default function KwjarClient() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b px-6 py-4">
-        <div className="flex items-center justify-between">
+      {/* Mandible Chamber */}
+      {mandibleChamberVisible && (
+        <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            mandible_chamber
+          </div>
+          
+          {/* Moved header content */}
           <div className="flex items-center space-x-6">
             <h1 className="text-2xl font-bold text-gray-800">🔍 Keywords Hub</h1>
             <ZhedoriButtonBar />
@@ -321,7 +389,36 @@ export default function KwjarClient() {
                 </div>
               </>
             )}
-            
+          </div>
+        </div>
+      )}
+
+      {/* Sinus Chamber */}
+      {sinusChamberVisible && (
+        <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            sinus_chamber
+          </div>
+          
+          {/* Main pagination and search controls */}
+          {mainPaginationControls && (
+            <div className="flex items-center space-x-4">
+              {mainPaginationControls.PaginationControls()}
+              {mainPaginationControls.SearchField()}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Protozoic Chamber */}
+      {protozoicChamberVisible && (
+        <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            protozoic_chamber
+          </div>
+          
+          {/* Moved buttons and controls */}
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               {/* Functions Popup Button (styled like nwjar1) */}
               <button
@@ -356,12 +453,32 @@ export default function KwjarClient() {
                 delete kws and clear from any cncglub.kwslot*
               </button>
             </div>
-          </div>
-          <div className="text-right">
-            <div className="text-sm text-gray-500">DataForSEO Integration</div>
-            <div className="text-xs text-gray-400">Project: Keywords Research</div>
+            <div className="text-right">
+              <div className="text-sm text-gray-500">DataForSEO Integration</div>
+              <div className="text-xs text-gray-400">Project: Keywords Research</div>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Mesozoic Chamber */}
+      {mesozoicChamberVisible && (
+        <div className="border border-black p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            mesozoic_chamber
+          </div>
+          
+          {/* Table Actions */}
+          {tableActions && (
+            <div className="mt-2">
+              {tableActions.DataForSEOActions()}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Header - now empty, keeping for potential future use */}
+      <div className="bg-white border-b px-6 py-4" style={{ display: 'none' }}>
       </div>
 
       {/* Main Content - Full Width KeywordsHubTable */}
@@ -369,6 +486,8 @@ export default function KwjarClient() {
         <KeywordsHubTable 
           selectedTagId={selectedTag?.tag_id}
           onColumnPaginationRender={setColumnPaginationControls}
+          onMainPaginationRender={setMainPaginationControls}
+          onTableActionsRender={setTableActions}
           initialColumnsPerPage={columnsPerPage}
           initialColumnPage={currentColumnPage}
           onColumnPaginationChange={handleColumnPaginationChange}

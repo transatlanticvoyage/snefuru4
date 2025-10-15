@@ -27,10 +27,22 @@ export default function Cnjar1Client() {
     return true;
   });
 
+  // Chamber visibility states
+  const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
+  const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
+  const [protozoicChamberVisible, setProtozoicChamberVisible] = useState(true);
+  const [mesozoicChamberVisible, setMesozoicChamberVisible] = useState(true);
+
   // Column pagination controls state
   const [columnPaginationControls, setColumnPaginationControls] = useState<{
     ColumnPaginationBar1: () => JSX.Element | null;
     ColumnPaginationBar2: () => JSX.Element | null;
+  } | null>(null);
+
+  // Table controls state
+  const [tableControls, setTableControls] = useState<{
+    FilterControls: () => JSX.Element;
+    TableActions: () => JSX.Element;
   } | null>(null);
 
   // Column pagination URL parameter states
@@ -67,6 +79,34 @@ export default function Cnjar1Client() {
     };
   }, [isHeaderVisible]);
 
+  // Listen for chamber visibility changes from bezel
+  useEffect(() => {
+    const handleChamberToggle = (event: CustomEvent) => {
+      const { chamber, visible } = event.detail;
+      
+      switch(chamber) {
+        case 'mandible_chamber':
+          setMandibleChamberVisible(visible);
+          break;
+        case 'sinus_chamber':
+          setSinusChamberVisible(visible);
+          break;
+        case 'protozoic_chamber':
+          setProtozoicChamberVisible(visible);
+          break;
+        case 'mesozoic_chamber':
+          setMesozoicChamberVisible(visible);
+          break;
+      }
+    };
+
+    window.addEventListener('cnjar1-chamber-toggle' as any, handleChamberToggle as any);
+    
+    return () => {
+      window.removeEventListener('cnjar1-chamber-toggle' as any, handleChamberToggle as any);
+    };
+  }, []);
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -77,57 +117,101 @@ export default function Cnjar1Client() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">
-              CNJar1 Manager
-            </h1>
+      {/* Mandible Chamber */}
+      {mandibleChamberVisible && (
+        <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            mandible_chamber
           </div>
-          <div className="flex items-center space-x-4">
-            <DrenjariButtonBarDriggsmanLinks />
-            <div className="text-right">
-              <div className="text-sm text-gray-500">City-Industry Combinations</div>
-              <div className="text-xs text-gray-400">Manage cncglub table</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Hide/Show Header Button */}
-      <div className="px-6 py-2 bg-gray-50">
-        <button
-          onClick={() => setIsHeaderVisible(!isHeaderVisible)}
-          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
-        >
-          {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
-        </button>
-      </div>
-
-      {/* Column Pagination Button Bars */}
-      {columnPaginationControls && (
-        <div className="px-6 py-2 bg-white border-b">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              {columnPaginationControls.ColumnPaginationBar1()}
-            </div>
-            <div className="flex items-center">
-              {columnPaginationControls.ColumnPaginationBar2()}
+          
+          {/* Header content */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <h1 className="text-2xl font-bold text-gray-800">
+                  CNJar1 Manager
+                </h1>
+                {/* Hide/Show Header Button moved here */}
+                <button
+                  onClick={() => setIsHeaderVisible(!isHeaderVisible)}
+                  className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+                >
+                  {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
+                </button>
+              </div>
+              <div className="flex items-center space-x-4">
+                <DrenjariButtonBarDriggsmanLinks />
+                <div className="text-right">
+                  <div className="text-sm text-gray-500">City-Industry Combinations</div>
+                  <div className="text-xs text-gray-400">Manage cncglub table</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Drenjari Links at Top */}
-      <div className="px-6 py-4">
-        <DrenjariButtonBarDriggsmanLinks />
-      </div>
+      {/* Sinus Chamber */}
+      {sinusChamberVisible && (
+        <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            sinus_chamber
+          </div>
+          
+          {/* Column Pagination Button Bars moved from protozoic */}
+          {columnPaginationControls && (
+            <div className="mt-2">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  {columnPaginationControls.ColumnPaginationBar1()}
+                </div>
+                <div className="flex items-center">
+                  {columnPaginationControls.ColumnPaginationBar2()}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Protozoic Chamber */}
+      {protozoicChamberVisible && (
+        <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            protozoic_chamber
+          </div>
+          
+          {/* Drenjari Links moved from mesozoic */}
+          <div className="mt-2">
+            <DrenjariButtonBarDriggsmanLinks />
+          </div>
+        </div>
+      )}
+
+      {/* Mesozoic Chamber */}
+      {mesozoicChamberVisible && (
+        <div className="border border-black p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            mesozoic_chamber
+          </div>
+          
+          {/* Table Controls */}
+          {tableControls && (
+            <div className="mt-2">
+              {tableControls.FilterControls()}
+              {tableControls.TableActions()}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* All content moved into chambers above */}
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <Cnjar1Table
           onColumnPaginationRender={setColumnPaginationControls}
+          onTableControlsRender={setTableControls}
           initialColumnsPerPage={columnsPerPage}
           initialColumnPage={currentColumnPage}
           onColumnPaginationChange={handleColumnPaginationChange}

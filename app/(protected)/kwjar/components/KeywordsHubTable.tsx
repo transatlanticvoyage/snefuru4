@@ -3,12 +3,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
-import dynamic from 'next/dynamic';
-
-const NubraTablefaceKite = dynamic(
-  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
-  { ssr: false }
-);
 
 interface KeywordRecord {
   keyword_id: number;
@@ -77,6 +71,13 @@ interface KeywordsHubTableProps {
   initialColumnsPerPage?: number;
   initialColumnPage?: number;
   onColumnPaginationChange?: (columnsPerPage: number, currentPage: number) => void;
+  onMainPaginationRender?: (controls: {
+    PaginationControls: () => JSX.Element;
+    SearchField: () => JSX.Element;
+  }) => void;
+  onTableActionsRender?: (controls: {
+    DataForSEOActions: () => JSX.Element;
+  }) => void;
 }
 
 export default function KeywordsHubTable({ 
@@ -84,7 +85,9 @@ export default function KeywordsHubTable({
   onColumnPaginationRender, 
   initialColumnsPerPage = 8,
   initialColumnPage = 1,
-  onColumnPaginationChange
+  onColumnPaginationChange,
+  onMainPaginationRender,
+  onTableActionsRender
 }: KeywordsHubTableProps) {
   const { user } = useAuth();
   const [data, setData] = useState<KeywordRecord[]>([]);
@@ -514,6 +517,25 @@ export default function KeywordsHubTable({
       });
     }
   }, [onColumnPaginationRender, currentColumnPage, totalColumnPages, columnsPerPage]);
+
+  // Pass main pagination controls to parent
+  useEffect(() => {
+    if (onMainPaginationRender) {
+      onMainPaginationRender({
+        PaginationControls,
+        SearchField
+      });
+    }
+  }, [onMainPaginationRender, currentPage, totalPages, itemsPerPage, searchTerm]);
+
+  // Pass table actions to parent
+  useEffect(() => {
+    if (onTableActionsRender) {
+      onTableActionsRender({
+        DataForSEOActions
+      });
+    }
+  }, [onTableActionsRender, bulkRefreshing, blankRefreshing, reverseLookupRefreshing, selectedRows.size]);
 
   // Notify parent of column pagination changes
   useEffect(() => {
@@ -1114,15 +1136,16 @@ export default function KeywordsHubTable({
     if (column.key === 'serp_tool') {
       return (
         <div className="px-2 py-1 flex items-center justify-center">
-          <button
-            onClick={() => {
-              window.open(`/serpjar?keyword_id=${item.keyword_id}`, '_blank');
-            }}
-            className="w-4 h-4 bg-black text-white font-bold text-xs flex items-center justify-center hover:bg-gray-800 transition-colors"
+          <a
+            href={`/serpjar?keyword_id=${item.keyword_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-4 h-4 bg-black text-white font-bold text-xs flex items-center justify-center hover:bg-gray-800 transition-colors no-underline inline-block"
             title={`Open SERP tool for keyword: ${item.keyword_datum}`}
+            style={{ textDecoration: 'none', lineHeight: '16px' }}
           >
-            S
-          </button>
+            s
+          </a>
         </div>
       );
     }
@@ -1154,6 +1177,101 @@ export default function KeywordsHubTable({
   };
 
   // Pagination Controls Component - Matching /filejar style
+  // DataForSEO Actions Component
+  const DataForSEOActions = () => (
+    <div className="flex items-center space-x-2">
+      {/* Tooltip label */}
+      <div className="relative group">
+        <button className="bg-gray-100 text-gray-600 px-3 py-2 rounded-md text-sm font-medium cursor-help border border-gray-300">
+          DFS Task Post/Get
+        </button>
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+          Task Post/Get: Asynchronous processing
+        </div>
+      </div>
+      
+      {/* Refresh Metrics Button */}
+      <button
+        onClick={bulkRefreshMetrics}
+        disabled={bulkRefreshing || selectedRows.size === 0}
+        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+          bulkRefreshing || selectedRows.size === 0
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            : 'bg-blue-600 text-white hover:bg-blue-700'
+        }`}
+      >
+        {bulkRefreshing ? 'Processing...' : 'Refresh Metrics'}
+      </button>
+
+      {/* Only Refresh Blanks Button */}
+      <button
+        onClick={bulkRefreshBlanks}
+        disabled={blankRefreshing || bulkRefreshing}
+        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+          blankRefreshing || bulkRefreshing
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            : 'bg-green-600 text-white hover:bg-green-700'
+        }`}
+      >
+        {blankRefreshing ? 'Processing...' : 'only refresh blanks'}
+      </button>
+
+      {/* Reverse Lookup Refresh Button */}
+      <button
+        onClick={bulkRefreshReverseLookup}
+        disabled={reverseLookupRefreshing || bulkRefreshing || blankRefreshing}
+        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+          reverseLookupRefreshing || bulkRefreshing || blankRefreshing
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            : 'bg-purple-600 text-white hover:bg-purple-700'
+        }`}
+        title={selectedRows.size > 0 ? `Refresh reverse lookup for ${selectedRows.size} selected keywords` : `Refresh reverse lookup for ${paginatedData.length} visible keywords`}
+      >
+        {reverseLookupRefreshing ? 'Processing...' : 'refresh reverse lookup'}
+      </button>
+      
+      {/* Create New Buttons */}
+      <button
+        onClick={createNewInline}
+        className="bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+      >
+        Create New (Inline)
+      </button>
+      <button
+        onClick={() => setIsCreateModalOpen(true)}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+      >
+        Create New (Popup)
+      </button>
+    </div>
+  );
+
+  const SearchField = () => {
+    return (
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Search all fields..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+        />
+        <button
+          onClick={() => {
+            setSearchTerm('');
+            setCurrentPage(1);
+          }}
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+        >
+          CL
+        </button>
+      </div>
+    );
+  };
+
   const PaginationControls = () => {
     // Always show pagination controls
     
@@ -1301,29 +1419,7 @@ export default function KeywordsHubTable({
       <div className="flex-none bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <NubraTablefaceKite text="nubra-tableface-kite" />
-            <PaginationControls />
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search all fields..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
-              />
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setCurrentPage(1);
-                }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
-              >
-                CL
-              </button>
-            </div>
+            {/* Controls moved to parent component's sinus chamber */}
             
             {/* DataForSEO Bulk Refresh Controls */}
             <div className="flex items-center space-x-2">

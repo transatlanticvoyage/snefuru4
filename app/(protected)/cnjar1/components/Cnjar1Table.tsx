@@ -3,14 +3,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter, useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { f355PopulateCncglub } from '../utils/f355-populate-cncglub';
 import { f360DeleteAllCncglub } from '../utils/f360-delete-all-cncglub';
-
-const NubraTablefaceKite = dynamic(
-  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
-  { ssr: false }
-);
 
 interface Cncglub {
   cncg_id: number;
@@ -66,13 +60,18 @@ interface Cnjar1TableProps {
     ColumnPaginationBar1: () => JSX.Element | null;
     ColumnPaginationBar2: () => JSX.Element | null;
   }) => void;
+  onTableControlsRender?: (controls: {
+    FilterControls: () => JSX.Element;
+    TableActions: () => JSX.Element;
+  }) => void;
   initialColumnsPerPage?: number;
   initialColumnPage?: number;
   onColumnPaginationChange?: (columnsPerPage: number, currentPage: number) => void;
 }
 
 export default function Cnjar1Table({ 
-  onColumnPaginationRender, 
+  onColumnPaginationRender,
+  onTableControlsRender, 
   initialColumnsPerPage = 8,
   initialColumnPage = 1,
   onColumnPaginationChange
@@ -546,6 +545,16 @@ export default function Cnjar1Table({
       onColumnPaginationChange(columnsPerPage, currentColumnPage);
     }
   }, [onColumnPaginationChange, columnsPerPage, currentColumnPage]);
+
+  // Pass table controls to parent
+  useEffect(() => {
+    if (onTableControlsRender) {
+      onTableControlsRender({
+        FilterControls,
+        TableActions
+      });
+    }
+  }, [onTableControlsRender, citySizeFilter, stateFilter, industryFilter, searchTerm, currentPage, itemsPerPage]);
 
   // Handle sorting
   const handleSort = (field: keyof Cncglub | string) => {
@@ -1184,6 +1193,156 @@ export default function Cnjar1Table({
     );
   };
 
+  // Filter Controls Component
+  const FilterControls = () => (
+    <div className="bg-white border-b border-gray-200 px-4 py-2">
+      <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-3">
+          <label className="font-bold text-sm text-gray-700">Filter by City Population:</label>
+          <select
+            value={citySizeFilter}
+            onChange={(e) => {
+              handleCitySizeFilterChange(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="all">All Records</option>
+            <option value="75k-325k">75k-325k</option>
+            <option value="under-25k">Under 25k</option>
+            <option value="25k-50k">25k - 50k</option>
+            <option value="50k-100k">50k - 100k</option>
+            <option value="100k-500k">100k - 500k</option>
+            <option value="500k-plus">500k+</option>
+          </select>
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          <label className="font-bold text-sm text-gray-700">State:</label>
+          <select
+            value={stateFilter}
+            onChange={(e) => {
+              handleStateFilterChange(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="all">All States</option>
+            {usStates.map(state => (
+              <option key={state.code} value={state.code}>
+                {state.code} - {state.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          <label className="font-bold text-sm text-gray-700">Industry Name:</label>
+          <select
+            value={industryFilter}
+            onChange={(e) => {
+              handleIndustryFilterChange(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="all">All Industries</option>
+            {industries
+              .slice()
+              .sort((a, b) => (a.industry_name || '').localeCompare(b.industry_name || ''))
+              .map(industry => (
+                <option key={industry.industry_id} value={industry.industry_name || ''}>
+                  {industry.industry_name}
+                </option>
+              ))}
+          </select>
+        </div>
+        
+        <div className="text-xs text-gray-500">
+          Debug: {data.length} total, {filteredAndSortedData.length} filtered
+        </div>
+      </div>
+    </div>
+  );
+
+  // Table Actions Component
+  const TableActions = () => (
+    <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-6">
+          <button
+            onClick={handleF355PopulateClick}
+            disabled={isF355Running}
+            className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors flex items-center space-x-2"
+          >
+            {isF355Running ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Running...</span>
+              </>
+            ) : (
+              <span>f355 populate cncglub</span>
+            )}
+          </button>
+          <button
+            onClick={handleF360DeleteClick}
+            disabled={isF360Running}
+            className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors flex items-center space-x-2"
+          >
+            {isF360Running ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Deleting...</span>
+              </>
+            ) : (
+              <span>f360 delete all cncglub records</span>
+            )}
+          </button>
+          <div className="text-sm text-gray-600">
+            {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
+            {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+          </div>
+          <PaginationControls />
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search all fields..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+            />
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setCurrentPage(1);
+              }}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+            >
+              CL
+            </button>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={createNewRecordInline}
+            className="bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+          >
+            Create New (Inline)
+          </button>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+          >
+            Create New (Popup)
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   // Pagination Controls Component
   const PaginationControls = () => (
     <div className="flex items-center space-x-4">
@@ -1292,12 +1451,16 @@ export default function Cnjar1Table({
 
   return (
     <div className="w-full">
-      {/* City Size Filter */}
-      <div className="bg-white border-b border-gray-200 px-4 py-2">
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-3">
-            <label className="font-bold text-sm text-gray-700">Filter by City Population:</label>
-            <select
+      {/* Filters and controls moved to chambers - removing duplicate rendering */}
+      {/* Keeping minimal version for now in case controls aren't properly loaded */}
+      {false && (
+        <>
+          {/* City Size Filter */}
+          <div className="bg-white border-b border-gray-200 px-4 py-2">
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-3">
+                <label className="font-bold text-sm text-gray-700">Filter by City Population:</label>
+                <select
               value={citySizeFilter}
               onChange={(e) => {
                 handleCitySizeFilterChange(e.target.value);
@@ -1367,7 +1530,6 @@ export default function Cnjar1Table({
       <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-6">
-            <NubraTablefaceKite tableType="cncglub-grid" />
             <button
               onClick={handleF355PopulateClick}
               disabled={isF355Running}
@@ -1439,6 +1601,8 @@ export default function Cnjar1Table({
           </div>
         </div>
       </div>
+      </>
+      )}
 
       {/* Table */}
       <div className="bg-white overflow-hidden">
