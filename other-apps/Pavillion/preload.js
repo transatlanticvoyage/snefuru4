@@ -39,5 +39,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   dbGetFolders: (options) => ipcRenderer.invoke('db-get-folders', options),
   dbGetFiles: (options) => ipcRenderer.invoke('db-get-files', options),
   dbGetUnified: (options) => ipcRenderer.invoke('db-get-unified', options),
-  dbScanDirectory: (dirPath) => ipcRenderer.invoke('db-scan-directory', dirPath)
+  dbScanDirectory: (dirPath) => ipcRenderer.invoke('db-scan-directory', dirPath),
+  dbUpdateFolder: (folderPath, updates) => ipcRenderer.invoke('db-update-folder', folderPath, updates),
+  
+  // Additional file operations for Filegun
+  createFile: (filePath, content) => ipcRenderer.invoke('create-file', filePath, content),
+  renameFile: (oldPath, newName) => ipcRenderer.invoke('rename-file', oldPath, newName)
 });

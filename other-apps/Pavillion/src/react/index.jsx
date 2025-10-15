@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import FilegunPage from './components/filegun/FilegunPageSimple';
+import FilegunPageComplete2 from './components/filegun/FilegunPageComplete2';
 import './styles/tailwind.css';
+import './styles/filegun.css';
 
 // Global function to mount React components in Electron
 window.mountReactComponent = (componentName, elementId, props = {}) => {
@@ -15,7 +16,7 @@ window.mountReactComponent = (componentName, elementId, props = {}) => {
   
   switch (componentName) {
     case 'FilegunPage':
-      root.render(<FilegunPage {...props} />);
+      root.render(<FilegunPageComplete2 {...props} />);
       break;
     default:
       console.error(`Component "${componentName}" not found`);
@@ -23,4 +24,4 @@ window.mountReactComponent = (componentName, elementId, props = {}) => {
 };
 
 // Export for use in renderer
-export { FilegunPage };
+export { FilegunPageComplete2 as FilegunPage };

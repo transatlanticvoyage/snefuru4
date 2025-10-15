@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
@@ -7,7 +8,8 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'react-bundle.js',
     library: 'PavillionReact',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    globalObject: 'this'
   },
   module: {
     rules: [
@@ -28,7 +30,22 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx'],
+    fallback: {
+      "path": false,
+      "fs": false,
+      "crypto": false
+    }
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'global': 'window',
+      'process.env.NODE_ENV': JSON.stringify('development')
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+      Buffer: ['buffer', 'Buffer']
+    })
+  ],
   target: 'electron-renderer'
 };

@@ -316,12 +316,21 @@ function initializeFobjectJar() {
 
 // Filegun Implementation
 function initializeFilegun() {
-  // Mount the React component
-  if (window.mountReactComponent) {
+  // Load the React bundle if not already loaded
+  if (!window.mountReactComponent) {
+    const reactBundle = document.createElement('script');
+    reactBundle.src = './dist/react-bundle.js';
+    reactBundle.onload = () => {
+      console.log('React bundle loaded, mounting Filegun component');
+      if (window.mountReactComponent) {
+        window.mountReactComponent('FilegunPage', 'filegun-react-root');
+      }
+    };
+    document.head.appendChild(reactBundle);
+  } else {
+    // React bundle already loaded, just mount the component
     window.mountReactComponent('FilegunPage', 'filegun-react-root');
     console.log('Filegun React component mounted');
-  } else {
-    console.error('React mount function not available. Make sure react-bundle.js is loaded.');
   }
 }
 

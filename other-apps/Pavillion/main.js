@@ -688,6 +688,60 @@ ipcMain.handle('db-scan-directory', async (event, dirPath) => {
   }
 });
 
+// Add missing database handlers for Filegun
+ipcMain.handle('db-update-folder', async (event, folderPath, updates) => {
+  if (!db) {
+    return { success: false, error: 'Database not initialized' };
+  }
+  
+  try {
+    const updateFields = [];
+    const values = [];
+    
+    for (const [key, value] of Object.entries(updates)) {
+      updateFields.push(`${key} = ?`);
+      values.push(value);
+    }
+    
+    values.push(folderPath);
+    
+    const stmt = db.prepare(`
+      UPDATE filegun_folders 
+      SET ${updateFields.join(', ')} 
+      WHERE folder_path = ?
+    `);
+    
+    const result = stmt.run(...values);
+    
+    return { success: true, changes: result.changes };
+  } catch (error) {
+    console.error('Update folder error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('create-file', async (event, filePath, content = '') => {
+  try {
+    await fs.promises.writeFile(filePath, content);
+    return { success: true };
+  } catch (error) {
+    console.error('Create file error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('rename-file', async (event, oldPath, newName) => {
+  try {
+    const dir = path.dirname(oldPath);
+    const newPath = path.join(dir, newName);
+    await fs.promises.rename(oldPath, newPath);
+    return { success: true, newPath };
+  } catch (error) {
+    console.error('Rename file error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
 ipcMain.handle('get-available-cloud-storage', async () => {
   const homePath = app.getPath('home');
   const cloudServices = [
