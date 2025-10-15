@@ -79,6 +79,20 @@ function initializeTabs() {
       } else if (groupId === 'jupiter') {
         addFolderBtn.style.display = 'none';
         streamManagement.style.display = 'none';
+      } else if (groupId === 'filegun' || groupId === 'folderjar' || groupId === 'fobjectjar') {
+        addFolderBtn.style.display = 'none';
+        streamManagement.style.display = 'none';
+        // Initialize the page if it's the first time
+        if (groupId === 'filegun' && !window.filegunInitialized) {
+          initializeFilegun();
+          window.filegunInitialized = true;
+        } else if (groupId === 'folderjar' && !window.folderjarInitialized) {
+          initializeFolderJar();
+          window.folderjarInitialized = true;
+        } else if (groupId === 'fobjectjar' && !window.fobjectjarInitialized) {
+          initializeFobjectJar();
+          window.fobjectjarInitialized = true;
+        }
       } else {
         addFolderBtn.style.display = 'block';
         streamManagement.style.display = 'none';

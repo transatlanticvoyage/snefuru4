@@ -1,9 +1,11 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu, shell, globalShortcut } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const Database = require('better-sqlite3');
 
 let mainWindow;
 let userDataPath;
+let db;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -23,6 +25,9 @@ function createWindow() {
 
   mainWindow.loadFile('index.html');
 
+  // Always open DevTools for debugging
+  mainWindow.webContents.openDevTools();
+  
   if (process.argv.includes('--dev')) {
     mainWindow.webContents.openDevTools();
   }
@@ -32,8 +37,76 @@ function createWindow() {
   });
 }
 
+// Initialize database
+function initializeDatabase() {
+  const dbPath = path.join(app.getPath('userData'), 'pavilion.db');
+  db = new Database(dbPath);
+  
+  // Create tables if they don't exist
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS filegun_folders (
+      folder_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      folder_path TEXT,
+      folder_name TEXT,
+      folder_parent_path TEXT,
+      depth INTEGER,
+      file_system_created TEXT,
+      file_system_modified TEXT,
+      last_accessed_at TEXT,
+      last_sync_at TEXT,
+      is_protected BOOLEAN,
+      permissions TEXT,
+      checksum TEXT,
+      sync_status TEXT,
+      is_pinned BOOLEAN
+    );
+    
+    CREATE TABLE IF NOT EXISTS filegun_files (
+      file_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      file_path TEXT,
+      file_name TEXT,
+      file_parent_path TEXT,
+      extension TEXT,
+      mime_type TEXT,
+      file_size INTEGER,
+      encoding TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      modified_at TEXT,
+      last_accessed_at TEXT,
+      file_system_created TEXT,
+      file_system_modified TEXT,
+      is_protected BOOLEAN,
+      permissions TEXT,
+      owner_user TEXT,
+      owner_group TEXT,
+      is_hidden BOOLEAN,
+      is_executable BOOLEAN,
+      line_count INTEGER,
+      character_count INTEGER,
+      word_count INTEGER,
+      checksum TEXT,
+      content_preview TEXT,
+      is_code_file BOOLEAN,
+      programming_language TEXT,
+      git_status TEXT,
+      last_git_commit TEXT,
+      tags TEXT,
+      custom_metadata TEXT,
+      user_notes TEXT,
+      color_label TEXT,
+      importance_level INTEGER,
+      sync_status TEXT,
+      last_sync_at TEXT,
+      is_zepulus_docs BOOLEAN
+    );
+  `);
+  
+  console.log('Database initialized at:', dbPath);
+}
+
 app.whenReady().then(() => {
   userDataPath = path.join(app.getPath('userData'), 'pavilion-config.json');
+  initializeDatabase();
   
   // Register custom protocol for Gazebo helper
   app.setAsDefaultProtocolClient('pavilion');
@@ -98,6 +171,10 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   // Unregister global shortcuts
   globalShortcut.unregisterAll();
+  // Close database if it exists
+  if (db) {
+    db.close();
+  }
   // Quit app completely when window closes (even on macOS)
   app.quit();
 });
@@ -395,6 +472,219 @@ ipcMain.handle('check-path-exists', async (event, pathToCheck) => {
     return true;
   } catch (error) {
     return false;
+  }
+});
+
+// Database IPC Handlers
+ipcMain.handle('db-get-folders', async (event, options = {}) => {
+  if (!db) {
+    console.error('Database not initialized');
+    return { data: [], total: 0, error: 'Database not initialized' };
+  }
+  try {
+    let query = 'SELECT * FROM filegun_folders';
+    const params = [];
+    
+    if (options.search) {
+      query += ' WHERE folder_name LIKE ? OR folder_path LIKE ?';
+      params.push(`%${options.search}%`, `%${options.search}%`);
+    }
+    
+    query += ' ORDER BY ' + (options.sortField || 'file_system_created') + ' ' + (options.sortOrder || 'DESC');
+    
+    if (options.limit) {
+      query += ' LIMIT ? OFFSET ?';
+      params.push(options.limit, options.offset || 0);
+    }
+    
+    const stmt = db.prepare(query);
+    const rows = stmt.all(...params);
+    
+    // Get total count
+    let countQuery = 'SELECT COUNT(*) as total FROM filegun_folders';
+    if (options.search) {
+      countQuery += ' WHERE folder_name LIKE ? OR folder_path LIKE ?';
+    }
+    const countStmt = db.prepare(countQuery);
+    const count = options.search ? 
+      countStmt.get(`%${options.search}%`, `%${options.search}%`) : 
+      countStmt.get();
+    
+    return { data: rows, total: count.total };
+  } catch (error) {
+    console.error('Database error:', error);
+    return { data: [], total: 0, error: error.message };
+  }
+});
+
+ipcMain.handle('db-get-files', async (event, options = {}) => {
+  if (!db) {
+    console.error('Database not initialized');
+    return { data: [], total: 0, error: 'Database not initialized' };
+  }
+  try {
+    let query = 'SELECT * FROM filegun_files';
+    const params = [];
+    
+    if (options.search) {
+      query += ' WHERE file_name LIKE ? OR file_path LIKE ?';
+      params.push(`%${options.search}%`, `%${options.search}%`);
+    }
+    
+    query += ' ORDER BY ' + (options.sortField || 'created_at') + ' ' + (options.sortOrder || 'DESC');
+    
+    if (options.limit) {
+      query += ' LIMIT ? OFFSET ?';
+      params.push(options.limit, options.offset || 0);
+    }
+    
+    const stmt = db.prepare(query);
+    const rows = stmt.all(...params);
+    
+    // Get total count
+    let countQuery = 'SELECT COUNT(*) as total FROM filegun_files';
+    if (options.search) {
+      countQuery += ' WHERE file_name LIKE ? OR file_path LIKE ?';
+    }
+    const countStmt = db.prepare(countQuery);
+    const count = options.search ? 
+      countStmt.get(`%${options.search}%`, `%${options.search}%`) : 
+      countStmt.get();
+    
+    return { data: rows, total: count.total };
+  } catch (error) {
+    console.error('Database error:', error);
+    return { data: [], total: 0, error: error.message };
+  }
+});
+
+ipcMain.handle('db-get-unified', async (event, options = {}) => {
+  if (!db) {
+    console.error('Database not initialized');
+    return { data: [], total: 0, error: 'Database not initialized' };
+  }
+  try {
+    // Combine files and folders for unified view
+    let filesQuery = `SELECT 'file' as type, file_id as id, file_name as name, file_path as path, 
+                      file_parent_path as parent_path, file_size as size, extension, 
+                      NULL as depth, file_system_created, file_system_modified, 
+                      is_protected, permissions, NULL as is_pinned, sync_status
+                      FROM filegun_files`;
+    
+    let foldersQuery = `SELECT 'folder' as type, folder_id as id, folder_name as name, 
+                        folder_path as path, folder_parent_path as parent_path, 
+                        NULL as size, NULL as extension, depth, 
+                        file_system_created, file_system_modified, 
+                        is_protected, permissions, is_pinned, sync_status
+                        FROM filegun_folders`;
+    
+    const params = [];
+    let whereClause = '';
+    
+    if (options.search) {
+      whereClause = ' WHERE name LIKE ? OR path LIKE ?';
+      params.push(`%${options.search}%`, `%${options.search}%`);
+    }
+    
+    if (options.typeFilter && options.typeFilter !== 'all') {
+      if (options.typeFilter === 'file') {
+        foldersQuery = 'SELECT * FROM (SELECT NULL LIMIT 0) WHERE 1=0'; // Empty folders
+      } else if (options.typeFilter === 'folder') {
+        filesQuery = 'SELECT * FROM (SELECT NULL LIMIT 0) WHERE 1=0'; // Empty files
+      }
+    }
+    
+    let query = `SELECT * FROM ((${filesQuery}${whereClause}) UNION ALL (${foldersQuery}${whereClause})) 
+                 ORDER BY ${options.sortField || 'file_system_modified'} ${options.sortOrder || 'DESC'}`;
+    
+    if (options.limit) {
+      query += ' LIMIT ? OFFSET ?';
+      params.push(options.limit, options.offset || 0);
+    }
+    
+    const stmt = db.prepare(query);
+    const rows = stmt.all(...params.concat(params)); // Duplicate params for both subqueries
+    
+    // Get total count
+    const countStmt = db.prepare(`SELECT COUNT(*) as total FROM ((${filesQuery}${whereClause}) UNION ALL (${foldersQuery}${whereClause}))`);
+    const count = options.search ? 
+      countStmt.get(...params.concat(params)) : 
+      countStmt.get();
+    
+    return { data: rows, total: count.total };
+  } catch (error) {
+    console.error('Database error:', error);
+    return { data: [], total: 0, error: error.message };
+  }
+});
+
+ipcMain.handle('db-scan-directory', async (event, dirPath) => {
+  if (!db) {
+    console.error('Database not initialized');
+    return { success: false, error: 'Database not initialized' };
+  }
+  try {
+    const stats = await fs.promises.stat(dirPath);
+    const items = await fs.promises.readdir(dirPath, { withFileTypes: true });
+    
+    const results = [];
+    
+    for (const item of items) {
+      const itemPath = path.join(dirPath, item.name);
+      try {
+        const itemStats = await fs.promises.stat(itemPath);
+        
+        if (item.isDirectory()) {
+          // Insert folder
+          const stmt = db.prepare(`
+            INSERT OR REPLACE INTO filegun_folders 
+            (folder_path, folder_name, folder_parent_path, depth, file_system_created, 
+             file_system_modified, is_protected, sync_status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+          
+          stmt.run(
+            itemPath,
+            item.name,
+            dirPath,
+            itemPath.split(path.sep).length,
+            itemStats.birthtime.toISOString(),
+            itemStats.mtime.toISOString(),
+            false,
+            'synced'
+          );
+        } else {
+          // Insert file
+          const stmt = db.prepare(`
+            INSERT OR REPLACE INTO filegun_files 
+            (file_path, file_name, file_parent_path, extension, file_size, 
+             file_system_created, file_system_modified, is_protected, sync_status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+          
+          stmt.run(
+            itemPath,
+            item.name,
+            dirPath,
+            path.extname(item.name),
+            itemStats.size,
+            itemStats.birthtime.toISOString(),
+            itemStats.mtime.toISOString(),
+            false,
+            'synced'
+          );
+        }
+        
+        results.push({ path: itemPath, success: true });
+      } catch (error) {
+        results.push({ path: itemPath, success: false, error: error.message });
+      }
+    }
+    
+    return { success: true, scanned: results.length, results };
+  } catch (error) {
+    console.error('Scan error:', error);
+    return { success: false, error: error.message };
   }
 });
 

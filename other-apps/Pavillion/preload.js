@@ -33,5 +33,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onGazeboAddToStream: (callback) => ipcRenderer.on('gazebo-add-to-stream', (event, data) => callback(data)),
   
   // Meridian Board handler
-  onMeridianFileDropped: (callback) => ipcRenderer.on('meridian-file-dropped', (event, filePath) => callback(filePath))
+  onMeridianFileDropped: (callback) => ipcRenderer.on('meridian-file-dropped', (event, filePath) => callback(filePath)),
+  
+  // Database API
+  dbGetFolders: (options) => ipcRenderer.invoke('db-get-folders', options),
+  dbGetFiles: (options) => ipcRenderer.invoke('db-get-files', options),
+  dbGetUnified: (options) => ipcRenderer.invoke('db-get-unified', options),
+  dbScanDirectory: (dirPath) => ipcRenderer.invoke('db-scan-directory', dirPath)
 });
