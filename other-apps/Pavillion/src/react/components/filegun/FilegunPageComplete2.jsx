@@ -11,6 +11,8 @@ import SentinelStatus from './SentinelStatus';
 import MeadControl from './MeadControl';
 import MenjariButtonBarFileGunLinks from '../MenjariButtonBarFileGunLinks';
 import FilegunFoldersTable from '../shared/FilegunFoldersTable';
+import ChamberControls from './ChamberControls';
+import RavineEditor from './RavineEditor';
 
 export default function FilegunPageComplete2() {
   const { user } = useAuth();
@@ -36,12 +38,25 @@ export default function FilegunPageComplete2() {
     return true;
   });
   
-  const [chambersVisible, setChambersVisible] = useState({
-    toolbar24: true,
-    toolbar25: true,
-    sentinelLake: true,
-    meadLake: true,
-    hemlockViewerPane: true
+  const [chambersVisible, setChambersVisible] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('filegun-chambers-visible');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Error parsing saved chambers state:', e);
+        }
+      }
+    }
+    return {
+      toolbar24: true,
+      toolbar25: true,
+      sentinelLake: true,
+      meadLake: true,
+      hemlockViewerPane: true,
+      ravineEditor: false
+    };
   });
 
   useEffect(() => {
@@ -58,6 +73,12 @@ export default function FilegunPageComplete2() {
       localStorage.setItem('filegun-header-visible', isHeaderVisible.toString());
     }
   }, [isHeaderVisible]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('filegun-chambers-visible', JSON.stringify(chambersVisible));
+    }
+  }, [chambersVisible]);
 
   const loadDirectory = async (path) => {
     setIsLoading(true);
@@ -192,6 +213,12 @@ export default function FilegunPageComplete2() {
 
   return (
     <div className="flex flex-col h-screen bg-white">
+      {/* Chamber Controls - Always visible at top */}
+      <ChamberControls 
+        chambersVisible={chambersVisible}
+        onToggleChamber={toggleChamber}
+      />
+
       {/* Header with Menjari Button Bar */}
       {isHeaderVisible && (
         <div className="bg-white border-b">
@@ -220,18 +247,16 @@ export default function FilegunPageComplete2() {
 
       {/* Toolbar24 */}
       {chambersVisible.toolbar24 && (
-        <div className="bg-white border-b px-4 py-3">
+        <div className="bg-gray-50 border-b px-4 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <span className="font-bold text-sm mr-4">toolbar24</span>
-              <div className="flex items-center space-x-6">
-                <MenjariButtonBarFileGunLinks />
-                <SentinelStatus />
-                <div className="text-right">
-                  <div className="text-sm text-gray-500">Environment: Development Only</div>
-                  <div className="text-xs text-gray-400">Project: Pavilion</div>
-                </div>
-              </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-xs font-semibold text-gray-600">TOOLBAR24</span>
+              <SentinelStatus />
+            </div>
+            <div className="flex items-center space-x-4 text-xs text-gray-500">
+              <span>Environment: Development</span>
+              <span>•</span>
+              <span>Project: Pavilion</span>
             </div>
           </div>
         </div>
@@ -240,17 +265,27 @@ export default function FilegunPageComplete2() {
       {/* Toolbar25 */}
       {chambersVisible.toolbar25 && (
         <div className="toolbar25">
-          <FilegunToolbar
-            currentPath={currentPath}
-            onNavigateUp={handleNavigateUp}
-            onRefresh={handleRefresh}
-            onCreateFolder={handleCreateFolder}
-            onCreateFile={handleCreateFile}
-            canNavigateUp={canNavigateUp}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            onNavigateToPath={loadDirectory}
-          />
+          <div className="flex items-center justify-between">
+            <FilegunToolbar
+              currentPath={currentPath}
+              onNavigateUp={handleNavigateUp}
+              onRefresh={handleRefresh}
+              onCreateFolder={handleCreateFolder}
+              onCreateFile={handleCreateFile}
+              canNavigateUp={canNavigateUp}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              onNavigateToPath={loadDirectory}
+            />
+            <button
+              onClick={() => toggleChamber('ravineEditor')}
+              className="mx-4 px-3 py-1 bg-gray-800 text-white text-sm rounded hover:bg-gray-700 flex items-center space-x-1"
+              title="Open Ravine Editor"
+            >
+              <span>🏔️</span>
+              <span>Editor</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -409,6 +444,13 @@ export default function FilegunPageComplete2() {
         operations={operations}
         currentPath={currentPath}
         itemCount={items.length}
+      />
+
+      {/* Ravine Editor Popup */}
+      <RavineEditor
+        isOpen={chambersVisible.ravineEditor}
+        onClose={() => toggleChamber('ravineEditor')}
+        currentPath={currentPath}
       />
     </div>
   );
