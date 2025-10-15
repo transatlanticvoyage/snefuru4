@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getAvailableCloudStorage: () => ipcRenderer.invoke('get-available-cloud-storage'),
   copyFiles: (filePaths) => ipcRenderer.invoke('copy-files', filePaths),
   pasteFiles: (destinationPath) => ipcRenderer.invoke('paste-files', destinationPath),
+  pasteFilesM2: (destinationPath) => ipcRenderer.invoke('paste-files-m2', destinationPath),
   moveFiles: (filePaths, destinationPath) => ipcRenderer.invoke('move-files', filePaths, destinationPath),
   
   // Jupiter file handler
@@ -29,5 +30,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   checkFileStatus: (filePath) => ipcRenderer.invoke('check-file-status', filePath),
   
   // Gazebo stream handler
-  onGazeboAddToStream: (callback) => ipcRenderer.on('gazebo-add-to-stream', (event, data) => callback(data))
+  onGazeboAddToStream: (callback) => ipcRenderer.on('gazebo-add-to-stream', (event, data) => callback(data)),
+  
+  // Meridian Board handler
+  onMeridianFileDropped: (callback) => ipcRenderer.on('meridian-file-dropped', (event, filePath) => callback(filePath))
 });

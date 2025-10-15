@@ -50,6 +50,31 @@ app.whenReady().then(() => {
   
   createWindow();
   
+  // Handle dock icon drag and drop
+  app.on('open-file', (event, filePath) => {
+    event.preventDefault();
+    console.log('File dropped on dock icon:', filePath);
+    
+    // Create window if it doesn't exist
+    if (!mainWindow) {
+      createWindow();
+    }
+    
+    // Wait for window to be ready, then send file info
+    if (mainWindow) {
+      if (mainWindow.webContents.isLoading()) {
+        mainWindow.webContents.once('did-finish-load', () => {
+          mainWindow.webContents.send('meridian-file-dropped', filePath);
+        });
+      } else {
+        mainWindow.webContents.send('meridian-file-dropped', filePath);
+      }
+      
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+  
   // Register F9 global hotkey for Jupiter file selection
   setTimeout(() => {
     const success = globalShortcut.register('F9', () => {
@@ -426,7 +451,12 @@ ipcMain.handle('paste-files', async (event, destinationPath) => {
     const script = `
       set destinationPath to "${destinationPath}"
       tell application "Finder"
-        duplicate (the clipboard) to POSIX file destinationPath
+        try
+          duplicate (the clipboard) to folder (POSIX file destinationPath as alias)
+          return "success"
+        on error errMsg
+          return "error: " & errMsg
+        end try
       end tell
     `;
     
@@ -436,6 +466,94 @@ ipcMain.handle('paste-files', async (event, destinationPath) => {
         resolve({ success: code === 0 });
       });
     });
+  } catch (error) {
+    console.error('Error pasting files:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('paste-files-m2', async (event, destinationPath) => {
+  try {
+    const { exec, spawn } = require('child_process');
+    const util = require('util');
+    const execAsync = util.promisify(exec);
+    
+    // Method 2: Search for files by filename in common locations
+    try {
+      const { stdout: clipboardText } = await execAsync('pbpaste');
+      const filename = clipboardText.trim();
+      
+      console.log('M2 Clipboard filename:', filename);
+      
+      if (filename && filename.length > 0 && !filename.includes('\n')) {
+        // Search for this file in common locations
+        const searchPaths = [
+          app.getPath('downloads'),
+          app.getPath('desktop'), 
+          app.getPath('documents'),
+          app.getPath('home')
+        ];
+        
+        console.log('M2 Searching for file:', filename);
+        
+        for (const searchPath of searchPaths) {
+          try {
+            const { stdout: findResult } = await execAsync(`find "${searchPath}" -name "${filename}" -type f 2>/dev/null | head -1`);
+            const foundPath = findResult.trim();
+            
+            if (foundPath) {
+              console.log('M2 Found file at:', foundPath);
+              
+              // Copy the found file to destination
+              const copyScript = `
+                set sourcePath to "${foundPath}"
+                set destinationPath to "${destinationPath}"
+                tell application "Finder"
+                  try
+                    set sourceFile to POSIX file sourcePath as alias
+                    set targetFolder to folder (POSIX file destinationPath as alias)
+                    duplicate sourceFile to targetFolder
+                    return "success"
+                  on error errMsg
+                    return "error: " & errMsg
+                  end try
+                end tell
+              `;
+              
+              return new Promise((resolve) => {
+                const copyProcess = spawn('osascript', ['-e', copyScript]);
+                let copyOutput = '';
+                
+                copyProcess.stdout.on('data', (data) => {
+                  copyOutput += data.toString();
+                });
+                
+                copyProcess.on('close', (code) => {
+                  console.log('M2 Copy result:', copyOutput.trim());
+                  
+                  if (copyOutput.includes('success')) {
+                    resolve({ success: true });
+                  } else {
+                    resolve({ success: false, error: `Failed to copy file: ${copyOutput.trim()}` });
+                  }
+                });
+              });
+            }
+          } catch (error) {
+            // Continue searching in other locations
+            continue;
+          }
+        }
+        
+        return { success: false, error: `File "${filename}" not found in common locations` };
+      }
+      
+      return { success: false, error: 'No valid filename found in clipboard' };
+      
+    } catch (error) {
+      console.error('Error reading clipboard:', error);
+      return { success: false, error: 'Failed to read clipboard' };
+    }
   } catch (error) {
     console.error('Error pasting files:', error);
     return { success: false, error: error.message };

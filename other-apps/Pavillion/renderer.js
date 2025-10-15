@@ -28,6 +28,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeRefreshHandler();
   initializeJupiterFileHandler();
   initializeGazeboStreamHandler();
+  initializeMeridianBoard();
+  initializePasteButtons();
   await initializeCloudStorage();
   await loadConfiguration();
   
@@ -37,6 +39,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Jupiter action buttons
   initializeJupiterActions();
 });
+
+// Simple function to get the target folder for paste operations
+function getTargetPasteFolder() {
+  // Just use the current finder path - simple and straightforward
+  if (finderCurrentPath) {
+    console.log(`Pasting to current folder: ${finderCurrentPath}`);
+    return finderCurrentPath;
+  }
+  
+  console.log('No current folder available for paste');
+  return null;
+}
 
 function initializeTabs() {
   const tabButtons = document.querySelectorAll('.tab-button');
@@ -1130,6 +1144,84 @@ async function renderSiloLStreamItems(streamId) {
   }
 }
 
+function initializePasteButtons() {
+  // Add event listeners for the paste buttons
+  const pasteM1Btn = document.getElementById('paste-m1-btn');
+  const pasteM2Btn = document.getElementById('paste-m2-btn');
+  const copyM1Btn = document.getElementById('copy-m1-btn');
+  
+  if (pasteM1Btn) {
+    pasteM1Btn.addEventListener('click', async () => {
+      await handleSimplePaste();
+    });
+  }
+  
+  if (pasteM2Btn) {
+    pasteM2Btn.addEventListener('click', async () => {
+      await handleFilenamePaste();
+    });
+    
+    // Add tooltip functionality
+    pasteM2Btn.setAttribute('title', 'Filename Search Paste: Reads the filename from clipboard and searches Downloads, Desktop, Documents, and Home folders to find and copy the matching file. Useful when regular paste fails.');
+  }
+  
+  if (copyM1Btn) {
+    copyM1Btn.addEventListener('click', async () => {
+      await copySelectedFiles();
+    });
+  }
+}
+
+// Simple paste function (method 1)
+async function handleSimplePaste() {
+  const targetFolder = getTargetPasteFolder();
+  
+  if (!targetFolder) {
+    showNotification('No folder open for paste operation', 'error');
+    return;
+  }
+  
+  try {
+    const result = await window.electronAPI.pasteFiles(targetFolder);
+    
+    if (result.success) {
+      showNotification(`Files pasted to ${targetFolder.split('/').pop() || 'current folder'}`, 'success');
+      await navigateToFolder(targetFolder);
+    } else {
+      showNotification('Paste failed - try paste (m2) if you copied a filename', 'error');
+    }
+  } catch (error) {
+    console.error('Error in simple paste:', error);
+    showNotification('Paste operation failed', 'error');
+  }
+}
+
+// Filename search paste function (method 2)
+async function handleFilenamePaste() {
+  const targetFolder = getTargetPasteFolder();
+  
+  if (!targetFolder) {
+    showNotification('No folder open for paste operation', 'error');
+    return;
+  }
+  
+  try {
+    const result = await window.electronAPI.pasteFilesM2(targetFolder);
+    
+    if (result.success) {
+      showNotification(`File found and pasted to ${targetFolder.split('/').pop() || 'current folder'}`, 'success');
+      await navigateToFolder(targetFolder);
+    } else {
+      const errorMsg = result.error || 'File not found in common locations';
+      showNotification(`Search paste failed: ${errorMsg}`, 'error');
+      console.error('Filename paste operation failed:', result);
+    }
+  } catch (error) {
+    console.error('Error in filename paste:', error);
+    showNotification('Filename paste operation failed', 'error');
+  }
+}
+
 function initializeClipboardOperations() {
   document.addEventListener('keydown', async (event) => {
     // Only handle shortcuts when in finder view
@@ -1145,9 +1237,9 @@ function initializeClipboardOperations() {
     }
     
     // Cmd+V (Paste)
-    if (event.metaKey && event.key === 'v' && clipboardFiles.length > 0) {
+    if (event.metaKey && event.key === 'v') {
       event.preventDefault();
-      await pasteFiles();
+      await handleSimplePaste();
     }
     
     // Cmd+X (Cut)
@@ -1425,6 +1517,186 @@ async function updateFileStatus(filePath) {
 }
 
 let currentSelectedFilePath = null;
+let currentMeridianFilePath = null;
+
+function initializeMeridianBoard() {
+  // Listen for file drops on dock icon
+  if (window.electronAPI?.onMeridianFileDropped) {
+    window.electronAPI.onMeridianFileDropped((filePath) => {
+      console.log('Meridian file dropped:', filePath);
+      
+      // Switch to Meridian Board tab
+      const meridianTab = document.querySelector('[data-group="meridian"]');
+      if (meridianTab) {
+        meridianTab.click();
+      }
+      
+      // Update the file display
+      updateMeridianFileDisplay(filePath);
+    });
+  }
+  
+  // Initialize Meridian action buttons
+  initializeMeridianActions();
+}
+
+async function updateMeridianFileDisplay(filePath) {
+  // Store the current file path for actions
+  currentMeridianFilePath = filePath;
+  
+  const fileNameElement = document.getElementById('meridian-file-name');
+  const filePathElement = document.getElementById('meridian-file-path');
+  const fileIconElement = document.querySelector('#group-meridian .selected-file-display .file-icon');
+  
+  if (fileNameElement && filePathElement && fileIconElement) {
+    const fileName = filePath.split('/').pop();
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+    
+    // Update display elements
+    fileNameElement.textContent = fileName;
+    filePathElement.textContent = filePath;
+    
+    // Set appropriate icon based on file type
+    let icon = '📄'; // Default document icon
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+      icon = '🖼️';
+    } else if (['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(fileExtension)) {
+      icon = '🎬';
+    } else if (['mp3', 'wav', 'aac', 'flac', 'm4a'].includes(fileExtension)) {
+      icon = '🎵';
+    } else if (['pdf'].includes(fileExtension)) {
+      icon = '📕';
+    } else if (['doc', 'docx', 'txt', 'rtf'].includes(fileExtension)) {
+      icon = '📝';
+    } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(fileExtension)) {
+      icon = '📦';
+    }
+    
+    fileIconElement.textContent = icon;
+    
+    // Update selected file display styling
+    const selectedFileDisplay = document.querySelector('#group-meridian .selected-file-display');
+    if (selectedFileDisplay) {
+      selectedFileDisplay.style.borderColor = '#007AFF';
+      selectedFileDisplay.style.backgroundColor = '#f0f8ff';
+    }
+    
+    // Check file status
+    await updateMeridianFileStatus(filePath);
+  }
+}
+
+async function updateMeridianFileStatus(filePath) {
+  const statusIndicator = document.getElementById('meridian-file-status-indicator');
+  const statusIcon = document.getElementById('meridian-status-icon');
+  const statusText = document.getElementById('meridian-status-text');
+  
+  if (!statusIndicator || !statusIcon || !statusText) return;
+  
+  // Show indicator and set checking state
+  statusIndicator.style.display = 'flex';
+  statusIcon.className = 'status-icon checking';
+  statusText.textContent = 'Checking file status...';
+  
+  try {
+    const status = await window.electronAPI.checkFileStatus(filePath);
+    
+    if (status.isOpen === true) {
+      statusIcon.className = 'status-icon open';
+      statusText.textContent = status.details;
+    } else if (status.isOpen === false) {
+      statusIcon.className = 'status-icon closed';
+      statusText.textContent = status.details;
+    } else {
+      statusIcon.className = 'status-icon checking';
+      statusText.textContent = status.details;
+    }
+  } catch (error) {
+    console.error('Error checking file status:', error);
+    statusIcon.className = 'status-icon checking';
+    statusText.textContent = 'Could not check file status';
+  }
+}
+
+function initializeMeridianActions() {
+  const openBtn = document.getElementById('meridian-open-btn');
+  const showInFinderBtn = document.getElementById('meridian-show-in-finder-btn');
+  const addToStreamBtn = document.getElementById('meridian-add-to-stream-btn');
+  const streamDropdown = document.getElementById('meridian-stream-dropdown');
+  
+  if (openBtn) {
+    openBtn.addEventListener('click', async () => {
+      if (currentMeridianFilePath) {
+        try {
+          await window.electronAPI.openFile(currentMeridianFilePath);
+          console.log('Opened file:', currentMeridianFilePath);
+        } catch (error) {
+          console.error('Error opening file:', error);
+        }
+      }
+    });
+  }
+  
+  if (showInFinderBtn) {
+    showInFinderBtn.addEventListener('click', async () => {
+      if (currentMeridianFilePath) {
+        try {
+          await window.electronAPI.openInFinder(currentMeridianFilePath);
+          console.log('Showed file in Finder:', currentMeridianFilePath);
+        } catch (error) {
+          console.error('Error showing file in Finder:', error);
+        }
+      }
+    });
+  }
+  
+  // Add to Stream dropdown functionality
+  if (addToStreamBtn && streamDropdown) {
+    addToStreamBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      if (!currentMeridianFilePath) {
+        showNotification('No file selected', 'error');
+        return;
+      }
+      
+      // Toggle dropdown visibility
+      const isVisible = streamDropdown.style.display !== 'none';
+      streamDropdown.style.display = isVisible ? 'none' : 'block';
+    });
+    
+    // Handle stream option clicks
+    const streamOptions = streamDropdown.querySelectorAll('.meridian-stream-option');
+    streamOptions.forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const streamNumber = parseInt(option.dataset.stream);
+        
+        if (currentMeridianFilePath) {
+          // Add file to the selected stream
+          const fileName = currentMeridianFilePath.split('/').pop();
+          addItemToStream(streamNumber, currentMeridianFilePath, fileName);
+          
+          // Show success notification
+          showNotification(`Added "${fileName}" to Stream ${streamNumber}`, 'success');
+          
+          // Hide dropdown
+          streamDropdown.style.display = 'none';
+          
+          // Save configuration
+          saveConfiguration();
+        }
+      });
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!addToStreamBtn.contains(e.target) && !streamDropdown.contains(e.target)) {
+        streamDropdown.style.display = 'none';
+      }
+    });
+  }
+}
 
 function initializeJupiterActions() {
   const openBtn = document.getElementById('jupiter-open-btn');

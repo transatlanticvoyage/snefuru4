@@ -18,6 +18,7 @@
         <button class="tab-button" data-group="1">Streams 1-5</button>
         <button class="tab-button" data-group="2">Streams 6-10</button>
         <button class="tab-button" data-group="jupiter">jupiter</button>
+        <button class="tab-button" data-group="meridian">meridian board</button>
       </div>
       <div class="tab-actions">
         <button id="add-folder-btn" class="action-button" style="display: none;">+ Add Folder</button>
@@ -228,6 +229,55 @@
               <button class="jupiter-action-btn">Archive File</button>
               <button class="jupiter-action-btn">Generate Thumbnail</button>
               <button class="jupiter-action-btn">Share Link</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stream-group" id="group-meridian">
+        <div class="meridian-container">
+          <div class="meridian-header">
+            <h2>Meridian Board - File Processing Hub</h2>
+          </div>
+          
+          <div class="selected-file-display">
+            <div class="file-icon">📄</div>
+            <div class="file-info">
+              <div class="file-name" id="meridian-file-name">No file selected</div>
+              <div class="file-path" id="meridian-file-path">Drag a file to the Pavilion dock icon to get started</div>
+            </div>
+          </div>
+          
+          <div class="file-status-indicator" id="meridian-file-status-indicator" style="display: none;">
+            <div class="status-icon" id="meridian-status-icon">●</div>
+            <div class="status-text" id="meridian-status-text">Checking file status...</div>
+          </div>
+          
+          <div class="meridian-actions">
+            <h3>Processing Options</h3>
+            <div class="action-buttons">
+              <button class="meridian-action-btn" id="meridian-open-btn">Open File</button>
+              <button class="meridian-action-btn" id="meridian-show-in-finder-btn">Show In Finder</button>
+              <div class="meridian-stream-dropdown-container">
+                <button class="meridian-action-btn" id="meridian-add-to-stream-btn">Add to Stream ▼</button>
+                <div class="meridian-stream-dropdown" id="meridian-stream-dropdown" style="display: none;">
+                  <div class="meridian-stream-option" data-stream="1">Stream 1</div>
+                  <div class="meridian-stream-option" data-stream="2">Stream 2</div>
+                  <div class="meridian-stream-option" data-stream="3">Stream 3</div>
+                  <div class="meridian-stream-option" data-stream="4">Stream 4</div>
+                  <div class="meridian-stream-option" data-stream="5">Stream 5</div>
+                  <div class="meridian-stream-option" data-stream="6">Stream 6</div>
+                  <div class="meridian-stream-option" data-stream="7">Stream 7</div>
+                  <div class="meridian-stream-option" data-stream="8">Stream 8</div>
+                  <div class="meridian-stream-option" data-stream="9">Stream 9</div>
+                  <div class="meridian-stream-option" data-stream="10">Stream 10</div>
+                </div>
+              </div>
+              <button class="meridian-action-btn">Copy to Folder</button>
+              <button class="meridian-action-btn">Move to Folder</button>
+              <button class="meridian-action-btn">Create Archive</button>
+              <button class="meridian-action-btn">Generate Metadata</button>
+              <button class="meridian-action-btn">Duplicate File</button>
             </div>
           </div>
         </div>
