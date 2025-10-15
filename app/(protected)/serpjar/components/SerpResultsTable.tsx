@@ -30,10 +30,19 @@ interface SerpResultsTableProps {
   keywordData?: {keyword_id: number, keyword_datum: string} | null;
 }
 
+interface PendingFetch {
+  fetch_id: number;
+  status: string;
+  message: string;
+  last_checked?: string;
+  created_at: string;
+}
+
 export default function SerpResultsTable({ keywordId, keywordData }: SerpResultsTableProps) {
   const [data, setData] = useState<SerpResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pendingFetch, setPendingFetch] = useState<PendingFetch | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
@@ -77,9 +86,60 @@ export default function SerpResultsTable({ keywordId, keywordData }: SerpResults
     fetchData();
   }, [keywordId]);
   
+  // Auto-refresh for pending fetches
+  useEffect(() => {
+    if (!pendingFetch) return;
+    
+    // Set up interval to check for results every 30 seconds
+    const interval = setInterval(async () => {
+      console.log('Auto-checking for completed SERP results...');
+      try {
+        const response = await fetch('/api/f400-check-pending', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const result = await response.json();
+        
+        if (result.completed > 0) {
+          // Refresh the data to show new results
+          fetchData();
+        }
+      } catch (error) {
+        console.error('Auto-check error:', error);
+      }
+    }, 30000); // Check every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [pendingFetch]);
+  
   const fetchData = async () => {
     try {
       setLoading(true);
+      setPendingFetch(null);
+      
+      // If we have a keyword ID, also check for pending fetches
+      if (keywordId) {
+        const { data: fetches, error: fetchError } = await supabase
+          .from('zhe_serp_fetches')
+          .select('fetch_id, api_response_json, items_count, created_at')
+          .eq('rel_keyword_id', keywordId)
+          .order('created_at', { ascending: false })
+          .limit(1);
+        
+        if (!fetchError && fetches && fetches.length > 0) {
+          const latestFetch = fetches[0];
+          // Check if this is a pending fetch (items_count is 0 and has a processing status)
+          if (latestFetch.items_count === '0' && latestFetch.api_response_json?.status === 'processing') {
+            setPendingFetch({
+              fetch_id: latestFetch.fetch_id,
+              status: latestFetch.api_response_json.status,
+              message: latestFetch.api_response_json.message || 'DataForSEO task is processing...',
+              last_checked: latestFetch.api_response_json.last_checked,
+              created_at: latestFetch.created_at
+            });
+          }
+        }
+      }
       
       // Build API URL with keyword_id parameter if provided
       const apiUrl = keywordId 
@@ -547,6 +607,47 @@ export default function SerpResultsTable({ keywordId, keywordData }: SerpResults
 
   return (
     <div className="w-full">
+      {/* Pending Fetch Status Banner */}
+      {pendingFetch && (
+        <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-600"></div>
+              <div>
+                <div className="font-semibold text-yellow-800">SERP Fetch In Progress</div>
+                <div className="text-sm text-yellow-700">{pendingFetch.message}</div>
+                {pendingFetch.last_checked && (
+                  <div className="text-xs text-yellow-600 mt-1">
+                    Last checked: {new Date(pendingFetch.last_checked).toLocaleTimeString()}
+                  </div>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={async () => {
+                // Trigger background check for pending fetches
+                try {
+                  const response = await fetch('/api/f400-check-pending', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                  const result = await response.json();
+                  if (result.completed > 0) {
+                    // Refresh the data
+                    fetchData();
+                  }
+                } catch (error) {
+                  console.error('Error checking pending fetches:', error);
+                }
+              }}
+              className="px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm"
+            >
+              Check Status
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Top Header Area */}
       <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
         <div className="flex justify-between items-center">

@@ -141,9 +141,12 @@ export default function SerpjarClient() {
 
       // Show success message based on status
       if (result.status === 'pending') {
-        alert(`${result.message}\n\n${result.note}\n\nDataForSEO Task ID: ${result.dataforseo_task_id}\nFetch ID: ${result.fetch_id}\n\nThe system will automatically attempt to retrieve results in 2 minutes.`);
+        alert(`${result.message}\n\n${result.note}\n\nDataForSEO Task ID: ${result.dataforseo_task_id}\nFetch ID: ${result.fetch_id}\n\nThe page will automatically refresh to check for results.`);
         
-        // Automatically attempt to complete the pending fetch after 2 minutes
+        // Refresh the page to show pending status
+        window.location.reload();
+        
+        // Also set up a delayed check (now reduced since we have auto-refresh)
         setTimeout(async () => {
           try {
             console.log(`Attempting to complete pending fetch_id: ${result.fetch_id}`);
@@ -170,7 +173,7 @@ export default function SerpjarClient() {
             console.error('Error completing pending fetch:', error);
             // Don't show an error alert, as this is a background operation
           }
-        }, 120000); // 2 minutes delay
+        }, 60000); // 1 minute delay (reduced since we have auto-refresh now)
         
       } else {
         alert(`${result.message}\n\nResults stored: ${result.organic_results_stored || 0}\nPlease refresh the page to see new results.`);

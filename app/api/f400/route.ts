@@ -176,18 +176,24 @@ export async function POST(request: NextRequest) {
     const fetchId = fetchRecord?.fetch_id || null;
     console.log(`📋 Created fetch record: ${fetchId}`);
 
-    // Step 5: Try to get SERP results with extended timeout
+    // Step 5: Try to get SERP results with extended timeout (10 minutes)
     console.log('⏳ Attempting to retrieve SERP results...');
     
     let serpResults = null;
     let retries = 0;
-    const maxRetries = 18; // 3 minutes total (10 seconds * 18)
+    const maxRetries = 60; // 10 minutes total (10 seconds * 60)
+    const checkInterval = 10000; // Check every 10 seconds
+    const quickCheckPeriod = 30; // Quick checks for first 5 minutes (30 * 10s)
     
     while (retries < maxRetries) {
-      await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds
+      // Wait before checking (shorter wait time for first 5 minutes)
+      const waitTime = retries < quickCheckPeriod ? checkInterval : checkInterval * 2; // 20s intervals after 5 min
+      await new Promise(resolve => setTimeout(resolve, waitTime));
       retries++;
       
-      console.log(`🔄 Checking SERP results (attempt ${retries}/${maxRetries}) - ${retries * 10}s elapsed...`);
+      const elapsedMinutes = Math.floor((retries * checkInterval) / 60000);
+      const elapsedSeconds = ((retries * checkInterval) / 1000) % 60;
+      console.log(`🔄 Checking SERP results (attempt ${retries}/${maxRetries}) - ${elapsedMinutes}m ${elapsedSeconds}s elapsed...`);
       
       try {
         const serpResultResponse = await fetch(`https://api.dataforseo.com/v3/serp/google/organic/task_get/regular/${serpTaskId}`, {
@@ -200,6 +206,10 @@ export async function POST(request: NextRequest) {
 
         if (!serpResultResponse.ok) {
           console.error(`SERP results API error (attempt ${retries}):`, serpResultResponse.status);
+          // Don't give up immediately on API errors, they might be temporary
+          if (retries >= 10) { // Only break after 10 failed attempts
+            break;
+          }
           continue;
         }
 
@@ -207,10 +217,25 @@ export async function POST(request: NextRequest) {
         
         if (serpResultData.tasks && serpResultData.tasks[0] && serpResultData.tasks[0].result) {
           serpResults = serpResultData.tasks[0].result[0];
-          console.log('✅ SERP results retrieved successfully');
+          console.log(`✅ SERP results retrieved successfully after ${elapsedMinutes}m ${elapsedSeconds}s`);
           break;
         } else if (serpResultData.tasks && serpResultData.tasks[0] && serpResultData.tasks[0].status_code === 20000) {
           console.log('⏳ Task still processing...');
+          
+          // Save intermediate status to database so UI can show progress
+          if (fetchId && retries % 6 === 0) { // Update every minute
+            await supabase
+              .from('zhe_serp_fetches')
+              .update({
+                api_response_json: { 
+                  task_id: serpTaskId, 
+                  status: 'processing', 
+                  message: `DataForSEO task processing... (${elapsedMinutes}m elapsed)`,
+                  last_checked: new Date().toISOString()
+                }
+              })
+              .eq('fetch_id', fetchId);
+          }
           continue;
         } else {
           console.error('SERP results retrieval failed:', serpResultData);
@@ -218,6 +243,9 @@ export async function POST(request: NextRequest) {
         }
       } catch (error) {
         console.error(`Error checking results (attempt ${retries}):`, error);
+        if (retries >= 10) { // Allow some failures before giving up
+          break;
+        }
         continue;
       }
     }
@@ -234,7 +262,7 @@ export async function POST(request: NextRequest) {
         keyword_datum: keywordData.keyword_datum,
         dataforseo_task_id: serpTaskId,
         fetch_id: fetchId,
-        note: 'DataForSEO task is processing. Results will appear in the table once ready (usually within 2-5 minutes). Task waited 3 minutes but results were not ready yet.',
+        note: 'DataForSEO task is processing. Results will appear in the table once ready. The system waited 10 minutes but results are still processing. Please use the "Complete Pending Fetches" button in a few minutes.',
         location: keywordData.location_display_name || `Location ${keywordData.rel_dfs_location_code}`,
         language: keywordData.language_name
       });
