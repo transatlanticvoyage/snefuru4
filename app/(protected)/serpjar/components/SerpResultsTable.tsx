@@ -29,6 +29,7 @@ interface SerpResultsTableProps {
   keywordId?: number | null;
   keywordData?: {keyword_id: number, keyword_datum: string} | null;
   onTableControlsRender?: (controls: { PaginationControls: () => JSX.Element } | null) => void;
+  onHeaderControlsRender?: (controls: { HeaderSection: () => JSX.Element } | null) => void;
 }
 
 interface PendingFetch {
@@ -39,7 +40,7 @@ interface PendingFetch {
   created_at: string;
 }
 
-export default function SerpResultsTable({ keywordId, keywordData, onTableControlsRender }: SerpResultsTableProps) {
+export default function SerpResultsTable({ keywordId, keywordData, onTableControlsRender, onHeaderControlsRender }: SerpResultsTableProps) {
   const [data, setData] = useState<SerpResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -274,6 +275,13 @@ export default function SerpResultsTable({ keywordId, keywordData, onTableContro
       setSelectedRows(new Set(paginatedData.map(item => item.result_id)));
     }
   };
+
+  // Expose header controls to parent (after pagination calculations)
+  useEffect(() => {
+    if (onHeaderControlsRender) {
+      onHeaderControlsRender({ HeaderSection });
+    }
+  }, [onHeaderControlsRender, startIndex, itemsPerPage, filteredAndSortedData.length, keywordId, selectedRows.size, searchTerm, currentPage]);
 
   // Inline editing functions
   const startEditing = (id: number, field: string, currentValue: any) => {
@@ -584,6 +592,51 @@ export default function SerpResultsTable({ keywordId, keywordData, onTableContro
     );
   };
 
+  // Header Section Component - For mesozoic chamber
+  const HeaderSection = () => {
+    return (
+      <div className="flex items-center space-x-6">
+        <div className="text-sm text-gray-600">
+          {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} results
+          {keywordId && (
+            <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
+              Filtered by keyword_id: {keywordId}
+            </span>
+          )}
+          {keywordId && filteredAndSortedData.length === 0 && (
+            <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-md text-xs font-medium">
+              No results for this keyword
+            </span>
+          )}
+          {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+        </div>
+        <NubraTablefaceKite text="nubra-tableface-kite" />
+        <PaginationControls />
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search all fields..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+          />
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setCurrentPage(1);
+            }}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+          >
+            CL
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -656,52 +709,7 @@ export default function SerpResultsTable({ keywordId, keywordData, onTableContro
         </div>
       )}
       
-      {/* Top Header Area */}
-      <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-6">
-            <div className="text-sm text-gray-600">
-              {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} results
-              {keywordId && (
-                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
-                  Filtered by keyword_id: {keywordId}
-                </span>
-              )}
-              {keywordId && filteredAndSortedData.length === 0 && (
-                <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-md text-xs font-medium">
-                  No results for this keyword
-                </span>
-              )}
-              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
-            </div>
-            <NubraTablefaceKite text="nubra-tableface-kite" />
-            <PaginationControls />
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search all fields..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
-              />
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setCurrentPage(1);
-                }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
-              >
-                CL
-              </button>
-            </div>
-          </div>
-          <div></div>
-        </div>
-        
-      </div>
+      {/* Header now rendered in mesozoic chamber via callback */}
 
       {/* Table */}
       <div className="bg-white overflow-hidden">
@@ -818,45 +826,7 @@ export default function SerpResultsTable({ keywordId, keywordData, onTableContro
         </div>
       </div>
 
-      {/* Bottom Controls */}
-      <div className="bg-white border-t border-gray-200 px-4 py-2">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-6">
-            <div className="text-sm text-gray-600">
-              {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} results
-              {keywordId && (
-                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
-                  Filtered by keyword_id: {keywordId}
-                </span>
-              )}
-              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
-            </div>
-            <PaginationControls />
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search all fields..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
-              />
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setCurrentPage(1);
-                }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
-              >
-                CL
-              </button>
-            </div>
-          </div>
-          <div></div>
-        </div>
-      </div>
+      {/* Bottom controls removed - now rendered in mesozoic chamber */}
     </div>
   );
 }

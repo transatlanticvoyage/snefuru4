@@ -13,11 +13,13 @@ export async function POST(request: NextRequest) {
     throw new Error('F400 process timed out');
   }, 15 * 60 * 1000);
 
+  let keyword_id: number | undefined;
+
   try {
     console.log('🚀 F400 ZHE SERP Fetch starting...');
     
     const body = await request.json();
-    const { keyword_id } = body;
+    keyword_id = body.keyword_id;
 
     if (!keyword_id) {
       return NextResponse.json({ error: 'keyword_id is required' }, { status: 400 });
@@ -155,7 +157,7 @@ export async function POST(request: NextRequest) {
     // Step 4: Create fetch record immediately
     console.log('📋 Creating fetch record...');
     
-    const { data: fetchRecord, error: fetchError } = await supabase
+    const { data: fetchRecord, error: fetchError} = await supabase
       .from('zhe_serp_fetches')
       .insert({
         rel_keyword_id: keyword_id,
@@ -175,6 +177,16 @@ export async function POST(request: NextRequest) {
 
     const fetchId = fetchRecord?.fetch_id || null;
     console.log(`📋 Created fetch record: ${fetchId}`);
+
+    // Update keywordshub with pending status
+    await supabase
+      .from('keywordshub')
+      .update({ 
+        serp_fetch_status: 'pending',
+        serp_last_fetched_at: new Date().toISOString()
+      })
+      .eq('keyword_id', keyword_id);
+    console.log('📋 Updated keyword status to pending');
 
     // Step 5: Try to get SERP results with extended timeout (10 minutes)
     console.log('⏳ Attempting to retrieve SERP results...');
@@ -332,6 +344,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Update keywordshub with completed status
+    await supabase
+      .from('keywordshub')
+      .update({ 
+        serp_results_count: storedResultsCount,
+        serp_fetch_status: 'completed',
+        serp_last_fetched_at: new Date().toISOString()
+      })
+      .eq('keyword_id', keyword_id);
+    console.log(`📋 Updated keyword status to completed with ${storedResultsCount} results`);
+
     console.log('🎉 F400 ZHE SERP Fetch completed successfully with results!');
 
     return NextResponse.json({
@@ -350,6 +373,18 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ F400 function error:', error);
+    
+    // Update keywordshub with error status if we have keyword_id
+    if (keyword_id) {
+      await supabase
+        .from('keywordshub')
+        .update({ 
+          serp_fetch_status: 'error',
+          serp_last_fetched_at: new Date().toISOString()
+        })
+        .eq('keyword_id', keyword_id);
+    }
+    
     return NextResponse.json({ 
       error: 'Internal server error',
       details: error instanceof Error ? error.message : 'Unknown error'

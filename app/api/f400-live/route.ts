@@ -7,11 +7,13 @@ const supabase = createClient(
 );
 
 export async function POST(request: NextRequest) {
+  let keyword_id: number | undefined;
+  
   try {
     console.log('🚀 F400 LIVE - Direct SERP Fetch starting...');
     
     const body = await request.json();
-    const { keyword_id } = body;
+    keyword_id = body.keyword_id;
 
     if (!keyword_id) {
       return NextResponse.json({ error: 'keyword_id is required' }, { status: 400 });
@@ -78,6 +80,15 @@ export async function POST(request: NextRequest) {
     const serpResults = data.tasks[0].result[0];
     console.log(`✅ Got ${serpResults.items?.length || 0} items immediately`);
 
+    // Update keywordshub with pending status (brief moment before completion)
+    await supabase
+      .from('keywordshub')
+      .update({ 
+        serp_fetch_status: 'pending',
+        serp_last_fetched_at: new Date().toISOString()
+      })
+      .eq('keyword_id', keyword_id);
+
     // Create fetch record
     const { data: fetchRecord, error: fetchError } = await supabase
       .from('zhe_serp_fetches')
@@ -130,6 +141,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Update keywordshub with completed status
+    await supabase
+      .from('keywordshub')
+      .update({ 
+        serp_results_count: storedCount,
+        serp_fetch_status: 'completed',
+        serp_last_fetched_at: new Date().toISOString()
+      })
+      .eq('keyword_id', keyword_id);
+    console.log(`📋 Updated keyword status to completed with ${storedCount} results`);
+
     return NextResponse.json({
       success: true,
       message: `F400 LIVE fetch completed successfully`,
@@ -144,6 +166,18 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('F400 LIVE error:', error);
+    
+    // Update keywordshub with error status if we have keyword_id
+    if (keyword_id) {
+      await supabase
+        .from('keywordshub')
+        .update({ 
+          serp_fetch_status: 'error',
+          serp_last_fetched_at: new Date().toISOString()
+        })
+        .eq('keyword_id', keyword_id);
+    }
+    
     return NextResponse.json({ 
       error: 'F400 LIVE fetch failed',
       details: error instanceof Error ? error.message : 'Unknown error'

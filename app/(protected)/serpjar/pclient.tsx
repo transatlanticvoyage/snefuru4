@@ -45,6 +45,11 @@ export default function SerpjarClient() {
     PaginationControls: () => JSX.Element;
   } | null>(null);
 
+  // Header controls state
+  const [headerControls, setHeaderControls] = useState<{
+    HeaderSection: () => JSX.Element;
+  } | null>(null);
+
   useEffect(() => {
     if (!user) {
       router.push('/login');
@@ -350,53 +355,8 @@ export default function SerpjarClient() {
             mandible_chamber
           </div>
         
-        {/* Button Controls Section */}
-        <div className="flex flex-wrap items-start gap-3">
-          {/* F400 SERP Fetch Button */}
-          <button
-            onClick={() => keywordId && handleF400SerpFetch()}
-            disabled={!keywordId || f400Loading}
-            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
-              !keywordId || f400Loading
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-            }`}
-          >
-            {f400Loading ? 'Processing...' : `Run F400 ${f400Mode === 'live' ? 'LIVE' : 'QUEUED'} SERP Fetch`}
-          </button>
-
-          {/* Complete Pending Fetches Button */}
-          <button
-            onClick={() => keywordId && handleCompletePendingFetches()}
-            disabled={!keywordId || completeLoading}
-            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
-              !keywordId || completeLoading
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
-            }`}
-          >
-            {completeLoading ? 'Checking...' : 'Complete Pending Fetch'}
-          </button>
-
-          {/* F410 Stamp EMD Match Button */}
-          <button
-            onClick={() => {
-              // TODO: Add F410 functionality
-              console.log('F410 Stamp EMD Match button clicked for keyword_id:', keywordId);
-            }}
-            disabled={!keywordId}
-            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
-              !keywordId
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-orange-500 text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2'
-            }`}
-          >
-            Run F410 Stamp EMD Match 1
-          </button>
-        </div>
-        
         {/* F400 Mode Toggle */}
-        <div className="mt-3 flex items-center space-x-4 bg-gray-100 rounded-lg p-3">
+        <div className="flex items-center space-x-4 bg-gray-100 rounded-lg p-3">
           <span className="text-sm font-medium text-gray-700">F400 Mode:</span>
           <label className="inline-flex items-center cursor-pointer">
             <input
@@ -437,6 +397,76 @@ export default function SerpjarClient() {
               ? '⚡ Results in 2-3 seconds' 
               : '⏱️ Results in 2-10 minutes'}
           </div>
+          
+          {/* Complete Pending Fetches Button - moved here */}
+          <button
+            onClick={() => keywordId && handleCompletePendingFetches()}
+            disabled={!keywordId || completeLoading}
+            className={`ml-4 px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
+              !keywordId || completeLoading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
+            }`}
+          >
+            {completeLoading ? 'Checking...' : 'Complete Pending Fetch'}
+          </button>
+        </div>
+        
+        {/* Button Controls Section */}
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          {/* Step 1 */}
+          <span className="font-bold text-gray-800" style={{ fontSize: '16px' }}>Step 1</span>
+          
+          {/* F400 SERP Fetch Button */}
+          <button
+            onClick={() => keywordId && handleF400SerpFetch()}
+            disabled={!keywordId || f400Loading}
+            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
+              !keywordId || f400Loading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+            }`}
+          >
+            {f400Loading ? 'Processing...' : `Run F400 ${f400Mode === 'live' ? 'LIVE' : 'QUEUED'} SERP Fetch`}
+          </button>
+
+          {/* Step 2 */}
+          <span className="font-bold text-gray-800" style={{ fontSize: '16px' }}>Step 2</span>
+
+          {/* F410 Stamp EMD Match Button */}
+          <button
+            onClick={() => {
+              // TODO: Add F410 functionality
+              console.log('F410 Stamp EMD Match button clicked for keyword_id:', keywordId);
+            }}
+            disabled={!keywordId}
+            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
+              !keywordId
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-orange-500 text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2'
+            }`}
+          >
+            Run F410 Stamp EMD Match 1
+          </button>
+          
+          {/* Step 3 */}
+          <span className="font-bold text-gray-800" style={{ fontSize: '16px' }}>Step 3</span>
+          
+          {/* F420 Cache Ranking Zones Button */}
+          <button
+            onClick={() => {
+              // TODO: Add F420 functionality
+              console.log('F420 Cache Ranking Zones button clicked for keyword_id:', keywordId);
+            }}
+            disabled={!keywordId}
+            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
+              !keywordId
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2'
+            }`}
+          >
+            Run F420 Cache Ranking Zones
+          </button>
         </div>
         </div>
       )}
@@ -562,9 +592,16 @@ export default function SerpjarClient() {
       {/* Protozoic Chamber */}
       {protozoicChamberVisible && (
         <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
-          <div className="font-bold" style={{ fontSize: '16px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
             protozoic_chamber
           </div>
+          
+          {/* Table Pagination Controls - MOVED FROM MESOZOIC */}
+          {tableControls && tableControls.PaginationControls && (
+            <div className="mt-2">
+              {tableControls.PaginationControls()}
+            </div>
+          )}
         </div>
       )}
 
@@ -575,10 +612,10 @@ export default function SerpjarClient() {
             mesozoic_chamber
           </div>
           
-          {/* Table Pagination Controls */}
-          {tableControls && tableControls.PaginationControls && (
+          {/* Table Header Controls - Result count, pagination, search */}
+          {headerControls && headerControls.HeaderSection && (
             <div className="mt-2">
-              {tableControls.PaginationControls()}
+              {headerControls.HeaderSection()}
             </div>
           )}
         </div>
@@ -591,6 +628,7 @@ export default function SerpjarClient() {
           keywordId={keywordId} 
           keywordData={keywordData} 
           onTableControlsRender={setTableControls}
+          onHeaderControlsRender={setHeaderControls}
         />
       </div>
 

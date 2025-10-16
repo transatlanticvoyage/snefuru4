@@ -155,6 +155,17 @@ export async function POST(request: NextRequest) {
 
       console.log(`✅ Stored ${insertedResults?.length || 0} organic results`);
 
+      // Update keywordshub with completed status
+      await supabase
+        .from('keywordshub')
+        .update({ 
+          serp_results_count: insertedResults?.length || 0,
+          serp_fetch_status: 'completed',
+          serp_last_fetched_at: new Date().toISOString()
+        })
+        .eq('keyword_id', fetchRecord.rel_keyword_id);
+      console.log(`📋 Updated keyword status to completed with ${insertedResults?.length || 0} results`);
+
       return NextResponse.json({
         success: true,
         message: `Successfully completed pending fetch and stored ${insertedResults?.length || 0} organic results.`,
@@ -164,6 +175,16 @@ export async function POST(request: NextRequest) {
         dataforseo_task_id: taskId
       });
     } else {
+      // Update keywordshub with completed status (0 results)
+      await supabase
+        .from('keywordshub')
+        .update({ 
+          serp_results_count: 0,
+          serp_fetch_status: 'completed',
+          serp_last_fetched_at: new Date().toISOString()
+        })
+        .eq('keyword_id', fetchRecord.rel_keyword_id);
+
       return NextResponse.json({
         success: true,
         message: 'Fetch completed but no organic results found.',

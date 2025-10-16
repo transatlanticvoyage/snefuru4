@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
 
@@ -9,6 +9,7 @@ interface KeywordRecord {
   keyword_datum: string;
   search_volume: number | null;
   cpc: number | null;
+  semrush_volume: number | null;
   rel_dfs_location_code: number | null;
   location_display_name: string | null;
   location_coordinate: string | null;
@@ -24,6 +25,10 @@ interface KeywordRecord {
   created_by: string | null;
   last_updated_by: string | null;
   cached_cncglub_ids: string | null;
+  // SERP fetch tracking fields
+  serp_results_count: number;
+  serp_last_fetched_at: string | null;
+  serp_fetch_status: 'none' | 'pending' | 'completed' | 'error';
   tags?: Array<{ tag_id: number; tag_name: string }>;
 }
 
@@ -42,8 +47,24 @@ const columns: ColumnDefinition[] = [
   { key: 'serp_tool', label: 'serp_tool', type: 'button' },
   { key: 'keyword_id', label: 'keyword_id', type: 'number' },
   { key: 'keyword_datum', label: 'keyword_datum', type: 'text' },
+  { 
+    key: 'serp_status', 
+    label: 'serp_status', 
+    type: 'serp_indicator',
+    leftSeparator: 'black-4px',
+    headerRow1Text: 'keywordshub',
+    headerRow2Text: 'F400 SERP'
+  },
   { key: 'search_volume', label: 'search_volume', type: 'number' },
-  { key: 'cpc', label: 'cpc', type: 'number', rightSeparator: 'black-4px' },
+  { key: 'cpc', label: 'cpc', type: 'number' },
+  { 
+    key: 'semrush_volume', 
+    label: 'semrush_volume', 
+    type: 'number',
+    headerRow1Text: 'keywordshub',
+    headerRow2Text: 'semrush_volume',
+    rightSeparator: 'black-4px'
+  },
   { key: 'rel_dfs_location_code', label: 'rel_dfs_location_code', type: 'number' },
   { key: 'location_display_name', label: 'location_display_name', type: 'text' },
   { key: 'location_coordinate', label: 'location_coordinate', type: 'text' },
@@ -80,6 +101,24 @@ interface KeywordsHubTableProps {
   }) => void;
 }
 
+// Helper function to format relative time
+function formatDistanceToNow(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  
+  if (diffSecs < 60) return `${diffSecs}s ago`;
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
+  return `${Math.floor(diffDays / 365)}y ago`;
+}
+
 export default function KeywordsHubTable({ 
   selectedTagId, 
   onColumnPaginationRender, 
@@ -98,6 +137,7 @@ export default function KeywordsHubTable({
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [sortField, setSortField] = useState<keyof KeywordRecord>('created_at');
+  const [fetchingSerpKeywords, setFetchingSerpKeywords] = useState<Set<number>>(new Set());
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Column pagination states
@@ -528,15 +568,6 @@ export default function KeywordsHubTable({
     }
   }, [onMainPaginationRender, currentPage, totalPages, itemsPerPage, searchTerm]);
 
-  // Pass table actions to parent
-  useEffect(() => {
-    if (onTableActionsRender) {
-      onTableActionsRender({
-        DataForSEOActions
-      });
-    }
-  }, [onTableActionsRender, bulkRefreshing, blankRefreshing, reverseLookupRefreshing, selectedRows.size]);
-
   // Notify parent of column pagination changes
   useEffect(() => {
     if (onColumnPaginationChange) {
@@ -875,7 +906,7 @@ export default function KeywordsHubTable({
   };
 
   // Create new inline record
-  const createNewInline = async () => {
+  const createNewInline = useCallback(async () => {
     if (!userInternalId) return;
 
     try {
@@ -916,7 +947,7 @@ export default function KeywordsHubTable({
       console.error('Error creating record:', error);
       alert('Failed to create record');
     }
-  };
+  }, [userInternalId]);
 
   // Handle popup form creation
   const handleCreate = async () => {
@@ -1166,6 +1197,104 @@ export default function KeywordsHubTable({
       );
     }
 
+    // Special handling for SERP status indicator column
+    if (column.key === 'serp_status') {
+      const status = item.serp_fetch_status;
+      const count = item.serp_results_count;
+      const lastFetched = item.serp_last_fetched_at;
+      const isFetching = fetchingSerpKeywords.has(item.keyword_id);
+      
+      return (
+        <div className="flex items-center justify-between space-x-2 px-2 py-1">
+          <div className="flex items-center space-x-2 flex-1">
+            {status === 'completed' && (
+              <>
+                <span className="text-green-600 text-base">✅</span>
+                <div className="text-xs">
+                  <div className="font-semibold text-gray-900">{count} results</div>
+                  {lastFetched && (
+                    <div className="text-gray-400">
+                      {formatDistanceToNow(new Date(lastFetched))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+            {status === 'pending' && (
+              <>
+                <span className="text-yellow-600 text-base">⏳</span>
+                <span className="text-xs text-yellow-700 font-medium">Fetching...</span>
+              </>
+            )}
+            {status === 'error' && (
+              <>
+                <span className="text-red-600 text-base">❌</span>
+                <span className="text-xs text-red-700 font-medium">Error</span>
+              </>
+            )}
+            {status === 'none' && (
+              <>
+                <span className="text-gray-400 text-base">⚪</span>
+                <span className="text-xs text-gray-500">Not fetched</span>
+              </>
+            )}
+          </div>
+          
+          {/* Action Button */}
+          <button
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (isFetching) return;
+              
+              // Mark as fetching
+              setFetchingSerpKeywords(prev => new Set([...prev, item.keyword_id]));
+              
+              try {
+                // Open serpjar in new tab with this keyword_id
+                if (status === 'completed') {
+                  // If already fetched, just view results
+                  window.open(`/serpjar?keyword_id=${item.keyword_id}`, '_blank');
+                } else {
+                  // If not fetched or error, navigate and they can fetch from there
+                  window.open(`/serpjar?keyword_id=${item.keyword_id}`, '_blank');
+                }
+              } finally {
+                // Remove from fetching state after a brief delay
+                setTimeout(() => {
+                  setFetchingSerpKeywords(prev => {
+                    const next = new Set(prev);
+                    next.delete(item.keyword_id);
+                    return next;
+                  });
+                }, 1000);
+              }
+            }}
+            disabled={isFetching || status === 'pending'}
+            className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-white text-xs font-bold transition-colors ${
+              isFetching || status === 'pending'
+                ? 'bg-gray-400 cursor-not-allowed'
+                : status === 'completed'
+                ? 'bg-green-600 hover:bg-green-700'
+                : status === 'error'
+                ? 'bg-red-600 hover:bg-red-700'
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+            title={
+              status === 'completed' ? 'View SERP results' :
+              status === 'error' ? 'Retry fetch in SERP tool' :
+              status === 'pending' ? 'Fetch in progress...' :
+              'Fetch SERP in SERP tool'
+            }
+          >
+            {status === 'completed' ? 'v' : 
+             status === 'error' ? 'r' : 
+             status === 'pending' ? '⋯' : 
+             's'}
+          </button>
+        </div>
+      );
+    }
+
     return (
       <div
         className={cellClass}
@@ -1178,7 +1307,7 @@ export default function KeywordsHubTable({
 
   // Pagination Controls Component - Matching /filejar style
   // DataForSEO Actions Component
-  const DataForSEOActions = () => (
+  const DataForSEOActions = useCallback(() => (
     <div className="flex items-center space-x-2">
       {/* Tooltip label */}
       <div className="relative group">
@@ -1244,7 +1373,16 @@ export default function KeywordsHubTable({
         Create New (Popup)
       </button>
     </div>
-  );
+  ), [bulkRefreshMetrics, bulkRefreshBlanks, bulkRefreshReverseLookup, createNewInline, bulkRefreshing, blankRefreshing, reverseLookupRefreshing, selectedRows.size, paginatedData.length]);
+
+  // Pass table actions to parent (must be after DataForSEOActions is defined)
+  useEffect(() => {
+    if (onTableActionsRender) {
+      onTableActionsRender({
+        DataForSEOActions
+      });
+    }
+  }, [onTableActionsRender, DataForSEOActions]);
 
   const SearchField = () => {
     return (
@@ -1415,85 +1553,6 @@ export default function KeywordsHubTable({
 
   return (
     <div className="h-full flex flex-col">
-      {/* Controls */}
-      <div className="flex-none bg-white border-b px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            {/* Controls moved to parent component's sinus chamber */}
-            
-            {/* DataForSEO Bulk Refresh Controls */}
-            <div className="flex items-center space-x-2">
-              {/* Tooltip label */}
-              <div className="relative group">
-                <button className="bg-gray-100 text-gray-600 px-3 py-2 rounded-md text-sm font-medium cursor-help border border-gray-300">
-                  DFS Task Post/Get
-                </button>
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                  Task Post/Get: Asynchronous processing
-                </div>
-              </div>
-              
-              {/* Refresh Metrics Button */}
-              <button
-                onClick={bulkRefreshMetrics}
-                disabled={bulkRefreshing || selectedRows.size === 0}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  bulkRefreshing || selectedRows.size === 0
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
-              >
-                {bulkRefreshing ? 'Processing...' : 'Refresh Metrics'}
-              </button>
-
-              {/* Only Refresh Blanks Button */}
-              <button
-                onClick={bulkRefreshBlanks}
-                disabled={blankRefreshing || bulkRefreshing}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  blankRefreshing || bulkRefreshing
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700'
-                }`}
-              >
-                {blankRefreshing ? 'Processing...' : 'only refresh blanks'}
-              </button>
-
-              {/* Reverse Lookup Refresh Button */}
-              <button
-                onClick={bulkRefreshReverseLookup}
-                disabled={reverseLookupRefreshing || bulkRefreshing || blankRefreshing}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  reverseLookupRefreshing || bulkRefreshing || blankRefreshing
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-purple-600 text-white hover:bg-purple-700'
-                }`}
-                title={selectedRows.size > 0 ? `Refresh reverse lookup for ${selectedRows.size} selected keywords` : `Refresh reverse lookup for ${paginatedData.length} visible keywords`}
-              >
-                {reverseLookupRefreshing ? 'Processing...' : 'refresh reverse lookup'}
-              </button>
-              
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex space-x-2">
-              <button
-                onClick={createNewInline}
-                className="bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
-              >
-                Create New (Inline)
-              </button>
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
-              >
-                Create New (Popup)
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Table */}
       <div className="flex-1 bg-white overflow-hidden">
         <div className="h-full overflow-auto">

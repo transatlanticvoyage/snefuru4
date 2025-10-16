@@ -53,6 +53,7 @@ export default function KwjarClient() {
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
   const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
   const [protozoicChamberVisible, setProtozoicChamberVisible] = useState(true);
+  const [mesozoicChamberVisible, setMesozoicChamberVisible] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -76,6 +77,11 @@ export default function KwjarClient() {
     const savedProtozoic = localStorage.getItem('kwjar_protozoicChamberVisible');
     if (savedProtozoic !== null) {
       setProtozoicChamberVisible(JSON.parse(savedProtozoic));
+    }
+    
+    const savedMesozoic = localStorage.getItem('kwjar_mesozoicChamberVisible');
+    if (savedMesozoic !== null) {
+      setMesozoicChamberVisible(JSON.parse(savedMesozoic));
     }
   }, []);
 
