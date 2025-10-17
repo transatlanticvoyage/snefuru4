@@ -55,7 +55,17 @@ export default function SerpjarClient() {
   
   // Fetch version selector state
   const [fetchVersion, setFetchVersion] = useState<string>('latest'); // 'latest', 'all', or version number
-  const [availableVersions, setAvailableVersions] = useState<number[]>([]);
+  const [availableVersions, setAvailableVersions] = useState<Array<{
+    version: number;
+    batch_name: string | null;
+    fetch_source: string;
+  }>>([]);
+  
+  // Cache staleness tracking
+  const [cacheStatus, setCacheStatus] = useState<'CURRENT' | 'STALE' | 'NO_CACHE'>('NO_CACHE');
+  
+  // Gazelle step tracking
+  const [gazelleCurrentStep, setGazelleCurrentStep] = useState<'F400' | 'F410' | 'F420' | null>(null);
   
   // Chamber visibility states
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
@@ -243,7 +253,15 @@ export default function SerpjarClient() {
       try {
         const { data, error } = await supabase
           .from('zhe_serp_fetches')
-          .select('fetch_version')
+          .select(`
+            fetch_version,
+            fetch_source,
+            batch_id,
+            zhe_serp_fetch_batches:batch_id (
+              batch_name,
+              batch_source
+            )
+          `)
           .eq('rel_keyword_id', keywordId)
           .order('fetch_version', { ascending: true });
 
@@ -253,7 +271,12 @@ export default function SerpjarClient() {
           return;
         }
 
-        const versions = data?.map(f => f.fetch_version).filter((v): v is number => v !== null) || [];
+        const versions = data?.map(f => ({
+          version: f.fetch_version,
+          batch_name: f.zhe_serp_fetch_batches?.batch_name || null,
+          fetch_source: f.fetch_source
+        })).filter((v): v is { version: number; batch_name: string | null; fetch_source: string } => v.version !== null) || [];
+        
         setAvailableVersions(versions);
       } catch (err) {
         console.error('Failed to fetch available versions:', err);
@@ -262,6 +285,69 @@ export default function SerpjarClient() {
     };
 
     fetchAvailableVersions();
+  }, [keywordId, supabase]);
+
+  // Detect cache staleness
+  useEffect(() => {
+    const checkCacheStatus = async () => {
+      if (!keywordId) {
+        setCacheStatus('NO_CACHE');
+        return;
+      }
+
+      try {
+        // Get current cache for this keyword
+        const { data: cache, error: cacheError } = await supabase
+          .from('keywordshub_emd_zone_cache')
+          .select('source_fetch_id, is_current')
+          .eq('keyword_id', keywordId)
+          .eq('emd_stamp_method', 'method-1')
+          .eq('is_current', true)
+          .maybeSingle();
+
+        if (cacheError) {
+          console.error('Error checking cache status:', cacheError);
+          setCacheStatus('NO_CACHE');
+          return;
+        }
+
+        if (!cache) {
+          setCacheStatus('NO_CACHE');
+          return;
+        }
+
+        // Get latest fetch for this keyword
+        const { data: latestFetch, error: fetchError } = await supabase
+          .from('zhe_serp_fetches')
+          .select('fetch_id')
+          .eq('rel_keyword_id', keywordId)
+          .eq('is_latest', true)
+          .maybeSingle();
+
+        if (fetchError) {
+          console.error('Error checking latest fetch:', fetchError);
+          setCacheStatus('STALE');
+          return;
+        }
+
+        if (!latestFetch) {
+          setCacheStatus('NO_CACHE');
+          return;
+        }
+
+        // Compare source_fetch_id with latest fetch_id
+        if (cache.source_fetch_id === latestFetch.fetch_id) {
+          setCacheStatus('CURRENT');
+        } else {
+          setCacheStatus('STALE');
+        }
+      } catch (err) {
+        console.error('Failed to check cache status:', err);
+        setCacheStatus('NO_CACHE');
+      }
+    };
+
+    checkCacheStatus();
   }, [keywordId, supabase]);
 
   // F400 SERP Fetch Handler
@@ -466,6 +552,7 @@ export default function SerpjarClient() {
     }
 
     setGazelleLoading(true);
+    setGazelleCurrentStep('F400');
     try {
       // Step 1: Run F400 (SERP Fetch)
       console.log('Gazelle: Starting F400 SERP Fetch...');
@@ -515,6 +602,7 @@ export default function SerpjarClient() {
       }
 
       // Step 2: Run F410 (EMD Stamp Match)
+      setGazelleCurrentStep('F410');
       console.log('Gazelle: Starting F410 EMD Stamp Match...');
       
       const f410Response = await fetch('/api/f410', {
@@ -536,6 +624,7 @@ export default function SerpjarClient() {
       console.log('Gazelle: F410 completed successfully');
 
       // Step 3: Run F420 (Cache Ranking Zones)
+      setGazelleCurrentStep('F420');
       console.log('Gazelle: Starting F420 Zone Cache...');
       
       const f420Response = await fetch('/api/f420', {
@@ -582,6 +671,7 @@ export default function SerpjarClient() {
       alert(`Gazelle Aggregate Function failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setGazelleLoading(false);
+      setGazelleCurrentStep(null);
     }
   };
 
@@ -735,7 +825,7 @@ export default function SerpjarClient() {
                 : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
             }`}
           >
-            {gazelleLoading ? 'Running Gazelle...' : '🦌 Gazelle Aggregate Function - F400, F410, and F420 Together'}
+            {gazelleLoading ? `Running ${gazelleCurrentStep || 'Gazelle'}...` : '🦌 Gazelle Aggregate Function - F400, F410, and F420 Together'}
           </button>
           
           {/* Step 1 */}
@@ -1087,6 +1177,54 @@ export default function SerpjarClient() {
       </div>
       )}
 
+      {/* Cache Staleness Banner */}
+      {cacheStatus === 'STALE' && (
+        <div className="border-l border-r border-black bg-orange-50 border-orange-300 px-6 py-3 mx-4">
+          <div className="flex items-center gap-3">
+            <span className="text-orange-500 text-2xl">⚠️</span>
+            <div className="flex-1">
+              <p className="text-orange-800 font-semibold text-sm mb-1">
+                Cache Outdated - Zone Data May Be Stale
+              </p>
+              <p className="text-orange-700 text-xs">
+                A new SERP fetch (F400) was run, but zone cache (F420) wasn't updated. 
+                Click the Gazelle button or run F410 + F420 manually to refresh zone data.
+              </p>
+            </div>
+            <button
+              onClick={() => keywordId && handleGazelleAggregate()}
+              disabled={gazelleLoading}
+              className="px-4 py-2 bg-orange-500 text-white text-xs font-medium rounded hover:bg-orange-600 transition-colors disabled:bg-gray-400"
+            >
+              {gazelleLoading ? 'Running...' : '🦌 Run Gazelle Now'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {cacheStatus === 'NO_CACHE' && keywordData && (
+        <div className="border-l border-r border-black bg-red-50 border-red-300 px-6 py-3 mx-4">
+          <div className="flex items-center gap-3">
+            <span className="text-red-500 text-2xl">✗</span>
+            <div className="flex-1">
+              <p className="text-red-800 font-semibold text-sm mb-1">
+                No Zone Cache Found
+              </p>
+              <p className="text-red-700 text-xs">
+                Run the Gazelle function to fetch SERP results and generate zone data for this keyword.
+              </p>
+            </div>
+            <button
+              onClick={() => keywordId && handleGazelleAggregate()}
+              disabled={gazelleLoading}
+              className="px-4 py-2 bg-red-500 text-white text-xs font-medium rounded hover:bg-red-600 transition-colors disabled:bg-gray-400"
+            >
+              {gazelleLoading ? 'Running...' : '🦌 Run Gazelle Now'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Protozoic Chamber */}
       {protozoicChamberVisible && (
         <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
@@ -1105,10 +1243,18 @@ export default function SerpjarClient() {
               onChange={(e) => setFetchVersion(e.target.value)}
               className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:border-blue-500"
             >
-              <option value="latest">Latest (v{availableVersions[availableVersions.length - 1] || '?'})</option>
-              {availableVersions.slice().reverse().map(version => (
-                <option key={version} value={version.toString()}>
-                  Version {version}
+              <option value="latest">
+                Latest (v{availableVersions[availableVersions.length - 1]?.version || '?'})
+                {availableVersions[availableVersions.length - 1]?.batch_name && 
+                  ` [${availableVersions[availableVersions.length - 1].batch_name}]`}
+              </option>
+              {availableVersions.slice().reverse().map(versionInfo => (
+                <option key={versionInfo.version} value={versionInfo.version.toString()}>
+                  Version {versionInfo.version}
+                  {versionInfo.batch_name ? ` [${versionInfo.batch_name}]` : 
+                   versionInfo.fetch_source === 'manual-serpjar' ? ' [Manual]' :
+                   versionInfo.fetch_source === 'bulk-kwjar' ? ' [Bulk]' : 
+                   ' [Fabric]'}
                 </option>
               ))}
               <option value="all">All Versions ({availableVersions.length} total)</option>

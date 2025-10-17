@@ -36,6 +36,8 @@ interface KeywordRecord {
   industries?: {
     industry_name: string | null;
   } | null;
+  // Cache staleness tracking
+  cache_status?: 'CURRENT' | 'STALE' | 'NO_CACHE';
   // EMD zone cache data (method-1)
   emd_cache_m1?: {
     total_emd_sites: number | null;
@@ -461,7 +463,8 @@ export default function KeywordsHubTable({
             zone_26_50_domains,
             zone_51_100_domains,
             cached_at,
-            latest_fetch_id
+            latest_fetch_id,
+            source_fetch_id
           `)
           .eq('emd_stamp_method', 'method-1')
           .eq('is_current', true)  // Only fetch current cache, not historical
@@ -469,6 +472,17 @@ export default function KeywordsHubTable({
         
         if (cacheError) {
           console.error('Error fetching EMD zone cache:', cacheError);
+        }
+
+        // Get latest fetch_id for each keyword to detect staleness
+        const { data: latestFetches, error: fetchError } = await supabase
+          .from('zhe_serp_fetches')
+          .select('rel_keyword_id, fetch_id')
+          .eq('is_latest', true)
+          .in('rel_keyword_id', keywordIds);
+
+        if (fetchError) {
+          console.error('Error fetching latest fetches:', fetchError);
         }
         
         // Group tags by keyword_id
@@ -496,12 +510,38 @@ export default function KeywordsHubTable({
             cacheByKeywordId[cache.keyword_id] = cache;
           });
         }
+
+        // Create latest fetch lookup for staleness detection
+        const latestFetchByKeywordId: Record<number, number> = {};
         
-        // Add tags and cache data to keywords
+        if (latestFetches) {
+          latestFetches.forEach(fetch => {
+            latestFetchByKeywordId[fetch.rel_keyword_id] = fetch.fetch_id;
+          });
+        }
+        
+        // Calculate cache status for each keyword
+        const cacheStatusByKeywordId: Record<number, 'CURRENT' | 'STALE' | 'NO_CACHE'> = {};
+        
+        keywordIds.forEach(kwId => {
+          const cache = cacheByKeywordId[kwId];
+          const latestFetchId = latestFetchByKeywordId[kwId];
+          
+          if (!cache) {
+            cacheStatusByKeywordId[kwId] = 'NO_CACHE';
+          } else if (cache.source_fetch_id === latestFetchId) {
+            cacheStatusByKeywordId[kwId] = 'CURRENT';
+          } else {
+            cacheStatusByKeywordId[kwId] = 'STALE';
+          }
+        });
+        
+        // Add tags, cache data, and cache status to keywords
         const keywordsWithTags = keywords.map(keyword => ({
           ...keyword,
           tags: tagsByKeywordId[keyword.keyword_id] || [],
-          emd_cache_m1: cacheByKeywordId[keyword.keyword_id] || null
+          emd_cache_m1: cacheByKeywordId[keyword.keyword_id] || null,
+          cache_status: cacheStatusByKeywordId[keyword.keyword_id] || 'NO_CACHE'
         }));
         
         console.log('🏷️ [FETCH DATA] Loaded cache data for', Object.keys(cacheByKeywordId).length, 'keywords');
@@ -1361,12 +1401,23 @@ export default function KeywordsHubTable({
         );
       }
       
+      // Check if this is a zone count column (needs staleness indicator)
+      const isZoneCountColumn = column.key.includes('emd_cache_m1') && column.key.includes('_count');
+      
       return (
         <div
           className={cellClass}
           onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
         >
-          {typeof value === 'number' ? (column.key === 'rel_dfs_location_code' ? value.toString() : value.toLocaleString()) : value}
+          <div className="flex items-center gap-1">
+            <span>{typeof value === 'number' ? (column.key === 'rel_dfs_location_code' ? value.toString() : value.toLocaleString()) : value}</span>
+            {isZoneCountColumn && item.cache_status && item.cache_status !== 'CURRENT' && (
+              <span className="ml-1">
+                {item.cache_status === 'STALE' && <span className="text-orange-500" title="Cache is outdated - run F410+F420">⚠️</span>}
+                {item.cache_status === 'NO_CACHE' && <span className="text-red-500" title="No cache - run Gazelle">✗</span>}
+              </span>
+            )}
+          </div>
         </div>
       );
     }
@@ -1629,6 +1680,13 @@ export default function KeywordsHubTable({
                 )}
               </div>
             ))}
+            {/* Add staleness indicator at end of domain list (only show warnings/errors) */}
+            {item.cache_status && item.cache_status !== 'CURRENT' && (
+              <span className="ml-2">
+                {item.cache_status === 'STALE' && <span className="text-orange-500" title="Cache is outdated - run F410+F420">⚠️</span>}
+                {item.cache_status === 'NO_CACHE' && <span className="text-red-500" title="No cache - run Gazelle">✗</span>}
+              </span>
+            )}
           </div>
         </div>
       );

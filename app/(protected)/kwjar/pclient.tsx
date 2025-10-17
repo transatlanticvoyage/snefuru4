@@ -367,14 +367,34 @@ export default function KwjarClient() {
     let successCount = 0;
     let failCount = 0;
     const results: any[] = [];
+    let batchId: number | null = null;
 
     try {
+      // ═══════════════════════════════════════════════════════════
+      // STEP 0: Create batch record
+      // ═══════════════════════════════════════════════════════════
+      console.log('📦 Creating Gazelle batch record...');
+      const { data: batchData, error: batchError } = await supabase.rpc('create_serp_fetch_batch', {
+        p_batch_name: `Gazelle Bulk: ${selectedKeywordIds.length} keywords`,
+        p_batch_source: 'bulk-kwjar',
+        p_user_id: user?.id || null,
+        p_total_keywords: selectedKeywordIds.length
+      });
+
+      if (batchError) {
+        console.error('Error creating batch:', batchError);
+        throw new Error('Failed to create batch record');
+      }
+
+      batchId = batchData;
+      console.log(`✅ Batch created: #${batchId}`);
+
       for (let i = 0; i < selectedKeywordIds.length; i++) {
         const keywordId = selectedKeywordIds[i];
         setGazelleProgress({ current: i + 1, total: selectedKeywordIds.length });
 
         try {
-          console.log(`Gazelle Bulk: Processing keyword ${i + 1}/${selectedKeywordIds.length} (ID: ${keywordId})`);
+          console.log(`Gazelle Bulk: Processing keyword ${i + 1}/${selectedKeywordIds.length} (ID: ${keywordId}) [Batch #${batchId}]`);
 
           // Step 1: Run F400 (SERP Fetch) - always use Live mode for bulk
           const f400Response = await fetch('/api/f400-live', {
@@ -384,6 +404,9 @@ export default function KwjarClient() {
             },
             body: JSON.stringify({
               keyword_id: keywordId,
+              batch_id: batchId,
+              fetch_source: 'bulk-kwjar',
+              initiated_by_user_id: user?.id || null
             }),
           });
 
@@ -437,6 +460,16 @@ export default function KwjarClient() {
             f420_relations: f420Result.relations_created || 0,
           });
           successCount++;
+
+          // Update batch progress after successful completion
+          if (batchId) {
+            await supabase.rpc('update_batch_progress', {
+              p_batch_id: batchId,
+              p_completed: successCount + failCount,
+              p_failed: failCount,
+              p_status: null // Keep as 'in_progress' until done
+            });
+          }
         } catch (error) {
           console.error(`Error processing keyword ${keywordId}:`, error);
           results.push({
@@ -445,7 +478,31 @@ export default function KwjarClient() {
             error: error instanceof Error ? error.message : 'Unknown error',
           });
           failCount++;
+
+          // Update batch progress after failure
+          if (batchId) {
+            await supabase.rpc('update_batch_progress', {
+              p_batch_id: batchId,
+              p_completed: successCount + failCount,
+              p_failed: failCount,
+              p_status: null // Keep as 'in_progress'
+            });
+          }
         }
+      }
+
+      // ═══════════════════════════════════════════════════════════
+      // Mark batch as completed
+      // ═══════════════════════════════════════════════════════════
+      if (batchId) {
+        const finalStatus = failCount === selectedKeywordIds.length ? 'failed' : 'completed';
+        await supabase.rpc('update_batch_progress', {
+          p_batch_id: batchId,
+          p_completed: successCount + failCount,
+          p_failed: failCount,
+          p_status: finalStatus
+        });
+        console.log(`✅ Batch #${batchId} marked as ${finalStatus}`);
       }
 
       // Show final results
@@ -456,6 +513,7 @@ export default function KwjarClient() {
 
       alert(
         `🦌 Gazelle Bulk Processing Complete!\n\n` +
+        `Batch ID: #${batchId}\n` +
         `Total Keywords Processed: ${selectedKeywordIds.length}\n` +
         `✅ Successful: ${successCount}\n` +
         `❌ Failed: ${failCount}\n\n` +
@@ -470,6 +528,17 @@ export default function KwjarClient() {
       window.location.reload();
     } catch (error) {
       console.error('Gazelle bulk processing error:', error);
+      
+      // Mark batch as failed if it was created
+      if (batchId) {
+        await supabase.rpc('update_batch_progress', {
+          p_batch_id: batchId,
+          p_completed: successCount + failCount,
+          p_failed: failCount,
+          p_status: 'failed'
+        });
+      }
+      
       alert(`Gazelle bulk processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setGazelleLoading(false);
