@@ -33,6 +33,12 @@ export default function GazelleHelperClient() {
   const [filterStatus, setFilterStatus] = useState<'all' | 'in_progress' | 'stalled' | 'completed' | 'failed'>('all');
   const [resumingBatchId, setResumingBatchId] = useState<number | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [resumeProgress, setResumeProgress] = useState<{
+    batchId: number;
+    current: number;
+    total: number;
+    batchName: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -100,14 +106,14 @@ export default function GazelleHelperClient() {
   }, [autoRefresh]);
 
   const handleResumeBatch = async (batchId: number) => {
-    if (!confirm('Resume this stalled batch? This will process all pending keywords.')) {
+    if (!confirm('Resume this stalled batch? This will process all pending keywords.\n\nIMPORTANT: Keep this browser tab open until processing completes.')) {
       return;
     }
 
     setResumingBatchId(batchId);
 
     try {
-      // Call API endpoint to resume batch
+      // Step 1: Get the list of keywords to process
       const response = await fetch('/api/gazelle-resume', {
         method: 'POST',
         headers: {
@@ -125,21 +131,165 @@ export default function GazelleHelperClient() {
         throw new Error(result.error || 'Failed to resume batch');
       }
 
+      const keywordIds = result.keyword_ids || [];
+      const batchName = result.batch_name || `Batch #${batchId}`;
+
+      if (keywordIds.length === 0) {
+        alert('No pending keywords to process.');
+        return;
+      }
+
+      // Step 2: Process keywords sequentially
+      setResumeProgress({
+        batchId,
+        current: 0,
+        total: keywordIds.length,
+        batchName
+      });
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (let i = 0; i < keywordIds.length; i++) {
+        const keywordId = keywordIds[i];
+        setResumeProgress({
+          batchId,
+          current: i + 1,
+          total: keywordIds.length,
+          batchName
+        });
+
+        try {
+          console.log(`Processing keyword ${i + 1}/${keywordIds.length}: ID ${keywordId}`);
+
+          // Run F400 + F410 + F420 (Gazelle pipeline)
+          await processKeyword(keywordId, batchId);
+          successCount++;
+
+          // Update batch progress after each keyword
+          await updateBatchProgress(batchId, successCount, failCount);
+
+        } catch (error) {
+          console.error(`Error processing keyword ${keywordId}:`, error);
+          failCount++;
+
+          // Update batch progress even on failure
+          await updateBatchProgress(batchId, successCount, failCount);
+        }
+
+        // Small delay to avoid overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      // Step 3: Mark batch as completed
+      await markBatchComplete(batchId, successCount, failCount, keywordIds.length);
+
+      // Step 4: Show results
       alert(
-        `🦌 Batch Resume Initiated!\n\n` +
-        `Batch ID: #${batchId}\n` +
-        `Pending keywords: ${result.pending_keywords}\n\n` +
-        `The batch will continue processing in the background.\n` +
-        `Refresh this page to monitor progress.`
+        `🦌 Batch Resume Complete!\n\n` +
+        `Batch: ${batchName}\n` +
+        `Batch ID: #${batchId}\n\n` +
+        `Total processed: ${keywordIds.length}\n` +
+        `✅ Successful: ${successCount}\n` +
+        `❌ Failed: ${failCount}\n\n` +
+        `The table will now refresh.`
       );
 
       // Refresh the table
       fetchBatches();
+
     } catch (error) {
       console.error('Error resuming batch:', error);
       alert(`Failed to resume batch: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setResumingBatchId(null);
+      setResumeProgress(null);
+    }
+  };
+
+  const processKeyword = async (keywordId: number, batchId: number) => {
+    // Step 1: F400 LIVE SERP Fetch
+    const f400Response = await fetch('/api/f400-live', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        keyword_id: keywordId,
+        batch_id: batchId,
+        fetch_source: 'bulk-kwjar',
+        initiated_by_user_id: user?.id || null
+      }),
+    });
+
+    const f400Result = await f400Response.json();
+
+    if (!f400Response.ok) {
+      throw new Error(f400Result.error || 'F400 failed');
+    }
+
+    // Step 2: F410 EMD Stamp Match
+    const f410Response = await fetch('/api/f410', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        keyword_id: keywordId,
+      }),
+    });
+
+    const f410Result = await f410Response.json();
+
+    if (!f410Response.ok) {
+      throw new Error(f410Result.error || 'F410 failed');
+    }
+
+    // Step 3: F420 Cache Ranking Zones
+    const f420Response = await fetch('/api/f420', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        keyword_id: keywordId,
+        emd_stamp_method: 'method-1',
+      }),
+    });
+
+    const f420Result = await f420Response.json();
+
+    if (!f420Response.ok) {
+      throw new Error(f420Result.error || 'F420 failed');
+    }
+
+    return { f400Result, f410Result, f420Result };
+  };
+
+  const updateBatchProgress = async (batchId: number, successCount: number, failCount: number) => {
+    try {
+      await supabase.rpc('update_batch_progress', {
+        p_batch_id: batchId,
+        p_completed: successCount,
+        p_failed: failCount,
+        p_status: null // Keep as in_progress
+      });
+    } catch (error) {
+      console.error('Error updating batch progress:', error);
+    }
+  };
+
+  const markBatchComplete = async (batchId: number, successCount: number, failCount: number, total: number) => {
+    try {
+      const finalStatus = failCount === total ? 'failed' : 'completed';
+      await supabase.rpc('update_batch_progress', {
+        p_batch_id: batchId,
+        p_completed: successCount,
+        p_failed: failCount,
+        p_status: finalStatus
+      });
+    } catch (error) {
+      console.error('Error marking batch complete:', error);
     }
   };
 
@@ -260,6 +410,49 @@ export default function GazelleHelperClient() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Resume Progress Modal */}
+      {resumeProgress && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="text-center">
+              <div className="mb-4">
+                <div className="inline-block p-3 bg-blue-100 rounded-full mb-3">
+                  <svg className="w-8 h-8 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Processing Batch</h3>
+                <p className="text-sm text-gray-600 mb-1">{resumeProgress.batchName}</p>
+                <p className="text-xs text-gray-500">Batch #{resumeProgress.batchId}</p>
+              </div>
+
+              <div className="mb-4">
+                <div className="flex justify-between text-sm text-gray-600 mb-2">
+                  <span>Progress</span>
+                  <span>{resumeProgress.current} / {resumeProgress.total}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div
+                    className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                    style={{ width: `${(resumeProgress.current / resumeProgress.total) * 100}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  {Math.round((resumeProgress.current / resumeProgress.total) * 100)}% complete
+                </p>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                <p className="text-xs text-yellow-800">
+                  ⚠️ Keep this tab open until processing completes
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
       <div className="px-6 pt-6">
         <ZhedoriButtonBar />
