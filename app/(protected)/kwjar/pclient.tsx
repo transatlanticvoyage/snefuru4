@@ -30,6 +30,7 @@ export default function KwjarClient() {
   const [showGazelleFirstConfirm, setShowGazelleFirstConfirm] = useState(false);
   const [showGazelleSecondConfirm, setShowGazelleSecondConfirm] = useState(false);
   const [gazelleProgress, setGazelleProgress] = useState({ current: 0, total: 0 });
+  const [f400Mode, setF400Mode] = useState<'live' | 'queued' | null>(null); // User must choose before proceeding
   
   // Retry failed keywords state
   const [showRetryPopup, setShowRetryPopup] = useState(false);
@@ -453,10 +454,11 @@ export default function KwjarClient() {
         setGazelleProgress({ current: i + 1, total: selectedKeywordIds.length });
 
         try {
-          console.log(`Gazelle Bulk: Processing keyword ${i + 1}/${selectedKeywordIds.length} (ID: ${keywordId}) [Batch #${batchId}]`);
+          console.log(`Gazelle Bulk: Processing keyword ${i + 1}/${selectedKeywordIds.length} (ID: ${keywordId}) [Batch #${batchId}] - Mode: ${f400Mode}`);
 
-          // Step 1: Run F400 (SERP Fetch) - always use Live mode for bulk
-          const f400Response = await fetch('/api/f400-live', {
+          // Step 1: Run F400 (SERP Fetch) - use selected mode
+          const f400Endpoint = f400Mode === 'live' ? '/api/f400-live' : '/api/f400';
+          const f400Response = await fetch(f400Endpoint, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -473,6 +475,31 @@ export default function KwjarClient() {
 
           if (!f400Response.ok) {
             throw new Error(f400Result.error || 'F400 failed');
+          }
+
+          // For queued mode, wait and complete the pending fetch
+          if (f400Mode === 'queued' && f400Result.status === 'pending') {
+            console.log(`Gazelle Bulk: Waiting for queued fetch to complete (keyword ${keywordId})...`);
+            
+            // Wait 60 seconds for the queued task
+            await new Promise(resolve => setTimeout(resolve, 60000));
+            
+            // Try to complete the pending fetch
+            const completeResponse = await fetch('/api/f400-complete', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                fetch_id: f400Result.fetch_id,
+              }),
+            });
+
+            const completeResult = await completeResponse.json();
+            
+            if (!completeResponse.ok || !completeResult.success) {
+              throw new Error('F400 queued fetch did not complete in time. Keyword may need manual retry.');
+            }
           }
 
           // Step 2: Run F410 (EMD Stamp Match)
@@ -573,6 +600,7 @@ export default function KwjarClient() {
       alert(
         `🦌 Gazelle Bulk Processing Complete!\n\n` +
         `Batch ID: #${batchId}\n` +
+        `F400 Mode: ${f400Mode === 'live' ? 'Live (instant)' : 'Queued (delayed)'}\n` +
         `Total Keywords Processed: ${selectedKeywordIds.length}\n` +
         `✅ Successful: ${successCount}\n` +
         `❌ Failed: ${failCount}\n\n` +
@@ -580,6 +608,7 @@ export default function KwjarClient() {
         `• Total SERP results fetched: ${totalF400Results}\n` +
         `• Total EMD matches found: ${totalF410Matches}\n` +
         `• Total zone relations created: ${totalF420Relations}\n\n` +
+        `Estimated cost: $${(successCount * (f400Mode === 'live' ? 0.015 : 0.002)).toFixed(2)} USD\n\n` +
         `The page will now refresh.`
       );
 
@@ -1030,6 +1059,7 @@ export default function KwjarClient() {
                     alert('Please select keywords from the table first');
                     return;
                   }
+                  setF400Mode(null); // Reset mode for fresh selection
                   setShowGazelleFirstConfirm(true);
                 }}
                 disabled={selectedKeywordIds.length === 0 || gazelleLoading}
@@ -1040,7 +1070,7 @@ export default function KwjarClient() {
                 }`}
               >
                 {gazelleLoading 
-                  ? `Processing ${gazelleProgress.current}/${gazelleProgress.total}...`
+                  ? `Processing ${gazelleProgress.current}/${gazelleProgress.total}... (${f400Mode === 'live' ? 'LIVE' : 'QUEUED'})`
                   : `🦌 Gazelle Aggregate ${selectedKeywordIds.length > 0 ? `(${selectedKeywordIds.length})` : ''}`
                 }
               </button>
@@ -1299,38 +1329,96 @@ export default function KwjarClient() {
                 <p className="text-gray-700 mb-4">
                   You are about to run the <strong>Gazelle Bulk Aggregate Function</strong> on <strong>{selectedKeywordIds.length} keyword(s)</strong>.
                 </p>
+                
+                {/* Live vs Queued Mode Selection */}
+                <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
+                  <label className="block text-sm font-semibold text-gray-800 mb-3">
+                    Select F400 Mode: <span className="text-red-600">*Required</span>
+                  </label>
+                  <div className="flex items-center space-x-2">
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        value="live"
+                        checked={f400Mode === 'live'}
+                        onChange={() => setF400Mode('live')}
+                        className="sr-only peer"
+                      />
+                      <div className={`px-4 py-3 rounded-l-lg border-2 transition-colors ${
+                        f400Mode === 'live' 
+                          ? 'bg-green-500 text-white border-green-500' 
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}>
+                        <span className="font-bold block">Live (instant)</span>
+                        <span className="text-xs block mt-1">⚡ Results in 2-3 seconds</span>
+                        <span className="text-xs block">~$0.015 per keyword</span>
+                      </div>
+                    </label>
+                    <label className="inline-flex items-center cursor-pointer -ml-1">
+                      <input
+                        type="radio"
+                        value="queued"
+                        checked={f400Mode === 'queued'}
+                        onChange={() => setF400Mode('queued')}
+                        className="sr-only peer"
+                      />
+                      <div className={`px-4 py-3 rounded-r-lg border-2 transition-colors ${
+                        f400Mode === 'queued' 
+                          ? 'bg-blue-500 text-white border-blue-500' 
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}>
+                        <span className="font-bold block">Queued (delayed)</span>
+                        <span className="text-xs block mt-1">⏱️ Results in 2-10 minutes</span>
+                        <span className="text-xs block">~$0.002 per keyword</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
                 <p className="text-gray-700 mb-4">
                   This is a <strong className="text-red-600">very resource-intensive operation</strong> that will:
                 </p>
                 <ul className="list-disc list-inside text-gray-600 space-y-2 mb-4">
-                  <li>Run F400 (LIVE SERP Fetch) for each keyword - <strong>~$0.015 per keyword</strong></li>
+                  <li>Run F400 ({f400Mode === 'live' ? 'LIVE' : f400Mode === 'queued' ? 'QUEUED' : ''} SERP Fetch) for each keyword</li>
                   <li>Run F410 (EMD Stamp Match) for each keyword</li>
                   <li>Run F420 (Cache Ranking Zones) for each keyword</li>
-                  <li>Take approximately <strong>{selectedKeywordIds.length * 25} seconds</strong> to complete</li>
-                  <li>Consume significant API credits from your DataForSEO account</li>
+                  <li>Take approximately <strong>{f400Mode === 'live' ? selectedKeywordIds.length * 25 : selectedKeywordIds.length * 120} seconds</strong> to complete</li>
+                  <li>Consume API credits from your DataForSEO account</li>
                 </ul>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
-                  <p className="text-yellow-800 font-medium text-sm">
-                    Estimated cost: <strong>${(selectedKeywordIds.length * 0.015).toFixed(2)} USD</strong>
+                <div className={`border rounded-md p-3 ${f400Mode ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-100 border-gray-300'}`}>
+                  <p className={`font-medium text-sm ${f400Mode ? 'text-yellow-800' : 'text-gray-600'}`}>
+                    Estimated cost: <strong>{f400Mode ? `$${(selectedKeywordIds.length * (f400Mode === 'live' ? 0.015 : 0.002)).toFixed(2)} USD` : 'Select mode to see estimate'}</strong>
                   </p>
-                  <p className="text-yellow-700 text-sm mt-1">
+                  <p className={`text-sm mt-1 ${f400Mode ? 'text-yellow-700' : 'text-gray-500'}`}>
                     This operation cannot be stopped once started.
                   </p>
                 </div>
               </div>
               <div className="flex justify-end space-x-3">
                 <button
-                  onClick={() => setShowGazelleFirstConfirm(false)}
+                  onClick={() => {
+                    setShowGazelleFirstConfirm(false);
+                    setF400Mode(null); // Reset mode on cancel
+                  }}
                   className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => {
+                    if (!f400Mode) {
+                      alert('Please select either Live or Queued mode before continuing');
+                      return;
+                    }
                     setShowGazelleFirstConfirm(false);
                     setShowGazelleSecondConfirm(true);
                   }}
-                  className="px-4 py-2 bg-yellow-600 text-white hover:bg-yellow-700 rounded-md transition-colors"
+                  disabled={!f400Mode}
+                  className={`px-4 py-2 rounded-md transition-colors ${
+                    f400Mode
+                      ? 'bg-yellow-600 text-white hover:bg-yellow-700'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
                 >
                   I Understand, Continue
                 </button>
@@ -1360,14 +1448,17 @@ export default function KwjarClient() {
                 <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
                   <p className="text-red-800 font-medium mb-2">Clicking "Yes, Run Gazelle Now" will:</p>
                   <ul className="list-disc list-inside text-red-700 space-y-1 text-sm">
-                    <li>Process {selectedKeywordIds.length} keywords with F400 + F410 + F420</li>
-                    <li>Cost approximately ${(selectedKeywordIds.length * 0.015).toFixed(2)} in API credits</li>
-                    <li>Take approximately {Math.ceil(selectedKeywordIds.length * 25 / 60)} minutes to complete</li>
+                    <li>Process {selectedKeywordIds.length} keywords with F400 ({f400Mode === 'live' ? 'LIVE' : 'QUEUED'}) + F410 + F420</li>
+                    <li>Cost approximately ${(selectedKeywordIds.length * (f400Mode === 'live' ? 0.015 : 0.002)).toFixed(2)} in API credits</li>
+                    <li>Take approximately {Math.ceil(selectedKeywordIds.length * (f400Mode === 'live' ? 25 : 120) / 60)} minutes to complete</li>
                     <li>Cannot be stopped or undone once started</li>
                   </ul>
                 </div>
                 <p className="text-gray-700 font-medium">
                   Selected keywords: <span className="text-blue-600">{selectedKeywordIds.length}</span>
+                </p>
+                <p className="text-gray-700 font-medium mt-2">
+                  F400 Mode: <span className={`font-bold ${f400Mode === 'live' ? 'text-green-600' : 'text-blue-600'}`}>{f400Mode === 'live' ? 'Live (instant)' : 'Queued (delayed)'}</span>
                 </p>
               </div>
               <div className="flex justify-end space-x-3">
