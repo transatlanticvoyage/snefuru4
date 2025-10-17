@@ -189,20 +189,22 @@ export async function POST(request: NextRequest) {
 
       // ═══════════════════════════════════════════════════════════
       // Determine city ID fields based on kw_rubric shortcodes
+      // Logic: Fill ONLY ONE column - exact OR largest, never both
       // ═══════════════════════════════════════════════════════════
       let rel_exact_city_id = null;
       let rel_largest_city_id = null;
 
-      // Check if rubric contains both (city_name) and (state_code) = exact match
+      // Check if rubric contains both (city_name) and (state_code) = exact match ONLY
       const hasBothShortcodes = kw_rubric.includes('(city_name)') && kw_rubric.includes('(state_code)');
-      if (hasBothShortcodes) {
-        // Use the source city from cncglub row
-        rel_exact_city_id = row.rel_city_id;
-        console.log(`Exact city match: ${city.city_name}, ${city.state_code} (city_id: ${rel_exact_city_id})`);
-      }
+      const hasOnlyCityName = kw_rubric.includes('(city_name)') && !kw_rubric.includes('(state_code)');
 
-      // Check if rubric contains (city_name) = find largest city
-      if (kw_rubric.includes('(city_name)')) {
+      if (hasBothShortcodes) {
+        // Use the source city from cncglub row - EXACT MATCH ONLY
+        rel_exact_city_id = row.rel_city_id;
+        rel_largest_city_id = null; // Explicitly set to null
+        console.log(`EXACT city match: ${city.city_name}, ${city.state_code} (city_id: ${rel_exact_city_id}) - ONLY filling rel_exact_city_id`);
+      } else if (hasOnlyCityName) {
+        // Find largest city by population - LARGEST MATCH ONLY
         try {
           const { data: largestCity, error: largestCityError } = await supabase
             .from('cities')
@@ -214,12 +216,16 @@ export async function POST(request: NextRequest) {
 
           if (!largestCityError && largestCity) {
             rel_largest_city_id = largestCity.city_id;
-            console.log(`Largest city match for "${city.city_name}": city_id ${rel_largest_city_id} with population ${largestCity.city_population}`);
+            rel_exact_city_id = null; // Explicitly set to null
+            console.log(`LARGEST city match for "${city.city_name}": city_id ${rel_largest_city_id} with population ${largestCity.city_population} - ONLY filling rel_largest_city_id`);
           }
         } catch (error) {
           console.error('Error finding largest city:', error);
           // Continue processing even if largest city lookup fails
         }
+      } else {
+        // No city shortcodes present - both remain null
+        console.log(`No city shortcodes in rubric - both city ID fields remain null`);
       }
 
       if (existingKeyword) {

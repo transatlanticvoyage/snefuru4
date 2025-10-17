@@ -27,6 +27,8 @@ interface KeywordRecord {
   cached_cncglub_ids: string | null;
   rel_industry_id: number | null;
   cached_city_name: string | null;
+  rel_largest_city_id: number | null;
+  rel_exact_city_id: number | null;
   // SERP fetch tracking fields
   serp_results_count: number;
   serp_last_fetched_at: string | null;
@@ -35,6 +37,14 @@ interface KeywordRecord {
   // Joined industry data
   industries?: {
     industry_name: string | null;
+  } | null;
+  // Joined largest city data
+  largest_city?: {
+    city_population: number | null;
+  } | null;
+  // Joined exact city data
+  exact_city?: {
+    city_population: number | null;
   } | null;
   // Cache staleness tracking
   cache_status?: 'CURRENT' | 'STALE' | 'NO_CACHE';
@@ -69,6 +79,7 @@ interface ColumnDefinition {
   headerRow1BgClass?: string;
   readOnly?: boolean;
   isJoined?: boolean;
+  isJoistColumn?: boolean;
   isHoistColumn?: boolean;
 }
 
@@ -76,31 +87,60 @@ const columns: ColumnDefinition[] = [
   { key: 'serp_tool', label: 'serp_tool', type: 'button' },
   { key: 'keyword_id', label: 'keyword_id', type: 'number' },
   { 
-    key: 'hoist_note1', 
-    label: 'note1', 
+    key: 'rel_exact_city_id', 
+    label: 'rel_exact_city_id', 
+    type: 'number',
+    headerRow1Text: 'joist',
+    headerRow2Text: 'rel_exact_city_id',
+    readOnly: true,
+    isJoistColumn: true
+  },
+  { 
+    key: 'joist_metro_pop_placeholder', 
+    label: 'metro pop', 
     type: 'text',
+    headerRow1Text: 'joist',
+    headerRow2Text: 'metro pop',
+    readOnly: true,
+    isJoistColumn: true
+  },
+  { 
+    key: 'exact_city.city_population', 
+    label: 'city pop', 
+    type: 'number',
+    headerRow1Text: 'joist',
+    headerRow2Text: 'city pop',
+    readOnly: true,
+    isJoistColumn: true,
+    isJoined: true
+  },
+  { 
+    key: 'rel_largest_city_id', 
+    label: 'rel_largest_city_id', 
+    type: 'number',
     headerRow1Text: 'hoist',
-    headerRow2Text: 'note1',
+    headerRow2Text: 'rel_largest_city_id',
     readOnly: true,
     isHoistColumn: true
   },
   { 
-    key: 'hoist_ven_metro_pop', 
-    label: 'ven_metro_pop', 
+    key: 'hoist_metro_pop_placeholder', 
+    label: 'metro pop', 
     type: 'text',
     headerRow1Text: 'hoist',
-    headerRow2Text: 'ven_metro_pop',
+    headerRow2Text: 'metro pop',
     readOnly: true,
     isHoistColumn: true
   },
   { 
-    key: 'hoist_ven_city_pop', 
-    label: 'ven_city_pop', 
-    type: 'text',
+    key: 'largest_city.city_population', 
+    label: 'city pop', 
+    type: 'number',
     headerRow1Text: 'hoist',
-    headerRow2Text: 'ven_city_pop',
+    headerRow2Text: 'city pop',
     readOnly: true,
-    isHoistColumn: true
+    isHoistColumn: true,
+    isJoined: true
   },
   { key: 'keyword_datum', label: 'keyword_datum', type: 'text' },
   { 
@@ -297,6 +337,7 @@ const columns: ColumnDefinition[] = [
 interface KeywordsHubTableProps {
   selectedTagId?: number;
   tagFilterRefreshKey?: number;
+  showJoistColumns?: boolean;
   showHoistColumns?: boolean;
   onColumnPaginationRender?: (controls: {
     ColumnPaginationBar1: () => JSX.Element | null;
@@ -336,6 +377,7 @@ function formatDistanceToNow(date: Date): string {
 export default function KeywordsHubTable({ 
   selectedTagId,
   tagFilterRefreshKey = 0,
+  showJoistColumns = true,
   showHoistColumns = true,
   onColumnPaginationRender, 
   initialColumnsPerPage = 8,
@@ -424,6 +466,12 @@ export default function KeywordsHubTable({
           *,
           industries:rel_industry_id (
             industry_name
+          ),
+          exact_city:cities!rel_exact_city_id (
+            city_population
+          ),
+          largest_city:cities!rel_largest_city_id (
+            city_population
           )
         `);
 
@@ -646,17 +694,27 @@ export default function KeywordsHubTable({
 
   // Column pagination logic with sticky columns
   const baseStickyKeys = ['serp_tool', 'keyword_id', 'keyword_datum', 'search_volume', 'cpc'];
-  const hoistColumnKeys = ['hoist_note1', 'hoist_ven_metro_pop', 'hoist_ven_city_pop'];
+  const joistColumnKeys = ['rel_exact_city_id', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
+  const hoistColumnKeys = ['rel_largest_city_id', 'hoist_metro_pop_placeholder', 'largest_city.city_population'];
   
-  // Filter columns based on hoist toggle - remove hoist columns entirely if toggle is OFF
-  const activeColumns = showHoistColumns 
-    ? columns 
-    : columns.filter(col => !hoistColumnKeys.includes(col.key));
+  // Filter columns based on joist and hoist toggles
+  let activeColumns = columns;
+  if (!showJoistColumns) {
+    activeColumns = activeColumns.filter(col => !joistColumnKeys.includes(col.key));
+  }
+  if (!showHoistColumns) {
+    activeColumns = activeColumns.filter(col => !hoistColumnKeys.includes(col.key));
+  }
   
-  // Build sticky column keys with hoist columns inserted between keyword_id and keyword_datum
-  const stickyColumnKeys = showHoistColumns 
-    ? [...baseStickyKeys.slice(0, 2), ...hoistColumnKeys, ...baseStickyKeys.slice(2)]
-    : baseStickyKeys;
+  // Build sticky column keys with joist and hoist columns inserted between keyword_id and keyword_datum
+  let stickyColumnKeys = [...baseStickyKeys.slice(0, 2)];
+  if (showJoistColumns) {
+    stickyColumnKeys = [...stickyColumnKeys, ...joistColumnKeys];
+  }
+  if (showHoistColumns) {
+    stickyColumnKeys = [...stickyColumnKeys, ...hoistColumnKeys];
+  }
+  stickyColumnKeys = [...stickyColumnKeys, ...baseStickyKeys.slice(2)];
   
   const stickyColumns = activeColumns.filter(col => stickyColumnKeys.includes(col.key));
   const paginatedColumns = activeColumns.filter(col => !stickyColumnKeys.includes(col.key));
@@ -1343,6 +1401,15 @@ export default function KeywordsHubTable({
 
   // Render cell content
   const renderCell = (item: KeywordRecord, column: typeof columns[0]) => {
+    // Handle placeholder columns for metro pop (no database column exists)
+    if (column.key === 'joist_metro_pop_placeholder' || column.key === 'hoist_metro_pop_placeholder') {
+      return (
+        <div className="px-2 py-1 text-xs">
+          <span className="text-gray-400 italic">no db col</span>
+        </div>
+      );
+    }
+
     // Handle joined columns
     let value: any;
     if (column.key.includes('.')) {
@@ -1351,6 +1418,10 @@ export default function KeywordsHubTable({
         value = (item.industries as any)[field];
       } else if (table === 'serp_cache_m1' && item.serp_cache_m1) {
         value = (item.serp_cache_m1 as any)[field];
+      } else if (table === 'exact_city' && item.exact_city) {
+        value = (item.exact_city as any)[field];
+      } else if (table === 'largest_city' && item.largest_city) {
+        value = (item.largest_city as any)[field];
       } else {
         value = null;
       }
@@ -2025,8 +2096,13 @@ export default function KeywordsHubTable({
 
   return (
     <>
-      {/* Polka dot pattern CSS for hoist columns */}
+      {/* Polka dot pattern CSS for joist and hoist columns */}
       <style jsx>{`
+        .joist-column-header {
+          background-color: #D0F0C0;
+          background-image: radial-gradient(circle, #A0D090 2px, transparent 2px);
+          background-size: 12px 12px;
+        }
         .hoist-column-header {
           background-color: #F5F5DC;
           background-image: radial-gradient(circle, #D3D3D3 2px, transparent 2px);
@@ -2049,7 +2125,9 @@ export default function KeywordsHubTable({
                   <th
                     key={`keywordshub-${column.key}`}
                     className={`px-2 py-3 text-left border border-gray-200 ${
-                      column.isHoistColumn 
+                      column.isJoistColumn 
+                        ? 'joist-column-header'
+                        : column.isHoistColumn 
                         ? 'hoist-column-header' 
                         : (column.headerRow1BgClass || (column.key === 'tags' ? '' : 'bg-[#bcc4f1]'))
                     } ${
@@ -2058,7 +2136,7 @@ export default function KeywordsHubTable({
                       column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
                     }`}
                     style={{ 
-                      backgroundColor: column.key === 'tags' ? '#d3d3d3' : (column.isHoistColumn ? '#F5F5DC' : undefined)
+                      backgroundColor: column.key === 'tags' ? '#d3d3d3' : (column.isJoistColumn ? '#D0F0C0' : (column.isHoistColumn ? '#F5F5DC' : undefined))
                     }}
                   >
                     <span className="font-bold text-xs">

@@ -114,6 +114,7 @@ export default function KwjarClient() {
   const [protozoicChamberVisible, setProtozoicChamberVisible] = useState(true);
   const [mesozoicChamberVisible, setMesozoicChamberVisible] = useState(true);
   const [showHoistColumns, setShowHoistColumns] = useState(true);
+  const [showJoistColumns, setShowJoistColumns] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -147,6 +148,11 @@ export default function KwjarClient() {
     const savedHoistColumns = localStorage.getItem('kwjar_showHoistColumns');
     if (savedHoistColumns !== null) {
       setShowHoistColumns(JSON.parse(savedHoistColumns));
+    }
+    
+    const savedJoistColumns = localStorage.getItem('kwjar_showJoistColumns');
+    if (savedJoistColumns !== null) {
+      setShowJoistColumns(JSON.parse(savedJoistColumns));
     }
   }, []);
 
@@ -892,6 +898,27 @@ export default function KwjarClient() {
               </>
             )}
             
+            {/* Joist Columns Toggle */}
+            <div className="flex items-center space-x-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
+              <span className="text-sm font-medium text-gray-700">Show joist columns</span>
+              <button
+                onClick={() => {
+                  const newValue = !showJoistColumns;
+                  setShowJoistColumns(newValue);
+                  localStorage.setItem('kwjar_showJoistColumns', JSON.stringify(newValue));
+                }}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  showJoistColumns ? 'bg-green-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    showJoistColumns ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
             {/* Hoist Columns Toggle */}
             <div className="flex items-center space-x-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
               <span className="text-sm font-medium text-gray-700">Show hoist columns</span>
@@ -1222,6 +1249,7 @@ export default function KwjarClient() {
         <KeywordsHubTable 
           selectedTagId={selectedTag?.tag_id}
           tagFilterRefreshKey={tagFilterRefreshKey}
+          showJoistColumns={showJoistColumns}
           showHoistColumns={showHoistColumns}
           onColumnPaginationRender={setColumnPaginationControls}
           onMainPaginationRender={setMainPaginationControls}
