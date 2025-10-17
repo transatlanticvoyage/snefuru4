@@ -395,7 +395,7 @@ export default function KeywordsHubTable({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const [sortField, setSortField] = useState<keyof KeywordRecord>('created_at');
+  const [sortField, setSortField] = useState<string>('created_at');
   const [fetchingSerpKeywords, setFetchingSerpKeywords] = useState<Set<number>>(new Set());
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
@@ -670,10 +670,21 @@ export default function KeywordsHubTable({
       );
     });
 
-    // Sort data
+    // Sort data - handle both regular fields and joined fields (with dots)
     filtered.sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
+      let aValue: any;
+      let bValue: any;
+      
+      // Handle joined columns (e.g., "exact_city.city_population")
+      if (sortField.includes('.')) {
+        const [table, field] = sortField.split('.');
+        aValue = (a as any)[table]?.[field] ?? null;
+        bValue = (b as any)[table]?.[field] ?? null;
+      } else {
+        // Handle regular columns
+        aValue = (a as any)[sortField] ?? null;
+        bValue = (b as any)[sortField] ?? null;
+      }
       
       if (aValue === null && bValue === null) return 0;
       if (aValue === null) return sortOrder === 'asc' ? -1 : 1;
@@ -726,8 +737,8 @@ export default function KeywordsHubTable({
   // Combined visible columns: sticky columns + paginated columns
   const visibleColumns = [...stickyColumns, ...visiblePaginatedColumns];
 
-  // Handle sort
-  const handleSort = (field: keyof KeywordRecord) => {
+  // Handle sort - accepts both regular and joined column keys (e.g., "exact_city.city_population")
+  const handleSort = (field: string) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -2171,19 +2182,19 @@ export default function KeywordsHubTable({
                   <th
                     key={column.key}
                     className={`px-2 py-3 text-left border border-gray-200 ${
-                      column.key === 'serp_tool' ? '' : 'cursor-pointer hover:bg-gray-100'
+                      (column.key === 'serp_tool' || column.key === 'joist_metro_pop_placeholder' || column.key === 'hoist_metro_pop_placeholder') ? '' : 'cursor-pointer hover:bg-gray-100'
                     } ${
                       column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
                     } ${
                       column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
                     }`}
-                    onClick={column.key === 'serp_tool' ? undefined : () => handleSort(column.key as keyof KeywordRecord)}
+                    onClick={(column.key === 'serp_tool' || column.key === 'joist_metro_pop_placeholder' || column.key === 'hoist_metro_pop_placeholder') ? undefined : () => handleSort(column.key)}
                   >
                     <div className="flex items-center space-x-1">
                       <span className="font-bold text-xs lowercase">
                         {column.key === 'serp_tool' ? 'serp' : (column.headerRow2Text || column.label)}
                       </span>
-                      {sortField === column.key && column.key !== 'serp_tool' && (
+                      {sortField === column.key && column.key !== 'serp_tool' && column.key !== 'joist_metro_pop_placeholder' && column.key !== 'hoist_metro_pop_placeholder' && (
                         <span className="text-xs">
                           {sortOrder === 'asc' ? '↑' : '↓'}
                         </span>
