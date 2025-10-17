@@ -69,11 +69,39 @@ interface ColumnDefinition {
   headerRow1BgClass?: string;
   readOnly?: boolean;
   isJoined?: boolean;
+  isHoistColumn?: boolean;
 }
 
 const columns: ColumnDefinition[] = [
   { key: 'serp_tool', label: 'serp_tool', type: 'button' },
   { key: 'keyword_id', label: 'keyword_id', type: 'number' },
+  { 
+    key: 'hoist_note1', 
+    label: 'note1', 
+    type: 'text',
+    headerRow1Text: 'hoist',
+    headerRow2Text: 'note1',
+    readOnly: true,
+    isHoistColumn: true
+  },
+  { 
+    key: 'hoist_ven_metro_pop', 
+    label: 'ven_metro_pop', 
+    type: 'text',
+    headerRow1Text: 'hoist',
+    headerRow2Text: 'ven_metro_pop',
+    readOnly: true,
+    isHoistColumn: true
+  },
+  { 
+    key: 'hoist_ven_city_pop', 
+    label: 'ven_city_pop', 
+    type: 'text',
+    headerRow1Text: 'hoist',
+    headerRow2Text: 'ven_city_pop',
+    readOnly: true,
+    isHoistColumn: true
+  },
   { key: 'keyword_datum', label: 'keyword_datum', type: 'text' },
   { 
     key: 'serp_status', 
@@ -269,6 +297,7 @@ const columns: ColumnDefinition[] = [
 interface KeywordsHubTableProps {
   selectedTagId?: number;
   tagFilterRefreshKey?: number;
+  showHoistColumns?: boolean;
   onColumnPaginationRender?: (controls: {
     ColumnPaginationBar1: () => JSX.Element | null;
     ColumnPaginationBar2: () => JSX.Element | null;
@@ -307,6 +336,7 @@ function formatDistanceToNow(date: Date): string {
 export default function KeywordsHubTable({ 
   selectedTagId,
   tagFilterRefreshKey = 0,
+  showHoistColumns = true,
   onColumnPaginationRender, 
   initialColumnsPerPage = 8,
   initialColumnPage = 1,
@@ -615,9 +645,21 @@ export default function KeywordsHubTable({
   const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
   // Column pagination logic with sticky columns
-  const stickyColumnKeys = ['serp_tool', 'keyword_id', 'keyword_datum', 'search_volume', 'cpc'];
-  const stickyColumns = columns.filter(col => stickyColumnKeys.includes(col.key));
-  const paginatedColumns = columns.filter(col => !stickyColumnKeys.includes(col.key));
+  const baseStickyKeys = ['serp_tool', 'keyword_id', 'keyword_datum', 'search_volume', 'cpc'];
+  const hoistColumnKeys = ['hoist_note1', 'hoist_ven_metro_pop', 'hoist_ven_city_pop'];
+  
+  // Filter columns based on hoist toggle - remove hoist columns entirely if toggle is OFF
+  const activeColumns = showHoistColumns 
+    ? columns 
+    : columns.filter(col => !hoistColumnKeys.includes(col.key));
+  
+  // Build sticky column keys with hoist columns inserted between keyword_id and keyword_datum
+  const stickyColumnKeys = showHoistColumns 
+    ? [...baseStickyKeys.slice(0, 2), ...hoistColumnKeys, ...baseStickyKeys.slice(2)]
+    : baseStickyKeys;
+  
+  const stickyColumns = activeColumns.filter(col => stickyColumnKeys.includes(col.key));
+  const paginatedColumns = activeColumns.filter(col => !stickyColumnKeys.includes(col.key));
   
   const totalColumnPages = columnsPerPage === 0 ? 1 : Math.ceil(paginatedColumns.length / columnsPerPage);
   const startColumnIndex = columnsPerPage === 0 ? 0 : (currentColumnPage - 1) * columnsPerPage;
@@ -1982,9 +2024,19 @@ export default function KeywordsHubTable({
   }
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Table */}
-      <div className="flex-1 bg-white overflow-hidden">
+    <>
+      {/* Polka dot pattern CSS for hoist columns */}
+      <style jsx>{`
+        .hoist-column-header {
+          background-color: #F5F5DC;
+          background-image: radial-gradient(circle, #D3D3D3 2px, transparent 2px);
+          background-size: 12px 12px;
+        }
+      `}</style>
+      
+      <div className="h-full flex flex-col">
+        {/* Table */}
+        <div className="flex-1 bg-white overflow-hidden">
         <div className="h-full overflow-auto">
           <table className="border-collapse border border-gray-200">
             <thead className="bg-gray-50 sticky top-0">
@@ -1997,14 +2049,16 @@ export default function KeywordsHubTable({
                   <th
                     key={`keywordshub-${column.key}`}
                     className={`px-2 py-3 text-left border border-gray-200 ${
-                      column.headerRow1BgClass || (column.key === 'tags' ? '' : 'bg-[#bcc4f1]')
+                      column.isHoistColumn 
+                        ? 'hoist-column-header' 
+                        : (column.headerRow1BgClass || (column.key === 'tags' ? '' : 'bg-[#bcc4f1]'))
                     } ${
                       column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
                     } ${
                       column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
                     }`}
                     style={{ 
-                      backgroundColor: column.key === 'tags' ? '#d3d3d3' : undefined 
+                      backgroundColor: column.key === 'tags' ? '#d3d3d3' : (column.isHoistColumn ? '#F5F5DC' : undefined)
                     }}
                   >
                     <span className="font-bold text-xs">
@@ -2227,6 +2281,7 @@ export default function KeywordsHubTable({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

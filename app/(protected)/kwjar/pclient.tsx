@@ -113,6 +113,7 @@ export default function KwjarClient() {
   const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
   const [protozoicChamberVisible, setProtozoicChamberVisible] = useState(true);
   const [mesozoicChamberVisible, setMesozoicChamberVisible] = useState(true);
+  const [showHoistColumns, setShowHoistColumns] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -141,6 +142,11 @@ export default function KwjarClient() {
     const savedMesozoic = localStorage.getItem('kwjar_mesozoicChamberVisible');
     if (savedMesozoic !== null) {
       setMesozoicChamberVisible(JSON.parse(savedMesozoic));
+    }
+    
+    const savedHoistColumns = localStorage.getItem('kwjar_showHoistColumns');
+    if (savedHoistColumns !== null) {
+      setShowHoistColumns(JSON.parse(savedHoistColumns));
     }
   }, []);
 
@@ -885,6 +891,27 @@ export default function KwjarClient() {
                 </div>
               </>
             )}
+            
+            {/* Hoist Columns Toggle */}
+            <div className="flex items-center space-x-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
+              <span className="text-sm font-medium text-gray-700">Show hoist columns</span>
+              <button
+                onClick={() => {
+                  const newValue = !showHoistColumns;
+                  setShowHoistColumns(newValue);
+                  localStorage.setItem('kwjar_showHoistColumns', JSON.stringify(newValue));
+                }}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  showHoistColumns ? 'bg-green-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    showHoistColumns ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1195,6 +1222,7 @@ export default function KwjarClient() {
         <KeywordsHubTable 
           selectedTagId={selectedTag?.tag_id}
           tagFilterRefreshKey={tagFilterRefreshKey}
+          showHoistColumns={showHoistColumns}
           onColumnPaginationRender={setColumnPaginationControls}
           onMainPaginationRender={setMainPaginationControls}
           onTableActionsRender={setTableActions}
