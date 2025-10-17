@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
 import SerpResultsTable from './components/SerpResultsTable';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import IndustrySelectorPopup from '../kwjar/components/IndustrySelectorPopup';
 
 export default function SerpjarClient() {
   const { user } = useAuth();
@@ -24,14 +25,33 @@ export default function SerpjarClient() {
     low_top_of_page_bid: number | null,
     high_top_of_page_bid: number | null,
     cached_cncglub_ids: string | null,
+    rel_industry_id: number | null,
+    cached_city_name: string | null,
+    industry_name: string | null,
+    industry_emd_stamp_slug: string | null,
     tags?: Array<{ tag_id: number; tag_name: string }>
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [f400Loading, setF400Loading] = useState(false);
+  const [f410Loading, setF410Loading] = useState(false);
+  const [f420Loading, setF420Loading] = useState(false);
+  const [gazelleLoading, setGazelleLoading] = useState(false);
   const [completeLoading, setCompleteLoading] = useState(false);
   const [showFirstWarning, setShowFirstWarning] = useState(false);
   const [showSecondWarning, setShowSecondWarning] = useState(false);
   const [f400Mode, setF400Mode] = useState<'live' | 'queued'>('live'); // Default to live mode
+  
+  // Industry selector popup state
+  const [isIndustryPopupOpen, setIsIndustryPopupOpen] = useState(false);
+  const [selectedIndustry, setSelectedIndustry] = useState<{ industry_id: number; industry_name: string } | null>(null);
+  
+  // Inline editing state for cached_city_name
+  const [isEditingCityName, setIsEditingCityName] = useState(false);
+  const [editedCityName, setEditedCityName] = useState('');
+  
+  // Inline editing state for emd_stamp_slug
+  const [isEditingEmdStampSlug, setIsEditingEmdStampSlug] = useState(false);
+  const [editedEmdStampSlug, setEditedEmdStampSlug] = useState('');
   
   // Chamber visibility states
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
@@ -136,7 +156,23 @@ export default function SerpjarClient() {
       try {
         const { data, error } = await supabase
           .from('keywordshub')
-          .select('keyword_id, keyword_datum, search_volume, cpc, competition, competition_index, low_top_of_page_bid, high_top_of_page_bid, cached_cncglub_ids')
+          .select(`
+            keyword_id, 
+            keyword_datum, 
+            search_volume, 
+            cpc, 
+            competition, 
+            competition_index, 
+            low_top_of_page_bid, 
+            high_top_of_page_bid, 
+            cached_cncglub_ids,
+            rel_industry_id,
+            cached_city_name,
+            industries (
+              industry_name,
+              emd_stamp_slug
+            )
+          `)
           .eq('keyword_id', keywordId)
           .single();
 
@@ -168,7 +204,19 @@ export default function SerpjarClient() {
         })) || [];
 
         setKeywordData({
-          ...data,
+          keyword_id: data.keyword_id,
+          keyword_datum: data.keyword_datum,
+          search_volume: data.search_volume,
+          cpc: data.cpc,
+          competition: data.competition,
+          competition_index: data.competition_index,
+          low_top_of_page_bid: data.low_top_of_page_bid,
+          high_top_of_page_bid: data.high_top_of_page_bid,
+          cached_cncglub_ids: data.cached_cncglub_ids,
+          rel_industry_id: data.rel_industry_id,
+          cached_city_name: data.cached_city_name,
+          industry_name: data.industries?.industry_name || null,
+          industry_emd_stamp_slug: data.industries?.emd_stamp_slug || null,
           tags
         });
       } catch (err) {
@@ -272,6 +320,233 @@ export default function SerpjarClient() {
   const handleWarningCancel = () => {
     setShowFirstWarning(false);
     setShowSecondWarning(false);
+  };
+
+  // F410 Stamp EMD Match Handler
+  const handleF410StampEmdMatch = async () => {
+    if (!keywordId) {
+      alert('No keyword selected');
+      return;
+    }
+
+    setF410Loading(true);
+    try {
+      const response = await fetch('/api/f410', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          keyword_id: keywordId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to run F410 Stamp EMD Match');
+      }
+
+      // Show success message
+      alert(
+        `✅ F410 Stamp EMD Match Complete!\n\n` +
+        `Keyword: "${result.keyword_datum}"\n` +
+        `EMD Stamp Slug: "${result.emd_stamp_slug}"\n` +
+        `City Name: "${result.cached_city_name}"\n\n` +
+        `• Total SERP results checked: ${result.total_checked}\n` +
+        `• Matches found: ${result.matches_found}\n\n` +
+        `The page will now refresh to show updated results.`
+      );
+
+      // Refresh the page to show updated data
+      window.location.reload();
+    } catch (error) {
+      console.error('F410 error:', error);
+      alert(`F410 Stamp EMD Match failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setF410Loading(false);
+    }
+  };
+
+  // F420 Cache Ranking Zones Function
+  const handleF420CacheZones = async () => {
+    if (!keywordId) {
+      alert('No keyword selected');
+      return;
+    }
+
+    setF420Loading(true);
+    try {
+      console.log('F420: Starting zone cache...');
+      
+      const response = await fetch('/api/f420', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          keyword_id: keywordId,
+          emd_stamp_method: 'method-1'
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'F420 zone caching failed');
+      }
+
+      // Show success message
+      alert(
+        `✅ F420 Zone Cache Complete!\n\n` +
+        `Keyword: "${keywordData?.keyword_datum}"\n` +
+        `Method: ${result.emd_stamp_method}\n\n` +
+        `• Total EMD sites: ${result.total_emd_sites}\n` +
+        `• Zone 1: ${result.zone_breakdown.zone_1}\n` +
+        `• Zone 2: ${result.zone_breakdown.zone_2}\n` +
+        `• Zone 3: ${result.zone_breakdown.zone_3}\n` +
+        `• Zone 4-10: ${result.zone_breakdown.zone_4_10}\n` +
+        `• Zone 11-25: ${result.zone_breakdown.zone_11_25}\n` +
+        `• Zone 26-50: ${result.zone_breakdown.zone_26_50}\n` +
+        `• Zone 51-100: ${result.zone_breakdown.zone_51_100}\n\n` +
+        `Relations created: ${result.relations_created}`
+      );
+
+      // Refresh the page to show updated data
+      window.location.reload();
+    } catch (error) {
+      console.error('F420 error:', error);
+      alert(`F420 Zone Cache failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setF420Loading(false);
+    }
+  };
+
+  // Gazelle Aggregate Function - F400 + F410 Together
+  const handleGazelleAggregate = async () => {
+    if (!keywordId) {
+      alert('No keyword selected');
+      return;
+    }
+
+    setGazelleLoading(true);
+    try {
+      // Step 1: Run F400 (SERP Fetch)
+      console.log('Gazelle: Starting F400 SERP Fetch...');
+      const endpoint = f400Mode === 'live' ? '/api/f400-live' : '/api/f400';
+      
+      const f400Response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          keyword_id: keywordId,
+        }),
+      });
+
+      const f400Result = await f400Response.json();
+
+      if (!f400Response.ok) {
+        throw new Error(f400Result.error || 'F400 SERP fetch failed');
+      }
+
+      console.log('Gazelle: F400 completed successfully');
+
+      // For queued mode, we need to wait and complete
+      if (f400Mode === 'queued' && f400Result.status === 'pending') {
+        console.log('Gazelle: Waiting for queued fetch to complete...');
+        
+        // Wait 60 seconds for the queued task
+        await new Promise(resolve => setTimeout(resolve, 60000));
+        
+        // Try to complete the pending fetch
+        const completeResponse = await fetch('/api/f400-complete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fetch_id: f400Result.fetch_id,
+          }),
+        });
+
+        const completeResult = await completeResponse.json();
+        
+        if (!completeResponse.ok || !completeResult.success) {
+          throw new Error('F400 queued fetch did not complete in time. Please try again or use Live mode.');
+        }
+      }
+
+      // Step 2: Run F410 (EMD Stamp Match)
+      console.log('Gazelle: Starting F410 EMD Stamp Match...');
+      
+      const f410Response = await fetch('/api/f410', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          keyword_id: keywordId,
+        }),
+      });
+
+      const f410Result = await f410Response.json();
+
+      if (!f410Response.ok) {
+        throw new Error(f410Result.error || 'F410 Stamp EMD Match failed');
+      }
+
+      console.log('Gazelle: F410 completed successfully');
+
+      // Step 3: Run F420 (Cache Ranking Zones)
+      console.log('Gazelle: Starting F420 Zone Cache...');
+      
+      const f420Response = await fetch('/api/f420', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          keyword_id: keywordId,
+          emd_stamp_method: 'method-1',
+        }),
+      });
+
+      const f420Result = await f420Response.json();
+
+      if (!f420Response.ok) {
+        throw new Error(f420Result.error || 'F420 Zone Cache failed');
+      }
+
+      console.log('Gazelle: F420 completed successfully');
+
+      // Show success message
+      alert(
+        `🦌 Gazelle Aggregate Function Complete!\n\n` +
+        `Keyword: "${keywordData?.keyword_datum}"\n\n` +
+        `✅ F400 SERP Fetch: ${f400Mode === 'live' ? 'Live' : 'Queued'}\n` +
+        `   • SERP results stored: ${f400Result.organic_results_stored || 0}\n\n` +
+        `✅ F410 EMD Stamp Match:\n` +
+        `   • Total checked: ${f410Result.total_checked}\n` +
+        `   • Matches found: ${f410Result.matches_found}\n` +
+        `   • EMD: "${f410Result.emd_stamp_slug}"\n` +
+        `   • City: "${f410Result.cached_city_name}"\n\n` +
+        `✅ F420 Zone Cache:\n` +
+        `   • Total EMD sites: ${f420Result.total_emd_sites}\n` +
+        `   • Zones cached: ${f420Result.zones_cached}\n` +
+        `   • Relations created: ${f420Result.relations_created}\n\n` +
+        `The page will now refresh to show all results.`
+      );
+
+      // Refresh the page
+      window.location.reload();
+    } catch (error) {
+      console.error('Gazelle Aggregate error:', error);
+      alert(`Gazelle Aggregate Function failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setGazelleLoading(false);
+    }
   };
 
   // Complete Pending Fetches Handler
@@ -414,6 +689,19 @@ export default function SerpjarClient() {
         
         {/* Button Controls Section */}
         <div className="mt-3 flex flex-wrap items-center gap-3">
+          {/* Gazelle Aggregate Function Button */}
+          <button
+            onClick={() => keywordId && handleGazelleAggregate()}
+            disabled={!keywordId || gazelleLoading}
+            className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
+              !keywordId || gazelleLoading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+            }`}
+          >
+            {gazelleLoading ? 'Running Gazelle...' : '🦌 Gazelle Aggregate Function - F400, F410, and F420 Together'}
+          </button>
+          
           {/* Step 1 */}
           <span className="font-bold text-gray-800" style={{ fontSize: '16px' }}>Step 1</span>
           
@@ -435,37 +723,31 @@ export default function SerpjarClient() {
 
           {/* F410 Stamp EMD Match Button */}
           <button
-            onClick={() => {
-              // TODO: Add F410 functionality
-              console.log('F410 Stamp EMD Match button clicked for keyword_id:', keywordId);
-            }}
-            disabled={!keywordId}
+            onClick={() => keywordId && handleF410StampEmdMatch()}
+            disabled={!keywordId || f410Loading}
             className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
-              !keywordId
+              !keywordId || f410Loading
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-orange-500 text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2'
             }`}
           >
-            Run F410 Stamp EMD Match 1
+            {f410Loading ? 'Processing...' : 'Run F410 Stamp EMD Match 1'}
           </button>
-          
+
           {/* Step 3 */}
           <span className="font-bold text-gray-800" style={{ fontSize: '16px' }}>Step 3</span>
-          
+
           {/* F420 Cache Ranking Zones Button */}
           <button
-            onClick={() => {
-              // TODO: Add F420 functionality
-              console.log('F420 Cache Ranking Zones button clicked for keyword_id:', keywordId);
-            }}
-            disabled={!keywordId}
+            onClick={() => keywordId && handleF420CacheZones()}
+            disabled={!keywordId || f420Loading}
             className={`px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
-              !keywordId
+              !keywordId || f420Loading
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2'
+                : 'bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
             }`}
           >
-            Run F420 Cache Ranking Zones
+            {f420Loading ? 'Caching Zones...' : 'Run F420 Cache Ranking Zones'}
           </button>
         </div>
         </div>
@@ -496,8 +778,8 @@ export default function SerpjarClient() {
         </div>
         
         {/* New section below SERP Results heading */}
-        <div className="mt-4 flex items-start space-x-6">
-          <div className="font-bold text-gray-800" style={{ fontSize: '20px' }}>
+        <div className="mt-4">
+          <div className="font-bold text-gray-800 mb-4" style={{ fontSize: '20px' }}>
             {keywordId ? (
               <span>
                 keywordshub.keyword_id: <span className="text-blue-600">{keywordId}</span>
@@ -513,7 +795,8 @@ export default function SerpjarClient() {
           </div>
           
           {/* UI Table */}
-          <table className="border-collapse" style={{ border: '1px solid #4a5568' }}>
+          <div className="overflow-x-auto">
+            <table className="border-collapse" style={{ border: '1px solid #4a5568' }}>
             <thead>
               <tr className="bg-gray-200">
                 <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>keyword_id</th>
@@ -526,6 +809,9 @@ export default function SerpjarClient() {
                 <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>high_top_of_page_bid</th>
                 <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>tags</th>
                 <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>cached_cncglub_ids</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>rel_industry_id</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>industries.emd_stamp_slug</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>cached_city_name</th>
               </tr>
             </thead>
             <tbody>
@@ -581,9 +867,185 @@ export default function SerpjarClient() {
                     <span className="text-gray-400 italic">not cached</span>
                   )}
                 </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.rel_industry_id && keywordData?.industry_name ? (
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="text-purple-600 font-medium cursor-pointer hover:text-purple-800 hover:underline"
+                        onClick={() => {
+                          setSelectedIndustry({
+                            industry_id: keywordData.rel_industry_id!,
+                            industry_name: keywordData.industry_name!
+                          });
+                          setIsIndustryPopupOpen(true);
+                        }}
+                      >
+                        ({keywordData.rel_industry_id}) - {keywordData.industry_name}
+                      </span>
+                      <button
+                        onClick={async () => {
+                          const confirmed = confirm(`Clear industry assignment for keyword "${keywordData.keyword_datum}"?`);
+                          if (!confirmed) return;
+                          
+                          try {
+                            const { error } = await supabase
+                              .from('keywordshub')
+                              .update({ rel_industry_id: null })
+                              .eq('keyword_id', keywordData.keyword_id);
+                            
+                            if (error) throw error;
+                            
+                            alert('Industry cleared successfully');
+                            window.location.reload();
+                          } catch (error) {
+                            console.error('Error clearing industry:', error);
+                            alert('Failed to clear industry');
+                          }
+                        }}
+                        className="text-red-500 hover:text-red-700 font-bold text-sm"
+                        title="Clear industry"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <span
+                      className="text-gray-400 italic cursor-pointer hover:text-gray-600"
+                      onClick={() => {
+                        setSelectedIndustry(null);
+                        setIsIndustryPopupOpen(true);
+                      }}
+                    >
+                      (click to set)
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {isEditingEmdStampSlug ? (
+                    <input
+                      type="text"
+                      value={editedEmdStampSlug}
+                      onChange={(e) => setEditedEmdStampSlug(e.target.value)}
+                      onBlur={async () => {
+                        if (!keywordData?.rel_industry_id) {
+                          alert('No industry assigned to this keyword');
+                          setIsEditingEmdStampSlug(false);
+                          return;
+                        }
+                        
+                        try {
+                          const { error } = await supabase
+                            .from('industries')
+                            .update({ emd_stamp_slug: editedEmdStampSlug })
+                            .eq('industry_id', keywordData.rel_industry_id);
+                          
+                          if (error) throw error;
+                          
+                          setIsEditingEmdStampSlug(false);
+                          // Update local state
+                          if (keywordData) {
+                            setKeywordData({
+                              ...keywordData,
+                              industry_emd_stamp_slug: editedEmdStampSlug
+                            });
+                          }
+                        } catch (error) {
+                          console.error('Error updating emd_stamp_slug:', error);
+                          alert('Failed to update emd_stamp_slug');
+                          setIsEditingEmdStampSlug(false);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.currentTarget.blur();
+                        }
+                        if (e.key === 'Escape') {
+                          setEditedEmdStampSlug(keywordData?.industry_emd_stamp_slug || '');
+                          setIsEditingEmdStampSlug(false);
+                        }
+                      }}
+                      autoFocus
+                      className="w-full px-2 py-1 border border-blue-500 rounded text-xs"
+                    />
+                  ) : (
+                    <div
+                      onClick={() => {
+                        if (!keywordData?.rel_industry_id) {
+                          alert('No industry assigned to this keyword. Please assign an industry first.');
+                          return;
+                        }
+                        setEditedEmdStampSlug(keywordData?.industry_emd_stamp_slug || '');
+                        setIsEditingEmdStampSlug(true);
+                      }}
+                      className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+                    >
+                      {keywordData?.industry_emd_stamp_slug || (
+                        <span className="text-gray-400 italic">(click to edit)</span>
+                      )}
+                    </div>
+                  )}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {isEditingCityName ? (
+                    <input
+                      type="text"
+                      value={editedCityName}
+                      onChange={(e) => setEditedCityName(e.target.value)}
+                      onBlur={async () => {
+                        if (!keywordId) return;
+                        
+                        try {
+                          const { error } = await supabase
+                            .from('keywordshub')
+                            .update({ cached_city_name: editedCityName })
+                            .eq('keyword_id', keywordId);
+                          
+                          if (error) throw error;
+                          
+                          setIsEditingCityName(false);
+                          // Update local state
+                          if (keywordData) {
+                            setKeywordData({
+                              ...keywordData,
+                              cached_city_name: editedCityName
+                            });
+                          }
+                        } catch (error) {
+                          console.error('Error updating cached_city_name:', error);
+                          alert('Failed to update city name');
+                          setIsEditingCityName(false);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.currentTarget.blur();
+                        }
+                        if (e.key === 'Escape') {
+                          setEditedCityName(keywordData?.cached_city_name || '');
+                          setIsEditingCityName(false);
+                        }
+                      }}
+                      autoFocus
+                      className="w-full px-2 py-1 border border-blue-500 rounded text-xs"
+                    />
+                  ) : (
+                    <div
+                      onClick={() => {
+                        setEditedCityName(keywordData?.cached_city_name || '');
+                        setIsEditingCityName(true);
+                      }}
+                      className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+                    >
+                      {keywordData?.cached_city_name || (
+                        <span className="text-gray-400 italic">(click to edit)</span>
+                      )}
+                    </div>
+                  )}
+                </td>
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
         {/* End of sinus_chamber */}
       </div>
@@ -725,6 +1187,38 @@ export default function SerpjarClient() {
           </div>
         </div>
       )}
+
+      {/* Industry Selector Popup */}
+      <IndustrySelectorPopup
+        isOpen={isIndustryPopupOpen}
+        onClose={() => setIsIndustryPopupOpen(false)}
+        onSelect={async (industry) => {
+          if (!keywordId) {
+            alert('No keyword selected');
+            return;
+          }
+          
+          try {
+            const { error } = await supabase
+              .from('keywordshub')
+              .update({ rel_industry_id: industry.industry_id })
+              .eq('keyword_id', keywordId);
+            
+            if (error) throw error;
+            
+            alert(`Industry updated to "${industry.industry_name}" successfully`);
+            setSelectedIndustry(industry);
+            setIsIndustryPopupOpen(false);
+            
+            // Refresh the page to show updated data
+            window.location.reload();
+          } catch (error) {
+            console.error('Error updating industry:', error);
+            alert('Failed to update industry');
+          }
+        }}
+        currentSelection={selectedIndustry}
+      />
     </div>
   );
 }

@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
 import KeywordsHubTable from './components/KeywordsHubTable';
 import TagsPlenchPopup from './components/TagsPlenchPopup';
+import IndustrySelectorPopup from './components/IndustrySelectorPopup';
 
 export default function KwjarClient() {
   const { user } = useAuth();
@@ -17,6 +18,17 @@ export default function KwjarClient() {
   // Tags plench popup state
   const [isTagsPopupOpen, setIsTagsPopupOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<{ tag_id: number; tag_name: string } | null>(null);
+  
+  // Industry selection state
+  const [isIndustryPopupOpen, setIsIndustryPopupOpen] = useState(false);
+  const [selectedIndustry, setSelectedIndustry] = useState<{ industry_id: number; industry_name: string } | null>(null);
+  const [selectedKeywordIds, setSelectedKeywordIds] = useState<number[]>([]);
+  
+  // Gazelle bulk processing state
+  const [gazelleLoading, setGazelleLoading] = useState(false);
+  const [showGazelleFirstConfirm, setShowGazelleFirstConfirm] = useState(false);
+  const [showGazelleSecondConfirm, setShowGazelleSecondConfirm] = useState(false);
+  const [gazelleProgress, setGazelleProgress] = useState({ current: 0, total: 0 });
   
   // Debug selected tag changes
   useEffect(() => {
@@ -158,6 +170,10 @@ export default function KwjarClient() {
         };
         loadTagFromUrl();
       }
+    } else {
+      // If no kwtag parameter, clear the selected tag (unless it was already null)
+      console.log('🏷️ [PCLIENT] No kwtag in URL, clearing selectedTag');
+      setSelectedTag(null);
     }
     
     // Handle column pagination URL parameters
@@ -282,10 +298,10 @@ export default function KwjarClient() {
   }, [supabase]);
 
   // Handle column pagination changes from table component
-  const handleColumnPaginationChange = (newColumnsPerPage: number, newCurrentPage: number) => {
+  const handleColumnPaginationChange = useCallback((newColumnsPerPage: number, newCurrentPage: number) => {
     setColumnsPerPage(newColumnsPerPage);
     setCurrentColumnPage(newCurrentPage);
-  };
+  }, []);
 
   // Track URL changes for uelbar37 display (like nwjar1)
   useEffect(() => {
@@ -335,6 +351,129 @@ export default function KwjarClient() {
     setKz103Checked(!kz103Checked);
     if (kz101Checked) {
       setKz101Checked(false);
+    }
+  };
+
+  // Gazelle Bulk Aggregate Handler
+  const handleGazelleBulkAggregate = async () => {
+    if (selectedKeywordIds.length === 0) {
+      alert('Please select keywords from the table first');
+      return;
+    }
+
+    setGazelleLoading(true);
+    setGazelleProgress({ current: 0, total: selectedKeywordIds.length });
+
+    let successCount = 0;
+    let failCount = 0;
+    const results: any[] = [];
+
+    try {
+      for (let i = 0; i < selectedKeywordIds.length; i++) {
+        const keywordId = selectedKeywordIds[i];
+        setGazelleProgress({ current: i + 1, total: selectedKeywordIds.length });
+
+        try {
+          console.log(`Gazelle Bulk: Processing keyword ${i + 1}/${selectedKeywordIds.length} (ID: ${keywordId})`);
+
+          // Step 1: Run F400 (SERP Fetch) - always use Live mode for bulk
+          const f400Response = await fetch('/api/f400-live', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              keyword_id: keywordId,
+            }),
+          });
+
+          const f400Result = await f400Response.json();
+
+          if (!f400Response.ok) {
+            throw new Error(f400Result.error || 'F400 failed');
+          }
+
+          // Step 2: Run F410 (EMD Stamp Match)
+          const f410Response = await fetch('/api/f410', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              keyword_id: keywordId,
+            }),
+          });
+
+          const f410Result = await f410Response.json();
+
+          if (!f410Response.ok) {
+            throw new Error(f410Result.error || 'F410 failed');
+          }
+
+          // Step 3: Run F420 (Cache Ranking Zones)
+          const f420Response = await fetch('/api/f420', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              keyword_id: keywordId,
+              emd_stamp_method: 'method-1',
+            }),
+          });
+
+          const f420Result = await f420Response.json();
+
+          if (!f420Response.ok) {
+            throw new Error(f420Result.error || 'F420 failed');
+          }
+
+          results.push({
+            keyword_id: keywordId,
+            success: true,
+            f400_results: f400Result.organic_results_stored || 0,
+            f410_matches: f410Result.matches_found || 0,
+            f420_zones: f420Result.zones_cached || 0,
+            f420_relations: f420Result.relations_created || 0,
+          });
+          successCount++;
+        } catch (error) {
+          console.error(`Error processing keyword ${keywordId}:`, error);
+          results.push({
+            keyword_id: keywordId,
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
+          failCount++;
+        }
+      }
+
+      // Show final results
+      const successResults = results.filter(r => r.success);
+      const totalF400Results = successResults.reduce((sum, r) => sum + r.f400_results, 0);
+      const totalF410Matches = successResults.reduce((sum, r) => sum + r.f410_matches, 0);
+      const totalF420Relations = successResults.reduce((sum, r) => sum + r.f420_relations, 0);
+
+      alert(
+        `🦌 Gazelle Bulk Processing Complete!\n\n` +
+        `Total Keywords Processed: ${selectedKeywordIds.length}\n` +
+        `✅ Successful: ${successCount}\n` +
+        `❌ Failed: ${failCount}\n\n` +
+        `📊 Results:\n` +
+        `• Total SERP results fetched: ${totalF400Results}\n` +
+        `• Total EMD matches found: ${totalF410Matches}\n` +
+        `• Total zone relations created: ${totalF420Relations}\n\n` +
+        `The page will now refresh.`
+      );
+
+      // Refresh the page
+      window.location.reload();
+    } catch (error) {
+      console.error('Gazelle bulk processing error:', error);
+      alert(`Gazelle bulk processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setGazelleLoading(false);
+      setGazelleProgress({ current: 0, total: 0 });
     }
   };
 
@@ -406,11 +545,100 @@ export default function KwjarClient() {
             sinus_chamber
           </div>
           
-          {/* Main pagination and search controls */}
+          {/* Main pagination and search controls with industry controls */}
           {mainPaginationControls && (
             <div className="flex items-center space-x-4">
               {mainPaginationControls.PaginationControls()}
               {mainPaginationControls.SearchField()}
+              
+              {/* Industry Selection Controls - Wrapped in bordered div */}
+              <div className="flex items-center space-x-3 border border-black p-2 rounded-md">
+                <button
+                  onClick={() => setIsIndustryPopupOpen(true)}
+                  className="px-3 py-1.5 bg-purple-600 text-white rounded text-xs font-medium hover:bg-purple-700 transition-colors"
+                >
+                  select industry
+                </button>
+                
+                {selectedIndustry && (
+                  <div className="flex items-center space-x-2 bg-purple-50 border border-purple-300 rounded px-2 py-1">
+                    <span className="text-xs text-gray-600">Selected:</span>
+                    <span className="font-bold text-purple-700 text-xs">
+                      {selectedIndustry.industry_id}
+                    </span>
+                    <span className="text-xs text-gray-800">
+                      {selectedIndustry.industry_name}
+                    </span>
+                  </div>
+                )}
+                
+                <button
+                  onClick={async () => {
+                    if (!selectedIndustry) {
+                      alert('Please select an industry first');
+                      return;
+                    }
+                    if (selectedKeywordIds.length === 0) {
+                      alert('Please select keywords from the table first');
+                      return;
+                    }
+                    
+                    const confirmed = confirm(
+                      `Update ${selectedKeywordIds.length} keyword(s) to industry "${selectedIndustry.industry_name}" (ID: ${selectedIndustry.industry_id})?\n\nThis will set rel_industry_id for all selected keywords.`
+                    );
+                    
+                    if (!confirmed) return;
+                    
+                    try {
+                      const { error } = await supabase
+                        .from('keywordshub')
+                        .update({ rel_industry_id: selectedIndustry.industry_id })
+                        .in('keyword_id', selectedKeywordIds);
+                      
+                      if (error) throw error;
+                      
+                      alert(`Successfully updated ${selectedKeywordIds.length} keyword(s) to industry "${selectedIndustry.industry_name}"`);
+                      
+                      // Trigger refresh by dispatching event
+                      window.dispatchEvent(new CustomEvent('kwjar-refresh-needed'));
+                    } catch (error) {
+                      console.error('Error updating keywords:', error);
+                      alert('Failed to update keywords');
+                    }
+                  }}
+                  disabled={!selectedIndustry || selectedKeywordIds.length === 0}
+                  className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                    !selectedIndustry || selectedKeywordIds.length === 0
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-green-600 text-white hover:bg-green-700'
+                  }`}
+                >
+                  update industry to selected
+                  {selectedKeywordIds.length > 0 && ` (${selectedKeywordIds.length})`}
+                </button>
+              </div>
+              
+              {/* Gazelle Bulk Aggregate Button */}
+              <button
+                onClick={() => {
+                  if (selectedKeywordIds.length === 0) {
+                    alert('Please select keywords from the table first');
+                    return;
+                  }
+                  setShowGazelleFirstConfirm(true);
+                }}
+                disabled={selectedKeywordIds.length === 0 || gazelleLoading}
+                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                  selectedKeywordIds.length === 0 || gazelleLoading
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                {gazelleLoading 
+                  ? `Processing ${gazelleProgress.current}/${gazelleProgress.total}...`
+                  : `🦌 Gazelle Aggregate ${selectedKeywordIds.length > 0 ? `(${selectedKeywordIds.length})` : ''}`
+                }
+              </button>
             </div>
           )}
         </div>
@@ -497,6 +725,7 @@ export default function KwjarClient() {
           initialColumnsPerPage={columnsPerPage}
           initialColumnPage={currentColumnPage}
           onColumnPaginationChange={handleColumnPaginationChange}
+          onSelectedRowsChange={setSelectedKeywordIds}
         />
       </div>
 
@@ -511,6 +740,124 @@ export default function KwjarClient() {
           }}
           selectedTag={selectedTag}
         />
+      )}
+
+      {/* Industry Selector Popup */}
+      <IndustrySelectorPopup
+        isOpen={isIndustryPopupOpen}
+        onClose={() => setIsIndustryPopupOpen(false)}
+        onSelect={setSelectedIndustry}
+        currentSelection={selectedIndustry}
+      />
+
+      {/* Gazelle First Confirmation Modal */}
+      {showGazelleFirstConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="bg-yellow-100 rounded-full p-2 mr-3">
+                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">⚠️ Resource-Intensive Operation Warning</h3>
+              </div>
+              <div className="mb-6">
+                <p className="text-gray-700 mb-4">
+                  You are about to run the <strong>Gazelle Bulk Aggregate Function</strong> on <strong>{selectedKeywordIds.length} keyword(s)</strong>.
+                </p>
+                <p className="text-gray-700 mb-4">
+                  This is a <strong className="text-red-600">very resource-intensive operation</strong> that will:
+                </p>
+                <ul className="list-disc list-inside text-gray-600 space-y-2 mb-4">
+                  <li>Run F400 (LIVE SERP Fetch) for each keyword - <strong>~$0.015 per keyword</strong></li>
+                  <li>Run F410 (EMD Stamp Match) for each keyword</li>
+                  <li>Run F420 (Cache Ranking Zones) for each keyword</li>
+                  <li>Take approximately <strong>{selectedKeywordIds.length * 25} seconds</strong> to complete</li>
+                  <li>Consume significant API credits from your DataForSEO account</li>
+                </ul>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                  <p className="text-yellow-800 font-medium text-sm">
+                    Estimated cost: <strong>${(selectedKeywordIds.length * 0.015).toFixed(2)} USD</strong>
+                  </p>
+                  <p className="text-yellow-700 text-sm mt-1">
+                    This operation cannot be stopped once started.
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowGazelleFirstConfirm(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowGazelleFirstConfirm(false);
+                    setShowGazelleSecondConfirm(true);
+                  }}
+                  className="px-4 py-2 bg-yellow-600 text-white hover:bg-yellow-700 rounded-md transition-colors"
+                >
+                  I Understand, Continue
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Gazelle Second Confirmation Modal */}
+      {showGazelleSecondConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="bg-red-100 rounded-full p-2 mr-3">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">🚨 Final Confirmation Required</h3>
+              </div>
+              <div className="mb-6">
+                <p className="text-gray-700 mb-4">
+                  <strong>This is your last chance to cancel!</strong>
+                </p>
+                <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                  <p className="text-red-800 font-medium mb-2">Clicking "Yes, Run Gazelle Now" will:</p>
+                  <ul className="list-disc list-inside text-red-700 space-y-1 text-sm">
+                    <li>Process {selectedKeywordIds.length} keywords with F400 + F410 + F420</li>
+                    <li>Cost approximately ${(selectedKeywordIds.length * 0.015).toFixed(2)} in API credits</li>
+                    <li>Take approximately {Math.ceil(selectedKeywordIds.length * 25 / 60)} minutes to complete</li>
+                    <li>Cannot be stopped or undone once started</li>
+                  </ul>
+                </div>
+                <p className="text-gray-700 font-medium">
+                  Selected keywords: <span className="text-blue-600">{selectedKeywordIds.length}</span>
+                </p>
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowGazelleSecondConfirm(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowGazelleSecondConfirm(false);
+                    handleGazelleBulkAggregate();
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-md transition-colors font-medium"
+                >
+                  Yes, Run Gazelle Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* FPopup1 Implementation - Matching nwjar1 exactly */}

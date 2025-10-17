@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
 
@@ -25,11 +25,35 @@ interface KeywordRecord {
   created_by: string | null;
   last_updated_by: string | null;
   cached_cncglub_ids: string | null;
+  rel_industry_id: number | null;
+  cached_city_name: string | null;
   // SERP fetch tracking fields
   serp_results_count: number;
   serp_last_fetched_at: string | null;
   serp_fetch_status: 'none' | 'pending' | 'completed' | 'error';
   tags?: Array<{ tag_id: number; tag_name: string }>;
+  // Joined industry data
+  industries?: {
+    industry_name: string | null;
+  } | null;
+  // EMD zone cache data (method-1)
+  emd_cache_m1?: {
+    total_emd_sites: number | null;
+    zone_1_count: number | null;
+    zone_2_count: number | null;
+    zone_3_count: number | null;
+    zone_4_10_count: number | null;
+    zone_11_25_count: number | null;
+    zone_26_50_count: number | null;
+    zone_51_100_count: number | null;
+    zone_1_domains: any;
+    zone_2_domains: any;
+    zone_3_domains: any;
+    zone_4_10_domains: any;
+    zone_11_25_domains: any;
+    zone_26_50_domains: any;
+    zone_51_100_domains: any;
+  } | null;
 }
 
 interface ColumnDefinition {
@@ -41,6 +65,8 @@ interface ColumnDefinition {
   headerRow1Text?: string;
   headerRow2Text?: string;
   headerRow1BgClass?: string;
+  readOnly?: boolean;
+  isJoined?: boolean;
 }
 
 const columns: ColumnDefinition[] = [
@@ -80,7 +106,162 @@ const columns: ColumnDefinition[] = [
   { key: 'created_by', label: 'created_by', type: 'text' },
   { key: 'last_updated_by', label: 'last_updated_by', type: 'text' },
   { key: 'tags', label: 'tags', type: 'tags' },
-  { key: 'reverse_lookup', label: 'reverse_lookup', type: 'text', headerRow1Text: 'keywordshub', headerRow2Text: 'cached_cncglub_ids (revlook)', headerRow1BgClass: 'bg-gray-200' }
+  { key: 'reverse_lookup', label: 'reverse_lookup', type: 'text', headerRow1Text: 'keywordshub', headerRow2Text: 'cached_cncglub_ids (revlook)', headerRow1BgClass: 'bg-gray-200' },
+  { 
+    key: 'rel_industry_id', 
+    label: 'rel_industry_id', 
+    type: 'number',
+    leftSeparator: 'black-4px',
+    headerRow1Text: 'keywordshub',
+    headerRow2Text: 'rel_industry_id'
+  },
+  { 
+    key: 'industries.industry_name', 
+    label: 'industry_name', 
+    type: 'text',
+    headerRow1Text: 'industries',
+    headerRow2Text: 'industry_name',
+    isJoined: true,
+    readOnly: true
+  },
+  { 
+    key: 'cached_city_name', 
+    label: 'cached_city_name', 
+    type: 'text',
+    leftSeparator: 'black-4px',
+    headerRow1Text: 'keywordshub',
+    headerRow2Text: 'cached_city_name'
+  },
+  
+  // ═══════════════════════════════════════════════════════════
+  // METHOD-1 ZONE COLUMNS (15 columns total)
+  // ═══════════════════════════════════════════════════════════
+  
+  // COUNT COLUMNS (8 columns)
+  { 
+    key: 'emd_cache_m1.total_emd_sites', 
+    label: 'Total EMD Sites', 
+    type: 'number',
+    leftSeparator: 'black-4px',
+    headerRow1Text: 'method-1',
+    headerRow2Text: 'total',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_1_count', 
+    label: 'Zone 1', 
+    type: 'number',
+    headerRow1Text: 'zone',
+    headerRow2Text: '1',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_2_count', 
+    label: 'Zone 2', 
+    type: 'number',
+    headerRow1Text: 'zone',
+    headerRow2Text: '2',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_3_count', 
+    label: 'Zone 3', 
+    type: 'number',
+    headerRow1Text: 'zone',
+    headerRow2Text: '3',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_4_10_count', 
+    label: 'Zone 4-10', 
+    type: 'number',
+    headerRow1Text: 'zone',
+    headerRow2Text: '4-10',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_11_25_count', 
+    label: 'Zone 11-25', 
+    type: 'number',
+    headerRow1Text: 'zone',
+    headerRow2Text: '11-25',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_26_50_count', 
+    label: 'Zone 26-50', 
+    type: 'number',
+    headerRow1Text: 'zone',
+    headerRow2Text: '26-50',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_51_100_count', 
+    label: 'Zone 51-100', 
+    type: 'number',
+    headerRow1Text: 'zone',
+    headerRow2Text: '51-100',
+    readOnly: true
+  },
+  
+  // DOMAIN COLUMNS (7 columns)
+  { 
+    key: 'emd_cache_m1.zone_1_domains', 
+    label: 'Zone 1 Domains', 
+    type: 'emd_domains',
+    leftSeparator: 'black-4px',
+    headerRow1Text: 'domains',
+    headerRow2Text: '1',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_2_domains', 
+    label: 'Zone 2 Domains', 
+    type: 'emd_domains',
+    headerRow1Text: 'zone',
+    headerRow2Text: '2',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_3_domains', 
+    label: 'Zone 3 Domains', 
+    type: 'emd_domains',
+    headerRow1Text: 'zone',
+    headerRow2Text: '3',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_4_10_domains', 
+    label: 'Zone 4-10 Domains', 
+    type: 'emd_domains',
+    headerRow1Text: 'zone',
+    headerRow2Text: '4-10',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_11_25_domains', 
+    label: 'Zone 11-25 Domains', 
+    type: 'emd_domains',
+    headerRow1Text: 'zone',
+    headerRow2Text: '11-25',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_26_50_domains', 
+    label: 'Zone 26-50 Domains', 
+    type: 'emd_domains',
+    headerRow1Text: 'zone',
+    headerRow2Text: '26-50',
+    readOnly: true
+  },
+  { 
+    key: 'emd_cache_m1.zone_51_100_domains', 
+    label: 'Zone 51-100 Domains', 
+    type: 'emd_domains',
+    headerRow1Text: 'zone',
+    headerRow2Text: '51-100',
+    readOnly: true
+  }
 ];
 
 interface KeywordsHubTableProps {
@@ -99,6 +280,7 @@ interface KeywordsHubTableProps {
   onTableActionsRender?: (controls: {
     DataForSEOActions: () => JSX.Element;
   }) => void;
+  onSelectedRowsChange?: (selectedIds: number[]) => void;
 }
 
 // Helper function to format relative time
@@ -126,7 +308,8 @@ export default function KeywordsHubTable({
   initialColumnPage = 1,
   onColumnPaginationChange,
   onMainPaginationRender,
-  onTableActionsRender
+  onTableActionsRender,
+  onSelectedRowsChange
 }: KeywordsHubTableProps) {
   const { user } = useAuth();
   const [data, setData] = useState<KeywordRecord[]>([]);
@@ -203,7 +386,30 @@ export default function KeywordsHubTable({
       
       let query = supabase
         .from('keywordshub')
-        .select('*');
+        .select(`
+          *,
+          industries:rel_industry_id (
+            industry_name
+          ),
+          emd_cache_m1:keywordshub_emd_zone_cache!keyword_id (
+            total_emd_sites,
+            zone_1_count,
+            zone_2_count,
+            zone_3_count,
+            zone_4_10_count,
+            zone_11_25_count,
+            zone_26_50_count,
+            zone_51_100_count,
+            zone_1_domains,
+            zone_2_domains,
+            zone_3_domains,
+            zone_4_10_domains,
+            zone_11_25_domains,
+            zone_26_50_domains,
+            zone_51_100_domains
+          )
+        `)
+        .eq('emd_cache_m1.emd_stamp_method', 'method-1');
 
       // If a tag is selected, filter by keywords that have this tag
       if (selectedTagId) {
@@ -288,8 +494,27 @@ export default function KeywordsHubTable({
   };
 
   useEffect(() => {
+    console.log('🏷️ [KEYWORDS HUB TABLE] useEffect triggered - selectedTagId:', selectedTagId);
     fetchData();
-  }, [selectedTagId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTagId, supabase]);
+
+  // Listen for refresh events from parent
+  useEffect(() => {
+    const handleRefresh = () => {
+      fetchData();
+    };
+    window.addEventListener('kwjar-refresh-needed', handleRefresh);
+    return () => window.removeEventListener('kwjar-refresh-needed', handleRefresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Notify parent when selected rows change
+  useEffect(() => {
+    if (onSelectedRowsChange) {
+      onSelectedRowsChange(Array.from(selectedRows));
+    }
+  }, [selectedRows]);
 
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
@@ -569,11 +794,20 @@ export default function KeywordsHubTable({
   }, [onMainPaginationRender, currentPage, totalPages, itemsPerPage, searchTerm]);
 
   // Notify parent of column pagination changes
+  const prevColumnsPerPage = useRef(initialColumnsPerPage);
+  const prevCurrentColumnPage = useRef(initialColumnPage);
+  
   useEffect(() => {
-    if (onColumnPaginationChange) {
+    // Only notify parent if values have actually changed from the initial values
+    const columnsChanged = columnsPerPage !== prevColumnsPerPage.current;
+    const pageChanged = currentColumnPage !== prevCurrentColumnPage.current;
+    
+    if (onColumnPaginationChange && (columnsChanged || pageChanged)) {
+      prevColumnsPerPage.current = columnsPerPage;
+      prevCurrentColumnPage.current = currentColumnPage;
       onColumnPaginationChange(columnsPerPage, currentColumnPage);
     }
-  }, [columnsPerPage, currentColumnPage, onColumnPaginationChange]);
+  }, [columnsPerPage, currentColumnPage]);
 
   // Inline editing functions
   const startEditing = (id: number, field: string, currentValue: any) => {
@@ -1000,9 +1234,23 @@ export default function KeywordsHubTable({
 
   // Render cell content
   const renderCell = (item: KeywordRecord, column: typeof columns[0]) => {
-    const value = item[column.key as keyof KeywordRecord];
+    // Handle joined columns
+    let value: any;
+    if (column.key.includes('.')) {
+      const [table, field] = column.key.split('.');
+      if (table === 'industries' && item.industries) {
+        value = (item.industries as any)[field];
+      } else if (table === 'emd_cache_m1' && item.emd_cache_m1) {
+        value = (item.emd_cache_m1 as any)[field];
+      } else {
+        value = null;
+      }
+    } else {
+      value = item[column.key as keyof KeywordRecord];
+    }
+    
     const isEditing = editingCell?.id === item.keyword_id && editingCell?.field === column.key;
-    const isReadOnly = column.key === 'keyword_id' || column.key === 'created_at' || column.key === 'updated_at';
+    const isReadOnly = column.readOnly || column.key === 'keyword_id' || column.key === 'created_at' || column.key === 'updated_at';
 
     if (isEditing && !isReadOnly) {
       return (
@@ -1197,6 +1445,20 @@ export default function KeywordsHubTable({
       );
     }
 
+    // Special handling for joined industry_name column
+    if (column.key === 'industries.industry_name') {
+      const industryName = item.industries?.industry_name;
+      return (
+        <div className="px-2 py-1 text-xs cursor-default">
+          {industryName ? (
+            <span className="text-gray-900">{industryName}</span>
+          ) : (
+            <span className="text-gray-400 italic">no industry</span>
+          )}
+        </div>
+      );
+    }
+
     // Special handling for SERP status indicator column
     if (column.key === 'serp_status') {
       const status = item.serp_fetch_status;
@@ -1295,6 +1557,49 @@ export default function KeywordsHubTable({
       );
     }
 
+    // Special handling for EMD domains column (JSONB array of domain objects)
+    if (column.type === 'emd_domains') {
+      // Value should be from emd_cache_m1 nested object
+      let domainsArray = null;
+      if (column.key.includes('.')) {
+        const [table, field] = column.key.split('.');
+        if (table === 'emd_cache_m1' && item.emd_cache_m1) {
+          domainsArray = (item.emd_cache_m1 as any)[field];
+        }
+      }
+
+      if (!domainsArray || !Array.isArray(domainsArray) || domainsArray.length === 0) {
+        return (
+          <div className="px-2 py-1 text-xs">
+            <span className="text-gray-400">-</span>
+          </div>
+        );
+      }
+
+      return (
+        <div className="px-2 py-1 text-xs">
+          <div className="flex flex-col gap-1">
+            {domainsArray.slice(0, 3).map((domainObj: any, idx: number) => (
+              <div key={idx} className="flex items-center gap-1">
+                <span className="text-gray-500 text-[10px]">#{domainObj.rank}</span>
+                <a
+                  href={`/serpjar?keyword_id=${item.keyword_id}`}
+                  className="text-blue-600 hover:underline truncate max-w-[150px]"
+                  title={domainObj.domain}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {domainObj.domain}
+                </a>
+              </div>
+            ))}
+            {domainsArray.length > 3 && (
+              <span className="text-gray-500 text-[10px]">+{domainsArray.length - 3} more</span>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div
         className={cellClass}
@@ -1373,7 +1678,7 @@ export default function KeywordsHubTable({
         Create New (Popup)
       </button>
     </div>
-  ), [bulkRefreshMetrics, bulkRefreshBlanks, bulkRefreshReverseLookup, createNewInline, bulkRefreshing, blankRefreshing, reverseLookupRefreshing, selectedRows.size, paginatedData.length]);
+  ), [bulkRefreshing, blankRefreshing, reverseLookupRefreshing, selectedRows.size]);
 
   // Pass table actions to parent (must be after DataForSEOActions is defined)
   useEffect(() => {

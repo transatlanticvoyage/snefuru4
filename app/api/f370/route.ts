@@ -192,6 +192,15 @@ export async function POST(request: NextRequest) {
         keywordId = existingKeyword.keyword_id;
         existingKeywordsCount++;
         console.log(`Using existing keyword ID: ${keywordId}`);
+        
+        // Update existing keyword with industry_id and cached_city_name if not already set
+        await supabase
+          .from('keywordshub')
+          .update({ 
+            rel_industry_id: row.rel_industry_id,
+            cached_city_name: city.city_name
+          })
+          .eq('keyword_id', keywordId);
       } else {
         // Create new keyword
         const { data: newKeyword, error: keywordInsertError } = await supabase
@@ -200,7 +209,9 @@ export async function POST(request: NextRequest) {
             keyword_datum: renderedKeyword,
             rel_dfs_location_code: parseInt(rel_dfs_location_code),
             language_code: language_code,
-            language_name: 'English'
+            language_name: 'English',
+            rel_industry_id: row.rel_industry_id,
+            cached_city_name: city.city_name
           })
           .select('keyword_id')
           .single();
