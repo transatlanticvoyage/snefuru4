@@ -50,35 +50,60 @@ export async function POST(request: NextRequest) {
     const fetchId = latestFetch.fetch_id;
     console.log(`F420: Using fetch_id ${fetchId}`);
 
+    // DEBUG: Check total count before filtering
+    const { count: totalResultsCount, error: countError } = await supabase
+      .from('zhe_serp_results')
+      .select('*', { count: 'exact', head: true })
+      .eq('rel_fetch_id', fetchId);
+    
+    console.log(`F420: DEBUG - Total results in DB for fetch ${fetchId}: ${totalResultsCount}`);
+
     // ═══════════════════════════════════════════════════════════
-    // STEP 2: Get all EMD matches from zhe_serp_results
+    // STEP 2: Get ALL domains from zhe_serp_results (not just EMD)
     // ═══════════════════════════════════════════════════════════
-    // For method-1, use is_match_emd_stamp column
-    // For future methods, use is_match_emd_stamp_2, is_match_emd_stamp_3, etc.
     const matchColumn = emd_stamp_method === 'method-1' ? 'is_match_emd_stamp' : 'is_match_emd_stamp';
 
-    const { data: emdMatches, error: matchError } = await supabase
+    // Note: rank_in_group is stored as TEXT, so we need to filter/sort in JavaScript
+    const { data: allDomainsRaw, error: domainsError } = await supabase
       .from('zhe_serp_results')
-      .select('result_id, domain, rank_absolute, url')
+      .select('result_id, domain, rank_in_group, url, is_match_emd_stamp')
       .eq('rel_fetch_id', fetchId)
-      .eq(matchColumn, true)
-      .order('rank_absolute');
-
-    if (matchError) {
-      console.error('F420: Error fetching EMD matches:', matchError);
-      return NextResponse.json({ error: 'Failed to fetch EMD matches' }, { status: 500 });
+      .not('rank_in_group', 'is', null);
+    
+    // Filter by rank <= 100 and SORT in JavaScript (TEXT field can't be sorted correctly in DB)
+    const allDomains = (allDomainsRaw || [])
+      .filter(d => {
+        const rank = parseInt(d.rank_in_group || '0');
+        return rank > 0 && rank <= 100;
+      })
+      .sort((a, b) => parseInt(a.rank_in_group || '0') - parseInt(b.rank_in_group || '0'));
+    
+    console.log(`F420: Retrieved ${allDomains.length} domains (filtered rank 1-100, sorted numerically)`);
+    if (allDomains.length > 0) {
+      const firstRank = parseInt(allDomains[0].rank_in_group || '0');
+      const lastRank = parseInt(allDomains[allDomains.length - 1].rank_in_group || '0');
+      console.log(`F420: Rank range (rank_in_group): ${firstRank} to ${lastRank}`);
     }
 
-    console.log(`F420: Found ${emdMatches?.length || 0} EMD matches`);
+    if (domainsError) {
+      console.error('F420: Error fetching domains:', domainsError);
+      return NextResponse.json({ error: 'Failed to fetch domains' }, { status: 500 });
+    }
 
-    if (!emdMatches || emdMatches.length === 0) {
+    if (!allDomains || allDomains.length === 0) {
+      console.log('F420: No SERP results found for this fetch');
       return NextResponse.json({ 
-        message: 'No EMD matches found. Please run F410 first to mark EMD matches.',
-        total_emd_sites: 0,
+        message: 'No SERP results found. Please run F400 first.',
+        total_emd_count: 0,
         zones_cached: 0,
         relations_created: 0
       });
     }
+
+    // Separate EMD matches for relations table
+    const emdMatches = allDomains.filter(d => d[matchColumn] === true);
+    
+    console.log(`F420: Found ${allDomains.length} total domains, ${emdMatches.length} EMD matches`);
 
     // ═══════════════════════════════════════════════════════════
     // STEP 3: Mark old cache as historical and clear old relations
@@ -87,7 +112,7 @@ export async function POST(request: NextRequest) {
     
     // Set existing cache entries to is_current = FALSE (preserve history)
     await supabase
-      .from('keywordshub_emd_zone_cache')
+      .from('keywordshub_serp_zone_cache')
       .update({ is_current: false })
       .eq('keyword_id', keyword_id)
       .eq('emd_stamp_method', emd_stamp_method)
@@ -135,7 +160,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ═══════════════════════════════════════════════════════════
-    // STEP 5: Aggregate data by zone for cache
+    // STEP 5: Aggregate ALL domains by zone for cache
     // ═══════════════════════════════════════════════════════════
     const zoneAggregates: { [key: string]: any[] } = {
       '1': [],
@@ -147,68 +172,105 @@ export async function POST(request: NextRequest) {
       '51_100': []
     };
 
-    // Group matches by zone
-    for (const match of emdMatches) {
-      const zone = getZoneIdFromRank(match.rank_absolute);
+    // Create Set of EMD result_ids for fast lookup
+    const emdResultIds = new Set(emdMatches.map(m => m.result_id));
+
+    // Group ALL domains by zone with is_emd_m1 flag (already sorted numerically by rank_in_group)
+    for (const domain of allDomains) {
+      const rankNum = parseInt(domain.rank_in_group || '0');
+      const zone = getZoneIdFromRank(rankNum);
       if (zone && zoneAggregates[zone.zone_key]) {
         zoneAggregates[zone.zone_key].push({
-          domain: match.domain,
-          rank: match.rank_absolute,
-          result_id: match.result_id,
-          url: match.url
+          domain: domain.domain,
+          rank: rankNum,  // Store as number for proper sorting in UI
+          url: domain.url,
+          is_emd_m1: emdResultIds.has(domain.result_id)
         });
       }
     }
 
-    // Build cache object
+    // LOG zone aggregates for debugging
+    console.log('F420: ==================== Zone Aggregates Summary ====================');
+    console.log(`  Zone 1: ${zoneAggregates['1'].length} domains`, zoneAggregates['1'].map(d => `#${d.rank} ${d.domain} (EMD:${d.is_emd_m1})`));
+    console.log(`  Zone 2: ${zoneAggregates['2'].length} domains`, zoneAggregates['2'].map(d => `#${d.rank} ${d.domain} (EMD:${d.is_emd_m1})`));
+    console.log(`  Zone 3: ${zoneAggregates['3'].length} domains`, zoneAggregates['3'].map(d => `#${d.rank} ${d.domain} (EMD:${d.is_emd_m1})`));
+    console.log(`  Zone 4-10: ${zoneAggregates['4_10'].length} domains`, zoneAggregates['4_10'].slice(0, 3).map(d => `#${d.rank} ${d.domain}`));
+    console.log(`  Zone 11-25: ${zoneAggregates['11_25'].length} domains`, zoneAggregates['11_25'].slice(0, 3).map(d => `#${d.rank} ${d.domain}`));
+    console.log(`  Zone 26-50: ${zoneAggregates['26_50'].length} domains`, zoneAggregates['26_50'].slice(0, 3).map(d => `#${d.rank} ${d.domain}`));
+    console.log(`  Zone 51-100: ${zoneAggregates['51_100'].length} domains`, zoneAggregates['51_100'].slice(0, 3).map(d => `#${d.rank} ${d.domain}`));
+    console.log('F420: ================================================================');
+
+    // Build cache object with new structure
     const cacheData = {
       keyword_id,
       emd_stamp_method,
       latest_fetch_id: fetchId,
-      source_fetch_id: fetchId,  // Track which fetch this cache came from
-      is_current: true,           // Mark as current cache
+      source_fetch_id: fetchId,
+      is_current: true,
+      cache_version: 1,  // Add cache_version column
       
-      // Count columns
-      total_emd_sites: emdMatches.length,
-      zone_1_count: zoneAggregates['1'].length,
-      zone_2_count: zoneAggregates['2'].length,
-      zone_3_count: zoneAggregates['3'].length,
-      zone_4_10_count: zoneAggregates['4_10'].length,
-      zone_11_25_count: zoneAggregates['11_25'].length,
-      zone_26_50_count: zoneAggregates['26_50'].length,
-      zone_51_100_count: zoneAggregates['51_100'].length,
+      // Count columns (renamed)
+      total_emd_count: emdMatches.length,
+      zone_1_emd_count: zoneAggregates['1'].filter(d => d.is_emd_m1).length,
+      zone_2_emd_count: zoneAggregates['2'].filter(d => d.is_emd_m1).length,
+      zone_3_emd_count: zoneAggregates['3'].filter(d => d.is_emd_m1).length,
+      zone_4_10_emd_count: zoneAggregates['4_10'].filter(d => d.is_emd_m1).length,
+      zone_11_25_emd_count: zoneAggregates['11_25'].filter(d => d.is_emd_m1).length,
+      zone_26_50_emd_count: zoneAggregates['26_50'].filter(d => d.is_emd_m1).length,
+      zone_51_100_emd_count: zoneAggregates['51_100'].filter(d => d.is_emd_m1).length,
       
-      // Domain columns (top 5 per zone)
-      zone_1_domains: zoneAggregates['1'].slice(0, 5),
-      zone_2_domains: zoneAggregates['2'].slice(0, 5),
-      zone_3_domains: zoneAggregates['3'].slice(0, 5),
-      zone_4_10_domains: zoneAggregates['4_10'].slice(0, 5),
-      zone_11_25_domains: zoneAggregates['11_25'].slice(0, 5),
-      zone_26_50_domains: zoneAggregates['26_50'].slice(0, 5),
-      zone_51_100_domains: zoneAggregates['51_100'].slice(0, 5)
+      // Domain columns (new JSONB structure with all domains)
+      zone_1_domains: { domains: zoneAggregates['1'] },
+      zone_2_domains: { domains: zoneAggregates['2'] },
+      zone_3_domains: { domains: zoneAggregates['3'] },
+      zone_4_10_domains: { domains: zoneAggregates['4_10'] },
+      zone_11_25_domains: { domains: zoneAggregates['11_25'] },
+      zone_26_50_domains: { domains: zoneAggregates['26_50'] },
+      zone_51_100_domains: { domains: zoneAggregates['51_100'] }
     };
 
     // ═══════════════════════════════════════════════════════════
-    // STEP 6: INSERT new cache entry (we now preserve history)
+    // STEP 6: UPSERT cache entry (update if exists, insert if not)
     // ═══════════════════════════════════════════════════════════
+    // DEBUG: Log what we're about to store
+    console.log('F420: About to UPSERT cache data:');
+    console.log('  - zone_1_domains:', JSON.stringify(cacheData.zone_1_domains));
+    console.log('  - zone_2_domains:', JSON.stringify(cacheData.zone_2_domains));
+    console.log('  - zone_3_domains:', JSON.stringify(cacheData.zone_3_domains));
+    console.log('  - zone_1_emd_count:', cacheData.zone_1_emd_count);
+    console.log('  - zone_2_emd_count:', cacheData.zone_2_emd_count);
+    console.log('  - zone_3_emd_count:', cacheData.zone_3_emd_count);
+    
+    // Use upsert to handle both new and existing cache entries
+    // The unique constraint is on (keyword_id, emd_stamp_method, source_fetch_id)
     const { error: cacheError } = await supabase
-      .from('keywordshub_emd_zone_cache')
-      .insert(cacheData);
+      .from('keywordshub_serp_zone_cache')
+      .upsert(cacheData, {
+        onConflict: 'keyword_id,emd_stamp_method,source_fetch_id',
+        ignoreDuplicates: false
+      });
 
     if (cacheError) {
       console.error('F420: Error upserting cache:', cacheError);
-      return NextResponse.json({ error: 'Failed to update cache' }, { status: 500 });
+      console.error('F420: Cache data that failed:', JSON.stringify(cacheData, null, 2));
+      return NextResponse.json({ 
+        error: 'Failed to update cache',
+        details: cacheError.message,
+        code: cacheError.code,
+        hint: cacheError.hint
+      }, { status: 500 });
     }
 
-    console.log(`F420: Cache updated successfully`);
-    console.log(`F420: Zone distribution:`, {
-      zone_1: cacheData.zone_1_count,
-      zone_2: cacheData.zone_2_count,
-      zone_3: cacheData.zone_3_count,
-      zone_4_10: cacheData.zone_4_10_count,
-      zone_11_25: cacheData.zone_11_25_count,
-      zone_26_50: cacheData.zone_26_50_count,
-      zone_51_100: cacheData.zone_51_100_count
+    console.log(`F420: ✅ Universal SERP Zone Cache updated successfully`);
+    console.log(`F420: Total domains: ${allDomains.length}, EMD matches: ${emdMatches.length}`);
+    console.log(`F420: Zone EMD distribution:`, {
+      zone_1: cacheData.zone_1_emd_count,
+      zone_2: cacheData.zone_2_emd_count,
+      zone_3: cacheData.zone_3_emd_count,
+      zone_4_10: cacheData.zone_4_10_emd_count,
+      zone_11_25: cacheData.zone_11_25_emd_count,
+      zone_26_50: cacheData.zone_26_50_emd_count,
+      zone_51_100: cacheData.zone_51_100_emd_count
     });
 
     // ═══════════════════════════════════════════════════════════
@@ -219,17 +281,18 @@ export async function POST(request: NextRequest) {
       keyword_id,
       emd_stamp_method,
       latest_fetch_id: fetchId,
-      total_emd_sites: cacheData.total_emd_sites,
+      total_domains: allDomains.length,
+      total_emd_count: cacheData.total_emd_count,
       zones_cached: 7,
       relations_created: relationsToInsert.length,
       zone_breakdown: {
-        zone_1: cacheData.zone_1_count,
-        zone_2: cacheData.zone_2_count,
-        zone_3: cacheData.zone_3_count,
-        zone_4_10: cacheData.zone_4_10_count,
-        zone_11_25: cacheData.zone_11_25_count,
-        zone_26_50: cacheData.zone_26_50_count,
-        zone_51_100: cacheData.zone_51_100_count
+        zone_1: { emd: cacheData.zone_1_emd_count, total: zoneAggregates['1'].length },
+        zone_2: { emd: cacheData.zone_2_emd_count, total: zoneAggregates['2'].length },
+        zone_3: { emd: cacheData.zone_3_emd_count, total: zoneAggregates['3'].length },
+        zone_4_10: { emd: cacheData.zone_4_10_emd_count, total: zoneAggregates['4_10'].length },
+        zone_11_25: { emd: cacheData.zone_11_25_emd_count, total: zoneAggregates['11_25'].length },
+        zone_26_50: { emd: cacheData.zone_26_50_emd_count, total: zoneAggregates['26_50'].length },
+        zone_51_100: { emd: cacheData.zone_51_100_emd_count, total: zoneAggregates['51_100'].length }
       }
     });
 

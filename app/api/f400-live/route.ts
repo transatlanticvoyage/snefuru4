@@ -135,6 +135,12 @@ export async function POST(request: NextRequest) {
     const organicResults = serpResults.items?.filter((item: any) => item.type === 'organic') || [];
     let storedCount = 0;
     
+    // DEBUG: Log rank values from API
+    console.log('📊 F400: Sample rank values from API (first 5):');
+    organicResults.slice(0, 5).forEach((item: any, idx: number) => {
+      console.log(`  [${idx}] rank_group: ${item.rank_group}, rank_absolute: ${item.rank_absolute}, domain: ${item.domain}`);
+    });
+    
     if (organicResults.length > 0 && fetchId) {
       const resultsToInsert = organicResults.map((item: any) => ({
         rel_fetch_id: fetchId,
@@ -148,6 +154,12 @@ export async function POST(request: NextRequest) {
         breadcrumb: item.breadcrumb || null,
         is_match_emd_stamp: false
       }));
+      
+      // DEBUG: Log what we're about to insert
+      console.log('💾 F400: Sample data being inserted (first 3):');
+      resultsToInsert.slice(0, 3).forEach((r: any, idx: number) => {
+        console.log(`  [${idx}] rank_absolute: "${r.rank_absolute}", domain: ${r.domain}`);
+      });
 
       const { data: insertedResults, error: insertError } = await supabase
         .from('zhe_serp_results')
@@ -180,7 +192,7 @@ export async function POST(request: NextRequest) {
     
     // Set existing cache to is_current = FALSE (preserve history)
     await supabase
-      .from('keywordshub_emd_zone_cache')
+      .from('keywordshub_serp_zone_cache')
       .update({ is_current: false })
       .eq('keyword_id', keyword_id)
       .eq('is_current', true);

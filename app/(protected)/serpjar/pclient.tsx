@@ -36,6 +36,11 @@ export default function SerpjarClient() {
   const [f410Loading, setF410Loading] = useState(false);
   const [f420Loading, setF420Loading] = useState(false);
   const [gazelleLoading, setGazelleLoading] = useState(false);
+  const [gazelleResultsModal, setGazelleResultsModal] = useState<{
+    show: boolean;
+    message: string;
+    results: any;
+  }>({ show: false, message: '', results: null });
   const [completeLoading, setCompleteLoading] = useState(false);
   const [showFirstWarning, setShowFirstWarning] = useState(false);
   const [showSecondWarning, setShowSecondWarning] = useState(false);
@@ -298,7 +303,7 @@ export default function SerpjarClient() {
       try {
         // Get current cache for this keyword
         const { data: cache, error: cacheError } = await supabase
-          .from('keywordshub_emd_zone_cache')
+          .from('keywordshub_serp_zone_cache')
           .select('source_fetch_id, is_current')
           .eq('keyword_id', keywordId)
           .eq('emd_stamp_method', 'method-1')
@@ -515,23 +520,29 @@ export default function SerpjarClient() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'F420 zone caching failed');
+        const errorDetails = result.details ? `\n\nDetails: ${result.details}` : '';
+        const errorCode = result.code ? `\nCode: ${result.code}` : '';
+        const errorHint = result.hint ? `\nHint: ${result.hint}` : '';
+        throw new Error(`${result.error || 'F420 zone caching failed'}${errorDetails}${errorCode}${errorHint}`);
       }
 
-      // Show success message
+      // Show success message with detailed breakdown
+      console.log('✅ F420 Zone Cache Complete!', result);
       alert(
         `✅ F420 Zone Cache Complete!\n\n` +
         `Keyword: "${keywordData?.keyword_datum}"\n` +
         `Method: ${result.emd_stamp_method}\n\n` +
-        `• Total EMD sites: ${result.total_emd_sites}\n` +
-        `• Zone 1: ${result.zone_breakdown.zone_1}\n` +
-        `• Zone 2: ${result.zone_breakdown.zone_2}\n` +
-        `• Zone 3: ${result.zone_breakdown.zone_3}\n` +
-        `• Zone 4-10: ${result.zone_breakdown.zone_4_10}\n` +
-        `• Zone 11-25: ${result.zone_breakdown.zone_11_25}\n` +
-        `• Zone 26-50: ${result.zone_breakdown.zone_26_50}\n` +
-        `• Zone 51-100: ${result.zone_breakdown.zone_51_100}\n\n` +
-        `Relations created: ${result.relations_created}`
+        `Total EMD Matches: ${result.total_emd_count}\n\n` +
+        `EMD Count by Zone:\n` +
+        `• Zone 1: ${result.zone_breakdown.zone_1.emd}\n` +
+        `• Zone 2: ${result.zone_breakdown.zone_2.emd}\n` +
+        `• Zone 3: ${result.zone_breakdown.zone_3.emd}\n` +
+        `• Zone 4-10: ${result.zone_breakdown.zone_4_10.emd}\n` +
+        `• Zone 11-25: ${result.zone_breakdown.zone_11_25.emd}\n` +
+        `• Zone 26-50: ${result.zone_breakdown.zone_26_50.emd}\n` +
+        `• Zone 51-100: ${result.zone_breakdown.zone_51_100.emd}\n\n` +
+        `Relations created: ${result.relations_created}\n\n` +
+        `Check browser console for detailed logs.\nClick OK to refresh the page.`
       );
 
       // Refresh the page to show updated data
@@ -645,27 +656,51 @@ export default function SerpjarClient() {
       }
 
       console.log('Gazelle: F420 completed successfully');
+      
+      // Log detailed results to console BEFORE modal
+      console.log('🦌 GAZELLE COMPLETE - Full Results:', {
+        f400: f400Result,
+        f410: f410Result,
+        f420: f420Result
+      });
 
-      // Show success message
-      alert(
+      // Create detailed message for modal
+      const message = 
         `🦌 Gazelle Aggregate Function Complete!\n\n` +
-        `Keyword: "${keywordData?.keyword_datum}"\n\n` +
+        `Keyword: "${keywordData?.keyword_datum}"\n` +
+        `Keyword ID: ${keywordId}\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
         `✅ F400 SERP Fetch: ${f400Mode === 'live' ? 'Live' : 'Queued'}\n` +
-        `   • SERP results stored: ${f400Result.organic_results_stored || 0}\n\n` +
+        `   • SERP results stored: ${f400Result.organic_results_stored || 0}\n` +
+        `   • Fetch ID: ${f400Result.fetch_id || 'N/A'}\n\n` +
         `✅ F410 EMD Stamp Match:\n` +
         `   • Total checked: ${f410Result.total_checked}\n` +
         `   • Matches found: ${f410Result.matches_found}\n` +
-        `   • EMD: "${f410Result.emd_stamp_slug}"\n` +
-        `   • City: "${f410Result.cached_city_name}"\n\n` +
+        `   • EMD Stamp Slug: "${f410Result.emd_stamp_slug}"\n` +
+        `   • City Name: "${f410Result.cached_city_name}"\n\n` +
         `✅ F420 Zone Cache:\n` +
-        `   • Total EMD sites: ${f420Result.total_emd_sites}\n` +
-        `   • Zones cached: ${f420Result.zones_cached}\n` +
-        `   • Relations created: ${f420Result.relations_created}\n\n` +
-        `The page will now refresh to show all results.`
-      );
+        `   • Total domains processed: ${f420Result.total_domains}\n` +
+        `   • Total EMD matches: ${f420Result.total_emd_count}\n` +
+        `   • Relations created: ${f420Result.relations_created}\n` +
+        `   • Zones cached: ${f420Result.zones_cached}\n\n` +
+        `Zone Breakdown (EMD / Total):\n` +
+        `   • Zone 1: ${f420Result.zone_breakdown.zone_1.emd} / ${f420Result.zone_breakdown.zone_1.total}\n` +
+        `   • Zone 2: ${f420Result.zone_breakdown.zone_2.emd} / ${f420Result.zone_breakdown.zone_2.total}\n` +
+        `   • Zone 3: ${f420Result.zone_breakdown.zone_3.emd} / ${f420Result.zone_breakdown.zone_3.total}\n` +
+        `   • Zone 4-10: ${f420Result.zone_breakdown.zone_4_10.emd} / ${f420Result.zone_breakdown.zone_4_10.total}\n` +
+        `   • Zone 11-25: ${f420Result.zone_breakdown.zone_11_25.emd} / ${f420Result.zone_breakdown.zone_11_25.total}\n` +
+        `   • Zone 26-50: ${f420Result.zone_breakdown.zone_26_50.emd} / ${f420Result.zone_breakdown.zone_26_50.total}\n` +
+        `   • Zone 51-100: ${f420Result.zone_breakdown.zone_51_100.emd} / ${f420Result.zone_breakdown.zone_51_100.total}\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `Check browser console for full detailed logs.\n` +
+        `Click "Copy Results" to copy this message, then "Refresh Page" to see updates.`;
 
-      // Refresh the page
-      window.location.reload();
+      // Show modal instead of alert
+      setGazelleResultsModal({
+        show: true,
+        message,
+        results: { f400: f400Result, f410: f410Result, f420: f420Result }
+      });
     } catch (error) {
       console.error('Gazelle Aggregate error:', error);
       alert(`Gazelle Aggregate Function failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -1402,6 +1437,57 @@ export default function SerpjarClient() {
                   Yes, Run F400 Now
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Gazelle Results Modal */}
+      {gazelleResultsModal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl flex flex-col" style={{ height: '90vh' }}>
+            {/* Header */}
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600">
+              <h2 className="text-2xl font-bold text-white">🦌 Gazelle Results</h2>
+              <button
+                onClick={() => setGazelleResultsModal({ show: false, message: '', results: null })}
+                className="text-white hover:text-gray-200 text-3xl font-bold leading-none"
+                title="Close"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-50 p-4 rounded border border-gray-200 select-all">
+                {gazelleResultsModal.message}
+              </pre>
+            </div>
+
+            {/* Footer with Action Buttons */}
+            <div className="p-6 border-t border-gray-200 bg-gray-50 flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(gazelleResultsModal.message);
+                  alert('Results copied to clipboard!');
+                }}
+                className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Copy Results
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh Page
+              </button>
             </div>
           </div>
         </div>

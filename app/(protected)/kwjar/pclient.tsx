@@ -18,6 +18,7 @@ export default function KwjarClient() {
   // Tags plench popup state
   const [isTagsPopupOpen, setIsTagsPopupOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<{ tag_id: number; tag_name: string } | null>(null);
+  const [tagFilterRefreshKey, setTagFilterRefreshKey] = useState(0);
   
   // Industry selection state
   const [isIndustryPopupOpen, setIsIndustryPopupOpen] = useState(false);
@@ -850,6 +851,15 @@ export default function KwjarClient() {
     );
   }
 
+  // Handle refresh tag filter - force table to re-filter by current tag
+  const handleRefreshTagFilter = () => {
+    if (selectedTag) {
+      console.log('🔄 Refreshing tag filter for:', selectedTag);
+      // Increment the refresh key to force KeywordsHubTable to re-render and re-fetch
+      setTagFilterRefreshKey(prev => prev + 1);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Mandible Chamber */}
@@ -1106,26 +1116,46 @@ export default function KwjarClient() {
               >
                 functions popup
               </button>
-              <button
-                onClick={() => setIsTagsPopupOpen(true)}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                tags plench button
-              </button>
-              {selectedTag && (
-                <div className="flex items-center space-x-2">
-                  <div className="text-sm font-medium bg-navy text-white border border-black px-3 py-1 rounded" style={{ backgroundColor: 'navy' }}>
-                    {selectedTag.tag_name}
-                  </div>
+              
+              {/* Tags section with border */}
+              <div className="flex items-center space-x-2 border border-black px-3 py-2 rounded">
+                <button
+                  onClick={() => setIsTagsPopupOpen(true)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  tags plench button
+                </button>
+                
+                {/* REFRESH button */}
+                {selectedTag && (
                   <button
-                    onClick={() => setSelectedTag(null)}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors"
-                    title="Clear filter"
+                    onClick={handleRefreshTagFilter}
+                    className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2"
+                    title="Refresh tag filter"
                   >
-                    ×
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>REFRESH</span>
                   </button>
-                </div>
-              )}
+                )}
+                
+                {selectedTag && (
+                  <div className="flex items-center space-x-2">
+                    <div className="text-sm font-medium bg-navy text-white border border-black px-3 py-1 rounded" style={{ backgroundColor: 'navy' }}>
+                      {selectedTag.tag_name}
+                    </div>
+                    <button
+                      onClick={() => setSelectedTag(null)}
+                      className="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors"
+                      title="Clear filter"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+              </div>
+              
               <button
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
@@ -1164,6 +1194,7 @@ export default function KwjarClient() {
       <div className="flex-1 overflow-hidden">
         <KeywordsHubTable 
           selectedTagId={selectedTag?.tag_id}
+          tagFilterRefreshKey={tagFilterRefreshKey}
           onColumnPaginationRender={setColumnPaginationControls}
           onMainPaginationRender={setMainPaginationControls}
           onTableActionsRender={setTableActions}

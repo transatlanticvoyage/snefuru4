@@ -38,23 +38,23 @@ interface KeywordRecord {
   } | null;
   // Cache staleness tracking
   cache_status?: 'CURRENT' | 'STALE' | 'NO_CACHE';
-  // EMD zone cache data (method-1)
-  emd_cache_m1?: {
-    total_emd_sites: number | null;
-    zone_1_count: number | null;
-    zone_2_count: number | null;
-    zone_3_count: number | null;
-    zone_4_10_count: number | null;
-    zone_11_25_count: number | null;
-    zone_26_50_count: number | null;
-    zone_51_100_count: number | null;
-    zone_1_domains: any;
-    zone_2_domains: any;
-    zone_3_domains: any;
-    zone_4_10_domains: any;
-    zone_11_25_domains: any;
-    zone_26_50_domains: any;
-    zone_51_100_domains: any;
+  // Universal SERP zone cache data (method-1) - All domains with EMD flags
+  serp_cache_m1?: {
+    total_emd_count: number | null;
+    zone_1_emd_count: number | null;
+    zone_2_emd_count: number | null;
+    zone_3_emd_count: number | null;
+    zone_4_10_emd_count: number | null;
+    zone_11_25_emd_count: number | null;
+    zone_26_50_emd_count: number | null;
+    zone_51_100_emd_count: number | null;
+    zone_1_domains: { domains: Array<{domain: string; rank: number; url: string; is_emd_m1: boolean}> } | null;
+    zone_2_domains: { domains: Array<{domain: string; rank: number; url: string; is_emd_m1: boolean}> } | null;
+    zone_3_domains: { domains: Array<{domain: string; rank: number; url: string; is_emd_m1: boolean}> } | null;
+    zone_4_10_domains: { domains: Array<{domain: string; rank: number; url: string; is_emd_m1: boolean}> } | null;
+    zone_11_25_domains: { domains: Array<{domain: string; rank: number; url: string; is_emd_m1: boolean}> } | null;
+    zone_26_50_domains: { domains: Array<{domain: string; rank: number; url: string; is_emd_m1: boolean}> } | null;
+    zone_51_100_domains: { domains: Array<{domain: string; rank: number; url: string; is_emd_m1: boolean}> } | null;
   } | null;
 }
 
@@ -139,10 +139,10 @@ const columns: ColumnDefinition[] = [
   // METHOD-1 ZONE COLUMNS (15 columns total)
   // ═══════════════════════════════════════════════════════════
   
-  // COUNT COLUMNS (8 columns)
+  // COUNT COLUMNS (8 columns) - Updated with new column names
   { 
-    key: 'emd_cache_m1.total_emd_sites', 
-    label: 'Total EMD Sites', 
+    key: 'serp_cache_m1.total_emd_count', 
+    label: 'Total EMD Count', 
     type: 'number',
     leftSeparator: 'black-4px',
     headerRow1Text: 'method-1',
@@ -150,7 +150,7 @@ const columns: ColumnDefinition[] = [
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_1_count', 
+    key: 'serp_cache_m1.zone_1_emd_count', 
     label: 'Zone 1', 
     type: 'number',
     headerRow1Text: 'zone',
@@ -158,7 +158,7 @@ const columns: ColumnDefinition[] = [
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_2_count', 
+    key: 'serp_cache_m1.zone_2_emd_count', 
     label: 'Zone 2', 
     type: 'number',
     headerRow1Text: 'zone',
@@ -166,7 +166,7 @@ const columns: ColumnDefinition[] = [
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_3_count', 
+    key: 'serp_cache_m1.zone_3_emd_count', 
     label: 'Zone 3', 
     type: 'number',
     headerRow1Text: 'zone',
@@ -174,7 +174,7 @@ const columns: ColumnDefinition[] = [
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_4_10_count', 
+    key: 'serp_cache_m1.zone_4_10_emd_count', 
     label: 'Zone 4-10', 
     type: 'number',
     headerRow1Text: 'zone',
@@ -182,7 +182,7 @@ const columns: ColumnDefinition[] = [
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_11_25_count', 
+    key: 'serp_cache_m1.zone_11_25_emd_count', 
     label: 'Zone 11-25', 
     type: 'number',
     headerRow1Text: 'zone',
@@ -190,7 +190,7 @@ const columns: ColumnDefinition[] = [
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_26_50_count', 
+    key: 'serp_cache_m1.zone_26_50_emd_count', 
     label: 'Zone 26-50', 
     type: 'number',
     headerRow1Text: 'zone',
@@ -198,7 +198,7 @@ const columns: ColumnDefinition[] = [
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_51_100_count', 
+    key: 'serp_cache_m1.zone_51_100_emd_count', 
     label: 'Zone 51-100', 
     type: 'number',
     headerRow1Text: 'zone',
@@ -206,60 +206,60 @@ const columns: ColumnDefinition[] = [
     readOnly: true
   },
   
-  // DOMAIN COLUMNS (7 columns)
+  // DOMAIN COLUMNS (7 columns) - Updated type to serp_domains
   { 
-    key: 'emd_cache_m1.zone_1_domains', 
+    key: 'serp_cache_m1.zone_1_domains', 
     label: 'Zone 1 Domains', 
-    type: 'emd_domains',
+    type: 'serp_domains',
     leftSeparator: 'black-4px',
     headerRow1Text: 'domains',
     headerRow2Text: '1',
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_2_domains', 
+    key: 'serp_cache_m1.zone_2_domains', 
     label: 'Zone 2 Domains', 
-    type: 'emd_domains',
+    type: 'serp_domains',
     headerRow1Text: 'zone',
     headerRow2Text: '2',
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_3_domains', 
+    key: 'serp_cache_m1.zone_3_domains', 
     label: 'Zone 3 Domains', 
-    type: 'emd_domains',
+    type: 'serp_domains',
     headerRow1Text: 'zone',
     headerRow2Text: '3',
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_4_10_domains', 
+    key: 'serp_cache_m1.zone_4_10_domains', 
     label: 'Zone 4-10 Domains', 
-    type: 'emd_domains',
+    type: 'serp_domains',
     headerRow1Text: 'zone',
     headerRow2Text: '4-10',
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_11_25_domains', 
+    key: 'serp_cache_m1.zone_11_25_domains', 
     label: 'Zone 11-25 Domains', 
-    type: 'emd_domains',
+    type: 'serp_domains',
     headerRow1Text: 'zone',
     headerRow2Text: '11-25',
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_26_50_domains', 
+    key: 'serp_cache_m1.zone_26_50_domains', 
     label: 'Zone 26-50 Domains', 
-    type: 'emd_domains',
+    type: 'serp_domains',
     headerRow1Text: 'zone',
     headerRow2Text: '26-50',
     readOnly: true
   },
   { 
-    key: 'emd_cache_m1.zone_51_100_domains', 
+    key: 'serp_cache_m1.zone_51_100_domains', 
     label: 'Zone 51-100 Domains', 
-    type: 'emd_domains',
+    type: 'serp_domains',
     headerRow1Text: 'zone',
     headerRow2Text: '51-100',
     readOnly: true
@@ -268,6 +268,7 @@ const columns: ColumnDefinition[] = [
 
 interface KeywordsHubTableProps {
   selectedTagId?: number;
+  tagFilterRefreshKey?: number;
   onColumnPaginationRender?: (controls: {
     ColumnPaginationBar1: () => JSX.Element | null;
     ColumnPaginationBar2: () => JSX.Element | null;
@@ -304,7 +305,8 @@ function formatDistanceToNow(date: Date): string {
 }
 
 export default function KeywordsHubTable({ 
-  selectedTagId, 
+  selectedTagId,
+  tagFilterRefreshKey = 0,
   onColumnPaginationRender, 
   initialColumnsPerPage = 8,
   initialColumnPage = 1,
@@ -442,19 +444,19 @@ export default function KeywordsHubTable({
           console.error('Error fetching tag relations:', tagRelError);
         }
         
-        // Get EMD zone cache data for method-1
+        // Get Universal SERP zone cache data for method-1
         const { data: cacheData, error: cacheError } = await supabase
-          .from('keywordshub_emd_zone_cache')
+          .from('keywordshub_serp_zone_cache')
           .select(`
             keyword_id,
-            total_emd_sites,
-            zone_1_count,
-            zone_2_count,
-            zone_3_count,
-            zone_4_10_count,
-            zone_11_25_count,
-            zone_26_50_count,
-            zone_51_100_count,
+            total_emd_count,
+            zone_1_emd_count,
+            zone_2_emd_count,
+            zone_3_emd_count,
+            zone_4_10_emd_count,
+            zone_11_25_emd_count,
+            zone_26_50_emd_count,
+            zone_51_100_emd_count,
             zone_1_domains,
             zone_2_domains,
             zone_3_domains,
@@ -540,7 +542,7 @@ export default function KeywordsHubTable({
         const keywordsWithTags = keywords.map(keyword => ({
           ...keyword,
           tags: tagsByKeywordId[keyword.keyword_id] || [],
-          emd_cache_m1: cacheByKeywordId[keyword.keyword_id] || null,
+          serp_cache_m1: cacheByKeywordId[keyword.keyword_id] || null,
           cache_status: cacheStatusByKeywordId[keyword.keyword_id] || 'NO_CACHE'
         }));
         
@@ -559,10 +561,10 @@ export default function KeywordsHubTable({
   };
 
   useEffect(() => {
-    console.log('🏷️ [KEYWORDS HUB TABLE] useEffect triggered - selectedTagId:', selectedTagId);
+    console.log('🏷️ [KEYWORDS HUB TABLE] useEffect triggered - selectedTagId:', selectedTagId, 'refreshKey:', tagFilterRefreshKey);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTagId, supabase]);
+  }, [selectedTagId, tagFilterRefreshKey, supabase]);
 
   // Listen for refresh events from parent
   useEffect(() => {
@@ -1305,8 +1307,8 @@ export default function KeywordsHubTable({
       const [table, field] = column.key.split('.');
       if (table === 'industries' && item.industries) {
         value = (item.industries as any)[field];
-      } else if (table === 'emd_cache_m1' && item.emd_cache_m1) {
-        value = (item.emd_cache_m1 as any)[field];
+      } else if (table === 'serp_cache_m1' && item.serp_cache_m1) {
+        value = (item.serp_cache_m1 as any)[field];
       } else {
         value = null;
       }
@@ -1402,7 +1404,7 @@ export default function KeywordsHubTable({
       }
       
       // Check if this is a zone count column (needs staleness indicator)
-      const isZoneCountColumn = column.key.includes('emd_cache_m1') && column.key.includes('_count');
+      const isZoneCountColumn = column.key.includes('serp_cache_m1') && column.key.includes('_emd_count');
       
       return (
         <div
@@ -1633,16 +1635,30 @@ export default function KeywordsHubTable({
       );
     }
 
-    // Special handling for EMD domains column (JSONB array of domain objects)
-    if (column.type === 'emd_domains') {
-      // Value should be from emd_cache_m1 nested object
-      let domainsArray = null;
+    // Special handling for SERP domains column (JSONB with all domains + EMD flags)
+    if (column.type === 'serp_domains') {
+      // Value should be from serp_cache_m1 nested object
+      let domainsData = null;
+      let zoneKey = '';
       if (column.key.includes('.')) {
         const [table, field] = column.key.split('.');
-        if (table === 'emd_cache_m1' && item.emd_cache_m1) {
-          domainsArray = (item.emd_cache_m1 as any)[field];
+        if (table === 'serp_cache_m1' && item.serp_cache_m1) {
+          domainsData = (item.serp_cache_m1 as any)[field];
+          // Extract zone key from field name (e.g., 'zone_1_domains' -> '1')
+          const match = field.match(/zone_(.+)_domains/);
+          if (match) {
+            zoneKey = match[1]; // '1', '2', '3', '4_10', '11_25', '26_50', '51_100'
+          }
+          
+          // DEBUG: Log what we're receiving for the first 3 zones
+          if (['1', '2', '3'].includes(zoneKey) && item.keyword_id) {
+            console.log(`🔍 [KW ${item.keyword_id}] Zone ${zoneKey} raw data:`, JSON.stringify(domainsData));
+          }
         }
       }
+
+      // Check for new JSONB structure: {domains: [...]}
+      const domainsArray = domainsData?.domains;
 
       if (!domainsArray || !Array.isArray(domainsArray) || domainsArray.length === 0) {
         return (
@@ -1652,19 +1668,36 @@ export default function KeywordsHubTable({
         );
       }
 
-      // Display domains horizontally with full domain names
+      // Determine which zones should show ALL domains vs ONLY EMD matches
+      const showAllDomainsZones = ['1', '2', '3', '4_10'];
+      const shouldShowAllDomains = showAllDomainsZones.includes(zoneKey);
+
+      // Filter domains based on zone
+      const filteredDomains = shouldShowAllDomains 
+        ? domainsArray // Show ALL domains for zones 1, 2, 3, 4-10
+        : domainsArray.filter((d: any) => d.is_emd_m1 === true); // Show ONLY EMD for zones 11-25, 26-50, 51-100
+
+      if (filteredDomains.length === 0) {
+        return (
+          <div className="px-2 py-1 text-xs">
+            <span className="text-gray-400">-</span>
+          </div>
+        );
+      }
+
+      // Display domains horizontally with EMD highlighting
       return (
         <div className="px-2 py-1 text-xs whitespace-nowrap">
           <div className="flex items-center gap-2">
-            {domainsArray.map((domainObj: any, idx: number) => (
+            {filteredDomains.map((domainObj: any, idx: number) => (
               <div key={idx} className="flex items-center gap-1">
                 <span className="text-gray-500 text-[10px]">#{domainObj.rank}</span>
                 <a
                   href={domainObj.url || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                  title={`Rank ${domainObj.rank}: ${domainObj.domain}`}
+                  className={`${domainObj.is_emd_m1 ? 'text-blue-600' : 'text-black'} hover:underline`}
+                  title={`Rank ${domainObj.rank}: ${domainObj.domain}${domainObj.is_emd_m1 ? ' (EMD Match)' : ''}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!domainObj.url) {
@@ -1675,7 +1708,7 @@ export default function KeywordsHubTable({
                 >
                   {domainObj.domain}
                 </a>
-                {idx < domainsArray.length - 1 && (
+                {idx < filteredDomains.length - 1 && (
                   <span className="text-gray-400">•</span>
                 )}
               </div>

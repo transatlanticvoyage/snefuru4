@@ -56,42 +56,60 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Step 2: Get fetch_ids for this keyword
-    const { data: fetches, error: fetchError } = await supabase
+    // Step 2: Get LATEST fetch_id ONLY for this keyword
+    const { data: latestFetch, error: fetchError } = await supabase
       .from('zhe_serp_fetches')
       .select('fetch_id')
-      .eq('rel_keyword_id', keyword_id);
+      .eq('rel_keyword_id', keyword_id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
 
-    if (fetchError) {
-      console.error('Error fetching fetch records:', fetchError);
-      return NextResponse.json({ error: 'Failed to fetch fetch records' }, { status: 500 });
-    }
-
-    if (!fetches || fetches.length === 0) {
+    if (fetchError || !latestFetch) {
+      console.error('Error fetching latest fetch record:', fetchError);
       return NextResponse.json({ 
-        message: 'No SERP fetches found for this keyword. Please run F400 first.',
+        error: 'No SERP fetches found for this keyword. Please run F400 first.',
         matches_found: 0,
         total_checked: 0
-      });
+      }, { status: 400 });
     }
 
-    const fetchIds = fetches.map(f => f.fetch_id);
-    console.log(`F410: Found ${fetchIds.length} fetch_ids:`, fetchIds);
+    const latestFetchId = latestFetch.fetch_id;
+    console.log(`F410: Using LATEST fetch_id: ${latestFetchId}`);
 
-    // Step 3: Get all SERP results for these fetches
+    // DEBUG: Check how many results exist for this fetch_id
+    const { count: totalCount, error: countError } = await supabase
+      .from('zhe_serp_results')
+      .select('*', { count: 'exact', head: true })
+      .eq('rel_fetch_id', latestFetchId);
+    
+    console.log(`F410: DEBUG - Total results in DB for fetch ${latestFetchId}: ${totalCount}`);
+
+    // Step 3: Get SERP results ONLY from the latest fetch (top 100)
+    // Note: rank_in_group is stored as TEXT, so we can't sort/filter in DB - do it in JS
     const { data: serpResults, error: serpError } = await supabase
       .from('zhe_serp_results')
-      .select('result_id, domain, rel_fetch_id')
-      .in('rel_fetch_id', fetchIds);
+      .select('result_id, domain, rel_fetch_id, rank_in_group')
+      .eq('rel_fetch_id', latestFetchId)
+      .not('rank_in_group', 'is', null);
+    
+    // Filter and sort in JavaScript (TEXT field can't be filtered/sorted correctly in DB)
+    const filteredResults = (serpResults || [])
+      .filter(r => {
+        const rank = parseInt(r.rank_in_group || '0');
+        return rank > 0 && rank <= 100;
+      })
+      .sort((a, b) => parseInt(a.rank_in_group || '0') - parseInt(b.rank_in_group || '0'));
 
     if (serpError) {
       console.error('Error fetching SERP results:', serpError);
       return NextResponse.json({ error: 'Failed to fetch SERP results' }, { status: 500 });
     }
 
-    console.log(`F410: Found ${serpResults?.length || 0} SERP results to process`);
+    console.log(`F410: Found ${filteredResults.length} SERP results to process (after filtering rank <= 100)`);
+    console.log(`F410: Rank range: ${filteredResults[0]?.rank_in_group} to ${filteredResults[filteredResults.length - 1]?.rank_in_group}`);
 
-    if (!serpResults || serpResults.length === 0) {
+    if (!filteredResults || filteredResults.length === 0) {
       return NextResponse.json({ 
         message: 'No SERP results found for this keyword',
         matches_found: 0,
@@ -109,7 +127,7 @@ export async function POST(request: NextRequest) {
     const cityNameParts = cityNameLower.split(/\s+/).filter(part => part.length > 0);
     const emdStampSlugLower = emd_stamp_slug.toLowerCase();
 
-    for (const result of serpResults) {
+    for (const result of filteredResults) {
       if (!result.domain) continue;
 
       const domainLower = result.domain.toLowerCase();
@@ -170,13 +188,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log(`F410: Complete - Found ${matchesFound} matches out of ${serpResults.length} results`);
+    console.log(`F410: Complete - Found ${matchesFound} matches out of ${filteredResults.length} results`);
 
     return NextResponse.json({
       success: true,
       message: `F410 EMD Stamp Match completed`,
       matches_found: matchesFound,
-      total_checked: serpResults.length,
+      total_checked: filteredResults.length,
       matched_result_ids: matchedResultIds,
       emd_stamp_slug: emd_stamp_slug,
       cached_city_name: cached_city_name,

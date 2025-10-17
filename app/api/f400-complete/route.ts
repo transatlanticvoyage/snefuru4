@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
       
       // Set existing cache to is_current = FALSE (preserve history)
       await supabase
-        .from('keywordshub_emd_zone_cache')
+        .from('keywordshub_serp_zone_cache')
         .update({ is_current: false })
         .eq('keyword_id', fetchRecord.rel_keyword_id)
         .eq('is_current', true);
@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
       
       // Set existing cache to is_current = FALSE (preserve history)
       await supabase
-        .from('keywordshub_emd_zone_cache')
+        .from('keywordshub_serp_zone_cache')
         .update({ is_current: false })
         .eq('keyword_id', fetchRecord.rel_keyword_id)
         .eq('is_current', true);
