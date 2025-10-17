@@ -3134,12 +3134,12 @@ ${columnNames.join('\n')}`;
                     </td>
                     <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
                       <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        wolf exclusion band
+                        wolf sticky columns exclusion band
                       </div>
                     </td>
                     <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
                       <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        column templates
+                        pillarshift column templates
                       </div>
                     </td>
                     <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
