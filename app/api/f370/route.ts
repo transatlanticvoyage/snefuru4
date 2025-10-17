@@ -187,18 +187,55 @@ export async function POST(request: NextRequest) {
       let keywordId;
       let wasCreated = false;
 
+      // ═══════════════════════════════════════════════════════════
+      // Determine city ID fields based on kw_rubric shortcodes
+      // ═══════════════════════════════════════════════════════════
+      let rel_exact_city_id = null;
+      let rel_largest_city_id = null;
+
+      // Check if rubric contains both (city_name) and (state_code) = exact match
+      const hasBothShortcodes = kw_rubric.includes('(city_name)') && kw_rubric.includes('(state_code)');
+      if (hasBothShortcodes) {
+        // Use the source city from cncglub row
+        rel_exact_city_id = row.rel_city_id;
+        console.log(`Exact city match: ${city.city_name}, ${city.state_code} (city_id: ${rel_exact_city_id})`);
+      }
+
+      // Check if rubric contains (city_name) = find largest city
+      if (kw_rubric.includes('(city_name)')) {
+        try {
+          const { data: largestCity, error: largestCityError } = await supabase
+            .from('cities')
+            .select('city_id, city_population')
+            .eq('city_name', city.city_name)
+            .order('city_population', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (!largestCityError && largestCity) {
+            rel_largest_city_id = largestCity.city_id;
+            console.log(`Largest city match for "${city.city_name}": city_id ${rel_largest_city_id} with population ${largestCity.city_population}`);
+          }
+        } catch (error) {
+          console.error('Error finding largest city:', error);
+          // Continue processing even if largest city lookup fails
+        }
+      }
+
       if (existingKeyword) {
         // Keyword exists, use existing ID
         keywordId = existingKeyword.keyword_id;
         existingKeywordsCount++;
         console.log(`Using existing keyword ID: ${keywordId}`);
         
-        // Update existing keyword with industry_id and cached_city_name if not already set
+        // Update existing keyword with industry_id, cached_city_name, and new city ID fields
         await supabase
           .from('keywordshub')
           .update({ 
             rel_industry_id: row.rel_industry_id,
-            cached_city_name: city.city_name
+            cached_city_name: city.city_name,
+            rel_exact_city_id,
+            rel_largest_city_id
           })
           .eq('keyword_id', keywordId);
       } else {
@@ -211,7 +248,9 @@ export async function POST(request: NextRequest) {
             language_code: language_code,
             language_name: 'English',
             rel_industry_id: row.rel_industry_id,
-            cached_city_name: city.city_name
+            cached_city_name: city.city_name,
+            rel_exact_city_id,
+            rel_largest_city_id
           })
           .select('keyword_id')
           .single();
