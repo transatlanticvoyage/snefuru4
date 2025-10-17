@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     const { data: emdMatches, error: matchError } = await supabase
       .from('zhe_serp_results')
-      .select('result_id, domain, rank_absolute')
+      .select('result_id, domain, rank_absolute, url')
       .eq('rel_fetch_id', fetchId)
       .eq(matchColumn, true)
       .order('rank_absolute');
@@ -151,7 +151,8 @@ export async function POST(request: NextRequest) {
         zoneAggregates[zone.zone_key].push({
           domain: match.domain,
           rank: match.rank_absolute,
-          result_id: match.result_id
+          result_id: match.result_id,
+          url: match.url
         });
       }
     }

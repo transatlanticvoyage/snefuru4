@@ -390,26 +390,8 @@ export default function KeywordsHubTable({
           *,
           industries:rel_industry_id (
             industry_name
-          ),
-          emd_cache_m1:keywordshub_emd_zone_cache!keyword_id (
-            total_emd_sites,
-            zone_1_count,
-            zone_2_count,
-            zone_3_count,
-            zone_4_10_count,
-            zone_11_25_count,
-            zone_26_50_count,
-            zone_51_100_count,
-            zone_1_domains,
-            zone_2_domains,
-            zone_3_domains,
-            zone_4_10_domains,
-            zone_11_25_domains,
-            zone_26_50_domains,
-            zone_51_100_domains
           )
-        `)
-        .eq('emd_cache_m1.emd_stamp_method', 'method-1');
+        `);
 
       // If a tag is selected, filter by keywords that have this tag
       if (selectedTagId) {
@@ -438,7 +420,7 @@ export default function KeywordsHubTable({
 
       if (error) throw error;
       
-      // Fetch tag information for each keyword
+      // Fetch tag information and cache data for each keyword
       if (keywords && keywords.length > 0) {
         const keywordIds = keywords.map(k => k.keyword_id);
         
@@ -458,6 +440,36 @@ export default function KeywordsHubTable({
           console.error('Error fetching tag relations:', tagRelError);
         }
         
+        // Get EMD zone cache data for method-1
+        const { data: cacheData, error: cacheError } = await supabase
+          .from('keywordshub_emd_zone_cache')
+          .select(`
+            keyword_id,
+            total_emd_sites,
+            zone_1_count,
+            zone_2_count,
+            zone_3_count,
+            zone_4_10_count,
+            zone_11_25_count,
+            zone_26_50_count,
+            zone_51_100_count,
+            zone_1_domains,
+            zone_2_domains,
+            zone_3_domains,
+            zone_4_10_domains,
+            zone_11_25_domains,
+            zone_26_50_domains,
+            zone_51_100_domains,
+            cached_at,
+            latest_fetch_id
+          `)
+          .eq('emd_stamp_method', 'method-1')
+          .in('keyword_id', keywordIds);
+        
+        if (cacheError) {
+          console.error('Error fetching EMD zone cache:', cacheError);
+        }
+        
         // Group tags by keyword_id
         const tagsByKeywordId: Record<number, Array<{ tag_id: number; tag_name: string }>> = {};
         
@@ -475,11 +487,23 @@ export default function KeywordsHubTable({
           });
         }
         
-        // Add tags to keywords
+        // Group cache data by keyword_id
+        const cacheByKeywordId: Record<number, any> = {};
+        
+        if (cacheData) {
+          cacheData.forEach(cache => {
+            cacheByKeywordId[cache.keyword_id] = cache;
+          });
+        }
+        
+        // Add tags and cache data to keywords
         const keywordsWithTags = keywords.map(keyword => ({
           ...keyword,
-          tags: tagsByKeywordId[keyword.keyword_id] || []
+          tags: tagsByKeywordId[keyword.keyword_id] || [],
+          emd_cache_m1: cacheByKeywordId[keyword.keyword_id] || null
         }));
+        
+        console.log('🏷️ [FETCH DATA] Loaded cache data for', Object.keys(cacheByKeywordId).length, 'keywords');
         
         setData(keywordsWithTags);
       } else {
@@ -1576,25 +1600,34 @@ export default function KeywordsHubTable({
         );
       }
 
+      // Display domains horizontally with full domain names
       return (
-        <div className="px-2 py-1 text-xs">
-          <div className="flex flex-col gap-1">
-            {domainsArray.slice(0, 3).map((domainObj: any, idx: number) => (
+        <div className="px-2 py-1 text-xs whitespace-nowrap">
+          <div className="flex items-center gap-2">
+            {domainsArray.map((domainObj: any, idx: number) => (
               <div key={idx} className="flex items-center gap-1">
                 <span className="text-gray-500 text-[10px]">#{domainObj.rank}</span>
                 <a
-                  href={`/serpjar?keyword_id=${item.keyword_id}`}
-                  className="text-blue-600 hover:underline truncate max-w-[150px]"
-                  title={domainObj.domain}
-                  onClick={(e) => e.stopPropagation()}
+                  href={domainObj.url || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                  title={`Rank ${domainObj.rank}: ${domainObj.domain}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!domainObj.url) {
+                      e.preventDefault();
+                      alert('No URL available for this result');
+                    }
+                  }}
                 >
                   {domainObj.domain}
                 </a>
+                {idx < domainsArray.length - 1 && (
+                  <span className="text-gray-400">•</span>
+                )}
               </div>
             ))}
-            {domainsArray.length > 3 && (
-              <span className="text-gray-500 text-[10px]">+{domainsArray.length - 3} more</span>
-            )}
           </div>
         </div>
       );
