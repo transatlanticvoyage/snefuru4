@@ -464,6 +464,7 @@ export default function KeywordsHubTable({
             latest_fetch_id
           `)
           .eq('emd_stamp_method', 'method-1')
+          .eq('is_current', true)  // Only fetch current cache, not historical
           .in('keyword_id', keywordIds);
         
         if (cacheError) {

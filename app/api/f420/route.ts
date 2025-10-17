@@ -81,16 +81,19 @@ export async function POST(request: NextRequest) {
     }
 
     // ═══════════════════════════════════════════════════════════
-    // STEP 3: Clear existing cache and relations for this keyword+method
+    // STEP 3: Mark old cache as historical and clear old relations
     // ═══════════════════════════════════════════════════════════
-    console.log(`F420: Clearing old cache and relations for method ${emd_stamp_method}...`);
+    console.log(`F420: Marking old cache as historical for method ${emd_stamp_method}...`);
     
+    // Set existing cache entries to is_current = FALSE (preserve history)
     await supabase
       .from('keywordshub_emd_zone_cache')
-      .delete()
+      .update({ is_current: false })
       .eq('keyword_id', keyword_id)
-      .eq('emd_stamp_method', emd_stamp_method);
+      .eq('emd_stamp_method', emd_stamp_method)
+      .eq('is_current', true);
 
+    // Delete old relations (no need to keep historical relations, just cache)
     await supabase
       .from('relations_keywordshub_results_zones')
       .delete()
@@ -162,6 +165,8 @@ export async function POST(request: NextRequest) {
       keyword_id,
       emd_stamp_method,
       latest_fetch_id: fetchId,
+      source_fetch_id: fetchId,  // Track which fetch this cache came from
+      is_current: true,           // Mark as current cache
       
       // Count columns
       total_emd_sites: emdMatches.length,
@@ -184,13 +189,11 @@ export async function POST(request: NextRequest) {
     };
 
     // ═══════════════════════════════════════════════════════════
-    // STEP 6: UPSERT into cache table
+    // STEP 6: INSERT new cache entry (we now preserve history)
     // ═══════════════════════════════════════════════════════════
     const { error: cacheError } = await supabase
       .from('keywordshub_emd_zone_cache')
-      .upsert(cacheData, {
-        onConflict: 'keyword_id,emd_stamp_method'
-      });
+      .insert(cacheData);
 
     if (cacheError) {
       console.error('F420: Error upserting cache:', cacheError);

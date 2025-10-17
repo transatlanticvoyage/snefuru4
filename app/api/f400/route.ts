@@ -20,6 +20,9 @@ export async function POST(request: NextRequest) {
     
     const body = await request.json();
     keyword_id = body.keyword_id;
+    const batch_id = body.batch_id || null;  // Optional: for batch tracking
+    const fetch_source = body.fetch_source || 'manual-serpjar';  // Default to manual
+    const initiated_by_user_id = body.initiated_by_user_id || null;  // Optional: user tracking
 
     if (!keyword_id) {
       return NextResponse.json({ error: 'keyword_id is required' }, { status: 400 });
@@ -166,7 +169,10 @@ export async function POST(request: NextRequest) {
         fetched_at: new Date().toISOString(),
         se_results_count: '0', // Will update when results come in
         items_count: '0',
-        api_response_json: { task_id: serpTaskId, status: 'pending', message: 'DataForSEO task submitted, waiting for results' }
+        api_response_json: { task_id: serpTaskId, status: 'pending', message: 'DataForSEO task submitted, waiting for results' },
+        batch_id: batch_id,
+        fetch_source: fetch_source,
+        initiated_by_user_id: initiated_by_user_id
       })
       .select('fetch_id')
       .single();
@@ -371,21 +377,24 @@ export async function POST(request: NextRequest) {
     console.log(`📋 Updated keyword status to completed with ${storedResultsCount} results`);
 
     // ═══════════════════════════════════════════════════════════
-    // Clear EMD zone cache and relations (new fetch invalidates old cache)
+    // Mark old cache as historical and clear relations (new fetch invalidates old cache)
     // ═══════════════════════════════════════════════════════════
-    console.log('🧹 F400: Clearing EMD zone cache and relations (new fetch created)...');
+    console.log('🧹 F400: Marking old cache as historical and clearing relations (new fetch created)...');
     
+    // Set existing cache to is_current = FALSE (preserve history)
     await supabase
       .from('keywordshub_emd_zone_cache')
-      .delete()
-      .eq('keyword_id', keyword_id);
+      .update({ is_current: false })
+      .eq('keyword_id', keyword_id)
+      .eq('is_current', true);
     
+    // Delete old relations (will be rebuilt by F410+F420)
     await supabase
       .from('relations_keywordshub_results_zones')
       .delete()
       .eq('keyword_id', keyword_id);
     
-    console.log('✅ F400: Cache cleared. Run F410 + F420 to rebuild zone cache.');
+    console.log('✅ F400: Cache marked as historical. Run F410 + F420 to rebuild zone cache.');
 
     console.log('🎉 F400 ZHE SERP Fetch completed successfully with results!');
 

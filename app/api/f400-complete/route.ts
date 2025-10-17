@@ -167,21 +167,24 @@ export async function POST(request: NextRequest) {
       console.log(`📋 Updated keyword status to completed with ${insertedResults?.length || 0} results`);
 
       // ═══════════════════════════════════════════════════════════
-      // Clear EMD zone cache and relations (new fetch invalidates old cache)
+      // Mark old cache as historical and clear relations (new fetch invalidates old cache)
       // ═══════════════════════════════════════════════════════════
-      console.log('🧹 F400-Complete: Clearing EMD zone cache and relations (new fetch completed)...');
+      console.log('🧹 F400-Complete: Marking old cache as historical and clearing relations (new fetch completed)...');
       
+      // Set existing cache to is_current = FALSE (preserve history)
       await supabase
         .from('keywordshub_emd_zone_cache')
-        .delete()
-        .eq('keyword_id', fetchRecord.rel_keyword_id);
+        .update({ is_current: false })
+        .eq('keyword_id', fetchRecord.rel_keyword_id)
+        .eq('is_current', true);
       
+      // Delete old relations (will be rebuilt by F410+F420)
       await supabase
         .from('relations_keywordshub_results_zones')
         .delete()
         .eq('keyword_id', fetchRecord.rel_keyword_id);
       
-      console.log('✅ F400-Complete: Cache cleared. Run F410 + F420 to rebuild zone cache.');
+      console.log('✅ F400-Complete: Cache marked as historical. Run F410 + F420 to rebuild zone cache.');
 
       // Update fetch versioning system (mark as latest)
       console.log(`📋 F400-Complete: Updating fetch versioning for keyword ${fetchRecord.rel_keyword_id}, fetch ${fetch_id}`);
@@ -216,14 +219,17 @@ export async function POST(request: NextRequest) {
         })
         .eq('keyword_id', fetchRecord.rel_keyword_id);
 
-      // Clear cache even with 0 results
-      console.log('🧹 F400-Complete: Clearing EMD zone cache and relations...');
+      // Mark cache as historical even with 0 results
+      console.log('🧹 F400-Complete: Marking old cache as historical and clearing relations...');
       
+      // Set existing cache to is_current = FALSE (preserve history)
       await supabase
         .from('keywordshub_emd_zone_cache')
-        .delete()
-        .eq('keyword_id', fetchRecord.rel_keyword_id);
+        .update({ is_current: false })
+        .eq('keyword_id', fetchRecord.rel_keyword_id)
+        .eq('is_current', true);
       
+      // Delete old relations
       await supabase
         .from('relations_keywordshub_results_zones')
         .delete()
