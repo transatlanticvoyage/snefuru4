@@ -53,6 +53,10 @@ export default function SerpjarClient() {
   const [isEditingEmdStampSlug, setIsEditingEmdStampSlug] = useState(false);
   const [editedEmdStampSlug, setEditedEmdStampSlug] = useState('');
   
+  // Fetch version selector state
+  const [fetchVersion, setFetchVersion] = useState<string>('latest'); // 'latest', 'all', or version number
+  const [availableVersions, setAvailableVersions] = useState<number[]>([]);
+  
   // Chamber visibility states
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
   const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
@@ -226,6 +230,38 @@ export default function SerpjarClient() {
     };
 
     fetchKeywordData();
+  }, [keywordId, supabase]);
+
+  // Fetch available versions when keyword changes
+  useEffect(() => {
+    const fetchAvailableVersions = async () => {
+      if (!keywordId) {
+        setAvailableVersions([]);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('zhe_serp_fetches')
+          .select('fetch_version')
+          .eq('rel_keyword_id', keywordId)
+          .order('fetch_version', { ascending: true });
+
+        if (error) {
+          console.error('Error fetching versions:', error);
+          setAvailableVersions([]);
+          return;
+        }
+
+        const versions = data?.map(f => f.fetch_version).filter((v): v is number => v !== null) || [];
+        setAvailableVersions(versions);
+      } catch (err) {
+        console.error('Failed to fetch available versions:', err);
+        setAvailableVersions([]);
+      }
+    };
+
+    fetchAvailableVersions();
   }, [keywordId, supabase]);
 
   // F400 SERP Fetch Handler
@@ -1058,6 +1094,42 @@ export default function SerpjarClient() {
             protozoic_chamber
           </div>
           
+          {/* Version Selector Dropdown */}
+          <div className="mb-4 flex items-center gap-3">
+            <label htmlFor="version-selector" className="font-semibold text-sm">
+              Fetch Version:
+            </label>
+            <select
+              id="version-selector"
+              value={fetchVersion}
+              onChange={(e) => setFetchVersion(e.target.value)}
+              className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:border-blue-500"
+            >
+              <option value="latest">Latest (v{availableVersions[availableVersions.length - 1] || '?'})</option>
+              {availableVersions.slice().reverse().map(version => (
+                <option key={version} value={version.toString()}>
+                  Version {version}
+                </option>
+              ))}
+              <option value="all">All Versions ({availableVersions.length} total)</option>
+            </select>
+            {fetchVersion === 'latest' && (
+              <span className="text-xs text-gray-500 italic">
+                (Showing most recent fetch only)
+              </span>
+            )}
+            {fetchVersion === 'all' && (
+              <span className="text-xs text-gray-500 italic">
+                (Showing combined results from all {availableVersions.length} fetches)
+              </span>
+            )}
+            {!['latest', 'all'].includes(fetchVersion) && (
+              <span className="text-xs text-gray-500 italic">
+                (Historical data from fetch v{fetchVersion})
+              </span>
+            )}
+          </div>
+          
           {/* Table Pagination Controls - MOVED FROM MESOZOIC */}
           {tableControls && tableControls.PaginationControls && (
             <div className="mt-2">
@@ -1086,9 +1158,10 @@ export default function SerpjarClient() {
       {/* Main Content - Full Width SerpResultsTable */}
       <div className="flex-1 overflow-hidden">
         <SerpResultsTable 
-          key={keywordId} 
+          key={`${keywordId}-${fetchVersion}`} 
           keywordId={keywordId} 
           keywordData={keywordData} 
+          fetchVersion={fetchVersion}
           onTableControlsRender={setTableControls}
           onHeaderControlsRender={setHeaderControls}
         />

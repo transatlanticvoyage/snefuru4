@@ -6,19 +6,36 @@ export async function GET(request: NextRequest) {
     const supabase = supabaseAdmin;
     const { searchParams } = new URL(request.url);
     const keywordId = searchParams.get('keyword_id');
+    const fetchVersion = searchParams.get('fetch_version'); // 'latest', 'all', or version number
 
     let query;
 
     if (keywordId) {
       // Filter results by keyword_id using the relationship chain:
       // zhe_serp_results.rel_fetch_id -> zhe_serp_fetches.rel_keyword_id -> keywordshub.keyword_id
-      console.log(`Filtering results for keyword_id: ${keywordId}`);
+      console.log(`Filtering results for keyword_id: ${keywordId}, version: ${fetchVersion || 'latest (default)'}`);
       
-      // First get fetch_ids for this keyword_id
-      const { data: fetches, error: fetchError } = await supabase
+      // Build fetch query with version filtering
+      let fetchQuery = supabase
         .from('zhe_serp_fetches')
-        .select('fetch_id')
+        .select('fetch_id, fetch_version, is_latest')
         .eq('rel_keyword_id', parseInt(keywordId));
+
+      // Apply version filter
+      if (!fetchVersion || fetchVersion === 'latest') {
+        // Default: show only latest version
+        fetchQuery = fetchQuery.eq('is_latest', true);
+      } else if (fetchVersion === 'all') {
+        // Show all versions (no additional filter)
+      } else {
+        // Show specific version number
+        const versionNum = parseInt(fetchVersion);
+        if (!isNaN(versionNum)) {
+          fetchQuery = fetchQuery.eq('fetch_version', versionNum);
+        }
+      }
+
+      const { data: fetches, error: fetchError } = await fetchQuery;
 
       if (fetchError) {
         console.error('Error fetching fetch_ids:', fetchError);
@@ -26,12 +43,13 @@ export async function GET(request: NextRequest) {
       }
 
       if (!fetches || fetches.length === 0) {
-        console.log(`No fetches found for keyword_id: ${keywordId}`);
+        console.log(`No fetches found for keyword_id: ${keywordId} with version filter: ${fetchVersion || 'latest'}`);
         return NextResponse.json({ results: [] });
       }
 
       const fetchIds = fetches.map(f => f.fetch_id);
-      console.log(`Found ${fetchIds.length} fetch_ids: ${fetchIds.join(', ')}`);
+      const versionInfo = fetches.map(f => `v${f.fetch_version}${f.is_latest ? '*' : ''}`).join(', ');
+      console.log(`Found ${fetchIds.length} fetch_ids (${versionInfo}): ${fetchIds.join(', ')}`);
 
       // Now get results for these fetch_ids
       query = supabase

@@ -178,6 +178,21 @@ export async function POST(request: NextRequest) {
     const fetchId = fetchRecord?.fetch_id || null;
     console.log(`📋 Created fetch record: ${fetchId}`);
 
+    // Update fetch versioning system
+    if (fetchId) {
+      console.log(`📋 F400: Updating fetch versioning for keyword ${keyword_id}, fetch ${fetchId}`);
+      const { error: versionError } = await supabase.rpc('update_fetch_versioning', {
+        p_keyword_id: keyword_id,
+        p_new_fetch_id: fetchId
+      });
+      
+      if (versionError) {
+        console.error('Error updating fetch versioning:', versionError);
+      } else {
+        console.log('✅ F400: Fetch versioning updated');
+      }
+    }
+
     // Update keywordshub with pending status
     await supabase
       .from('keywordshub')
@@ -355,6 +370,23 @@ export async function POST(request: NextRequest) {
       .eq('keyword_id', keyword_id);
     console.log(`📋 Updated keyword status to completed with ${storedResultsCount} results`);
 
+    // ═══════════════════════════════════════════════════════════
+    // Clear EMD zone cache and relations (new fetch invalidates old cache)
+    // ═══════════════════════════════════════════════════════════
+    console.log('🧹 F400: Clearing EMD zone cache and relations (new fetch created)...');
+    
+    await supabase
+      .from('keywordshub_emd_zone_cache')
+      .delete()
+      .eq('keyword_id', keyword_id);
+    
+    await supabase
+      .from('relations_keywordshub_results_zones')
+      .delete()
+      .eq('keyword_id', keyword_id);
+    
+    console.log('✅ F400: Cache cleared. Run F410 + F420 to rebuild zone cache.');
+
     console.log('🎉 F400 ZHE SERP Fetch completed successfully with results!');
 
     return NextResponse.json({
@@ -368,7 +400,8 @@ export async function POST(request: NextRequest) {
       organic_results_stored: storedResultsCount,
       total_results_found: serpResults.items?.length || 0,
       location: keywordData.location_display_name || `Location ${keywordData.rel_dfs_location_code}`,
-      language: keywordData.language_name
+      language: keywordData.language_name,
+      cache_cleared: true  // Indicate cache was cleared
     });
 
   } catch (error) {

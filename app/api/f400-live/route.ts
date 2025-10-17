@@ -110,6 +110,21 @@ export async function POST(request: NextRequest) {
 
     const fetchId = fetchRecord?.fetch_id || null;
 
+    // Update fetch versioning system
+    if (fetchId) {
+      console.log(`📋 F400-LIVE: Updating fetch versioning for keyword ${keyword_id}, fetch ${fetchId}`);
+      const { error: versionError } = await supabase.rpc('update_fetch_versioning', {
+        p_keyword_id: keyword_id,
+        p_new_fetch_id: fetchId
+      });
+      
+      if (versionError) {
+        console.error('Error updating fetch versioning:', versionError);
+      } else {
+        console.log('✅ F400-LIVE: Fetch versioning updated');
+      }
+    }
+
     // Store organic results
     const organicResults = serpResults.items?.filter((item: any) => item.type === 'organic') || [];
     let storedCount = 0;
@@ -152,6 +167,23 @@ export async function POST(request: NextRequest) {
       .eq('keyword_id', keyword_id);
     console.log(`📋 Updated keyword status to completed with ${storedCount} results`);
 
+    // ═══════════════════════════════════════════════════════════
+    // Clear EMD zone cache and relations (new fetch invalidates old cache)
+    // ═══════════════════════════════════════════════════════════
+    console.log('🧹 F400: Clearing EMD zone cache and relations (new fetch created)...');
+    
+    await supabase
+      .from('keywordshub_emd_zone_cache')
+      .delete()
+      .eq('keyword_id', keyword_id);
+    
+    await supabase
+      .from('relations_keywordshub_results_zones')
+      .delete()
+      .eq('keyword_id', keyword_id);
+    
+    console.log('✅ F400: Cache cleared. Run F410 + F420 to rebuild zone cache.');
+
     return NextResponse.json({
       success: true,
       message: `F400 LIVE fetch completed successfully`,
@@ -161,7 +193,8 @@ export async function POST(request: NextRequest) {
       total_items: serpResults.items?.length || 0,
       organic_results_stored: storedCount,
       se_results_count: serpResults.se_results_count,
-      cost: data.tasks[0].cost || 0.002
+      cost: data.tasks[0].cost || 0.002,
+      cache_cleared: true  // Indicate cache was cleared
     });
 
   } catch (error) {

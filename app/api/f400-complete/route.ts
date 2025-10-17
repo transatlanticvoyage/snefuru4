@@ -166,13 +166,44 @@ export async function POST(request: NextRequest) {
         .eq('keyword_id', fetchRecord.rel_keyword_id);
       console.log(`📋 Updated keyword status to completed with ${insertedResults?.length || 0} results`);
 
+      // ═══════════════════════════════════════════════════════════
+      // Clear EMD zone cache and relations (new fetch invalidates old cache)
+      // ═══════════════════════════════════════════════════════════
+      console.log('🧹 F400-Complete: Clearing EMD zone cache and relations (new fetch completed)...');
+      
+      await supabase
+        .from('keywordshub_emd_zone_cache')
+        .delete()
+        .eq('keyword_id', fetchRecord.rel_keyword_id);
+      
+      await supabase
+        .from('relations_keywordshub_results_zones')
+        .delete()
+        .eq('keyword_id', fetchRecord.rel_keyword_id);
+      
+      console.log('✅ F400-Complete: Cache cleared. Run F410 + F420 to rebuild zone cache.');
+
+      // Update fetch versioning system (mark as latest)
+      console.log(`📋 F400-Complete: Updating fetch versioning for keyword ${fetchRecord.rel_keyword_id}, fetch ${fetch_id}`);
+      const { error: versionError } = await supabase.rpc('update_fetch_versioning', {
+        p_keyword_id: fetchRecord.rel_keyword_id,
+        p_new_fetch_id: fetch_id
+      });
+      
+      if (versionError) {
+        console.error('Error updating fetch versioning:', versionError);
+      } else {
+        console.log('✅ F400-Complete: Fetch versioning updated');
+      }
+
       return NextResponse.json({
         success: true,
         message: `Successfully completed pending fetch and stored ${insertedResults?.length || 0} organic results.`,
         fetch_id: fetch_id,
         organic_results_stored: insertedResults?.length || 0,
         total_results_found: serpResults.items?.length || 0,
-        dataforseo_task_id: taskId
+        dataforseo_task_id: taskId,
+        cache_cleared: true  // Indicate cache was cleared
       });
     } else {
       // Update keywordshub with completed status (0 results)
@@ -185,13 +216,38 @@ export async function POST(request: NextRequest) {
         })
         .eq('keyword_id', fetchRecord.rel_keyword_id);
 
+      // Clear cache even with 0 results
+      console.log('🧹 F400-Complete: Clearing EMD zone cache and relations...');
+      
+      await supabase
+        .from('keywordshub_emd_zone_cache')
+        .delete()
+        .eq('keyword_id', fetchRecord.rel_keyword_id);
+      
+      await supabase
+        .from('relations_keywordshub_results_zones')
+        .delete()
+        .eq('keyword_id', fetchRecord.rel_keyword_id);
+
+      // Update fetch versioning system (mark as latest even with 0 results)
+      console.log(`📋 F400-Complete: Updating fetch versioning for keyword ${fetchRecord.rel_keyword_id}, fetch ${fetch_id}`);
+      const { error: versionError } = await supabase.rpc('update_fetch_versioning', {
+        p_keyword_id: fetchRecord.rel_keyword_id,
+        p_new_fetch_id: fetch_id
+      });
+      
+      if (versionError) {
+        console.error('Error updating fetch versioning:', versionError);
+      }
+
       return NextResponse.json({
         success: true,
         message: 'Fetch completed but no organic results found.',
         fetch_id: fetch_id,
         organic_results_stored: 0,
         total_results_found: serpResults.items?.length || 0,
-        dataforseo_task_id: taskId
+        dataforseo_task_id: taskId,
+        cache_cleared: true
       });
     }
 

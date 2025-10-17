@@ -28,6 +28,7 @@ interface SerpResult {
 interface SerpResultsTableProps {
   keywordId?: number | null;
   keywordData?: {keyword_id: number, keyword_datum: string} | null;
+  fetchVersion?: string; // 'latest', 'all', or version number
   onTableControlsRender?: (controls: { PaginationControls: () => JSX.Element } | null) => void;
   onHeaderControlsRender?: (controls: { HeaderSection: () => JSX.Element } | null) => void;
 }
@@ -40,7 +41,7 @@ interface PendingFetch {
   created_at: string;
 }
 
-export default function SerpResultsTable({ keywordId, keywordData, onTableControlsRender, onHeaderControlsRender }: SerpResultsTableProps) {
+export default function SerpResultsTable({ keywordId, keywordData, fetchVersion = 'latest', onTableControlsRender, onHeaderControlsRender }: SerpResultsTableProps) {
   const [data, setData] = useState<SerpResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +87,7 @@ export default function SerpResultsTable({ keywordId, keywordData, onTableContro
     setData([]);
     setError(null);
     fetchData();
-  }, [keywordId]);
+  }, [keywordId, fetchVersion]);
   
   // Expose pagination controls to parent
   useEffect(() => {
@@ -150,12 +151,12 @@ export default function SerpResultsTable({ keywordId, keywordData, onTableContro
         }
       }
       
-      // Build API URL with keyword_id parameter if provided
+      // Build API URL with keyword_id and fetch_version parameters
       const apiUrl = keywordId 
-        ? `/api/zhe_serp_results?keyword_id=${keywordId}`
+        ? `/api/zhe_serp_results?keyword_id=${keywordId}&fetch_version=${fetchVersion}`
         : '/api/zhe_serp_results';
       
-      console.log(`Fetching SERP results from: ${apiUrl}`);
+      console.log(`Fetching SERP results from: ${apiUrl} (version: ${fetchVersion})`);
       const response = await fetch(apiUrl, {
         cache: 'no-store'  // Prevent caching
       });
