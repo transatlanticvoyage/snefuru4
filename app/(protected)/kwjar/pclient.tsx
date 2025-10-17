@@ -30,10 +30,56 @@ export default function KwjarClient() {
   const [showGazelleSecondConfirm, setShowGazelleSecondConfirm] = useState(false);
   const [gazelleProgress, setGazelleProgress] = useState({ current: 0, total: 0 });
   
+  // Retry failed keywords state
+  const [showRetryPopup, setShowRetryPopup] = useState(false);
+  const [failedKeywords, setFailedKeywords] = useState<Array<{
+    keyword_id: number;
+    keyword_datum: string;
+    batch_id: number;
+    batch_name: string;
+    fetch_id: number;
+  }>>([]);
+  const [loadingFailedKeywords, setLoadingFailedKeywords] = useState(false);
+  const [failedKeywordCount, setFailedKeywordCount] = useState<number>(0);
+  
   // Debug selected tag changes
   useEffect(() => {
     console.log('🏷️ [PCLIENT] selectedTag changed:', selectedTag);
   }, [selectedTag]);
+
+  // Check for failed keywords on page load
+  useEffect(() => {
+    const checkFailedCount = async () => {
+      try {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        const { data: recentBatches } = await supabase
+          .from('zhe_serp_fetch_batches')
+          .select('batch_id, failed_keywords')
+          .gt('failed_keywords', 0)
+          .gte('created_at', sevenDaysAgo.toISOString());
+
+        if (!recentBatches || recentBatches.length === 0) {
+          setFailedKeywordCount(0);
+          return;
+        }
+
+        const batchIds = recentBatches.map(b => b.batch_id);
+        const { data: failedFetches } = await supabase
+          .from('zhe_serp_fetches')
+          .select('fetch_id, items_count')
+          .in('batch_id', batchIds);
+
+        const failedCount = failedFetches?.filter(f => f.items_count === '0' || !f.items_count).length || 0;
+        setFailedKeywordCount(failedCount);
+      } catch (error) {
+        console.error('Error checking failed keyword count:', error);
+      }
+    };
+
+    checkFailedCount();
+  }, [supabase]);
   const [columnPaginationControls, setColumnPaginationControls] = useState<{
     ColumnPaginationBar1: () => JSX.Element | null;
     ColumnPaginationBar2: () => JSX.Element | null;
@@ -546,6 +592,232 @@ export default function KwjarClient() {
     }
   };
 
+  // Check for failed keywords in recent batches
+  const checkForFailedKeywords = async () => {
+    setLoadingFailedKeywords(true);
+    try {
+      // Get recent batches from last 7 days
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const { data: recentBatches, error: batchError } = await supabase
+        .from('zhe_serp_fetch_batches')
+        .select('batch_id, batch_name, failed_keywords')
+        .gt('failed_keywords', 0)
+        .gte('created_at', sevenDaysAgo.toISOString())
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (batchError) throw batchError;
+
+      if (!recentBatches || recentBatches.length === 0) {
+        alert('No failed keywords found in recent batches.');
+        return;
+      }
+
+      // Get all fetches from these batches
+      const batchIds = recentBatches.map(b => b.batch_id);
+      const { data: batchFetches, error: fetchError } = await supabase
+        .from('zhe_serp_fetches')
+        .select(`
+          fetch_id,
+          rel_keyword_id,
+          batch_id,
+          items_count
+        `)
+        .in('batch_id', batchIds);
+
+      if (fetchError) throw fetchError;
+
+      // Find fetches with no results (failed)
+      const failedFetches = batchFetches?.filter(f => f.items_count === '0' || !f.items_count) || [];
+
+      if (failedFetches.length === 0) {
+        alert('All keywords in recent batches have been successfully fetched.');
+        return;
+      }
+
+      // Get keyword details for failed fetches
+      const keywordIds = failedFetches.map(f => f.rel_keyword_id);
+      const { data: keywordDetails, error: kwError } = await supabase
+        .from('keywordshub')
+        .select('keyword_id, keyword_datum')
+        .in('keyword_id', keywordIds);
+
+      if (kwError) throw kwError;
+
+      // Merge data
+      const failedKeywordsList = failedFetches.map(fetch => {
+        const keyword = keywordDetails?.find(k => k.keyword_id === fetch.rel_keyword_id);
+        const batch = recentBatches.find(b => b.batch_id === fetch.batch_id);
+        
+        return {
+          keyword_id: fetch.rel_keyword_id,
+          keyword_datum: keyword?.keyword_datum || `Unknown (ID: ${fetch.rel_keyword_id})`,
+          batch_id: fetch.batch_id!,
+          batch_name: batch?.batch_name || `Batch #${fetch.batch_id}`,
+          fetch_id: fetch.fetch_id
+        };
+      });
+
+      setFailedKeywords(failedKeywordsList);
+      setShowRetryPopup(true);
+    } catch (error) {
+      console.error('Error checking for failed keywords:', error);
+      alert('Error checking for failed keywords');
+    } finally {
+      setLoadingFailedKeywords(false);
+    }
+  };
+
+  // Retry failed keywords - auto-run Gazelle
+  const retryFailedKeywords = async (keywordsToRetry: number[]) => {
+    if (keywordsToRetry.length === 0) return;
+
+    setShowRetryPopup(false);
+    setGazelleLoading(true);
+    setGazelleProgress({ current: 0, total: keywordsToRetry.length });
+
+    let successCount = 0;
+    let failCount = 0;
+    const results: any[] = [];
+    let batchId: number | null = null;
+
+    try {
+      // Create retry batch
+      console.log('📦 Creating retry batch record...');
+      const { data: retryBatchId, error: batchError } = await supabase.rpc('create_serp_fetch_batch', {
+        p_batch_name: `Retry: ${keywordsToRetry.length} failed keywords`,
+        p_batch_source: 'bulk-kwjar',
+        p_user_id: user?.id || null,
+        p_total_keywords: keywordsToRetry.length
+      });
+
+      if (batchError || !retryBatchId) {
+        throw new Error('Failed to create retry batch');
+      }
+
+      batchId = retryBatchId;
+      console.log(`✅ Retry batch created: #${batchId}`);
+
+      // Run Gazelle on each failed keyword
+      for (let i = 0; i < keywordsToRetry.length; i++) {
+        const keywordId = keywordsToRetry[i];
+        setGazelleProgress({ current: i + 1, total: keywordsToRetry.length });
+
+        try {
+          // Run F400, F410, F420 (same as main Gazelle)
+          const f400Response = await fetch('/api/f400-live', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              keyword_id: keywordId,
+              batch_id: batchId,
+              fetch_source: 'bulk-kwjar',
+              initiated_by_user_id: user?.id || null
+            }),
+          });
+
+          const f400Result = await f400Response.json();
+          if (!f400Response.ok) throw new Error(f400Result.error || 'F400 failed');
+
+          const f410Response = await fetch('/api/f410', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ keyword_id: keywordId }),
+          });
+
+          const f410Result = await f410Response.json();
+          if (!f410Response.ok) throw new Error(f410Result.error || 'F410 failed');
+
+          const f420Response = await fetch('/api/f420', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              keyword_id: keywordId,
+              emd_stamp_method: 'method-1',
+            }),
+          });
+
+          const f420Result = await f420Response.json();
+          if (!f420Response.ok) throw new Error(f420Result.error || 'F420 failed');
+
+          results.push({
+            keyword_id: keywordId,
+            success: true,
+            f400_results: f400Result.organic_results_stored || 0,
+            f410_matches: f410Result.matches_found || 0,
+            f420_zones: f420Result.zones_cached || 0,
+            f420_relations: f420Result.relations_created || 0,
+          });
+          successCount++;
+
+          if (batchId) {
+            await supabase.rpc('update_batch_progress', {
+              p_batch_id: batchId,
+              p_completed: successCount + failCount,
+              p_failed: failCount,
+              p_status: null
+            });
+          }
+        } catch (error) {
+          console.error(`Error processing keyword ${keywordId}:`, error);
+          results.push({
+            keyword_id: keywordId,
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
+          failCount++;
+
+          if (batchId) {
+            await supabase.rpc('update_batch_progress', {
+              p_batch_id: batchId,
+              p_completed: successCount + failCount,
+              p_failed: failCount,
+              p_status: null
+            });
+          }
+        }
+      }
+
+      // Mark batch as completed
+      if (batchId) {
+        const finalStatus = failCount === keywordsToRetry.length ? 'failed' : 'completed';
+        await supabase.rpc('update_batch_progress', {
+          p_batch_id: batchId,
+          p_completed: successCount + failCount,
+          p_failed: failCount,
+          p_status: finalStatus
+        });
+      }
+
+      // Show results
+      alert(
+        `🔄 Retry Complete!\n\n` +
+        `Batch ID: #${batchId}\n` +
+        `✅ Successful: ${successCount}\n` +
+        `❌ Failed Again: ${failCount}\n\n` +
+        `The page will now refresh.`
+      );
+
+      window.location.reload();
+    } catch (error) {
+      console.error('Retry error:', error);
+      
+      if (batchId) {
+        await supabase.rpc('update_batch_progress', {
+          p_batch_id: batchId,
+          p_status: 'failed'
+        });
+      }
+      
+      alert(`Retry failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setGazelleLoading(false);
+      setGazelleProgress({ current: 0, total: 0 });
+    }
+  };
+
   // Handle tab change (like nwjar1)
   const handleTabChange = (tab: 'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7') => {
     setActivePopupTab(tab);
@@ -708,10 +980,114 @@ export default function KwjarClient() {
                   : `🦌 Gazelle Aggregate ${selectedKeywordIds.length > 0 ? `(${selectedKeywordIds.length})` : ''}`
                 }
               </button>
+
+              {/* Retry Failed Keywords Button */}
+              <button
+                onClick={checkForFailedKeywords}
+                disabled={loadingFailedKeywords}
+                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors relative ${
+                  loadingFailedKeywords
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : failedKeywordCount > 0
+                    ? 'bg-red-600 text-white hover:bg-red-700 animate-pulse'
+                    : 'bg-gray-400 text-white'
+                }`}
+                title={failedKeywordCount > 0 
+                  ? `${failedKeywordCount} failed keywords available to retry`
+                  : 'No failed keywords in recent batches'}
+              >
+                {loadingFailedKeywords ? 'Checking...' : 
+                 failedKeywordCount > 0 ? `🔄 Retry Failed (${failedKeywordCount})` : 
+                 '🔄 No Failed Keywords'}
+                {failedKeywordCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {failedKeywordCount}
+                  </span>
+                )}
+              </button>
             </div>
           )}
         </div>
       )}
+
+      {/* Retry Failed Keywords Popup */}
+      {showRetryPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">🔄</span>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">Retry Failed Keywords</h3>
+                    <p className="text-sm text-gray-600">{failedKeywords.length} keywords failed in recent batches</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowRetryPopup(false)}
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-auto p-6">
+              <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-4">
+                <p className="text-sm text-yellow-800">
+                  <strong>Note:</strong> These keywords had fetch errors (network timeout, API issues, etc.). 
+                  Retrying will create a new batch and run F400+F410+F420 for each.
+                </p>
+              </div>
+
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="border px-3 py-2 text-left text-xs font-semibold">Keyword ID</th>
+                    <th className="border px-3 py-2 text-left text-xs font-semibold">Keyword</th>
+                    <th className="border px-3 py-2 text-left text-xs font-semibold">Original Batch</th>
+                    <th className="border px-3 py-2 text-left text-xs font-semibold">Fetch ID</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {failedKeywords.map((kw, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="border px-3 py-2 text-xs font-mono">{kw.keyword_id}</td>
+                      <td className="border px-3 py-2 text-xs">{kw.keyword_datum}</td>
+                      <td className="border px-3 py-2 text-xs text-gray-600">{kw.batch_name}</td>
+                      <td className="border px-3 py-2 text-xs font-mono text-gray-500">{kw.fetch_id}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="p-6 border-t bg-gray-50">
+              <div className="flex justify-between items-center">
+                <p className="text-sm text-gray-700">
+                  <strong>{failedKeywords.length}</strong> keyword{failedKeywords.length !== 1 ? 's' : ''} will be selected for retry
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowRetryPopup(false)}
+                    className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => retryFailedKeywords(failedKeywords.map(kw => kw.keyword_id))}
+                    className="px-4 py-2 bg-yellow-600 text-white hover:bg-yellow-700 rounded-md transition-colors font-medium"
+                  >
+                    🔄 Select & Prepare for Retry
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Protozoic Chamber */}
 
       {/* Protozoic Chamber */}
       {protozoicChamberVisible && (

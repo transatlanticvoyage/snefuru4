@@ -199,6 +199,28 @@ export async function POST(request: NextRequest) {
         console.log('✅ F400-Complete: Fetch versioning updated');
       }
 
+      // Update batch progress if this fetch is part of a batch
+      if (fetchRecord.batch_id) {
+        console.log(`📦 F400-Complete: Updating batch progress for batch ${fetchRecord.batch_id}`);
+        
+        // Get current batch status
+        const { data: currentBatch } = await supabase
+          .from('zhe_serp_fetch_batches')
+          .select('completed_keywords, failed_keywords')
+          .eq('batch_id', fetchRecord.batch_id)
+          .single();
+        
+        if (currentBatch) {
+          await supabase.rpc('update_batch_progress', {
+            p_batch_id: fetchRecord.batch_id,
+            p_completed: (currentBatch.completed_keywords || 0) + 1,
+            p_failed: currentBatch.failed_keywords || 0,
+            p_status: null  // Keep status as-is (will be set by main batch handler)
+          });
+          console.log('✅ F400-Complete: Batch progress updated');
+        }
+      }
+
       return NextResponse.json({
         success: true,
         message: `Successfully completed pending fetch and stored ${insertedResults?.length || 0} organic results.`,
