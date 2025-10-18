@@ -21,7 +21,7 @@ interface LeadsmartTransformed {
   city_name: string | null;
   state_code: string | null;
   payout: number | null;
-  aggregated_zip_codes_jsonb: string[] | null;
+  aggregated_zip_codes: string[] | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -82,7 +82,7 @@ export default function LeadsmartMorphClient() {
     'city_name',
     'state_code',
     'payout',
-    'aggregated_zip_codes_jsonb',
+    'aggregated_zip_codes',
     'created_at',
     'updated_at'
   ];
@@ -200,7 +200,7 @@ export default function LeadsmartMorphClient() {
     return (
       row.city_name?.toLowerCase().includes(searchLower) ||
       row.state_code?.toLowerCase().includes(searchLower) ||
-      row.aggregated_zip_codes_jsonb?.some(zip => zip.toLowerCase().includes(searchLower)) ||
+      row.aggregated_zip_codes?.some(zip => zip.toLowerCase().includes(searchLower)) ||
       row.payout?.toString().includes(searchLower)
     );
   });
@@ -577,7 +577,7 @@ export default function LeadsmartMorphClient() {
   const startEditing = (id: number, field: string, currentValue: any) => {
     setEditingCell({ id, field });
     // For JSONB arrays, display as newline-separated values
-    if (field === 'aggregated_zip_codes_jsonb' && Array.isArray(currentValue)) {
+    if (field === 'aggregated_zip_codes' && Array.isArray(currentValue)) {
       setEditValue(currentValue.join('\n'));
     } else {
       setEditValue(currentValue?.toString() || '');
@@ -590,7 +590,7 @@ export default function LeadsmartMorphClient() {
     try {
       // Convert editValue to appropriate format based on field
       let valueToSave: any = editValue;
-      if (editingCell.field === 'aggregated_zip_codes_jsonb') {
+      if (editingCell.field === 'aggregated_zip_codes') {
         // Convert newline-separated text to array
         valueToSave = editValue.split('\n').filter(z => z.trim());
       }
@@ -624,7 +624,7 @@ export default function LeadsmartMorphClient() {
     try {
       const { data: newRow, error: insertError } = await supabase
         .from('leadsmart_transformed')
-        .insert([{ city_name: '', state_code: '', payout: null, aggregated_zip_codes_jsonb: [] }])
+        .insert([{ city_name: '', state_code: '', payout: null, aggregated_zip_codes: [] }])
         .select()
         .single();
 
@@ -1066,7 +1066,7 @@ export default function LeadsmartMorphClient() {
                               className="w-full px-2 py-1 border border-blue-500 focus:outline-none"
                               rows={3}
                             />
-                          ) : col === 'aggregated_zip_codes_jsonb' && Array.isArray(value) ? (
+                          ) : col === 'aggregated_zip_codes' && Array.isArray(value) ? (
                             <>
                               <button
                                 onClick={(e) => {
@@ -1195,13 +1195,13 @@ export default function LeadsmartMorphClient() {
               
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '4px' }}>
-                  aggregated_zip_codes_jsonb (one per line)
+                  aggregated_zip_codes (one per line)
                 </label>
                 <textarea
-                  value={popupData.aggregated_zip_codes_jsonb?.join('\n') || ''}
+                  value={popupData.aggregated_zip_codes?.join('\n') || ''}
                   onChange={(e) => setPopupData({ 
                     ...popupData, 
-                    aggregated_zip_codes_jsonb: e.target.value.split('\n').filter(z => z.trim())
+                    aggregated_zip_codes: e.target.value.split('\n').filter(z => z.trim())
                   })}
                   className="w-full px-3 py-2 border border-gray-300 rounded"
                   rows={3}

@@ -486,7 +486,7 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
           city_name: groupKey.city_name,
           state_code: groupKey.state_code,
           payout: groupKey.payout,
-          aggregated_zip_codes_jsonb: aggregatedZipCodes,
+          aggregated_zip_codes: aggregatedZipCodes,
           jrel_release_id: groupKey.rel_release_id,
           jrel_subsheet_id: groupKey.rel_subsheet_id,
           jrel_subpart_id: groupKey.rel_subpart_id
@@ -511,7 +511,7 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
           const { data: updatedData, error: updateError } = await supabase
             .from('leadsmart_transformed')
             .update({
-              aggregated_zip_codes_jsonb: aggregatedZipCodes,
+              aggregated_zip_codes: aggregatedZipCodes,
               jrel_release_id: groupKey.rel_release_id,
               jrel_subsheet_id: groupKey.rel_subsheet_id,
               updated_at: new Date().toISOString()
