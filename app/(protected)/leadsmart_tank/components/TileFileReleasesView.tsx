@@ -122,9 +122,9 @@ export default function TileFileReleasesView({ onReleaseSelect, selectXType, sel
                   {/* SX Button */}
                   <td
                     onClick={() => onSelectX('release', release.release_id)}
-                    className={`cursor-pointer font-bold text-center transition-colors ${
+                    className={`cursor-pointer text-center transition-colors ${
                       isSelectX 
-                        ? 'bg-blue-600 text-white' 
+                        ? 'bg-blue-600 text-white font-bold' 
                         : 'bg-gray-100 hover:bg-gray-200'
                     }`}
                     style={{ padding: '5px', border: '1px solid #ccc', minWidth: '40px' }}
@@ -138,18 +138,18 @@ export default function TileFileReleasesView({ onReleaseSelect, selectXType, sel
                     onClick={() => handleViewChildren(release.release_id)}
                     className={`cursor-pointer text-center transition-colors ${
                       isViewChildren 
-                        ? 'bg-green-600 text-white' 
+                        ? 'bg-green-600 text-white font-bold' 
                         : 'bg-gray-100 hover:bg-gray-200'
                     }`}
                     style={{ padding: '5px', border: '1px solid #ccc', minWidth: '60px' }}
                     title="View Children"
                   >
-                    <span className="font-bold">vc</span> - {release.children_count || 0}
+                    vc - {release.children_count || 0}
                   </td>
                   
                   {/* Release Date */}
                   <td
-                    className="text-gray-800"
+                    className="text-gray-800 font-bold"
                     style={{ padding: '5px', border: '1px solid #ccc', minWidth: '100px' }}
                   >
                     {release.release_date || 'No date'}

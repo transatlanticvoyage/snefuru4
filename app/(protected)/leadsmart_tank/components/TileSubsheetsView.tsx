@@ -142,9 +142,9 @@ export default function TileSubsheetsView({ selectedReleaseId, onSubsheetSelect,
                     {/* SX Button */}
                     <td
                       onClick={() => onSelectX('subsheet', subsheet.subsheet_id)}
-                      className={`cursor-pointer font-bold text-center transition-colors ${
+                      className={`cursor-pointer text-center transition-colors ${
                         isSelectX 
-                          ? 'bg-blue-600 text-white' 
+                          ? 'bg-blue-600 text-white font-bold' 
                           : 'bg-gray-100 hover:bg-gray-200'
                       }`}
                       style={{ padding: '5px', border: '1px solid #ccc', minWidth: '40px' }}
@@ -158,18 +158,18 @@ export default function TileSubsheetsView({ selectedReleaseId, onSubsheetSelect,
                       onClick={() => handleViewChildren(subsheet.subsheet_id)}
                       className={`cursor-pointer text-center transition-colors ${
                         isViewChildren 
-                          ? 'bg-green-600 text-white' 
+                          ? 'bg-green-600 text-white font-bold' 
                           : 'bg-gray-100 hover:bg-gray-200'
                       }`}
                       style={{ padding: '5px', border: '1px solid #ccc', minWidth: '60px' }}
                       title="View Children"
                     >
-                      <span className="font-bold">vc</span> - {subsheet.children_count || 0}
+                      vc - {subsheet.children_count || 0}
                     </td>
                     
                     {/* Subsheet Name */}
                     <td
-                      className="text-gray-800"
+                      className="text-gray-800 font-bold"
                       style={{ padding: '5px', border: '1px solid #ccc', minWidth: '120px' }}
                     >
                       {subsheet.subsheet_name || 'No name'}

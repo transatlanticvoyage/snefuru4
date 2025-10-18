@@ -121,9 +121,9 @@ export default function TileSubpartsView({ selectedSubsheetId, onSubpartSelect, 
                     {/* SX Button */}
                     <td
                       onClick={() => onSelectX('subpart', subpart.subpart_id)}
-                      className={`cursor-pointer font-bold text-center transition-colors ${
+                      className={`cursor-pointer text-center transition-colors ${
                         isSelectX 
-                          ? 'bg-blue-600 text-white' 
+                          ? 'bg-blue-600 text-white font-bold' 
                           : 'bg-gray-100 hover:bg-gray-200'
                       }`}
                       style={{ padding: '5px', border: '1px solid #ccc', minWidth: '40px' }}
@@ -134,7 +134,7 @@ export default function TileSubpartsView({ selectedSubsheetId, onSubpartSelect, 
                     
                     {/* Payout Note */}
                     <td
-                      className="text-gray-800"
+                      className="text-gray-800 font-bold"
                       style={{ padding: '5px', border: '1px solid #ccc', minWidth: '120px' }}
                     >
                       {subpart.payout_note || 'No note'}
