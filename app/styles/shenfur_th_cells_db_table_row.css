@@ -1,4 +1,56 @@
 
+
+
+/*================= 2025__10_17 -  https://chatgpt.com/c/68f3829f-8c38-8332-8ba5-fcdda9773ff9 ================================================*/
+
+/* Target your existing <th> with bg + patterned overlay */
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_zip_based_data {
+  position: relative;
+  background-color: #c4dcfa; /* your existing bg color */
+}
+
+/* Overlay: very-light, tintable pentagon outlines arranged with gaps */
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_zip_based_data::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  /* Tile is 32x32 to create:
+     - row pattern: show one 16px-high row, skip the next 16px
+     - col pattern: within shown rows, show at x=0..16 cell, skip the x=16..32 cell
+     => net result: pentagon, space, pentagon, space; next row empty; repeat
+  */
+  background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>\
+  <!-- Draw a single pentagon inside the top-left 16x16 cell; the rest of the 32x32 tile is empty -->\
+  <g transform='translate(0,0)'>\
+    <path d='M8 3 L12.76 6.46 L10.94 12.05 L5.06 12.05 L3.24 6.46 Z' \
+          fill='none' stroke='black' stroke-opacity='0.12' stroke-width='1' \
+          stroke-linejoin='round'/>\
+  </g>\
+</svg>");
+  background-size: 32px 32px;     /* 16px cell shown, 16px cell skipped in both axes */
+  background-repeat: repeat;
+  background-position: 0 0;
+
+  /* Keep lines tintable by your background color (very light on white) */
+  mix-blend-mode: multiply;
+}
+
+
+
+/*================= 2025__10_17 -  ================================================*/
+
+/*=
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_zip_based_data {background-color:#c4dcfa;}
+
+====*/
+
+/*================= 2025__10_17 -  ================================================*/
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_subparts {background-color:#f4e69e;}
+
+
 /*================= 2025__10_17 -  ================================================*/
 
 div.cell_inner_wrapper_div {padding: 4px 4px 4px 4px;}

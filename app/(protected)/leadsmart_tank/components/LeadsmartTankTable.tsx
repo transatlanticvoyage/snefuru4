@@ -12,10 +12,12 @@ interface LeadsmartData {
   city_name: string | null;
   state_code: string | null;
   rel_release_id: number | null;
+  rel_subsheet_id: number | null;
   rel_subpart_id: number | null;
   user_id: string | null;
   created_at: string;
   updated_at: string;
+  payout_note?: string | null; // From join with leadsmart_subparts
 }
 
 interface Props {
@@ -50,8 +52,8 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
   // All columns (including static UI-only columns)
   const allColumns = [
     'global_row_id',
-    'subsheet',
-    'subpart_of_subsheet',
+    'rel_subsheet_id',
+    'rel_subpart_id',
     'sheet_row_id',
     'payout_note',
     'zip_code',
@@ -59,14 +61,16 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
     'city_name',
     'state_code',
     'rel_release_id',
-    'rel_subpart_id',
     'user_id',
     'created_at',
     'updated_at'
   ];
   
-  // Static columns (no database integration)
-  const staticColumns = ['subsheet', 'subpart_of_subsheet', 'payout_note'];
+  // Static columns (no direct database column, but joined data)
+  const staticColumns: string[] = [];
+  
+  // Columns that come from joined tables
+  const joinedColumns = ['payout_note'];
 
   // Fetch data
   const fetchData = useCallback(async () => {
@@ -76,11 +80,23 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
     try {
       const { data: fetchedData, error } = await supabase
         .from('leadsmart_zip_based_data')
-        .select('*')
+        .select(`
+          *,
+          leadsmart_subparts!rel_subpart_id (
+            payout_note
+          )
+        `)
         .order('global_row_id', { ascending: false });
       
       if (error) throw error;
-      setData(fetchedData || []);
+      
+      // Flatten the joined data
+      const flattenedData = fetchedData?.map(row => ({
+        ...row,
+        payout_note: row.leadsmart_subparts?.payout_note || null
+      })) || [];
+      
+      setData(flattenedData);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -102,6 +118,7 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
         city_name: '',
         state_code: '',
         rel_release_id: null,
+        rel_subsheet_id: null,
         rel_subpart_id: null,
         user_id: user?.id || null
       };
@@ -712,17 +729,23 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
                     </div>
                   </div>
                 </th>
-                {paginatedColumns.map(col => (
-                  <th 
-                    key={`table-${col}`}
-                    className={`for_db_table_leadsmart_zip_based_data for_db_column_${col}`}
-                    style={{ padding: 0, border: '1px solid gray' }}
-                  >
-                    <div className="cell_inner_wrapper_div" style={{ padding: '8px' }}>
-                      <span style={{ fontWeight: 'bold', textTransform: 'lowercase' }}>leadsmart_zip_based_data</span>
-                    </div>
-                  </th>
-                ))}
+                {paginatedColumns.map(col => {
+                  // Determine table name for this column
+                  const tableName = col === 'payout_note' ? 'leadsmart_subparts' : 'leadsmart_zip_based_data';
+                  const tableClass = col === 'payout_note' ? 'for_db_table_leadsmart_subparts' : 'for_db_table_leadsmart_zip_based_data';
+                  
+                  return (
+                    <th 
+                      key={`table-${col}`}
+                      className={`${tableClass} for_db_column_${col}`}
+                      style={{ padding: 0, border: '1px solid gray' }}
+                    >
+                      <div className="cell_inner_wrapper_div" style={{ padding: '8px' }}>
+                        <span style={{ fontWeight: 'bold', textTransform: 'lowercase' }}>{tableName}</span>
+                      </div>
+                    </th>
+                  );
+                })}
               </tr>
               {/* Database column name row */}
               <tr className="shenfur_db_column_name_tr">
@@ -731,20 +754,35 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
                     <span style={{ fontWeight: 'bold', textTransform: 'lowercase' }}>select</span>
                   </div>
                 </th>
-                {paginatedColumns.map(col => (
-                  <th 
-                    key={`column-${col}`}
-                    className={`for_db_table_leadsmart_zip_based_data for_db_column_${col}`}
-                    style={{ padding: 0, border: '1px solid gray' }}
-                  >
-                    <div className="cell_inner_wrapper_div" style={{ padding: '8px' }}>
-                      {staticColumns.includes(col) && (
-                        <span style={{ color: 'navy', marginRight: '4px' }}>★</span>
-                      )}
-                      <span style={{ fontWeight: 'bold', textTransform: 'lowercase' }}>{col}</span>
-                    </div>
-                  </th>
-                ))}
+                {paginatedColumns.map(col => {
+                  // Determine table class for this column
+                  const tableClass = col === 'payout_note' ? 'for_db_table_leadsmart_subparts' : 'for_db_table_leadsmart_zip_based_data';
+                  
+                  // Determine symbol and display name
+                  let symbol = null;
+                  let displayName = col;
+                  
+                  if (col === 'payout_note') {
+                    symbol = <span style={{ color: 'black', marginRight: '4px' }}>•</span>;
+                  } else if (col === 'rel_subsheet_id') {
+                    symbol = <span style={{ color: 'navy', marginRight: '4px' }}>★</span>;
+                  } else if (col === 'rel_subpart_id') {
+                    symbol = <span style={{ color: 'navy', marginRight: '4px' }}>★</span>;
+                  }
+                  
+                  return (
+                    <th 
+                      key={`column-${col}`}
+                      className={`${tableClass} for_db_column_${col}`}
+                      style={{ padding: 0, border: '1px solid gray' }}
+                    >
+                      <div className="cell_inner_wrapper_div" style={{ padding: '8px' }}>
+                        {symbol}
+                        <span style={{ fontWeight: 'bold', textTransform: 'lowercase' }}>{displayName}</span>
+                      </div>
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
@@ -769,28 +807,32 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
                       </div>
                     </div>
                   </td>
-                  {paginatedColumns.map(col => (
-                    <td 
-                      key={`new-${col}`}
-                      className={`for_db_table_leadsmart_zip_based_data for_db_column_${col}`}
-                      style={{ padding: 0, border: '1px solid gray' }}
-                    >
-                      <div className="cell_inner_wrapper_div" style={{ padding: '4px' }}>
-                        {col === 'global_row_id' || col === 'created_at' || col === 'updated_at' || col === 'user_id' ? (
-                          <span className="text-gray-400 text-xs">Auto</span>
-                        ) : staticColumns.includes(col) ? (
-                          <span className="text-gray-400 text-xs italic">Static</span>
-                        ) : (
-                          <input
-                            type="text"
-                            value={(newRow as any)[col] || ''}
-                            onChange={(e) => updateNewRowField(col, e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
-                          />
-                        )}
-                      </div>
-                    </td>
-                  ))}
+                  {paginatedColumns.map(col => {
+                    const tableClass = col === 'payout_note' ? 'for_db_table_leadsmart_subparts' : 'for_db_table_leadsmart_zip_based_data';
+                    
+                    return (
+                      <td 
+                        key={`new-${col}`}
+                        className={`${tableClass} for_db_column_${col}`}
+                        style={{ padding: 0, border: '1px solid gray' }}
+                      >
+                        <div className="cell_inner_wrapper_div" style={{ padding: '4px' }}>
+                          {col === 'global_row_id' || col === 'created_at' || col === 'updated_at' || col === 'user_id' ? (
+                            <span className="text-gray-400 text-xs">Auto</span>
+                          ) : joinedColumns.includes(col) ? (
+                            <span className="text-gray-400 text-xs italic">Joined</span>
+                          ) : (
+                            <input
+                              type="text"
+                              value={(newRow as any)[col] || ''}
+                              onChange={(e) => updateNewRowField(col, e.target.value)}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
+                            />
+                          )}
+                        </div>
+                      </td>
+                    );
+                  })}
                 </tr>
               )}
               
@@ -820,51 +862,55 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
                       </div>
                     </div>
                   </td>
-                  {paginatedColumns.map(col => (
-                    <td 
-                      key={`${row.global_row_id}-${col}`}
-                      className={`for_db_table_leadsmart_zip_based_data for_db_column_${col}`}
-                      style={{ padding: 0, border: '1px solid gray' }}
-                    >
-                      <div className="cell_inner_wrapper_div" style={{ padding: '4px' }}>
-                        {staticColumns.includes(col) ? (
-                          <div
-                            className="text-gray-400 italic"
-                            style={{ minHeight: '24px', padding: '4px' }}
-                          >
-                            {/* Static column - no database integration */}
-                          </div>
-                        ) : editingCell?.rowId === row.global_row_id && editingCell?.field === col ? (
-                          <div className="flex items-center space-x-1">
-                            <input
-                              type="text"
-                              value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
-                              onBlur={() => saveEdit(row.global_row_id, col)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') saveEdit(row.global_row_id, col);
-                                if (e.key === 'Escape') setEditingCell(null);
+                  {paginatedColumns.map(col => {
+                    const tableClass = col === 'payout_note' ? 'for_db_table_leadsmart_subparts' : 'for_db_table_leadsmart_zip_based_data';
+                    
+                    return (
+                      <td 
+                        key={`${row.global_row_id}-${col}`}
+                        className={`${tableClass} for_db_column_${col}`}
+                        style={{ padding: 0, border: '1px solid gray' }}
+                      >
+                        <div className="cell_inner_wrapper_div" style={{ padding: '4px' }}>
+                          {joinedColumns.includes(col) ? (
+                            <div
+                              className="text-gray-600 italic"
+                              style={{ minHeight: '24px', padding: '4px' }}
+                            >
+                              {(row as any)[col] || ''}
+                            </div>
+                          ) : editingCell?.rowId === row.global_row_id && editingCell?.field === col ? (
+                            <div className="flex items-center space-x-1">
+                              <input
+                                type="text"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onBlur={() => saveEdit(row.global_row_id, col)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveEdit(row.global_row_id, col);
+                                  if (e.key === 'Escape') setEditingCell(null);
+                                }}
+                                autoFocus
+                                className="w-full px-2 py-1 border border-blue-500 rounded text-xs"
+                              />
+                            </div>
+                          ) : (
+                            <div
+                              onClick={() => {
+                                if (col !== 'global_row_id' && col !== 'created_at' && col !== 'updated_at' && !joinedColumns.includes(col)) {
+                                  startEditing(row.global_row_id, col, (row as any)[col]);
+                                }
                               }}
-                              autoFocus
-                              className="w-full px-2 py-1 border border-blue-500 rounded text-xs"
-                            />
-                          </div>
-                        ) : (
-                          <div
-                            onClick={() => {
-                              if (col !== 'global_row_id' && col !== 'created_at' && col !== 'updated_at') {
-                                startEditing(row.global_row_id, col, (row as any)[col]);
-                              }
-                            }}
-                            className={col !== 'global_row_id' && col !== 'created_at' && col !== 'updated_at' ? 'cursor-pointer hover:bg-gray-50' : ''}
-                            style={{ minHeight: '24px', padding: '4px' }}
-                          >
-                            {(row as any)[col] !== null && (row as any)[col] !== undefined ? String((row as any)[col]) : ''}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  ))}
+                              className={col !== 'global_row_id' && col !== 'created_at' && col !== 'updated_at' && !joinedColumns.includes(col) ? 'cursor-pointer hover:bg-gray-50' : ''}
+                              style={{ minHeight: '24px', padding: '4px' }}
+                            >
+                              {(row as any)[col] !== null && (row as any)[col] !== undefined ? String((row as any)[col]) : ''}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>

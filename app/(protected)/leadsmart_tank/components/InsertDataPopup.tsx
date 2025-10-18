@@ -198,17 +198,32 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
       console.log('Selected Subpart ID:', selectedSubpartId);
       
       // Map the data to database records
-      const records = dataToInsert.map(row => ({
-        zip_code: row[0] || null,
-        payout: row[1] ? Number(row[1]) : null,
-        city_name: row[2] || null,
-        state_code: row[3] || null,
-        rel_release_id: selectedReleaseId,
-        rel_subpart_id: selectedSubpartId,
-        user_id: user.id,
-        sheet_row_id: null
-        // Columns 4-9 are placeholder columns and not inserted
-      }));
+      const records = dataToInsert.map((row, index) => {
+        // Clean and parse the payout value
+        let payoutValue = null;
+        if (row[1]) {
+          // Remove $ and commas, then parse
+          const cleanPayout = String(row[1]).replace(/[$,]/g, '').trim();
+          const parsedPayout = Number(cleanPayout);
+          payoutValue = isNaN(parsedPayout) ? null : parsedPayout;
+        }
+        
+        return {
+          zip_code: row[0] || null,
+          payout: payoutValue,
+          city_name: row[2] || null,
+          state_code: row[3] || null,
+          rel_release_id: selectedReleaseId,
+          rel_subsheet_id: selectedSubsheetId,
+          rel_subpart_id: selectedSubpartId,
+          user_id: user.id,
+          sheet_row_id: null
+          // Columns 4-9 are placeholder columns and not inserted
+        };
+      });
+      
+      // Log first 3 records for debugging
+      console.log('Sample records (first 3):', records.slice(0, 3));
       
       // Insert in batches to avoid timeout
       const batchSize = 1000;
@@ -217,17 +232,28 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
       for (let i = 0; i < records.length; i += batchSize) {
         const batch = records.slice(i, i + batchSize);
         
-        const { error } = await supabase
+        console.log(`Attempting to insert batch ${Math.floor(i / batchSize) + 1} (${batch.length} rows)...`);
+        
+        const { data: insertedData, error } = await supabase
           .from('leadsmart_zip_based_data')
           .insert(batch);
         
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Supabase error object:', error);
+          console.error('❌ Error message:', error.message);
+          console.error('❌ Error details:', error.details);
+          console.error('❌ Error hint:', error.hint);
+          console.error('❌ Error code:', error.code);
+          console.error('❌ First record in failed batch:', batch[0]);
+          
+          throw new Error(`Database error: ${error.message || 'Unknown error'}${error.hint ? `\n\nHint: ${error.hint}` : ''}${error.details ? `\n\nDetails: ${error.details}` : ''}`);
+        }
         
         insertedCount += batch.length;
-        console.log(`Inserted ${insertedCount} of ${records.length} rows...`);
+        console.log(`✅ Inserted ${insertedCount} of ${records.length} rows...`);
       }
       
-      const resultMessage = `✅ SUCCESS!\n\nInserted ${insertedCount} rows into leadsmart_zip_based_data\n\nMappings:\n- Release ID: ${selectedReleaseId}\n- Subsheet ID: ${selectedSubsheetId}\n- Subpart ID: ${selectedSubpartId}\n\nColumn Mappings:\n- Column 1 → zip_code\n- Column 2 → payout\n- Column 3 → city_name\n- Column 4 → state_code\n- Columns 5-10 → Not inserted (placeholders)`;
+      const resultMessage = `✅ SUCCESS!\n\nInserted ${insertedCount} rows into leadsmart_zip_based_data\n\nRelationship Mappings:\n- rel_release_id: ${selectedReleaseId}\n- rel_subsheet_id: ${selectedSubsheetId}\n- rel_subpart_id: ${selectedSubpartId}\n\nColumn Mappings:\n- Column 1 → zip_code\n- Column 2 → payout\n- Column 3 → city_name\n- Column 4 → state_code\n- Columns 5-10 → Not inserted (placeholders)\n\nAll ${insertedCount} records have been linked to:\n- Release #${selectedReleaseId}\n- Subsheet #${selectedSubsheetId}\n- Subpart #${selectedSubpartId}`;
       
       setInsertResults(resultMessage);
       setShowResultsPopup(true);

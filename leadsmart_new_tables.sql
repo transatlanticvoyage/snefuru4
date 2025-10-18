@@ -32,9 +32,10 @@ CREATE TRIGGER set_leadsmart_transformed_updated_at
 
 
 -- =====================================================
--- Create leadsmart_zip_based_to_transformed_relations table
+-- Create leadsmart_transformed_relations table
+-- (Previously named: leadsmart_zip_based_to_transformed_relations)
 -- =====================================================
-CREATE TABLE leadsmart_zip_based_to_transformed_relations (
+CREATE TABLE leadsmart_transformed_relations (
   relation_id SERIAL PRIMARY KEY,
   original_global_id INTEGER REFERENCES leadsmart_zip_based_data(global_row_id) ON DELETE CASCADE,
   transformed_mundial_id INTEGER REFERENCES leadsmart_transformed(mundial_id) ON DELETE CASCADE,
@@ -42,11 +43,11 @@ CREATE TABLE leadsmart_zip_based_to_transformed_relations (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create indexes for leadsmart_zip_based_to_transformed_relations
-CREATE INDEX idx_leadsmart_relations_original_global_id ON leadsmart_zip_based_to_transformed_relations(original_global_id);
-CREATE INDEX idx_leadsmart_relations_transformed_mundial_id ON leadsmart_zip_based_to_transformed_relations(transformed_mundial_id);
+-- Create indexes for leadsmart_transformed_relations
+CREATE INDEX idx_leadsmart_relations_original_global_id ON leadsmart_transformed_relations(original_global_id);
+CREATE INDEX idx_leadsmart_relations_transformed_mundial_id ON leadsmart_transformed_relations(transformed_mundial_id);
 
--- Create trigger function for leadsmart_zip_based_to_transformed_relations updated_at
+-- Create trigger function for leadsmart_transformed_relations updated_at
 CREATE OR REPLACE FUNCTION update_leadsmart_relations_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -55,9 +56,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create trigger for leadsmart_zip_based_to_transformed_relations
+-- Create trigger for leadsmart_transformed_relations
 CREATE TRIGGER set_leadsmart_relations_updated_at
-  BEFORE UPDATE ON leadsmart_zip_based_to_transformed_relations
+  BEFORE UPDATE ON leadsmart_transformed_relations
   FOR EACH ROW
   EXECUTE FUNCTION update_leadsmart_relations_updated_at();
 

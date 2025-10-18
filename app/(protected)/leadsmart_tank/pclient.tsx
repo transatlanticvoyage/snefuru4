@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import LeadsmartTankTable from './components/LeadsmartTankTable';
 import CreateNewPopup from './components/CreateNewPopup';
 import InsertDataPopup from './components/InsertDataPopup';
+import SelectorPopup from './components/SelectorPopup';
 import dynamic from 'next/dynamic';
 
 const ZhedoriButtonBar = dynamic(
@@ -26,6 +27,7 @@ export default function LeadsmartTankClient() {
   // Popup state
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
   const [isInsertDataPopupOpen, setIsInsertDataPopupOpen] = useState(false);
+  const [isSelectorPopupOpen, setIsSelectorPopupOpen] = useState(false);
   
   // Refresh trigger
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -125,6 +127,12 @@ export default function LeadsmartTankClient() {
             >
               insert new data
             </button>
+            <button
+              onClick={() => setIsSelectorPopupOpen(true)}
+              className="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700 transition-colors"
+            >
+              selector popup
+            </button>
           </div>
         </div>
       )}
@@ -196,6 +204,14 @@ export default function LeadsmartTankClient() {
             setRefreshTrigger(prev => prev + 1);
             setIsInsertDataPopupOpen(false);
           }}
+        />
+      )}
+      
+      {/* Selector Popup */}
+      {isSelectorPopupOpen && (
+        <SelectorPopup
+          isOpen={isSelectorPopupOpen}
+          onClose={() => setIsSelectorPopupOpen(false)}
         />
       )}
     </div>
