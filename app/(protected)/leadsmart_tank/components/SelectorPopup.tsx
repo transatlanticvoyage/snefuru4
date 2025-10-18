@@ -23,6 +23,10 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
   const [selectXId, setSelectXId] = useState<number | null>(null);
   const [selectXResultCount, setSelectXResultCount] = useState<number>(0);
   
+  // Associated transformed data state
+  const [transformedDataCount, setTransformedDataCount] = useState<number>(0);
+  const [deleteAssociatedData, setDeleteAssociatedData] = useState<boolean>(true);
+  
   // Delete confirmation states
   const [showFirstDeleteConfirm, setShowFirstDeleteConfirm] = useState(false);
   const [showSecondDeleteConfirm, setShowSecondDeleteConfirm] = useState(false);
@@ -63,6 +67,59 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
     fetchResultCount();
   }, [selectXType, selectXId, supabase]);
   
+  // Fetch count of associated transformed data
+  useEffect(() => {
+    const fetchTransformedDataCount = async () => {
+      if (!selectXType || !selectXId) {
+        setTransformedDataCount(0);
+        return;
+      }
+      
+      try {
+        // First, get all global_row_ids from leadsmart_zip_based_data
+        let zipQuery = supabase.from('leadsmart_zip_based_data').select('global_row_id');
+        
+        if (selectXType === 'release') {
+          zipQuery = zipQuery.eq('rel_release_id', selectXId);
+        } else if (selectXType === 'subsheet') {
+          zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
+        } else if (selectXType === 'subpart') {
+          zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
+        }
+        
+        const { data: zipData, error: zipError } = await zipQuery;
+        if (zipError) throw zipError;
+        
+        if (!zipData || zipData.length === 0) {
+          setTransformedDataCount(0);
+          return;
+        }
+        
+        const globalRowIds = zipData.map(row => row.global_row_id);
+        
+        // Now find all transformed_relations with these global_row_ids
+        const { data: relationsData, error: relationsError } = await supabase
+          .from('leadsmart_transformed_relations')
+          .select('transformed_mundial_id')
+          .in('original_global_id', globalRowIds);
+        
+        if (relationsError) throw relationsError;
+        
+        // Count unique transformed_mundial_ids
+        const uniqueTransformedIds = new Set(
+          relationsData?.map(r => r.transformed_mundial_id).filter(id => id !== null) || []
+        );
+        
+        setTransformedDataCount(uniqueTransformedIds.size);
+      } catch (error) {
+        console.error('Error fetching transformed data count:', error);
+        setTransformedDataCount(0);
+      }
+    };
+    
+    fetchTransformedDataCount();
+  }, [selectXType, selectXId, supabase]);
+  
   const handleDelete = async () => {
     if (!selectXType || !selectXId) {
       alert('Please select an item first');
@@ -71,6 +128,61 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
     
     setDeleting(true);
     try {
+      // If checkbox is checked and there's associated data, delete it first
+      if (deleteAssociatedData && transformedDataCount > 0) {
+        // Get all global_row_ids from leadsmart_zip_based_data
+        let zipQuery = supabase.from('leadsmart_zip_based_data').select('global_row_id');
+        
+        if (selectXType === 'release') {
+          zipQuery = zipQuery.eq('rel_release_id', selectXId);
+        } else if (selectXType === 'subsheet') {
+          zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
+        } else if (selectXType === 'subpart') {
+          zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
+        }
+        
+        const { data: zipData, error: zipError } = await zipQuery;
+        if (zipError) throw zipError;
+        
+        if (zipData && zipData.length > 0) {
+          const globalRowIds = zipData.map(row => row.global_row_id);
+          
+          // Get all transformed_mundial_ids from relations
+          const { data: relationsData, error: relationsError } = await supabase
+            .from('leadsmart_transformed_relations')
+            .select('transformed_mundial_id, relation_id')
+            .in('original_global_id', globalRowIds);
+          
+          if (relationsError) throw relationsError;
+          
+          if (relationsData && relationsData.length > 0) {
+            const transformedIds = relationsData
+              .map(r => r.transformed_mundial_id)
+              .filter(id => id !== null);
+            
+            // Delete from leadsmart_transformed
+            if (transformedIds.length > 0) {
+              const { error: transformedDeleteError } = await supabase
+                .from('leadsmart_transformed')
+                .delete()
+                .in('mundial_id', transformedIds);
+              
+              if (transformedDeleteError) throw transformedDeleteError;
+            }
+            
+            // Delete from leadsmart_transformed_relations
+            const relationIds = relationsData.map(r => r.relation_id);
+            const { error: relationsDeleteError } = await supabase
+              .from('leadsmart_transformed_relations')
+              .delete()
+              .in('relation_id', relationIds);
+            
+            if (relationsDeleteError) throw relationsDeleteError;
+          }
+        }
+      }
+      
+      // Now delete the main item
       let tableName = '';
       let idColumn = '';
       
@@ -92,7 +204,11 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
       
       if (error) throw error;
       
-      alert(`Successfully deleted ${selectXType} #${selectXId}`);
+      const deletedTransformedMsg = deleteAssociatedData && transformedDataCount > 0 
+        ? `\n\nAlso deleted ${transformedDataCount} associated leadsmart_transformed records and their relations.`
+        : '';
+      
+      alert(`Successfully deleted ${selectXType} #${selectXId}${deletedTransformedMsg}`);
       
       // Clear selection
       setSelectXType(null);
@@ -175,6 +291,37 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
               )}
               
               <div className="space-y-3">
+                <hr className="border-gray-300" />
+                
+                {/* Checkbox for deleting associated data */}
+                <div className="flex items-center space-x-2 py-2">
+                  <input
+                    type="checkbox"
+                    id="deleteAssociatedData"
+                    checked={deleteAssociatedData}
+                    onChange={(e) => setDeleteAssociatedData(e.target.checked)}
+                    disabled={transformedDataCount === 0}
+                    className={`w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500 ${
+                      transformedDataCount === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                    }`}
+                  />
+                  <label 
+                    htmlFor="deleteAssociatedData" 
+                    className={`text-sm ${
+                      transformedDataCount === 0 ? 'text-gray-400' : 'text-gray-700 cursor-pointer'
+                    }`}
+                  >
+                    delete associated rows from leadsmart_transformed and leadsmart_relations
+                    {transformedDataCount > 0 && (
+                      <span className="ml-2 text-red-600 font-semibold">
+                        ({transformedDataCount.toLocaleString()} records)
+                      </span>
+                    )}
+                  </label>
+                </div>
+                
+                <hr className="border-gray-300" />
+                
                 <button
                   onClick={() => {
                     if (!selectXType || !selectXId) {
@@ -238,6 +385,11 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
                   <p className="text-red-700 text-sm mt-2">
                     This item has <strong>{selectXResultCount.toLocaleString()} related results</strong> in leadsmart_zip_based_data
                   </p>
+                  {deleteAssociatedData && transformedDataCount > 0 && (
+                    <p className="text-red-700 text-sm mt-2 font-semibold">
+                      ⚠️ Will also delete <strong>{transformedDataCount.toLocaleString()} associated records</strong> from leadsmart_transformed and leadsmart_relations
+                    </p>
+                  )}
                 </div>
                 <p className="text-gray-700">
                   This action may affect related records. Are you sure you want to continue?
@@ -287,6 +439,9 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
                   <ul className="list-disc list-inside text-red-700 space-y-1 text-sm">
                     <li>Permanently delete {selectXType} #{selectXId}</li>
                     <li>Potentially affect {selectXResultCount.toLocaleString()} related records</li>
+                    {deleteAssociatedData && transformedDataCount > 0 && (
+                      <li className="font-semibold">Delete {transformedDataCount.toLocaleString()} associated records from leadsmart_transformed and leadsmart_relations</li>
+                    )}
                     <li>Cannot be undone once completed</li>
                   </ul>
                 </div>
