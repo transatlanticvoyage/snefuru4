@@ -1,6 +1,52 @@
 
 
 
+
+/*=================================================================*/
+
+
+/* Target your existing <th> with bg + patterned overlay */
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_transformed {
+  position: relative;
+  background-color: #fcdddd; /* your existing bg color */
+}
+
+/* Overlay: very-light, tintable STAR outlines arranged with gaps */
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_transformed::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>\
+  <!-- Draw a hollow star inside the top-left 16x16 cell; rest of 32x32 tile is empty -->\
+  <g transform='translate(0,0)'>\
+    <!-- Star centered at (8,8) with points defined manually -->\
+    <path d='M8 1 \
+             L9.902 5.854 \
+             L15 6.2 \
+             L11 9.446 \
+             L12.236 14.5 \
+             L8 11.8 \
+             L3.764 14.5 \
+             L5 9.446 \
+             L1 6.2 \
+             L6.098 5.854 Z' \
+          fill='none' stroke='black' stroke-opacity='0.12' stroke-width='1' \
+          stroke-linejoin='round' stroke-linecap='round'/>\
+  </g>\
+</svg>");
+  background-size: 32px 32px;
+  background-repeat: repeat;
+  background-position: 0 0;
+
+  mix-blend-mode: multiply; /* allows stroke to tint with bg */
+}
+
+
+
+
 /*================= 2025__10_17 -  https://chatgpt.com/c/68f3829f-8c38-8332-8ba5-fcdda9773ff9 ================================================*/
 
 /* Target your existing <th> with bg + patterned overlay */

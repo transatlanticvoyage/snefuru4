@@ -186,7 +186,7 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
       let valueToSave: any = editValue;
       
       // Type conversion based on field
-      if (field === 'payout' || field === 'sheet_row_id') {
+      if (field === 'payout' || field === 'sheet_row_id' || field === 'rel_release_id' || field === 'rel_subsheet_id' || field === 'rel_subpart_id') {
         valueToSave = editValue === '' ? null : Number(editValue);
       }
       
@@ -214,9 +214,20 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
     if (!newRow || !user) return;
     
     try {
+      // Convert numeric fields before inserting
+      const dataToInsert = {
+        ...newRow,
+        sheet_row_id: newRow.sheet_row_id ? Number(newRow.sheet_row_id) : null,
+        payout: newRow.payout ? Number(newRow.payout) : null,
+        rel_release_id: newRow.rel_release_id ? Number(newRow.rel_release_id) : null,
+        rel_subsheet_id: newRow.rel_subsheet_id ? Number(newRow.rel_subsheet_id) : null,
+        rel_subpart_id: newRow.rel_subpart_id ? Number(newRow.rel_subpart_id) : null,
+        user_id: user.id
+      };
+      
       const { data: insertedData, error } = await supabase
         .from('leadsmart_zip_based_data')
-        .insert([{ ...newRow, user_id: user.id }])
+        .insert([dataToInsert])
         .select()
         .single();
       
