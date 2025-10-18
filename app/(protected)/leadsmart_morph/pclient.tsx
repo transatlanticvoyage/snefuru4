@@ -21,7 +21,7 @@ interface LeadsmartTransformed {
   city_name: string | null;
   state_code: string | null;
   payout: number | null;
-  aggregated_zip_codes: string | null;
+  aggregated_zip_codes_jsonb: string[] | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -56,6 +56,10 @@ export default function LeadsmartMorphClient() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupData, setPopupData] = useState<Partial<LeadsmartTransformed>>({});
   const [isSelectorPopupOpen, setIsSelectorPopupOpen] = useState(false);
+  
+  // Zip codes popup state
+  const [zipCodesPopupOpen, setZipCodesPopupOpen] = useState(false);
+  const [zipCodesPopupData, setZipCodesPopupData] = useState<string[]>([]);
 
   // Chamber visibility state (integrated with bezel system)
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
@@ -78,7 +82,7 @@ export default function LeadsmartMorphClient() {
     'city_name',
     'state_code',
     'payout',
-    'aggregated_zip_codes',
+    'aggregated_zip_codes_jsonb',
     'created_at',
     'updated_at'
   ];
@@ -196,7 +200,7 @@ export default function LeadsmartMorphClient() {
     return (
       row.city_name?.toLowerCase().includes(searchLower) ||
       row.state_code?.toLowerCase().includes(searchLower) ||
-      row.aggregated_zip_codes?.toLowerCase().includes(searchLower) ||
+      row.aggregated_zip_codes_jsonb?.some(zip => zip.toLowerCase().includes(searchLower)) ||
       row.payout?.toString().includes(searchLower)
     );
   });
@@ -572,16 +576,28 @@ export default function LeadsmartMorphClient() {
   // Handle inline editing
   const startEditing = (id: number, field: string, currentValue: any) => {
     setEditingCell({ id, field });
-    setEditValue(currentValue?.toString() || '');
+    // For JSONB arrays, display as newline-separated values
+    if (field === 'aggregated_zip_codes_jsonb' && Array.isArray(currentValue)) {
+      setEditValue(currentValue.join('\n'));
+    } else {
+      setEditValue(currentValue?.toString() || '');
+    }
   };
 
   const saveEdit = async () => {
     if (!editingCell) return;
 
     try {
+      // Convert editValue to appropriate format based on field
+      let valueToSave: any = editValue;
+      if (editingCell.field === 'aggregated_zip_codes_jsonb') {
+        // Convert newline-separated text to array
+        valueToSave = editValue.split('\n').filter(z => z.trim());
+      }
+
       const { error: updateError } = await supabase
         .from('leadsmart_transformed')
-        .update({ [editingCell.field]: editValue })
+        .update({ [editingCell.field]: valueToSave })
         .eq('mundial_id', editingCell.id);
 
       if (updateError) throw updateError;
@@ -590,7 +606,7 @@ export default function LeadsmartMorphClient() {
       setData(prevData =>
         prevData.map(row =>
           row.mundial_id === editingCell.id
-            ? { ...row, [editingCell.field]: editValue }
+            ? { ...row, [editingCell.field]: valueToSave }
             : row
         )
       );
@@ -608,7 +624,7 @@ export default function LeadsmartMorphClient() {
     try {
       const { data: newRow, error: insertError } = await supabase
         .from('leadsmart_transformed')
-        .insert([{ city_name: '', state_code: '', payout: null, aggregated_zip_codes: '' }])
+        .insert([{ city_name: '', state_code: '', payout: null, aggregated_zip_codes_jsonb: [] }])
         .select()
         .single();
 
@@ -1033,15 +1049,14 @@ export default function LeadsmartMorphClient() {
                         }}
                         onClick={() => !isReadOnly && !isEditing && startEditing(row.mundial_id, col, value)}
                       >
-                        <div className="cell_inner_wrapper_div" style={{ minHeight: '40px', display: 'flex', alignItems: 'center' }}>
+                        <div className="cell_inner_wrapper_div" style={{ minHeight: '40px', display: 'flex', alignItems: 'center', gap: '8px', padding: '4px' }}>
                           {isEditing ? (
-                            <input
-                              type="text"
+                            <textarea
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
                               onBlur={saveEdit}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') saveEdit();
+                                if (e.key === 'Enter' && e.ctrlKey) saveEdit();
                                 if (e.key === 'Escape') {
                                   setEditingCell(null);
                                   setEditValue('');
@@ -1049,7 +1064,42 @@ export default function LeadsmartMorphClient() {
                               }}
                               autoFocus
                               className="w-full px-2 py-1 border border-blue-500 focus:outline-none"
+                              rows={3}
                             />
+                          ) : col === 'aggregated_zip_codes_jsonb' && Array.isArray(value) ? (
+                            <>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setZipCodesPopupData(value);
+                                  setZipCodesPopupOpen(true);
+                                }}
+                                style={{
+                                  border: '1px solid #666',
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  background: '#f0f0f0',
+                                  cursor: 'pointer',
+                                  fontWeight: 'bold',
+                                  fontSize: '12px',
+                                  minWidth: '30px',
+                                  textAlign: 'center'
+                                }}
+                                title="Click to view all zip codes"
+                              >
+                                {value.length}
+                              </button>
+                              <span 
+                                style={{ 
+                                  cursor: 'pointer',
+                                  color: 'inherit',
+                                  flex: 1
+                                }}
+                              >
+                                {value.slice(0, 2).join(' / ')}
+                                {value.length > 2 ? ' ...' : ''}
+                              </span>
+                            </>
                           ) : (
                             <span 
                               style={{ 
@@ -1145,13 +1195,17 @@ export default function LeadsmartMorphClient() {
               
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '4px' }}>
-                  aggregated_zip_codes
+                  aggregated_zip_codes_jsonb (one per line)
                 </label>
                 <textarea
-                  value={popupData.aggregated_zip_codes || ''}
-                  onChange={(e) => setPopupData({ ...popupData, aggregated_zip_codes: e.target.value })}
+                  value={popupData.aggregated_zip_codes_jsonb?.join('\n') || ''}
+                  onChange={(e) => setPopupData({ 
+                    ...popupData, 
+                    aggregated_zip_codes_jsonb: e.target.value.split('\n').filter(z => z.trim())
+                  })}
                   className="w-full px-3 py-2 border border-gray-300 rounded"
                   rows={3}
+                  placeholder="Enter zip codes, one per line"
                 />
               </div>
             </div>
@@ -1180,6 +1234,79 @@ export default function LeadsmartMorphClient() {
           isOpen={isSelectorPopupOpen}
           onClose={() => setIsSelectorPopupOpen(false)}
         />
+      )}
+      
+      {/* Zip Codes Popup */}
+      {zipCodesPopupOpen && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+          onClick={() => setZipCodesPopupOpen(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              padding: '24px',
+              borderRadius: '8px',
+              maxWidth: '500px',
+              width: '90%',
+              maxHeight: '80vh',
+              overflow: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
+              All Zip Codes ({zipCodesPopupData.length})
+            </h3>
+            
+            <textarea
+              value={zipCodesPopupData.join('\n')}
+              readOnly
+              style={{
+                width: '100%',
+                minHeight: '300px',
+                padding: '12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontFamily: 'monospace',
+                fontSize: '14px',
+                resize: 'vertical'
+              }}
+              onClick={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.select();
+              }}
+            />
+            
+            <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(zipCodesPopupData.join('\n'));
+                  alert('Zip codes copied to clipboard!');
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition-colors"
+              >
+                Copy All
+              </button>
+              <button
+                onClick={() => setZipCodesPopupOpen(false)}
+                className="bg-gray-300 hover:bg-gray-400 text-black font-medium px-4 py-2 rounded transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
