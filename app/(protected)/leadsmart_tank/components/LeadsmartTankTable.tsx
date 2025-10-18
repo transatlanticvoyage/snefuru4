@@ -12,6 +12,7 @@ interface LeadsmartData {
   city_name: string | null;
   state_code: string | null;
   rel_release_id: number | null;
+  rel_subpart_id: number | null;
   user_id: string | null;
   created_at: string;
   updated_at: string;
@@ -58,6 +59,7 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
     'city_name',
     'state_code',
     'rel_release_id',
+    'rel_subpart_id',
     'user_id',
     'created_at',
     'updated_at'
@@ -100,6 +102,7 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
         city_name: '',
         state_code: '',
         rel_release_id: null,
+        rel_subpart_id: null,
         user_id: user?.id || null
       };
       setNewRow(newRowData);

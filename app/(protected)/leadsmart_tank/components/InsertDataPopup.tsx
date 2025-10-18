@@ -29,6 +29,10 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null);
   const [selectedSubsheetId, setSelectedSubsheetId] = useState<number | null>(null);
   const [selectedSubpartId, setSelectedSubpartId] = useState<number | null>(null);
+  
+  // Results popup state
+  const [showResultsPopup, setShowResultsPopup] = useState(false);
+  const [insertResults, setInsertResults] = useState<string>('');
 
   const columnHeaders = [
     'zip_code',
@@ -187,42 +191,56 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
     setInserting(true);
     
     try {
-      // TODO: Implement database insertion logic here
-      // This is where you'll map the columns to the database fields
-      // and insert the data into leadsmart_zip_based_data table
-      
-      console.log('Data to insert:', dataToInsert);
+      console.log('Starting data insertion...');
       console.log('Total rows:', dataToInsert.length);
+      console.log('Selected Release ID:', selectedReleaseId);
+      console.log('Selected Subsheet ID:', selectedSubsheetId);
+      console.log('Selected Subpart ID:', selectedSubpartId);
       
-      // For now, just show a message
-      alert(`Ready to insert ${dataToInsert.length} rows. Database insertion functionality will be implemented next.`);
+      // Map the data to database records
+      const records = dataToInsert.map(row => ({
+        zip_code: row[0] || null,
+        payout: row[1] ? Number(row[1]) : null,
+        city_name: row[2] || null,
+        state_code: row[3] || null,
+        rel_release_id: selectedReleaseId,
+        rel_subpart_id: selectedSubpartId,
+        user_id: user.id,
+        sheet_row_id: null
+        // Columns 4-9 are placeholder columns and not inserted
+      }));
       
-      // When ready, this would be something like:
-      // const records = dataToInsert.map(row => ({
-      //   zip_code: row[0] || null,
-      //   payout: row[1] ? Number(row[1]) : null,
-      //   city_name: row[2] || null,
-      //   state_code: row[3] || null,
-      //   user_id: user.id,
-      //   // Columns 4-9 are placeholder columns and not inserted
-      //   // Other fields can be set to null or default values as needed:
-      //   leadsmart_file_release: null,
-      //   subsheet: null,
-      //   subpart_of_subsheet: null,
-      //   sheet_row_id: null,
-      //   payout_note: null
-      // }));
-      // 
-      // const { error } = await supabase
-      //   .from('leadsmart_zip_based_data')
-      //   .insert(records);
-      // 
-      // if (error) throw error;
-      // onSuccess();
+      // Insert in batches to avoid timeout
+      const batchSize = 1000;
+      let insertedCount = 0;
+      
+      for (let i = 0; i < records.length; i += batchSize) {
+        const batch = records.slice(i, i + batchSize);
+        
+        const { error } = await supabase
+          .from('leadsmart_zip_based_data')
+          .insert(batch);
+        
+        if (error) throw error;
+        
+        insertedCount += batch.length;
+        console.log(`Inserted ${insertedCount} of ${records.length} rows...`);
+      }
+      
+      const resultMessage = `✅ SUCCESS!\n\nInserted ${insertedCount} rows into leadsmart_zip_based_data\n\nMappings:\n- Release ID: ${selectedReleaseId}\n- Subsheet ID: ${selectedSubsheetId}\n- Subpart ID: ${selectedSubpartId}\n\nColumn Mappings:\n- Column 1 → zip_code\n- Column 2 → payout\n- Column 3 → city_name\n- Column 4 → state_code\n- Columns 5-10 → Not inserted (placeholders)`;
+      
+      setInsertResults(resultMessage);
+      setShowResultsPopup(true);
+      
+      // Clear data after successful insert
+      setGridData(Array(20).fill(null).map(() => Array(10).fill('')));
+      setFullDataset([]);
       
     } catch (error) {
       console.error('Error inserting data:', error);
-      alert('Failed to insert data');
+      const errorMessage = `❌ FAILED\n\nError inserting data: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      setInsertResults(errorMessage);
+      setShowResultsPopup(true);
     } finally {
       setInserting(false);
     }
@@ -439,6 +457,56 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
         </div>
         {/* End of Two Column Layout */}
       </div>
+      
+      {/* Results Popup */}
+      {showResultsPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-lg shadow-xl" style={{ width: '800px', height: '100vh', maxHeight: '100vh' }}>
+            <div className="flex flex-col h-full">
+              <div className="p-6 border-b bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl font-bold text-gray-800">Insertion Results</h3>
+                  <button
+                    onClick={() => setShowResultsPopup(false)}
+                    className="text-gray-400 hover:text-gray-600 text-3xl font-bold leading-none"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex-1 overflow-auto p-6">
+                <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 font-mono text-sm whitespace-pre-wrap">
+                  {insertResults}
+                </div>
+              </div>
+              
+              <div className="p-6 border-t bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(insertResults);
+                      alert('Results copied to clipboard!');
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md font-medium transition-colors"
+                  >
+                    📋 Copy to Clipboard
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowResultsPopup(false);
+                      onSuccess();
+                    }}
+                    className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-md font-medium transition-colors"
+                  >
+                    Close & Refresh
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

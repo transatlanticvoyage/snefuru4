@@ -20,7 +20,8 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
     payout: '',
     city_name: '',
     state_code: '',
-    rel_release_id: ''
+    rel_release_id: '',
+    rel_subpart_id: ''
   });
   
   const [saving, setSaving] = useState(false);
@@ -38,6 +39,7 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
         sheet_row_id: formData.sheet_row_id ? Number(formData.sheet_row_id) : null,
         payout: formData.payout ? Number(formData.payout) : null,
         rel_release_id: formData.rel_release_id ? Number(formData.rel_release_id) : null,
+        rel_subpart_id: formData.rel_subpart_id ? Number(formData.rel_subpart_id) : null,
         user_id: user.id
       };
       
@@ -143,17 +145,32 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
                 </div>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Release ID
-                </label>
-                <input
-                  type="number"
-                  value={formData.rel_release_id}
-                  onChange={(e) => handleChange('rel_release_id', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter release ID"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Release ID
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.rel_release_id}
+                    onChange={(e) => handleChange('rel_release_id', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter release ID"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subpart ID
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.rel_subpart_id}
+                    onChange={(e) => handleChange('rel_subpart_id', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter subpart ID"
+                  />
+                </div>
               </div>
             </div>
             
