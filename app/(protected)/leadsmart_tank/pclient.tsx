@@ -6,6 +6,12 @@ import { useRouter } from 'next/navigation';
 import LeadsmartTankTable from './components/LeadsmartTankTable';
 import CreateNewPopup from './components/CreateNewPopup';
 import InsertDataPopup from './components/InsertDataPopup';
+import dynamic from 'next/dynamic';
+
+const ZhedoriButtonBar = dynamic(
+  () => import('@/app/components/ZhedoriButtonBar'),
+  { ssr: false }
+);
 
 export default function LeadsmartTankClient() {
   const { user } = useAuth();
@@ -105,6 +111,10 @@ export default function LeadsmartTankClient() {
         <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
           <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
             mandible_chamber
+          </div>
+          
+          <div className="flex items-center space-x-4 mb-4">
+            <ZhedoriButtonBar />
           </div>
           
           <div className="flex items-center space-x-4">
