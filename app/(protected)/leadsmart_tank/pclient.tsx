@@ -234,6 +234,7 @@ export default function LeadsmartTankClient() {
         <SelectorPopup
           isOpen={isSelectorPopupOpen}
           onClose={() => setIsSelectorPopupOpen(false)}
+          pageType="tank"
         />
       )}
     </div>

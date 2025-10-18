@@ -9,9 +9,10 @@ import SelectorSubpartsGrid from './SelectorSubpartsGrid';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  pageType: 'tank' | 'morph';
 }
 
-export default function SelectorPopup({ isOpen, onClose }: Props) {
+export default function SelectorPopup({ isOpen, onClose, pageType }: Props) {
   const supabase = createClientComponentClient();
   
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null);
@@ -685,11 +686,18 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
           </div>
 
           {/* Right Pane - Selection Info and Actions */}
-          <div className="flex-1 bg-gray-50">
-            <div className="p-6">
-              <div className="font-bold text-gray-800 mb-4" style={{ fontSize: '16px' }}>
-                from select_x system:
-              </div>
+          <div className="flex-1 bg-gray-50 flex flex-col">
+            {/* Config Header Bar */}
+            <div className="bg-black text-white px-6 py-3 font-mono text-sm">
+              selector popup component configured for: /{pageType === 'tank' ? 'leadsmart_tank' : 'leadsmart_morph'}
+            </div>
+            
+            {pageType === 'tank' ? (
+              // Tank page configuration - original transform logic
+              <div className="p-6 flex-1 overflow-auto">
+                <div className="font-bold text-gray-800 mb-4" style={{ fontSize: '16px' }}>
+                  from select_x system:
+                </div>
               
               {selectXType && selectXId ? (
                 <div className="mb-6">
@@ -791,6 +799,14 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
                 </button>
               </div>
             </div>
+            ) : (
+              // Morph page configuration - blank for now
+              <div className="p-6 flex-1 overflow-auto">
+                <div className="text-gray-500 italic text-sm">
+                  Morph page configuration - coming soon
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

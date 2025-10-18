@@ -1233,6 +1233,7 @@ export default function LeadsmartMorphClient() {
         <SelectorPopup
           isOpen={isSelectorPopupOpen}
           onClose={() => setIsSelectorPopupOpen(false)}
+          pageType="morph"
         />
       )}
       
