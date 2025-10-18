@@ -8,6 +8,7 @@ import CreateNewPopup from './components/CreateNewPopup';
 import InsertDataPopup from './components/InsertDataPopup';
 import FrostySelectorPopup from './components/FrostySelectorPopup';
 import LeadSmartJettisonTable from '@/app/components/leadsmart/LeadSmartJettisonTable';
+import LeadSmartSkylabTileTables from '@/app/components/leadsmart/LeadSmartSkylabTileTables';
 import dynamic from 'next/dynamic';
 
 const ZhedoriButtonBar = dynamic(
@@ -32,6 +33,12 @@ export default function LeadsmartTankClient() {
   
   // Filter state for jettison table
   const [jettisonFilter, setJettisonFilter] = useState<{
+    type: 'release' | 'subsheet' | 'subpart' | null;
+    id: number | null;
+  }>({ type: null, id: null });
+  
+  // Filter state for skylab tile tables
+  const [skylabFilter, setSkylabFilter] = useState<{
     type: 'release' | 'subsheet' | 'subpart' | null;
     id: number | null;
   }>({ type: null, id: null });
@@ -196,6 +203,13 @@ export default function LeadsmartTankClient() {
           <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
             pec_chamber
           </div>
+          
+          {/* Skylab Tile Tables */}
+          <LeadSmartSkylabTileTables
+            pageType="tank"
+            onFilterApply={(type, id) => setSkylabFilter({ type, id })}
+            currentFilter={skylabFilter}
+          />
         </div>
       )}
 
@@ -203,6 +217,7 @@ export default function LeadsmartTankClient() {
       <LeadsmartTankTable 
         refreshTrigger={refreshTrigger}
         jettisonFilter={jettisonFilter}
+        skylabFilter={skylabFilter}
       />
       
       {/* Create New Popup */}

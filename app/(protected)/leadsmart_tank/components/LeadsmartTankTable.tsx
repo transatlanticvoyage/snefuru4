@@ -26,9 +26,13 @@ interface Props {
     type: 'release' | 'subsheet' | 'subpart' | null;
     id: number | null;
   };
+  skylabFilter?: {
+    type: 'release' | 'subsheet' | 'subpart' | null;
+    id: number | null;
+  };
 }
 
-export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter }: Props) {
+export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, skylabFilter }: Props) {
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   
@@ -101,6 +105,17 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter }: P
         }
       }
       
+      // Apply skylab filter if active
+      if (skylabFilter && skylabFilter.type && skylabFilter.id) {
+        if (skylabFilter.type === 'release') {
+          query = query.eq('rel_release_id', skylabFilter.id);
+        } else if (skylabFilter.type === 'subsheet') {
+          query = query.eq('rel_subsheet_id', skylabFilter.id);
+        } else if (skylabFilter.type === 'subpart') {
+          query = query.eq('rel_subpart_id', skylabFilter.id);
+        }
+      }
+      
       query = query.order('global_row_id', { ascending: false });
       
       const { data: fetchedData, error } = await query;
@@ -119,7 +134,7 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter }: P
     } finally {
       setLoading(false);
     }
-  }, [user, supabase, jettisonFilter]);
+  }, [user, supabase, jettisonFilter, skylabFilter]);
 
   useEffect(() => {
     fetchData();
@@ -798,11 +813,18 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter }: P
                     symbol = <span style={{ color: 'navy', marginRight: '4px' }}>★</span>;
                   }
                   
-                  // Determine if this column is the active filter
-                  const isActiveFilterColumn = jettisonFilter && jettisonFilter.type && (
-                    (jettisonFilter.type === 'release' && col === 'rel_release_id') ||
-                    (jettisonFilter.type === 'subsheet' && col === 'rel_subsheet_id') ||
-                    (jettisonFilter.type === 'subpart' && col === 'rel_subpart_id')
+                  // Determine if this column is the active filter (from jettison or skylab)
+                  const isActiveFilterColumn = (
+                    (jettisonFilter && jettisonFilter.type && (
+                      (jettisonFilter.type === 'release' && col === 'rel_release_id') ||
+                      (jettisonFilter.type === 'subsheet' && col === 'rel_subsheet_id') ||
+                      (jettisonFilter.type === 'subpart' && col === 'rel_subpart_id')
+                    )) ||
+                    (skylabFilter && skylabFilter.type && (
+                      (skylabFilter.type === 'release' && col === 'rel_release_id') ||
+                      (skylabFilter.type === 'subsheet' && col === 'rel_subsheet_id') ||
+                      (skylabFilter.type === 'subpart' && col === 'rel_subpart_id')
+                    ))
                   );
                   
                   return (

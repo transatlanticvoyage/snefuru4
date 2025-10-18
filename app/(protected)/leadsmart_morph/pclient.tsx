@@ -5,6 +5,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import LeadSmartJettisonTable from '@/app/components/leadsmart/LeadSmartJettisonTable';
+import LeadSmartSkylabTileTables from '@/app/components/leadsmart/LeadSmartSkylabTileTables';
 import FrostySelectorPopup from '../leadsmart_tank/components/FrostySelectorPopup';
 import dynamic from 'next/dynamic';
 
@@ -69,6 +70,12 @@ export default function LeadsmartMorphClient() {
   
   // Filter state for jettison table
   const [jettisonFilter, setJettisonFilter] = useState<{
+    type: 'release' | 'subsheet' | 'subpart' | null;
+    id: number | null;
+  }>({ type: null, id: null });
+  
+  // Filter state for skylab tile tables
+  const [skylabFilter, setSkylabFilter] = useState<{
     type: 'release' | 'subsheet' | 'subpart' | null;
     id: number | null;
   }>({ type: null, id: null });
@@ -152,7 +159,7 @@ export default function LeadsmartMorphClient() {
     if (user) {
       fetchData();
     }
-  }, [jettisonFilter]);
+  }, [jettisonFilter, skylabFilter]);
 
   const fetchData = async () => {
     try {
@@ -170,6 +177,17 @@ export default function LeadsmartMorphClient() {
           query = query.eq('jrel_subsheet_id', jettisonFilter.id);
         } else if (jettisonFilter.type === 'subpart') {
           query = query.eq('jrel_subpart_id', jettisonFilter.id);
+        }
+      }
+      
+      // Apply skylab filter if active
+      if (skylabFilter && skylabFilter.type && skylabFilter.id) {
+        if (skylabFilter.type === 'release') {
+          query = query.eq('jrel_release_id', skylabFilter.id);
+        } else if (skylabFilter.type === 'subsheet') {
+          query = query.eq('jrel_subsheet_id', skylabFilter.id);
+        } else if (skylabFilter.type === 'subpart') {
+          query = query.eq('jrel_subpart_id', skylabFilter.id);
         }
       }
       
@@ -795,9 +813,16 @@ export default function LeadsmartMorphClient() {
               marginBottom: '0px'
             }}
           >
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black' }}>
+            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
               pec_chamber
             </div>
+            
+            {/* Skylab Tile Tables */}
+            <LeadSmartSkylabTileTables
+              pageType="morph"
+              onFilterApply={(type, id) => setSkylabFilter({ type, id })}
+              currentFilter={skylabFilter}
+            />
           </div>
         )}
 
@@ -994,20 +1019,37 @@ export default function LeadsmartMorphClient() {
                     />
                   </div>
                 </th>
-                {paginatedColumns.map(col => (
-                  <th 
-                    key={`col-${col}`}
-                    className={`for_db_table_leadsmart_transformed for_db_column_${col}`}
-                    style={{ 
-                      padding: '0px',
-                      border: '1px solid gray'
-                    }}
-                  >
-                    <div className="cell_inner_wrapper_div">
-                      <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>{col}</span>
-                    </div>
-                  </th>
-                ))}
+                {paginatedColumns.map(col => {
+                  // Determine if this column is the active filter (from jettison or skylab)
+                  const isActiveFilterColumn = (
+                    (jettisonFilter && jettisonFilter.type && (
+                      (jettisonFilter.type === 'release' && col === 'jrel_release_id') ||
+                      (jettisonFilter.type === 'subsheet' && col === 'jrel_subsheet_id') ||
+                      (jettisonFilter.type === 'subpart' && col === 'jrel_subpart_id')
+                    )) ||
+                    (skylabFilter && skylabFilter.type && (
+                      (skylabFilter.type === 'release' && col === 'jrel_release_id') ||
+                      (skylabFilter.type === 'subsheet' && col === 'jrel_subsheet_id') ||
+                      (skylabFilter.type === 'subpart' && col === 'jrel_subpart_id')
+                    ))
+                  );
+                  
+                  return (
+                    <th 
+                      key={`col-${col}`}
+                      className={`for_db_table_leadsmart_transformed for_db_column_${col}`}
+                      style={{ 
+                        padding: '0px',
+                        border: '1px solid gray',
+                        backgroundColor: isActiveFilterColumn ? '#ffff99' : undefined
+                      }}
+                    >
+                      <div className="cell_inner_wrapper_div">
+                        <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>{col}</span>
+                      </div>
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             
