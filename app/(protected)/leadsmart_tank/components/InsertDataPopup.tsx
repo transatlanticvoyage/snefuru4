@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
 import FileReleasesGrid from './FileReleasesGrid';
+import SubsheetsGrid from './SubsheetsGrid';
+import SubpartsGrid from './SubpartsGrid';
 
 interface Props {
   isOpen: boolean;
@@ -22,6 +24,11 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pasteAreaRef = useRef<HTMLTextAreaElement>(null);
   const maxPreviewRows = 100; // Only show first 100 rows in grid for performance
+  
+  // Selection states for the three grids
+  const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null);
+  const [selectedSubsheetId, setSelectedSubsheetId] = useState<number | null>(null);
+  const [selectedSubpartId, setSelectedSubpartId] = useState<number | null>(null);
 
   const columnHeaders = [
     'zip_code',
@@ -158,6 +165,12 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
       return;
     }
 
+    // Check that all three grids have selections
+    if (!selectedReleaseId || !selectedSubsheetId || !selectedSubpartId) {
+      alert('Please make selections in all three grids (Release, Subsheet, and Subpart) before inserting data.');
+      return;
+    }
+
     // Use fullDataset if available, otherwise use gridData
     const sourceData = fullDataset.length > 0 ? fullDataset : gridData;
     
@@ -254,8 +267,13 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
               <div className="flex items-center space-x-3 mb-4">
                 <button
                   onClick={handleInsertData}
-                  disabled={inserting}
-                  className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md font-medium transition-colors disabled:bg-blue-400"
+                  disabled={inserting || !selectedReleaseId || !selectedSubsheetId || !selectedSubpartId}
+                  className={`px-6 py-2 rounded-md font-medium transition-colors ${
+                    inserting || !selectedReleaseId || !selectedSubsheetId || !selectedSubpartId
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
+                  title={!selectedReleaseId || !selectedSubsheetId || !selectedSubpartId ? 'Please make selections in all three grids on the right' : ''}
                 >
                   {inserting ? 'Inserting...' : 'insert data'}
                 </button>
@@ -270,6 +288,18 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
                   {fullDataset.length > 0 && fullDataset.length > maxPreviewRows && (
                     <span className="ml-2 text-blue-600">(Showing preview of first {maxPreviewRows} rows)</span>
                   )}
+                </div>
+                <div className="text-xs text-gray-600 ml-4 flex items-center space-x-3">
+                  <span>Selections:</span>
+                  <span className={selectedReleaseId ? 'text-green-600 font-semibold' : 'text-red-600'}>
+                    Release: {selectedReleaseId ? '✓' : '✗'}
+                  </span>
+                  <span className={selectedSubsheetId ? 'text-green-600 font-semibold' : 'text-red-600'}>
+                    Subsheet: {selectedSubsheetId ? '✓' : '✗'}
+                  </span>
+                  <span className={selectedSubpartId ? 'text-green-600 font-semibold' : 'text-red-600'}>
+                    Subpart: {selectedSubpartId ? '✓' : '✗'}
+                  </span>
                 </div>
               </div>
               
@@ -394,8 +424,16 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
           {/* End of Left Side */}
 
           {/* Right Side - File Releases Grid */}
-          <div className="flex-1 bg-white flex flex-col">
-            <FileReleasesGrid />
+          <div className="flex-1 bg-white flex flex-col overflow-auto">
+            <FileReleasesGrid onReleaseSelect={setSelectedReleaseId} />
+            <SubsheetsGrid 
+              selectedReleaseId={selectedReleaseId} 
+              onSubsheetSelect={setSelectedSubsheetId}
+            />
+            <SubpartsGrid 
+              selectedSubsheetId={selectedSubsheetId}
+              onSubpartSelect={setSelectedSubpartId}
+            />
           </div>
           {/* End of Right Side */}
         </div>

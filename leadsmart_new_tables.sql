@@ -67,8 +67,7 @@ CREATE TRIGGER set_leadsmart_relations_updated_at
 -- =====================================================
 CREATE TABLE leadsmart_subsheets (
   subsheet_id SERIAL PRIMARY KEY,
-  rel_original_global_row_id INTEGER REFERENCES leadsmart_zip_based_data(global_row_id) ON DELETE SET NULL,
-  rel_transformed_mundial_id INTEGER REFERENCES leadsmart_transformed(mundial_id) ON DELETE SET NULL,
+  rel_release_id INTEGER REFERENCES leadsmart_file_releases(release_id) ON DELETE SET NULL,
   subsheet_name TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -76,8 +75,7 @@ CREATE TABLE leadsmart_subsheets (
 );
 
 -- Create indexes for leadsmart_subsheets
-CREATE INDEX idx_leadsmart_subsheets_original_global_row_id ON leadsmart_subsheets(rel_original_global_row_id);
-CREATE INDEX idx_leadsmart_subsheets_transformed_mundial_id ON leadsmart_subsheets(rel_transformed_mundial_id);
+CREATE INDEX idx_leadsmart_subsheets_rel_release_id ON leadsmart_subsheets(rel_release_id);
 CREATE INDEX idx_leadsmart_subsheets_created_by ON leadsmart_subsheets(created_by);
 
 -- Create trigger function for leadsmart_subsheets updated_at

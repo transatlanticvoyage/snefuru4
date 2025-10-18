@@ -6,10 +6,7 @@ import { useAuth } from '@/app/context/AuthContext';
 
 interface LeadsmartData {
   global_row_id: number;
-  subsheet: string | null;
-  subpart_of_subsheet: string | null;
   sheet_row_id: number | null;
-  payout_note: string | null;
   zip_code: string | null;
   payout: number | null;
   city_name: string | null;
@@ -49,7 +46,7 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
   // New row state
   const [newRow, setNewRow] = useState<Partial<LeadsmartData> | null>(null);
 
-  // All columns from the database
+  // All columns (including static UI-only columns)
   const allColumns = [
     'global_row_id',
     'subsheet',
@@ -65,6 +62,9 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
     'created_at',
     'updated_at'
   ];
+  
+  // Static columns (no database integration)
+  const staticColumns = ['subsheet', 'subpart_of_subsheet', 'payout_note'];
 
   // Fetch data
   const fetchData = useCallback(async () => {
@@ -94,10 +94,7 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
   useEffect(() => {
     const handleCreateInline = () => {
       const newRowData: Partial<LeadsmartData> = {
-        subsheet: '',
-        subpart_of_subsheet: '',
         sheet_row_id: null,
-        payout_note: '',
         zip_code: '',
         payout: null,
         city_name: '',
@@ -738,6 +735,9 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
                     style={{ padding: 0, border: '1px solid gray' }}
                   >
                     <div className="cell_inner_wrapper_div" style={{ padding: '8px' }}>
+                      {staticColumns.includes(col) && (
+                        <span style={{ color: 'navy', marginRight: '4px' }}>★</span>
+                      )}
                       <span style={{ fontWeight: 'bold', textTransform: 'lowercase' }}>{col}</span>
                     </div>
                   </th>
@@ -775,6 +775,8 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
                       <div className="cell_inner_wrapper_div" style={{ padding: '4px' }}>
                         {col === 'global_row_id' || col === 'created_at' || col === 'updated_at' || col === 'user_id' ? (
                           <span className="text-gray-400 text-xs">Auto</span>
+                        ) : staticColumns.includes(col) ? (
+                          <span className="text-gray-400 text-xs italic">Static</span>
                         ) : (
                           <input
                             type="text"
@@ -822,7 +824,14 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
                       style={{ padding: 0, border: '1px solid gray' }}
                     >
                       <div className="cell_inner_wrapper_div" style={{ padding: '4px' }}>
-                        {editingCell?.rowId === row.global_row_id && editingCell?.field === col ? (
+                        {staticColumns.includes(col) ? (
+                          <div
+                            className="text-gray-400 italic"
+                            style={{ minHeight: '24px', padding: '4px' }}
+                          >
+                            {/* Static column - no database integration */}
+                          </div>
+                        ) : editingCell?.rowId === row.global_row_id && editingCell?.field === col ? (
                           <div className="flex items-center space-x-1">
                             <input
                               type="text"

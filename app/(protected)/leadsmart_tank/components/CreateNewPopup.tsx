@@ -15,10 +15,7 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
   const supabase = createClientComponentClient();
   
   const [formData, setFormData] = useState({
-    subsheet: '',
-    subpart_of_subsheet: '',
     sheet_row_id: '',
-    payout_note: '',
     zip_code: '',
     payout: '',
     city_name: '',
@@ -81,30 +78,6 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subsheet
-                </label>
-                <input
-                  type="text"
-                  value={formData.subsheet}
-                  onChange={(e) => handleChange('subsheet', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subpart of Subsheet
-                </label>
-                <input
-                  type="text"
-                  value={formData.subpart_of_subsheet}
-                  onChange={(e) => handleChange('subpart_of_subsheet', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Sheet Row ID
                 </label>
                 <input
@@ -112,18 +85,6 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
                   value={formData.sheet_row_id}
                   onChange={(e) => handleChange('sheet_row_id', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Payout Note
-                </label>
-                <textarea
-                  value={formData.payout_note}
-                  onChange={(e) => handleChange('payout_note', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={3}
                 />
               </div>
               

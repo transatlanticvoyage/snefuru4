@@ -13,7 +13,11 @@ interface FileRelease {
   created_by: string | null;
 }
 
-export default function FileReleasesGrid() {
+interface Props {
+  onReleaseSelect: (releaseId: number | null) => void;
+}
+
+export default function FileReleasesGrid({ onReleaseSelect }: Props) {
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   
@@ -136,7 +140,15 @@ export default function FileReleasesGrid() {
   const handleCheckboxClick = (releaseId: number) => {
     // Only one can be selected at a time (radio button behavior)
     setSelectedReleaseId(releaseId);
+    onReleaseSelect(releaseId);
   };
+  
+  // Notify parent when auto-selected on load
+  useEffect(() => {
+    if (selectedReleaseId !== null) {
+      onReleaseSelect(selectedReleaseId);
+    }
+  }, [selectedReleaseId, onReleaseSelect]);
 
   if (loading) {
     return <div className="p-4 text-sm text-gray-600">Loading...</div>;
@@ -145,6 +157,9 @@ export default function FileReleasesGrid() {
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b bg-gray-50">
+        <div className="font-bold text-gray-800 mb-3" style={{ fontSize: '16px' }}>
+          leadsmart_file_releases
+        </div>
         <button
           onClick={handleCreateInline}
           className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition-colors"
@@ -185,7 +200,20 @@ export default function FileReleasesGrid() {
             {newRelease && (
               <tr className="bg-yellow-50">
                 <td className="border border-gray-300 px-2 py-1 text-center">
-                  {/* No checkbox for new row until saved */}
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={handleSaveNew}
+                      className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={handleCancelNew}
+                      className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </td>
                 <td className="border border-gray-300 px-2 py-1 text-gray-400">Auto</td>
                 <td className="border border-gray-300 px-2 py-1">
@@ -208,22 +236,6 @@ export default function FileReleasesGrid() {
                 <td className="border border-gray-300 px-2 py-1 text-gray-400">Auto</td>
                 <td className="border border-gray-300 px-2 py-1 text-gray-400">Auto</td>
                 <td className="border border-gray-300 px-2 py-1 text-gray-400">Auto</td>
-                <td className="border border-gray-300 px-2 py-1">
-                  <div className="flex space-x-1">
-                    <button
-                      onClick={handleSaveNew}
-                      className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={handleCancelNew}
-                      className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </td>
               </tr>
             )}
             
