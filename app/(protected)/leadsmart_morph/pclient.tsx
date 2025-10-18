@@ -918,7 +918,7 @@ export default function LeadsmartMorphClient() {
           <table 
             style={{ 
               borderCollapse: 'collapse', 
-              width: '100%',
+              width: 'auto',
               border: '1px solid gray'
             }}
           >

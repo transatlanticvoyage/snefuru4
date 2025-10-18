@@ -410,8 +410,7 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
             <td 
               style={{ 
                 border: '1px solid gray', 
-                padding: '8px',
-                backgroundColor: isActiveFilter('release', jettisonData.release?.release_id || 0) ? '#ffff99' : 'white'
+                padding: '8px'
               }}
             >
               {jettisonData.release?.release_id || '-'}
@@ -419,8 +418,7 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
             <td 
               style={{ 
                 border: '1px solid gray', 
-                padding: '8px',
-                backgroundColor: isActiveFilter('release', jettisonData.release?.release_id || 0) ? '#ffff99' : 'white'
+                padding: '8px'
               }}
             >
               {jettisonData.release?.release_date || '-'}
@@ -429,7 +427,6 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
               style={{ 
                 border: '1px solid gray', 
                 padding: '8px',
-                backgroundColor: isActiveFilter('release', jettisonData.release?.release_id || 0) ? '#ffff99' : 'white',
                 maxWidth: '200px',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -442,7 +439,6 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
               style={{ 
                 border: '1px solid gray', 
                 padding: '8px',
-                backgroundColor: isActiveFilter('release', jettisonData.release?.release_id || 0) ? '#ffff99' : 'white',
                 fontWeight: 'bold',
                 color: '#2563eb'
               }}
@@ -453,7 +449,6 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
               style={{ 
                 border: '1px solid gray', 
                 padding: '8px',
-                backgroundColor: isActiveFilter('release', jettisonData.release?.release_id || 0) ? '#ffff99' : 'white',
                 fontWeight: 'bold',
                 color: '#059669'
               }}
@@ -463,8 +458,7 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
             <td 
               style={{ 
                 border: '1px solid gray', 
-                padding: '8px',
-                backgroundColor: isActiveFilter('release', jettisonData.release?.release_id || 0) ? '#ffff99' : 'white'
+                padding: '8px'
               }}
             >
               {jettisonData.release ? (
@@ -494,8 +488,7 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
             <td 
               style={{ 
                 border: '1px solid gray', 
-                padding: '8px',
-                backgroundColor: isActiveFilter('subsheet', jettisonData.subsheet?.subsheet_id || 0) ? '#ffff99' : 'white'
+                padding: '8px'
               }}
             >
               {jettisonData.subsheet?.subsheet_id || '-'}
@@ -503,8 +496,7 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
             <td 
               style={{ 
                 border: '1px solid gray', 
-                padding: '8px',
-                backgroundColor: isActiveFilter('subsheet', jettisonData.subsheet?.subsheet_id || 0) ? '#ffff99' : 'white'
+                padding: '8px'
               }}
             >
               {jettisonData.subsheet?.subsheet_name || '-'}
@@ -513,7 +505,6 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
               style={{ 
                 border: '1px solid gray', 
                 padding: '8px',
-                backgroundColor: isActiveFilter('subsheet', jettisonData.subsheet?.subsheet_id || 0) ? '#ffff99' : 'white',
                 fontWeight: 'bold',
                 color: '#2563eb'
               }}
@@ -524,7 +515,6 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
               style={{ 
                 border: '1px solid gray', 
                 padding: '8px',
-                backgroundColor: isActiveFilter('subsheet', jettisonData.subsheet?.subsheet_id || 0) ? '#ffff99' : 'white',
                 fontWeight: 'bold',
                 color: '#059669'
               }}
@@ -534,8 +524,7 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
             <td 
               style={{ 
                 border: '1px solid gray', 
-                padding: '8px',
-                backgroundColor: isActiveFilter('subsheet', jettisonData.subsheet?.subsheet_id || 0) ? '#ffff99' : 'white'
+                padding: '8px'
               }}
             >
               {jettisonData.subsheet ? (
@@ -565,8 +554,7 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
             <td 
               style={{ 
                 border: '1px solid gray', 
-                padding: '8px',
-                backgroundColor: isActiveFilter('subpart', jettisonData.subpart?.subpart_id || 0) ? '#ffff99' : 'white'
+                padding: '8px'
               }}
             >
               {jettisonData.subpart?.subpart_id || '-'}
@@ -574,8 +562,7 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
             <td 
               style={{ 
                 border: '1px solid gray', 
-                padding: '8px',
-                backgroundColor: isActiveFilter('subpart', jettisonData.subpart?.subpart_id || 0) ? '#ffff99' : 'white'
+                padding: '8px'
               }}
             >
               {jettisonData.subpart?.payout_note || '-'}
@@ -583,8 +570,7 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
             <td 
               style={{ 
                 border: '1px solid gray', 
-                padding: '8px',
-                backgroundColor: isActiveFilter('subpart', jettisonData.subpart?.subpart_id || 0) ? '#ffff99' : 'white'
+                padding: '8px'
               }}
             >
               {jettisonData.subpart?.subpart_name || '-'}
@@ -593,7 +579,6 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
               style={{ 
                 border: '1px solid gray', 
                 padding: '8px',
-                backgroundColor: isActiveFilter('subpart', jettisonData.subpart?.subpart_id || 0) ? '#ffff99' : 'white',
                 fontWeight: 'bold',
                 color: '#2563eb'
               }}
@@ -603,8 +588,7 @@ export default function LeadSmartJettisonTable({ config, onFilterChange }: Props
             <td 
               style={{ 
                 border: '1px solid gray', 
-                padding: '8px',
-                backgroundColor: isActiveFilter('subpart', jettisonData.subpart?.subpart_id || 0) ? '#ffff99' : 'white'
+                padding: '8px'
               }}
             >
               {jettisonData.subpart ? (

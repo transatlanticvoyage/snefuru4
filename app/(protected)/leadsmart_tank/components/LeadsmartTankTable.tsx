@@ -728,7 +728,7 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter }: P
         marginBottom: '16px'
       }}>
         <div className="overflow-x-auto">
-          <table className="text-sm" style={{ borderCollapse: 'collapse', width: '100%' }}>
+          <table className="text-sm" style={{ borderCollapse: 'collapse', width: 'auto' }}>
             <thead>
               {/* Database table name row */}
               <tr className="shenfur_db_table_name_tr">
