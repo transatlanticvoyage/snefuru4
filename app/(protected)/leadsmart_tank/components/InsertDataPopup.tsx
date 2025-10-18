@@ -84,26 +84,23 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
     // Filter out completely empty rows
     const filteredRows = rows.filter(row => row.some(cell => cell.trim() !== ''));
     
-    // Limit to 12,000 rows
-    const limitedRows = filteredRows.slice(0, 12000);
-    
-    // Store full dataset
-    setFullDataset(limitedRows);
+    // Store full dataset (no row limit)
+    setFullDataset(filteredRows);
     
     // Only show preview in grid (first 100 rows for performance)
-    const previewRows = limitedRows.slice(0, maxPreviewRows);
+    const previewRows = filteredRows.slice(0, maxPreviewRows);
     
     // Add more empty rows if we have less than 20 total preview rows
-    while (previewRows.length < Math.min(20, limitedRows.length)) {
+    while (previewRows.length < Math.min(20, filteredRows.length)) {
       previewRows.push(Array(10).fill(''));
     }
 
     setGridData(previewRows);
     
     // Show confirmation if many rows
-    if (limitedRows.length > maxPreviewRows) {
+    if (filteredRows.length > maxPreviewRows) {
       setTimeout(() => {
-        alert(`Successfully loaded ${limitedRows.length} rows. Showing preview of first ${maxPreviewRows} rows for performance.`);
+        alert(`Successfully loaded ${filteredRows.length} rows. Showing preview of first ${maxPreviewRows} rows for performance.`);
       }, 100);
     }
   };
@@ -133,17 +130,14 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
     // Filter out completely empty rows
     const filteredRows = rows.filter(row => row.some(cell => cell.trim() !== ''));
     
-    // Limit to 12,000 rows
-    const limitedRows = filteredRows.slice(0, 12000);
-    
-    // Store full dataset
-    setFullDataset(limitedRows);
+    // Store full dataset (no row limit)
+    setFullDataset(filteredRows);
     
     // Only show preview in grid (first 100 rows for performance)
-    const previewRows = limitedRows.slice(0, maxPreviewRows);
+    const previewRows = filteredRows.slice(0, maxPreviewRows);
     
     // Add more empty rows if we have less than 20 total preview rows
-    while (previewRows.length < Math.min(20, limitedRows.length)) {
+    while (previewRows.length < Math.min(20, filteredRows.length)) {
       previewRows.push(Array(10).fill(''));
     }
 
@@ -154,7 +148,7 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
     setShowPasteArea(false);
     
     // Show confirmation message
-    alert(`Successfully loaded ${limitedRows.length} rows. Showing preview of first ${previewRows.length} rows for performance.`);
+    alert(`Successfully loaded ${filteredRows.length} rows. Showing preview of first ${previewRows.length} rows for performance.`);
   };
 
   const handleCellChange = (rowIndex: number, colIndex: number, value: string) => {

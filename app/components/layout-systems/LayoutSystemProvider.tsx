@@ -78,15 +78,10 @@ export function LayoutSystemProvider({ children }: LayoutSystemProviderProps) {
 
         // Set preferred system if user has access, otherwise default
         const preferredSystem = data?.preferred_layout_system || DEFAULT_LAYOUT_SYSTEM;
-        console.log('User permissions:', permissions);
-        console.log('User preferred system:', preferredSystem);
-        console.log('Available systems:', available.map(s => s.id));
         
         if (canUserAccessSystem(preferredSystem, permissions)) {
-          console.log('Using preferred system:', preferredSystem);
           setCurrentSystem(preferredSystem);
         } else {
-          console.log('User cannot access preferred system, using default:', DEFAULT_LAYOUT_SYSTEM);
           setCurrentSystem(DEFAULT_LAYOUT_SYSTEM);
         }
       } catch (err) {
@@ -98,7 +93,7 @@ export function LayoutSystemProvider({ children }: LayoutSystemProviderProps) {
     };
 
     fetchUserPermissions();
-  }, [user, supabase]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const switchSystem = async (systemId: string) => {
     if (!canUserAccessSystem(systemId, userPermissions)) {
@@ -111,7 +106,6 @@ export function LayoutSystemProvider({ children }: LayoutSystemProviderProps) {
     // Save preference to database
     if (user?.id) {
       try {
-        console.log('Saving layout preference:', systemId);
         const { error } = await supabase
           .from('users')
           .update({ preferred_layout_system: systemId })
@@ -119,8 +113,6 @@ export function LayoutSystemProvider({ children }: LayoutSystemProviderProps) {
         
         if (error) {
           console.error('Error saving layout preference:', error);
-        } else {
-          console.log('Layout preference saved successfully');
         }
       } catch (error) {
         console.error('Error saving layout preference:', error);

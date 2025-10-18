@@ -155,117 +155,73 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     
     setDeleting(true);
     try {
-      // If checkbox is checked and there's associated data, delete it first
-      if (deleteAssociatedData && transformedDataCount > 0) {
-        // Get all global_row_ids from leadsmart_zip_based_data
-        let zipQuery = supabase.from('leadsmart_zip_based_data').select('global_row_id');
-        
-        if (selectXType === 'release') {
-          zipQuery = zipQuery.eq('rel_release_id', selectXId);
-        } else if (selectXType === 'subsheet') {
-          zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
-        } else if (selectXType === 'subpart') {
-          zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
-        }
-        
-        const { data: zipData, error: zipError } = await zipQuery;
-        if (zipError) throw zipError;
-        
-        if (zipData && zipData.length > 0) {
-          const globalRowIds = zipData.map(row => row.global_row_id);
-          
-          // Batch queries to avoid URL length limits
-          const uniqueTransformedIds = new Set<number>();
-          const allRelationIds: number[] = [];
-          const batchSize = 500;
-          
-          for (let i = 0; i < globalRowIds.length; i += batchSize) {
-            const batch = globalRowIds.slice(i, i + batchSize);
-            
-            const { data: relationsData, error: relationsError } = await supabase
-              .from('leadsmart_transformed_relations')
-              .select('transformed_mundial_id, relation_id')
-              .in('original_global_id', batch);
-            
-            if (relationsError) throw relationsError;
-            
-            relationsData?.forEach(r => {
-              if (r.transformed_mundial_id !== null) {
-                uniqueTransformedIds.add(r.transformed_mundial_id);
-              }
-              allRelationIds.push(r.relation_id);
-            });
-          }
-          
-          // Delete from leadsmart_transformed in batches
-          if (uniqueTransformedIds.size > 0) {
-            const transformedIds = Array.from(uniqueTransformedIds);
-            for (let i = 0; i < transformedIds.length; i += batchSize) {
-              const batch = transformedIds.slice(i, i + batchSize);
-              
-              const { error: transformedDeleteError } = await supabase
-                .from('leadsmart_transformed')
-                .delete()
-                .in('mundial_id', batch);
-              
-              if (transformedDeleteError) throw transformedDeleteError;
-            }
-          }
-          
-          // Delete from leadsmart_transformed_relations in batches
-          if (allRelationIds.length > 0) {
-            for (let i = 0; i < allRelationIds.length; i += batchSize) {
-              const batch = allRelationIds.slice(i, i + batchSize);
-              
-              const { error: relationsDeleteError } = await supabase
-                .from('leadsmart_transformed_relations')
-                .delete()
-                .in('relation_id', batch);
-              
-              if (relationsDeleteError) throw relationsDeleteError;
-            }
-          }
-        }
-      }
-      
-      // Now delete the main item
-      let tableName = '';
-      let idColumn = '';
+      // Delete from leadsmart_zip_based_data based on the selected entity
+      let relColumn = '';
       
       if (selectXType === 'release') {
-        tableName = 'leadsmart_file_releases';
-        idColumn = 'release_id';
+        relColumn = 'rel_release_id';
       } else if (selectXType === 'subsheet') {
-        tableName = 'leadsmart_subsheets';
-        idColumn = 'subsheet_id';
+        relColumn = 'rel_subsheet_id';
       } else if (selectXType === 'subpart') {
-        tableName = 'leadsmart_subparts';
-        idColumn = 'subpart_id';
+        relColumn = 'rel_subpart_id';
       }
       
-      const { error } = await supabase
-        .from(tableName)
-        .delete()
-        .eq(idColumn, selectXId);
+      // Count rows before deleting
+      const { count: beforeCount } = await supabase
+        .from('leadsmart_zip_based_data')
+        .select('*', { count: 'exact', head: true })
+        .eq(relColumn, selectXId);
       
-      if (error) throw error;
+      const rowsToDelete = beforeCount || 0;
       
-      const deletedTransformedMsg = deleteAssociatedData && transformedDataCount > 0 
-        ? `\n\nAlso deleted ${transformedDataCount} associated leadsmart_transformed records and their relations.`
-        : '';
+      if (rowsToDelete === 0) {
+        alert(`No rows found in leadsmart_zip_based_data with ${relColumn} = ${selectXId}`);
+        setDeleting(false);
+        return;
+      }
       
-      alert(`Successfully deleted ${selectXType} #${selectXId}${deletedTransformedMsg}`);
+      // Delete in batches to avoid timeout
+      const batchSize = 1000;
+      let totalDeleted = 0;
+      
+      // Keep deleting until no more rows match
+      while (true) {
+        const { data: batchData, error: fetchError } = await supabase
+          .from('leadsmart_zip_based_data')
+          .select('global_row_id')
+          .eq(relColumn, selectXId)
+          .limit(batchSize);
+        
+        if (fetchError) throw fetchError;
+        
+        if (!batchData || batchData.length === 0) break;
+        
+        const idsToDelete = batchData.map(row => row.global_row_id);
+        
+        const { error: deleteError } = await supabase
+          .from('leadsmart_zip_based_data')
+          .delete()
+          .in('global_row_id', idsToDelete);
+        
+        if (deleteError) throw deleteError;
+        
+        totalDeleted += idsToDelete.length;
+        
+        console.log(`Deleted batch: ${idsToDelete.length} rows (total so far: ${totalDeleted})`);
+      }
+      
+      alert(`Successfully deleted ${totalDeleted.toLocaleString()} rows from leadsmart_zip_based_data where ${relColumn} = ${selectXId}`);
       
       // Clear selection
       setSelectXType(null);
       setSelectXId(null);
       setShowSecondDeleteConfirm(false);
       
-      // Refresh the grids
+      // Refresh the page
       window.location.reload();
     } catch (error) {
       console.error('Error deleting:', error);
-      alert('Failed to delete item');
+      alert('Failed to delete rows from leadsmart_zip_based_data');
     } finally {
       setDeleting(false);
     }
@@ -778,31 +734,16 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
               <div className="space-y-3">
                 <hr className="border-gray-300" />
                 
-                {/* Checkbox for deleting associated data */}
-                <div className="flex items-center space-x-2 py-2">
-                  <input
-                    type="checkbox"
-                    id="deleteAssociatedData"
-                    checked={deleteAssociatedData}
-                    onChange={(e) => setDeleteAssociatedData(e.target.checked)}
-                    disabled={transformedDataCount === 0}
-                    className={`w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500 ${
-                      transformedDataCount === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                    }`}
-                  />
-                  <label 
-                    htmlFor="deleteAssociatedData" 
-                    className={`text-sm ${
-                      transformedDataCount === 0 ? 'text-gray-400' : 'text-gray-700 cursor-pointer'
-                    }`}
-                  >
-                    delete associated rows from leadsmart_transformed and leadsmart_relations
-                    {transformedDataCount > 0 && (
-                      <span className="ml-2 text-red-600 font-semibold">
-                        ({transformedDataCount.toLocaleString()} records)
-                      </span>
-                    )}
-                  </label>
+                {/* Info about what will be deleted */}
+                <div className="py-2 px-3 bg-yellow-50 border border-yellow-200 rounded">
+                  <p className="text-sm text-gray-700">
+                    <strong>Delete (method 1):</strong> Deletes rows from <span className="font-mono text-xs">leadsmart_zip_based_data</span> where the selected entity's rel_* column matches.
+                  </p>
+                  {selectXResultCount > 0 && (
+                    <p className="text-sm text-red-600 font-semibold mt-1">
+                      ⚠️ Will delete {selectXResultCount.toLocaleString()} rows
+                    </p>
+                  )}
                 </div>
                 
                 <hr className="border-gray-300" />
@@ -822,7 +763,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  delete
+                  delete (method 1)
                 </button>
                 
                 <button
@@ -888,25 +829,23 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
               </div>
               <div className="mb-6">
                 <p className="text-gray-700 mb-4">
-                  You are about to delete:
+                  <strong>Delete (method 1)</strong> will delete rows from <span className="font-mono text-xs">leadsmart_zip_based_data</span> based on your selection:
                 </p>
                 <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
                   <p className="text-red-800 font-medium">
-                    {selectXType === 'release' && `Release ID: ${selectXId}`}
-                    {selectXType === 'subsheet' && `Subsheet ID: ${selectXId}`}
-                    {selectXType === 'subpart' && `Subpart ID: ${selectXId}`}
+                    {selectXType === 'release' && `Selected: Release ID ${selectXId}`}
+                    {selectXType === 'subsheet' && `Selected: Subsheet ID ${selectXId}`}
+                    {selectXType === 'subpart' && `Selected: Subpart ID ${selectXId}`}
                   </p>
                   <p className="text-red-700 text-sm mt-2">
-                    This item has <strong>{selectXResultCount.toLocaleString()} related results</strong> in leadsmart_zip_based_data
+                    Will delete <strong>{selectXResultCount.toLocaleString()} rows</strong> from leadsmart_zip_based_data where 
+                    {selectXType === 'release' && ` rel_release_id = ${selectXId}`}
+                    {selectXType === 'subsheet' && ` rel_subsheet_id = ${selectXId}`}
+                    {selectXType === 'subpart' && ` rel_subpart_id = ${selectXId}`}
                   </p>
-                  {deleteAssociatedData && transformedDataCount > 0 && (
-                    <p className="text-red-700 text-sm mt-2 font-semibold">
-                      ⚠️ Will also delete <strong>{transformedDataCount.toLocaleString()} associated records</strong> from leadsmart_transformed and leadsmart_relations
-                    </p>
-                  )}
                 </div>
                 <p className="text-gray-700">
-                  This action may affect related records. Are you sure you want to continue?
+                  This will <strong>NOT</strong> delete the entity itself (release/subsheet/subpart). Are you sure you want to continue?
                 </p>
               </div>
               <div className="flex justify-end space-x-3">
@@ -951,11 +890,12 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                 <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
                   <p className="text-red-800 font-medium mb-2">Clicking "Yes, Delete Now" will:</p>
                   <ul className="list-disc list-inside text-red-700 space-y-1 text-sm">
-                    <li>Permanently delete {selectXType} #{selectXId}</li>
-                    <li>Potentially affect {selectXResultCount.toLocaleString()} related records</li>
-                    {deleteAssociatedData && transformedDataCount > 0 && (
-                      <li className="font-semibold">Delete {transformedDataCount.toLocaleString()} associated records from leadsmart_transformed and leadsmart_relations</li>
-                    )}
+                    <li className="font-semibold">Delete {selectXResultCount.toLocaleString()} rows from leadsmart_zip_based_data where 
+                    {selectXType === 'release' && ` rel_release_id = ${selectXId}`}
+                    {selectXType === 'subsheet' && ` rel_subsheet_id = ${selectXId}`}
+                    {selectXType === 'subpart' && ` rel_subpart_id = ${selectXId}`}
+                    </li>
+                    <li>NOT delete the {selectXType} entity itself (#{selectXId})</li>
                     <li>Cannot be undone once completed</li>
                   </ul>
                 </div>

@@ -81,7 +81,10 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
 
   // Fetch data
   const fetchData = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     
     setLoading(true);
     try {
