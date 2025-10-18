@@ -768,8 +768,24 @@ export default function SelectorPopup({ isOpen, onClose }: Props) {
                 </button>
                 
                 <button
-                  disabled
-                  className="w-full px-4 py-2 bg-gray-300 text-gray-500 rounded-md font-medium cursor-not-allowed"
+                  onClick={() => {
+                    if (!selectXType || !selectXId) {
+                      alert('Please select an item first');
+                      return;
+                    }
+                    // Dispatch event to jettison table
+                    window.dispatchEvent(new CustomEvent('jettison-filter-apply', {
+                      detail: { type: selectXType, id: selectXId }
+                    }));
+                    // Close selector popup
+                    onClose();
+                  }}
+                  disabled={!selectXType || !selectXId}
+                  className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
+                    selectXType && selectXId
+                      ? 'bg-green-600 text-white hover:bg-green-700'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
                 >
                   filter main ui table
                 </button>

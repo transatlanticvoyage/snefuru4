@@ -15,7 +15,6 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
   const supabase = createClientComponentClient();
   
   const [formData, setFormData] = useState({
-    sheet_row_id: '',
     zip_code: '',
     payout: '',
     city_name: '',
@@ -37,7 +36,6 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
     try {
       const dataToInsert = {
         ...formData,
-        sheet_row_id: formData.sheet_row_id ? Number(formData.sheet_row_id) : null,
         payout: formData.payout ? Number(formData.payout) : null,
         rel_release_id: formData.rel_release_id ? Number(formData.rel_release_id) : null,
         rel_subsheet_id: formData.rel_subsheet_id ? Number(formData.rel_subsheet_id) : null,
@@ -80,18 +78,6 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
           
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Sheet Row ID
-                </label>
-                <input
-                  type="number"
-                  value={formData.sheet_row_id}
-                  onChange={(e) => handleChange('sheet_row_id', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">

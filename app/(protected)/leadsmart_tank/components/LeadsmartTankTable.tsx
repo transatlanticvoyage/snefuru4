@@ -22,9 +22,13 @@ interface LeadsmartData {
 
 interface Props {
   refreshTrigger: number;
+  jettisonFilter?: {
+    type: 'release' | 'subsheet' | 'subpart' | null;
+    id: number | null;
+  };
 }
 
-export default function LeadsmartTankTable({ refreshTrigger }: Props) {
+export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter }: Props) {
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   
@@ -52,15 +56,14 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
   // All columns (including static UI-only columns)
   const allColumns = [
     'global_row_id',
+    'rel_release_id',
     'rel_subsheet_id',
     'rel_subpart_id',
-    'sheet_row_id',
     'payout_note',
     'zip_code',
     'payout',
     'city_name',
     'state_code',
-    'rel_release_id',
     'user_id',
     'created_at',
     'updated_at'
@@ -78,15 +81,29 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
     
     setLoading(true);
     try {
-      const { data: fetchedData, error } = await supabase
+      let query = supabase
         .from('leadsmart_zip_based_data')
         .select(`
           *,
           leadsmart_subparts!rel_subpart_id (
             payout_note
           )
-        `)
-        .order('global_row_id', { ascending: false });
+        `);
+      
+      // Apply jettison filter if active
+      if (jettisonFilter && jettisonFilter.type && jettisonFilter.id) {
+        if (jettisonFilter.type === 'release') {
+          query = query.eq('rel_release_id', jettisonFilter.id);
+        } else if (jettisonFilter.type === 'subsheet') {
+          query = query.eq('rel_subsheet_id', jettisonFilter.id);
+        } else if (jettisonFilter.type === 'subpart') {
+          query = query.eq('rel_subpart_id', jettisonFilter.id);
+        }
+      }
+      
+      query = query.order('global_row_id', { ascending: false });
+      
+      const { data: fetchedData, error } = await query;
       
       if (error) throw error;
       
@@ -102,7 +119,7 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [user, supabase]);
+  }, [user, supabase, jettisonFilter]);
 
   useEffect(() => {
     fetchData();
@@ -112,7 +129,6 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
   useEffect(() => {
     const handleCreateInline = () => {
       const newRowData: Partial<LeadsmartData> = {
-        sheet_row_id: null,
         zip_code: '',
         payout: null,
         city_name: '',
@@ -186,7 +202,7 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
       let valueToSave: any = editValue;
       
       // Type conversion based on field
-      if (field === 'payout' || field === 'sheet_row_id' || field === 'rel_release_id' || field === 'rel_subsheet_id' || field === 'rel_subpart_id') {
+      if (field === 'payout' || field === 'rel_release_id' || field === 'rel_subsheet_id' || field === 'rel_subpart_id') {
         valueToSave = editValue === '' ? null : Number(editValue);
       }
       
@@ -217,7 +233,6 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
       // Convert numeric fields before inserting
       const dataToInsert = {
         ...newRow,
-        sheet_row_id: newRow.sheet_row_id ? Number(newRow.sheet_row_id) : null,
         payout: newRow.payout ? Number(newRow.payout) : null,
         rel_release_id: newRow.rel_release_id ? Number(newRow.rel_release_id) : null,
         rel_subsheet_id: newRow.rel_subsheet_id ? Number(newRow.rel_subsheet_id) : null,
@@ -775,17 +790,30 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
                   
                   if (col === 'payout_note') {
                     symbol = <span style={{ color: 'black', marginRight: '4px' }}>•</span>;
+                  } else if (col === 'rel_release_id') {
+                    symbol = <span style={{ color: 'navy', marginRight: '4px' }}>★</span>;
                   } else if (col === 'rel_subsheet_id') {
                     symbol = <span style={{ color: 'navy', marginRight: '4px' }}>★</span>;
                   } else if (col === 'rel_subpart_id') {
                     symbol = <span style={{ color: 'navy', marginRight: '4px' }}>★</span>;
                   }
                   
+                  // Determine if this column is the active filter
+                  const isActiveFilterColumn = jettisonFilter && jettisonFilter.type && (
+                    (jettisonFilter.type === 'release' && col === 'rel_release_id') ||
+                    (jettisonFilter.type === 'subsheet' && col === 'rel_subsheet_id') ||
+                    (jettisonFilter.type === 'subpart' && col === 'rel_subpart_id')
+                  );
+                  
                   return (
                     <th 
                       key={`column-${col}`}
                       className={`${tableClass} for_db_column_${col}`}
-                      style={{ padding: 0, border: '1px solid gray' }}
+                      style={{ 
+                        padding: 0, 
+                        border: '1px solid gray',
+                        backgroundColor: isActiveFilterColumn ? '#ffff99' : undefined
+                      }}
                     >
                       <div className="cell_inner_wrapper_div" style={{ padding: '8px' }}>
                         {symbol}

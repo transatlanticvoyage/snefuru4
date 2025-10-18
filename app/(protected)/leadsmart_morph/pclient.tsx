@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import LeadSmartJettisonTable from '@/app/components/LeadSmartJettisonTable';
+import SelectorPopup from '../leadsmart_tank/components/SelectorPopup';
 import dynamic from 'next/dynamic';
 
 const ZhedoriButtonBar = dynamic(
@@ -13,6 +15,9 @@ const ZhedoriButtonBar = dynamic(
 
 interface LeadsmartTransformed {
   mundial_id: number;
+  jrel_release_id: number | null;
+  jrel_subsheet_id: number | null;
+  jrel_subpart_id: number | null;
   city_name: string | null;
   state_code: string | null;
   payout: number | null;
@@ -50,16 +55,26 @@ export default function LeadsmartMorphClient() {
   // Popup state
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupData, setPopupData] = useState<Partial<LeadsmartTransformed>>({});
+  const [isSelectorPopupOpen, setIsSelectorPopupOpen] = useState(false);
 
   // Chamber visibility state (integrated with bezel system)
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
   const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
   const [cardioChamberVisible, setCardioChamberVisible] = useState(true);
   const [pecChamberVisible, setPecChamberVisible] = useState(true);
+  
+  // Filter state for jettison table
+  const [jettisonFilter, setJettisonFilter] = useState<{
+    type: 'release' | 'subsheet' | 'subpart' | null;
+    id: number | null;
+  }>({ type: null, id: null });
 
   // Define all columns
   const allColumns = [
     'mundial_id',
+    'jrel_release_id',
+    'jrel_subsheet_id',
+    'jrel_subpart_id',
     'city_name',
     'state_code',
     'payout',
@@ -127,14 +142,36 @@ export default function LeadsmartMorphClient() {
     }
     fetchData();
   }, [user, router]);
+  
+  // Refetch when jettison filter changes
+  useEffect(() => {
+    if (user) {
+      fetchData();
+    }
+  }, [jettisonFilter]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data: fetchedData, error: fetchError } = await supabase
+      
+      let query = supabase
         .from('leadsmart_transformed')
-        .select('*')
-        .order('mundial_id', { ascending: false });
+        .select('*');
+      
+      // Apply jettison filter if active
+      if (jettisonFilter && jettisonFilter.type && jettisonFilter.id) {
+        if (jettisonFilter.type === 'release') {
+          query = query.eq('jrel_release_id', jettisonFilter.id);
+        } else if (jettisonFilter.type === 'subsheet') {
+          query = query.eq('jrel_subsheet_id', jettisonFilter.id);
+        } else if (jettisonFilter.type === 'subpart') {
+          query = query.eq('jrel_subpart_id', jettisonFilter.id);
+        }
+      }
+      
+      query = query.order('mundial_id', { ascending: false });
+      
+      const { data: fetchedData, error: fetchError } = await query;
 
       if (fetchError) throw fetchError;
 
@@ -146,6 +183,10 @@ export default function LeadsmartMorphClient() {
     } finally {
       setLoading(false);
     }
+  };
+  
+  const handleJettisonFilterChange = (filterType: 'release' | 'subsheet' | 'subpart' | null, filterId: number | null) => {
+    setJettisonFilter({ type: filterType, id: filterId });
   };
 
   // Filter data based on search
@@ -650,8 +691,22 @@ export default function LeadsmartMorphClient() {
               marginBottom: '0px'
             }}
           >
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black' }}>
+            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
               mandible_chamber
+            </div>
+            
+            <div className="flex items-center space-x-4 mb-4">
+              <ZhedoriButtonBar />
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold text-gray-800">Leadsmart Morph</h1>
+              <button
+                onClick={() => setIsSelectorPopupOpen(true)}
+                className="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700 transition-colors"
+              >
+                selector popup
+              </button>
             </div>
           </div>
         )}
@@ -700,6 +755,16 @@ export default function LeadsmartMorphClient() {
           >
             <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black' }}>
               cardio_chamber
+            </div>
+            
+            <div style={{ marginTop: '12px' }}>
+              <LeadSmartJettisonTable 
+                config={{
+                  targetTable: 'leadsmart_transformed',
+                  relColumnPrefix: 'jrel_'
+                }}
+                onFilterChange={handleJettisonFilterChange}
+              />
             </div>
           </div>
         )}
@@ -1106,7 +1171,15 @@ export default function LeadsmartMorphClient() {
               </button>
             </div>
           </div>
-    </div>
+        </div>
+      )}
+      
+      {/* Selector Popup */}
+      {isSelectorPopupOpen && (
+        <SelectorPopup
+          isOpen={isSelectorPopupOpen}
+          onClose={() => setIsSelectorPopupOpen(false)}
+        />
       )}
     </>
   );

@@ -216,8 +216,7 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
           rel_release_id: selectedReleaseId,
           rel_subsheet_id: selectedSubsheetId,
           rel_subpart_id: selectedSubpartId,
-          user_id: user.id,
-          sheet_row_id: null
+          user_id: user.id
           // Columns 4-9 are placeholder columns and not inserted
         };
       });

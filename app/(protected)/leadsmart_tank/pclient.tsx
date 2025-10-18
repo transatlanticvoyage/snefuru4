@@ -7,6 +7,7 @@ import LeadsmartTankTable from './components/LeadsmartTankTable';
 import CreateNewPopup from './components/CreateNewPopup';
 import InsertDataPopup from './components/InsertDataPopup';
 import SelectorPopup from './components/SelectorPopup';
+import LeadSmartJettisonTable from '@/app/components/LeadSmartJettisonTable';
 import dynamic from 'next/dynamic';
 
 const ZhedoriButtonBar = dynamic(
@@ -28,6 +29,12 @@ export default function LeadsmartTankClient() {
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
   const [isInsertDataPopupOpen, setIsInsertDataPopupOpen] = useState(false);
   const [isSelectorPopupOpen, setIsSelectorPopupOpen] = useState(false);
+  
+  // Filter state for jettison table
+  const [jettisonFilter, setJettisonFilter] = useState<{
+    type: 'release' | 'subsheet' | 'subpart' | null;
+    id: number | null;
+  }>({ type: null, id: null });
   
   // Refresh trigger
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -105,6 +112,10 @@ export default function LeadsmartTankClient() {
     // Trigger inline creation in table component
     window.dispatchEvent(new CustomEvent('leadsmart-create-inline'));
   };
+  
+  const handleJettisonFilterChange = (filterType: 'release' | 'subsheet' | 'subpart' | null, filterId: number | null) => {
+    setJettisonFilter({ type: filterType, id: filterId });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -168,6 +179,14 @@ export default function LeadsmartTankClient() {
           <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
             cardio_chamber
           </div>
+          
+          <LeadSmartJettisonTable 
+            config={{
+              targetTable: 'leadsmart_zip_based_data',
+              relColumnPrefix: 'rel_'
+            }}
+            onFilterChange={handleJettisonFilterChange}
+          />
         </div>
       )}
 
@@ -181,7 +200,10 @@ export default function LeadsmartTankClient() {
       )}
 
       {/* Table Component */}
-      <LeadsmartTankTable refreshTrigger={refreshTrigger} />
+      <LeadsmartTankTable 
+        refreshTrigger={refreshTrigger}
+        jettisonFilter={jettisonFilter}
+      />
       
       {/* Create New Popup */}
       {isCreatePopupOpen && (
