@@ -234,80 +234,123 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       return;
     }
     
+    console.log('🔄 FrostySelectorPopup: Checking transform status...');
+    const startTime = Date.now();
+    
     try {
-      // Fetch all source data
-      let zipQuery = supabase.from('leadsmart_zip_based_data').select('*');
-      
+      // First check row count
+      let countQuery = supabase.from('leadsmart_zip_based_data').select('*', { count: 'exact', head: true });
       if (selectXType === 'release') {
-        zipQuery = zipQuery.eq('rel_release_id', selectXId);
+        countQuery = countQuery.eq('rel_release_id', selectXId);
       } else if (selectXType === 'subsheet') {
-        zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
+        countQuery = countQuery.eq('rel_subsheet_id', selectXId);
       } else if (selectXType === 'subpart') {
-        zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
+        countQuery = countQuery.eq('rel_subpart_id', selectXId);
       }
       
-      const { data: sourceData, error: sourceError } = await zipQuery;
-      if (sourceError) throw sourceError;
+      const { count, error: countError } = await countQuery;
+      if (countError) throw countError;
       
-      if (!sourceData || sourceData.length === 0) {
+      console.log(`📊 Found ${count?.toLocaleString()} rows to check`);
+      
+      // Inform user but don't block (no hard limit)
+      if (count && count > 20000) {
+        console.warn(`⚠️ Large dataset: ${count.toLocaleString()} rows. Transform will use batch processing.`);
+      }
+      
+      // For large datasets, we'll check status in batches
+      console.log('⚡ Checking transform status in batches...');
+      const batchSize = 1000;
+      const totalBatches = Math.ceil((count || 0) / batchSize);
+      
+      const alreadyTransformedIds = new Set<number>();
+      let totalValid = 0;
+      let totalInvalid = 0;
+      
+      for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
+        const startRow = batchNum * batchSize;
+        const endRow = startRow + batchSize - 1;
+        
+        console.log(`📦 Processing batch ${batchNum + 1}/${totalBatches} (rows ${startRow}-${endRow})...`);
+        
+        let zipQuery = supabase.from('leadsmart_zip_based_data').select('*');
+        if (selectXType === 'release') {
+          zipQuery = zipQuery.eq('rel_release_id', selectXId);
+        } else if (selectXType === 'subsheet') {
+          zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
+        } else if (selectXType === 'subpart') {
+          zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
+        }
+        
+        zipQuery = zipQuery.range(startRow, endRow).order('global_row_id', { ascending: false });
+        
+        const { data: batchData, error: batchError } = await zipQuery;
+        if (batchError) throw batchError;
+        
+        if (!batchData || batchData.length === 0) break;
+        
+        // Filter out invalid rows in this batch
+        const validRows = batchData.filter(row => {
+          if (!row.city_name || !row.state_code || row.payout === null || row.payout === undefined) {
+            return false;
+          }
+          const cityLower = row.city_name.toLowerCase().trim();
+          const stateLower = row.state_code.toLowerCase().trim();
+          if (cityLower === 'city' || cityLower === 'city_name' || stateLower === 'state' || stateLower === 'state_code') {
+            return false;
+          }
+          return true;
+        });
+        
+        totalValid += validRows.length;
+        totalInvalid += (batchData.length - validRows.length);
+        
+        // Check which are already transformed (in batches)
+        const validGlobalRowIds = validRows.map(row => row.global_row_id);
+        const checkBatchSize = 500;
+        
+        for (let i = 0; i < validGlobalRowIds.length; i += checkBatchSize) {
+          const checkBatch = validGlobalRowIds.slice(i, i + checkBatchSize);
+          
+          const { data: relationsData, error: relationsError } = await supabase
+            .from('leadsmart_transformed_relations')
+            .select('original_global_id')
+            .in('original_global_id', checkBatch);
+          
+          if (relationsError) throw relationsError;
+          
+          relationsData?.forEach(r => {
+            alreadyTransformedIds.add(r.original_global_id);
+          });
+        }
+      }
+      
+      if (count === 0) {
         alert('No data found for transformation');
         return;
       }
       
-      // Filter out invalid rows
-      const validRows = sourceData.filter(row => {
-        if (!row.city_name || !row.state_code || row.payout === null || row.payout === undefined) {
-          return false;
-        }
-        const cityLower = row.city_name.toLowerCase().trim();
-        const stateLower = row.state_code.toLowerCase().trim();
-        if (cityLower === 'city' || cityLower === 'city_name' || stateLower === 'state' || stateLower === 'state_code') {
-          return false;
-        }
-        return true;
-      });
-      
-      const invalidRowsCount = sourceData.length - validRows.length;
-      
-      // Get global_row_ids of valid rows
-      const validGlobalRowIds = validRows.map(row => row.global_row_id);
-      
-      // Check which rows are already transformed (in batches)
-      const alreadyTransformedIds = new Set<number>();
-      const batchSize = 500;
-      
-      for (let i = 0; i < validGlobalRowIds.length; i += batchSize) {
-        const batch = validGlobalRowIds.slice(i, i + batchSize);
-        
-        const { data: relationsData, error: relationsError } = await supabase
-          .from('leadsmart_transformed_relations')
-          .select('original_global_id')
-          .in('original_global_id', batch);
-        
-        if (relationsError) throw relationsError;
-        
-        relationsData?.forEach(r => {
-          alreadyTransformedIds.add(r.original_global_id);
-        });
-      }
-      
       const alreadyTransformedCount = alreadyTransformedIds.size;
-      const notYetTransformedCount = validRows.length - alreadyTransformedCount;
+      const notYetTransformedCount = totalValid - alreadyTransformedCount;
       
       // Update stats
       setTransformStats({
-        totalRows: sourceData.length,
+        totalRows: count || 0,
         alreadyTransformed: alreadyTransformedCount,
         notYetTransformed: notYetTransformedCount,
-        invalidRows: invalidRowsCount
+        invalidRows: totalInvalid
       });
+      
+      const checkTime = Date.now() - startTime;
+      console.log(`✅ Transform status check complete in ${checkTime}ms`);
+      console.log(`   Total: ${count}, Already: ${alreadyTransformedCount}, New: ${notYetTransformedCount}, Invalid: ${totalInvalid}`);
       
       // Show confirmation popup
       setShowTransformConfirm(true);
       
     } catch (error) {
-      console.error('Error checking transform status:', error);
-      alert('Failed to check transform status');
+      console.error('❌ Error checking transform status:', error);
+      alert('Failed to check transform status. Check console for details.');
     }
   };
   
@@ -317,58 +360,47 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       return;
     }
     
+    console.log('🚀 Starting transformation process with batch processing...');
+    const startTime = Date.now();
     setTransforming(true);
+    
     try {
-      // Step 1: Fetch all source data from leadsmart_zip_based_data
-      let zipQuery = supabase.from('leadsmart_zip_based_data').select('*');
-      
+      // Step 1: Get total count
+      console.log('📊 Step 1: Getting total row count...');
+      let countQuery = supabase.from('leadsmart_zip_based_data').select('*', { count: 'exact', head: true });
       if (selectXType === 'release') {
-        zipQuery = zipQuery.eq('rel_release_id', selectXId);
+        countQuery = countQuery.eq('rel_release_id', selectXId);
       } else if (selectXType === 'subsheet') {
-        zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
+        countQuery = countQuery.eq('rel_subsheet_id', selectXId);
       } else if (selectXType === 'subpart') {
-        zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
+        countQuery = countQuery.eq('rel_subpart_id', selectXId);
       }
       
-      const { data: sourceData, error: sourceError } = await zipQuery;
-      if (sourceError) throw sourceError;
+      const { count: totalCount, error: countError } = await countQuery;
+      if (countError) throw countError;
       
-      if (!sourceData || sourceData.length === 0) {
+      console.log(`📈 Total rows to process: ${totalCount?.toLocaleString()}`);
+      
+      if (!totalCount || totalCount === 0) {
         alert('No data found for transformation');
         setTransforming(false);
         return;
       }
       
-      // Step 1.5: Check which rows are already transformed
-      const allGlobalRowIds = sourceData.map(row => row.global_row_id);
-      const alreadyTransformedIds = new Set<number>();
-      const batchSize = 500;
+      // Process in batches (NO HARD LIMIT!)
+      const BATCH_SIZE = 1000;
+      const totalBatches = Math.ceil(totalCount / BATCH_SIZE);
+      console.log(`📦 Will process ${totalBatches} batches of ${BATCH_SIZE} rows each`);
       
-      for (let i = 0; i < allGlobalRowIds.length; i += batchSize) {
-        const batch = allGlobalRowIds.slice(i, i + batchSize);
-        
-        const { data: relationsData, error: relationsError } = await supabase
-          .from('leadsmart_transformed_relations')
-          .select('original_global_id')
-          .in('original_global_id', batch);
-        
-        if (relationsError) throw relationsError;
-        
-        relationsData?.forEach(r => {
-          alreadyTransformedIds.add(r.original_global_id);
-        });
-      }
+      // Track global stats
+      let totalProcessed = 0;
+      let totalAlreadyTransformed = 0;
+      let totalSkipped = 0;
+      let transformedCount = 0;
+      let updatedCount = 0;
+      let relationsCount = 0;
       
-      // Filter out already transformed rows
-      const untransformedData = sourceData.filter(row => !alreadyTransformedIds.has(row.global_row_id));
-      
-      if (untransformedData.length === 0) {
-        alert('All rows have already been transformed. No new data to process.');
-        setTransforming(false);
-        return;
-      }
-      
-      // Step 2: Group data by city_name, state_code, payout, and the 3 rel_* IDs
+      // Global groups map (across all batches)
       interface GroupKey {
         city_name: string;
         state_code: string;
@@ -383,62 +415,122 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         global_row_ids: number[];
       }
       
-      const groups = new Map<string, GroupData>();
-      let skippedRowsCount = 0;
+      const globalGroups = new Map<string, GroupData>();
       
-      untransformedData.forEach(row => {
-        // Skip rows with invalid or missing critical data
-        if (!row.city_name || !row.state_code || row.payout === null || row.payout === undefined) {
-          console.warn('Skipping row with missing data:', row);
-          skippedRowsCount++;
-          return;
+      // Process each batch
+      for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
+        const startRow = batchNum * BATCH_SIZE;
+        const endRow = startRow + BATCH_SIZE - 1;
+        const progress = Math.round((batchNum / totalBatches) * 100);
+        
+        console.log(`📦 Processing batch ${batchNum + 1}/${totalBatches} (${progress}% - rows ${startRow}-${endRow})...`);
+        
+        // Fetch batch
+        let zipQuery = supabase.from('leadsmart_zip_based_data').select('*');
+        if (selectXType === 'release') {
+          zipQuery = zipQuery.eq('rel_release_id', selectXId);
+        } else if (selectXType === 'subsheet') {
+          zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
+        } else if (selectXType === 'subpart') {
+          zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
         }
         
-        // Skip rows that look like header rows
-        const cityLower = row.city_name.toLowerCase().trim();
-        const stateLower = row.state_code.toLowerCase().trim();
-        if (cityLower === 'city' || cityLower === 'city_name' || stateLower === 'state' || stateLower === 'state_code') {
-          console.warn('Skipping header row:', row);
-          skippedRowsCount++;
-          return;
-        }
+        zipQuery = zipQuery.range(startRow, endRow).order('global_row_id', { ascending: false });
         
-        const key = JSON.stringify({
-          city_name: cityLower,
-          state_code: stateLower,
-          payout: row.payout,
-          rel_release_id: row.rel_release_id,
-          rel_subsheet_id: row.rel_subsheet_id,
-          rel_subpart_id: row.rel_subpart_id
-        });
+        const { data: batchData, error: batchError } = await zipQuery;
+        if (batchError) throw batchError;
         
-        if (!groups.has(key)) {
-          groups.set(key, {
-            zip_codes: [],
-            global_row_ids: []
+        if (!batchData || batchData.length === 0) break;
+        
+        totalProcessed += batchData.length;
+        
+        // Check which rows in this batch are already transformed
+        const batchGlobalRowIds = batchData.map(row => row.global_row_id);
+        const alreadyTransformedInBatch = new Set<number>();
+        
+        const checkBatchSize = 500;
+        for (let i = 0; i < batchGlobalRowIds.length; i += checkBatchSize) {
+          const checkBatch = batchGlobalRowIds.slice(i, i + checkBatchSize);
+          
+          const { data: relationsData, error: relationsError } = await supabase
+            .from('leadsmart_transformed_relations')
+            .select('original_global_id')
+            .in('original_global_id', checkBatch);
+          
+          if (relationsError) throw relationsError;
+          
+          relationsData?.forEach(r => {
+            alreadyTransformedInBatch.add(r.original_global_id);
           });
         }
         
-        const group = groups.get(key)!;
-        if (row.zip_code) {
-          group.zip_codes.push(row.zip_code);
-        }
-        group.global_row_ids.push(row.global_row_id);
-      });
+        totalAlreadyTransformed += alreadyTransformedInBatch.size;
+        
+        // Process untransformed rows in this batch
+        batchData.forEach(row => {
+          // Skip already transformed
+          if (alreadyTransformedInBatch.has(row.global_row_id)) return;
+          
+          // Skip invalid data
+          if (!row.city_name || !row.state_code || row.payout === null || row.payout === undefined) {
+            totalSkipped++;
+            return;
+          }
+          
+          // Skip header rows
+          const cityLower = row.city_name.toLowerCase().trim();
+          const stateLower = row.state_code.toLowerCase().trim();
+          if (cityLower === 'city' || cityLower === 'city_name' || stateLower === 'state' || stateLower === 'state_code') {
+            totalSkipped++;
+            return;
+          }
+          
+          // Group by key
+          const key = JSON.stringify({
+            city_name: cityLower,
+            state_code: stateLower,
+            payout: row.payout,
+            rel_release_id: row.rel_release_id,
+            rel_subsheet_id: row.rel_subsheet_id,
+            rel_subpart_id: row.rel_subpart_id
+          });
+          
+          if (!globalGroups.has(key)) {
+            globalGroups.set(key, {
+              zip_codes: [],
+              global_row_ids: []
+            });
+          }
+          
+          const group = globalGroups.get(key)!;
+          if (row.zip_code) {
+            group.zip_codes.push(row.zip_code);
+          }
+          group.global_row_ids.push(row.global_row_id);
+        });
+        
+        console.log(`✅ Batch ${batchNum + 1} complete. Groups so far: ${globalGroups.size}`);
+      }
+      
+      console.log(`📊 All batches processed. Total groups: ${globalGroups.size}`);
       
       // Check if we have any valid groups
-      if (groups.size === 0) {
-        alert('No valid data to transform. All rows were skipped due to missing or invalid data.');
+      if (globalGroups.size === 0) {
+        alert('No valid data to transform. All rows were already transformed or skipped.');
         setTransforming(false);
         return;
       }
       
-      // Step 3: Insert into leadsmart_transformed and create relations
-      let transformedCount = 0;
-      let relationsCount = 0;
-      let updatedCount = 0;
+      // Step 3: Insert/update transformed records
+      console.log(`🔄 Inserting/updating ${globalGroups.size} transformed records...`);
+      let groupNum = 0;
       
-      for (const [keyStr, groupData] of groups) {
+      for (const [keyStr, groupData] of globalGroups) {
+        groupNum++;
+        if (groupNum % 100 === 0) {
+          console.log(`   Processing group ${groupNum}/${globalGroups.size}...`);
+        }
+        
         const groupKey: GroupKey = JSON.parse(keyStr);
         
         // Sort zip codes and prepare as JSONB array
@@ -513,23 +605,28 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         relationsCount += relationRecords.length;
       }
       
+      const totalTime = Date.now() - startTime;
       const resultMessage = `✅ TRANSFORM COMPLETE!\n\n` +
         `Source Data Analysis:\n` +
-        `- ${sourceData.length.toLocaleString()} total rows from leadsmart_zip_based_data\n` +
-        `- ${alreadyTransformedIds.size.toLocaleString()} rows already transformed (skipped)\n` +
-        `- ${untransformedData.length.toLocaleString()} rows not yet transformed\n` +
-        `- ${skippedRowsCount.toLocaleString()} rows skipped (invalid/missing data)\n` +
-        `- ${(untransformedData.length - skippedRowsCount).toLocaleString()} valid rows processed\n\n` +
+        `- ${totalCount.toLocaleString()} total rows in leadsmart_zip_based_data\n` +
+        `- ${totalProcessed.toLocaleString()} rows processed\n` +
+        `- ${totalAlreadyTransformed.toLocaleString()} rows already transformed (skipped)\n` +
+        `- ${totalSkipped.toLocaleString()} rows skipped (invalid/missing data)\n` +
+        `- ${(totalProcessed - totalAlreadyTransformed - totalSkipped).toLocaleString()} valid rows transformed\n\n` +
         `Transformed Results:\n` +
         `- ${transformedCount.toLocaleString()} NEW records created in leadsmart_transformed\n` +
         `- ${updatedCount.toLocaleString()} existing records updated in leadsmart_transformed\n` +
         `- ${relationsCount.toLocaleString()} relation records created\n` +
-        `- ${groups.size.toLocaleString()} unique city/state/payout combinations\n\n` +
+        `- ${globalGroups.size.toLocaleString()} unique city/state/payout combinations\n\n` +
+        `Performance:\n` +
+        `- Processed in ${totalBatches} batches of ${BATCH_SIZE} rows\n` +
+        `- Total time: ${(totalTime / 1000).toFixed(2)} seconds\n\n` +
         `Grouping Criteria:\n` +
         `- city_name, state_code, payout, jrel_subpart_id\n\n` +
         `Selection:\n` +
         `- ${selectXType}: #${selectXId}`;
       
+      console.log(`✅ Transform complete in ${(totalTime / 1000).toFixed(2)}s`);
       setTransformResults(resultMessage);
       setShowTransformResults(true);
       setShowTransformConfirm(false);
@@ -547,7 +644,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     }
   };
   
-  // Helper function to re-fetch transformed data count
+  // Helper function to re-fetch transformed data count (optimized for large datasets)
   const fetchTransformedDataCount = async () => {
     if (!selectXType || !selectXId) {
       setTransformedDataCount(0);
@@ -555,50 +652,78 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     }
     
     try {
-      let zipQuery = supabase.from('leadsmart_zip_based_data').select('global_row_id');
+      console.log('📊 Fetching transformed data count...');
+      
+      // Get total count of zip_based_data rows
+      let countQuery = supabase.from('leadsmart_zip_based_data').select('*', { count: 'exact', head: true });
       
       if (selectXType === 'release') {
-        zipQuery = zipQuery.eq('rel_release_id', selectXId);
+        countQuery = countQuery.eq('rel_release_id', selectXId);
       } else if (selectXType === 'subsheet') {
-        zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
+        countQuery = countQuery.eq('rel_subsheet_id', selectXId);
       } else if (selectXType === 'subpart') {
-        zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
+        countQuery = countQuery.eq('rel_subpart_id', selectXId);
       }
       
-      const { data: zipData, error: zipError } = await zipQuery;
-      if (zipError) throw zipError;
+      const { count: totalZipRows, error: countError } = await countQuery;
+      if (countError) throw countError;
       
-      if (!zipData || zipData.length === 0) {
+      if (!totalZipRows || totalZipRows === 0) {
         setTransformedDataCount(0);
         return;
       }
       
-      const globalRowIds = zipData.map(row => row.global_row_id);
-      
-      // Batch the queries to avoid URL length limits
+      // Process in batches to find transformed rows
+      const BATCH_SIZE = 1000;
+      const totalBatches = Math.ceil(totalZipRows / BATCH_SIZE);
       const uniqueTransformedIds = new Set<number>();
-      const batchSize = 500; // Safe batch size for URL length
       
-      for (let i = 0; i < globalRowIds.length; i += batchSize) {
-        const batch = globalRowIds.slice(i, i + batchSize);
+      for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
+        const startRow = batchNum * BATCH_SIZE;
+        const endRow = startRow + BATCH_SIZE - 1;
         
-        const { data: relationsData, error: relationsError } = await supabase
-          .from('leadsmart_transformed_relations')
-          .select('transformed_mundial_id')
-          .in('original_global_id', batch);
+        let zipQuery = supabase.from('leadsmart_zip_based_data').select('global_row_id');
+        if (selectXType === 'release') {
+          zipQuery = zipQuery.eq('rel_release_id', selectXId);
+        } else if (selectXType === 'subsheet') {
+          zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
+        } else if (selectXType === 'subpart') {
+          zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
+        }
         
-        if (relationsError) throw relationsError;
+        zipQuery = zipQuery.range(startRow, endRow);
         
-        relationsData?.forEach(r => {
-          if (r.transformed_mundial_id !== null) {
-            uniqueTransformedIds.add(r.transformed_mundial_id);
-          }
-        });
+        const { data: zipBatch, error: zipError } = await zipQuery;
+        if (zipError) throw zipError;
+        
+        if (!zipBatch || zipBatch.length === 0) break;
+        
+        const globalRowIds = zipBatch.map(row => row.global_row_id);
+        
+        // Check relations in sub-batches (to avoid URL length limits)
+        const subBatchSize = 500;
+        for (let i = 0; i < globalRowIds.length; i += subBatchSize) {
+          const subBatch = globalRowIds.slice(i, i + subBatchSize);
+          
+          const { data: relationsData, error: relationsError } = await supabase
+            .from('leadsmart_transformed_relations')
+            .select('transformed_mundial_id')
+            .in('original_global_id', subBatch);
+          
+          if (relationsError) throw relationsError;
+          
+          relationsData?.forEach(r => {
+            if (r.transformed_mundial_id !== null) {
+              uniqueTransformedIds.add(r.transformed_mundial_id);
+            }
+          });
+        }
       }
       
+      console.log(`✅ Found ${uniqueTransformedIds.size} transformed records`);
       setTransformedDataCount(uniqueTransformedIds.size);
     } catch (error) {
-      console.error('Error fetching transformed data count:', error);
+      console.error('❌ Error fetching transformed data count:', error);
       setTransformedDataCount(0);
     }
   };

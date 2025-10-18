@@ -38,6 +38,7 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
   
   // Data states
   const [data, setData] = useState<LeadsmartData[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0); // Total count from server
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   
@@ -79,15 +80,64 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
   // Columns that come from joined tables
   const joinedColumns = ['payout_note'];
 
-  // Fetch data
+  // Fetch data with server-side pagination
   const fetchData = useCallback(async () => {
     if (!user) {
       setLoading(false);
       return;
     }
     
+    console.log('🔄 LeadsmartTankTable: Starting data fetch (server-side pagination)...');
+    const startTime = Date.now();
     setLoading(true);
+    
     try {
+      // Build base query with count
+      let countQuery = supabase
+        .from('leadsmart_zip_based_data')
+        .select('*', { count: 'exact', head: true });
+      
+      // Apply filters to count query
+      if (jettisonFilter && jettisonFilter.type && jettisonFilter.id) {
+        console.log(`🔍 Applying jettison filter: ${jettisonFilter.type} = ${jettisonFilter.id}`);
+        if (jettisonFilter.type === 'release') {
+          countQuery = countQuery.eq('rel_release_id', jettisonFilter.id);
+        } else if (jettisonFilter.type === 'subsheet') {
+          countQuery = countQuery.eq('rel_subsheet_id', jettisonFilter.id);
+        } else if (jettisonFilter.type === 'subpart') {
+          countQuery = countQuery.eq('rel_subpart_id', jettisonFilter.id);
+        }
+      }
+      
+      if (skylabFilter && skylabFilter.type && skylabFilter.id) {
+        console.log(`🔍 Applying skylab filter: ${skylabFilter.type} = ${skylabFilter.id}`);
+        if (skylabFilter.type === 'release') {
+          countQuery = countQuery.eq('rel_release_id', skylabFilter.id);
+        } else if (skylabFilter.type === 'subsheet') {
+          countQuery = countQuery.eq('rel_subsheet_id', skylabFilter.id);
+        } else if (skylabFilter.type === 'subpart') {
+          countQuery = countQuery.eq('rel_subpart_id', skylabFilter.id);
+        }
+      }
+      
+      // Get total count (for pagination UI)
+      console.log('📊 Getting total row count...');
+      const { count: serverTotalCount, error: countError } = await countQuery;
+      
+      if (countError) {
+        console.error('❌ Error getting count:', countError);
+        setTotalCount(0);
+      } else {
+        console.log(`📈 Total matching rows: ${serverTotalCount?.toLocaleString()}`);
+        setTotalCount(serverTotalCount || 0);
+      }
+      
+      // Calculate range for current page (server-side pagination)
+      const startRow = (currentRowPage - 1) * rowsPerPage;
+      const endRow = startRow + rowsPerPage - 1;
+      console.log(`📄 Fetching page ${currentRowPage} (rows ${startRow}-${endRow})...`);
+      
+      // Build data query
       let query = supabase
         .from('leadsmart_zip_based_data')
         .select(`
@@ -97,7 +147,7 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
           )
         `);
       
-      // Apply jettison filter if active
+      // Apply same filters to data query
       if (jettisonFilter && jettisonFilter.type && jettisonFilter.id) {
         if (jettisonFilter.type === 'release') {
           query = query.eq('rel_release_id', jettisonFilter.id);
@@ -108,7 +158,6 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
         }
       }
       
-      // Apply skylab filter if active
       if (skylabFilter && skylabFilter.type && skylabFilter.id) {
         if (skylabFilter.type === 'release') {
           query = query.eq('rel_release_id', skylabFilter.id);
@@ -121,9 +170,18 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
       
       query = query.order('global_row_id', { ascending: false });
       
+      // Apply server-side pagination (NO HARD LIMIT!)
+      query = query.range(startRow, endRow);
+      
       const { data: fetchedData, error } = await query;
       
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Supabase query error:', error);
+        throw error;
+      }
+      
+      const fetchTime = Date.now() - startTime;
+      console.log(`✅ Data fetched successfully: ${fetchedData?.length.toLocaleString()} rows in ${fetchTime}ms`);
       
       // Flatten the joined data
       const flattenedData = fetchedData?.map(row => ({
@@ -131,17 +189,30 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
         payout_note: row.leadsmart_subparts?.payout_note || null
       })) || [];
       
+      console.log(`✅ Data ready to display: ${flattenedData.length.toLocaleString()} rows`);
       setData(flattenedData);
+      
+      const totalTime = Date.now() - startTime;
+      console.log(`⏱️ Total fetch time: ${totalTime}ms`);
+      
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('❌ Error fetching data:', error);
+      console.error('Error details:', error);
+      alert(`Error loading data: ${error instanceof Error ? error.message : 'Unknown error'}. Check console for details.`);
     } finally {
       setLoading(false);
+      console.log('✅ LeadsmartTankTable: Fetch complete, loading state set to false');
     }
-  }, [user, supabase, jettisonFilter, skylabFilter]);
+  }, [user, supabase, jettisonFilter, skylabFilter, currentRowPage, rowsPerPage]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData, refreshTrigger]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentRowPage(1);
+  }, [jettisonFilter, skylabFilter]);
 
   // Listen for inline create event
   useEffect(() => {
@@ -172,15 +243,15 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
     );
   });
 
-  // Row pagination
-  const totalRows = filteredData.length + (newRow ? 1 : 0);
+  // Row pagination (using server-side total count)
+  const totalRows = totalCount + (newRow ? 1 : 0);
   const totalRowPages = Math.ceil(totalRows / rowsPerPage);
-  const startRowIndex = (currentRowPage - 1) * rowsPerPage;
-  const endRowIndex = startRowIndex + rowsPerPage;
   
-  let paginatedData = filteredData.slice(startRowIndex, endRowIndex);
+  // Since we're using server-side pagination, data is already the current page
+  // Just apply client-side search filter to current page
+  let paginatedData = filteredData;
   
-  // Add new row at the top of current page if on page 1
+  // Add new row at the top if on page 1
   if (newRow && currentRowPage === 1) {
     paginatedData = [newRow as LeadsmartData, ...paginatedData.slice(0, rowsPerPage - 1)];
   }
