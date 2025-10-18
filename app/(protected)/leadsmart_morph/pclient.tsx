@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import LeadSmartJettisonTable from '@/app/components/LeadSmartJettisonTable';
+import LeadSmartJettisonTable from '@/app/components/leadsmart/LeadSmartJettisonTable';
 import FrostySelectorPopup from '../leadsmart_tank/components/FrostySelectorPopup';
 import dynamic from 'next/dynamic';
 

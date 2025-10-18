@@ -7,7 +7,7 @@ import LeadsmartTankTable from './components/LeadsmartTankTable';
 import CreateNewPopup from './components/CreateNewPopup';
 import InsertDataPopup from './components/InsertDataPopup';
 import FrostySelectorPopup from './components/FrostySelectorPopup';
-import LeadSmartJettisonTable from '@/app/components/LeadSmartJettisonTable';
+import LeadSmartJettisonTable from '@/app/components/leadsmart/LeadSmartJettisonTable';
 import dynamic from 'next/dynamic';
 
 const ZhedoriButtonBar = dynamic(
