@@ -15,7 +15,6 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
   const supabase = createClientComponentClient();
   
   const [formData, setFormData] = useState({
-    leadsmart_file_release: '',
     subsheet: '',
     subpart_of_subsheet: '',
     sheet_row_id: '',
@@ -23,7 +22,8 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
     zip_code: '',
     payout: '',
     city_name: '',
-    state_code: ''
+    state_code: '',
+    rel_release_id: ''
   });
   
   const [saving, setSaving] = useState(false);
@@ -40,6 +40,7 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
         ...formData,
         sheet_row_id: formData.sheet_row_id ? Number(formData.sheet_row_id) : null,
         payout: formData.payout ? Number(formData.payout) : null,
+        rel_release_id: formData.rel_release_id ? Number(formData.rel_release_id) : null,
         user_id: user.id
       };
       
@@ -78,18 +79,6 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
           
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Leadsmart File Release
-                </label>
-                <input
-                  type="text"
-                  value={formData.leadsmart_file_release}
-                  onChange={(e) => handleChange('leadsmart_file_release', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Subsheet
@@ -191,6 +180,19 @@ export default function CreateNewPopup({ isOpen, onClose, onSuccess }: Props) {
                     maxLength={2}
                   />
                 </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Release ID
+                </label>
+                <input
+                  type="number"
+                  value={formData.rel_release_id}
+                  onChange={(e) => handleChange('rel_release_id', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter release ID"
+                />
               </div>
             </div>
             

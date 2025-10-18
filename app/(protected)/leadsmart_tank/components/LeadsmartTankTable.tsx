@@ -6,7 +6,6 @@ import { useAuth } from '@/app/context/AuthContext';
 
 interface LeadsmartData {
   global_row_id: number;
-  leadsmart_file_release: string | null;
   subsheet: string | null;
   subpart_of_subsheet: string | null;
   sheet_row_id: number | null;
@@ -15,6 +14,7 @@ interface LeadsmartData {
   payout: number | null;
   city_name: string | null;
   state_code: string | null;
+  rel_release_id: number | null;
   user_id: string | null;
   created_at: string;
   updated_at: string;
@@ -52,7 +52,6 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
   // All columns from the database
   const allColumns = [
     'global_row_id',
-    'leadsmart_file_release',
     'subsheet',
     'subpart_of_subsheet',
     'sheet_row_id',
@@ -61,6 +60,7 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
     'payout',
     'city_name',
     'state_code',
+    'rel_release_id',
     'user_id',
     'created_at',
     'updated_at'
@@ -94,7 +94,6 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
   useEffect(() => {
     const handleCreateInline = () => {
       const newRowData: Partial<LeadsmartData> = {
-        leadsmart_file_release: '',
         subsheet: '',
         subpart_of_subsheet: '',
         sheet_row_id: null,
@@ -103,6 +102,7 @@ export default function LeadsmartTankTable({ refreshTrigger }: Props) {
         payout: null,
         city_name: '',
         state_code: '',
+        rel_release_id: null,
         user_id: user?.id || null
       };
       setNewRow(newRowData);

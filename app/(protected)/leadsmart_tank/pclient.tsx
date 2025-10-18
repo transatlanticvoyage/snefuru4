@@ -5,6 +5,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import LeadsmartTankTable from './components/LeadsmartTankTable';
 import CreateNewPopup from './components/CreateNewPopup';
+import InsertDataPopup from './components/InsertDataPopup';
 
 export default function LeadsmartTankClient() {
   const { user } = useAuth();
@@ -18,6 +19,7 @@ export default function LeadsmartTankClient() {
 
   // Popup state
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
+  const [isInsertDataPopupOpen, setIsInsertDataPopupOpen] = useState(false);
   
   // Refresh trigger
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -107,6 +109,12 @@ export default function LeadsmartTankClient() {
           
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-gray-800">Leadsmart Tank</h1>
+            <button
+              onClick={() => setIsInsertDataPopupOpen(true)}
+              className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition-colors"
+            >
+              insert new data
+            </button>
           </div>
         </div>
       )}
@@ -165,6 +173,18 @@ export default function LeadsmartTankClient() {
           onSuccess={() => {
             setRefreshTrigger(prev => prev + 1);
             setIsCreatePopupOpen(false);
+          }}
+        />
+      )}
+      
+      {/* Insert Data Popup */}
+      {isInsertDataPopupOpen && (
+        <InsertDataPopup
+          isOpen={isInsertDataPopupOpen}
+          onClose={() => setIsInsertDataPopupOpen(false)}
+          onSuccess={() => {
+            setRefreshTrigger(prev => prev + 1);
+            setIsInsertDataPopupOpen(false);
           }}
         />
       )}
