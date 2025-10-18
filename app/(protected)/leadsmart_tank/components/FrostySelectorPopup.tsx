@@ -45,6 +45,9 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     invalidRows: 0
   });
   
+  // Left pane view state
+  const [leftPaneView, setLeftPaneView] = useState<'grid' | 'tile'>('grid');
+  
   const handleSelectX = (type: 'release' | 'subsheet' | 'subpart', id: number) => {
     setSelectXType(type);
     setSelectXId(id);
@@ -666,26 +669,62 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
               </div>
             </div>
             
-            <SelectorFileReleasesGrid 
-              onReleaseSelect={setSelectedReleaseId}
-              selectXType={selectXType}
-              selectXId={selectXId}
-              onSelectX={handleSelectX}
-            />
-            <SelectorSubsheetsGrid 
-              selectedReleaseId={selectedReleaseId} 
-              onSubsheetSelect={setSelectedSubsheetId}
-              selectXType={selectXType}
-              selectXId={selectXId}
-              onSelectX={handleSelectX}
-            />
-            <SelectorSubpartsGrid 
-              selectedSubsheetId={selectedSubsheetId}
-              onSubpartSelect={setSelectedSubpartId}
-              selectXType={selectXType}
-              selectXId={selectXId}
-              onSelectX={handleSelectX}
-            />
+            {/* Tab System */}
+            <div className="flex border-b border-gray-300 bg-gray-50 flex-shrink-0">
+              <button
+                onClick={() => setLeftPaneView('grid')}
+                className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
+                  leftPaneView === 'grid'
+                    ? 'bg-white text-gray-900 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                Grid View
+              </button>
+              <button
+                onClick={() => setLeftPaneView('tile')}
+                className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
+                  leftPaneView === 'tile'
+                    ? 'bg-white text-gray-900 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                Tile View
+              </button>
+            </div>
+            
+            {/* Tab Content */}
+            {leftPaneView === 'grid' ? (
+              <>
+                <SelectorFileReleasesGrid 
+                  onReleaseSelect={setSelectedReleaseId}
+                  selectXType={selectXType}
+                  selectXId={selectXId}
+                  onSelectX={handleSelectX}
+                />
+                <SelectorSubsheetsGrid 
+                  selectedReleaseId={selectedReleaseId} 
+                  onSubsheetSelect={setSelectedSubsheetId}
+                  selectXType={selectXType}
+                  selectXId={selectXId}
+                  onSelectX={handleSelectX}
+                />
+                <SelectorSubpartsGrid 
+                  selectedSubsheetId={selectedSubsheetId}
+                  onSubpartSelect={setSelectedSubpartId}
+                  selectXType={selectXType}
+                  selectXId={selectXId}
+                  onSelectX={handleSelectX}
+                />
+              </>
+            ) : (
+              // Tile View - blank for now
+              <div className="flex-1 flex items-center justify-center p-6">
+                <div className="text-gray-500 italic text-sm">
+                  Tile View - coming soon
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Pane - Selection Info and Actions */}
