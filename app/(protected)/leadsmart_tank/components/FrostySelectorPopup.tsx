@@ -12,7 +12,7 @@ interface Props {
   pageType: 'tank' | 'morph';
 }
 
-export default function SelectorPopup({ isOpen, onClose, pageType }: Props) {
+export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props) {
   const supabase = createClientComponentClient();
   
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null);
@@ -646,23 +646,26 @@ export default function SelectorPopup({ isOpen, onClose, pageType }: Props) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl overflow-hidden" style={{ width: '100vw', height: '100vh' }}>
-        {/* Header */}
-        <div className="p-6 border-b bg-gray-50">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-800">Selector Popup</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-3xl font-bold leading-none"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-
         {/* Two Column Layout - Full Height */}
-        <div className="flex h-full" style={{ height: 'calc(100vh - 100px)' }}>
+        <div className="flex h-full">
           {/* Left Pane - Grids with counts */}
           <div className="flex-1 bg-white flex flex-col overflow-auto border-r border-gray-300">
+            {/* Header - now part of left pane */}
+            <div className="p-6 border-b bg-gray-50 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-2xl font-bold text-gray-800">FrostySelectorPopup</span>
+                  <span className="text-sm text-gray-600 ml-2">(central component for the "tank" and "morph" pages)</span>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="text-gray-400 hover:text-gray-600 text-3xl font-bold leading-none"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            
             <SelectorFileReleasesGrid 
               onReleaseSelect={setSelectedReleaseId}
               selectXType={selectXType}

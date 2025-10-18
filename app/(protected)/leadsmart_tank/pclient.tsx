@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import LeadsmartTankTable from './components/LeadsmartTankTable';
 import CreateNewPopup from './components/CreateNewPopup';
 import InsertDataPopup from './components/InsertDataPopup';
-import SelectorPopup from './components/SelectorPopup';
+import FrostySelectorPopup from './components/FrostySelectorPopup';
 import LeadSmartJettisonTable from '@/app/components/LeadSmartJettisonTable';
 import dynamic from 'next/dynamic';
 
@@ -231,7 +231,7 @@ export default function LeadsmartTankClient() {
       
       {/* Selector Popup */}
       {isSelectorPopupOpen && (
-        <SelectorPopup
+        <FrostySelectorPopup
           isOpen={isSelectorPopupOpen}
           onClose={() => setIsSelectorPopupOpen(false)}
           pageType="tank"

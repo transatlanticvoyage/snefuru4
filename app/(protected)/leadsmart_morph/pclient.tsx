@@ -5,7 +5,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import LeadSmartJettisonTable from '@/app/components/LeadSmartJettisonTable';
-import SelectorPopup from '../leadsmart_tank/components/SelectorPopup';
+import FrostySelectorPopup from '../leadsmart_tank/components/FrostySelectorPopup';
 import dynamic from 'next/dynamic';
 
 const ZhedoriButtonBar = dynamic(
@@ -1230,7 +1230,7 @@ export default function LeadsmartMorphClient() {
       
       {/* Selector Popup */}
       {isSelectorPopupOpen && (
-        <SelectorPopup
+        <FrostySelectorPopup
           isOpen={isSelectorPopupOpen}
           onClose={() => setIsSelectorPopupOpen(false)}
           pageType="morph"
