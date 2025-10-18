@@ -5,6 +5,9 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import SelectorFileReleasesGrid from './SelectorFileReleasesGrid';
 import SelectorSubsheetsGrid from './SelectorSubsheetsGrid';
 import SelectorSubpartsGrid from './SelectorSubpartsGrid';
+import TileFileReleasesView from './TileFileReleasesView';
+import TileSubsheetsView from './TileSubsheetsView';
+import TileSubpartsView from './TileSubpartsView';
 
 interface Props {
   isOpen: boolean;
@@ -718,11 +721,28 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                 />
               </>
             ) : (
-              // Tile View - blank for now
-              <div className="flex-1 flex items-center justify-center p-6">
-                <div className="text-gray-500 italic text-sm">
-                  Tile View - coming soon
-                </div>
+              // Tile View - compact mini-tables
+              <div className="flex-1 overflow-auto">
+                <TileFileReleasesView
+                  onReleaseSelect={setSelectedReleaseId}
+                  selectXType={selectXType}
+                  selectXId={selectXId}
+                  onSelectX={handleSelectX}
+                />
+                <TileSubsheetsView
+                  selectedReleaseId={selectedReleaseId}
+                  onSubsheetSelect={setSelectedSubsheetId}
+                  selectXType={selectXType}
+                  selectXId={selectXId}
+                  onSelectX={handleSelectX}
+                />
+                <TileSubpartsView
+                  selectedSubsheetId={selectedSubsheetId}
+                  onSubpartSelect={setSelectedSubpartId}
+                  selectXType={selectXType}
+                  selectXId={selectXId}
+                  onSelectX={handleSelectX}
+                />
               </div>
             )}
           </div>
