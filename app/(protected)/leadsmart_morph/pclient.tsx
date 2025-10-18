@@ -814,7 +814,7 @@ export default function LeadsmartMorphClient() {
             }}
           >
             <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
-              pec_chamber
+              pec_chamber skylab_system
             </div>
             
             {/* Skylab Tile Tables */}

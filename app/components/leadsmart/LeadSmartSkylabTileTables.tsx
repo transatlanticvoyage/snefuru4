@@ -55,6 +55,11 @@ export default function LeadSmartSkylabTileTables({
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null);
   const [selectedSubsheetId, setSelectedSubsheetId] = useState<number | null>(null);
   
+  // Navigation states for cycling through sx tiles
+  const [currentReleaseIndex, setCurrentReleaseIndex] = useState<number>(0);
+  const [currentSubsheetIndex, setCurrentSubsheetIndex] = useState<number>(0);
+  const [currentSubpartIndex, setCurrentSubpartIndex] = useState<number>(0);
+  
   const [loading, setLoading] = useState(true);
 
   // Fetch releases
@@ -198,6 +203,53 @@ export default function LeadSmartSkylabTileTables({
     fetchSubparts();
   }, [fetchSubparts]);
 
+  // Reset navigation indices when data changes
+  useEffect(() => {
+    if (releases.length > 0 && currentReleaseIndex >= releases.length) {
+      setCurrentReleaseIndex(0);
+    }
+  }, [releases.length, currentReleaseIndex]);
+
+  useEffect(() => {
+    if (subsheets.length > 0 && currentSubsheetIndex >= subsheets.length) {
+      setCurrentSubsheetIndex(0);
+    }
+  }, [subsheets.length, currentSubsheetIndex]);
+
+  useEffect(() => {
+    if (subparts.length > 0 && currentSubpartIndex >= subparts.length) {
+      setCurrentSubpartIndex(0);
+    }
+  }, [subparts.length, currentSubpartIndex]);
+
+  // Sync navigation indices with current filter
+  useEffect(() => {
+    if (currentFilter?.type === 'release' && currentFilter?.id) {
+      const index = releases.findIndex(r => r.release_id === currentFilter.id);
+      if (index !== -1) {
+        setCurrentReleaseIndex(index);
+      }
+    }
+  }, [currentFilter, releases]);
+
+  useEffect(() => {
+    if (currentFilter?.type === 'subsheet' && currentFilter?.id) {
+      const index = subsheets.findIndex(s => s.subsheet_id === currentFilter.id);
+      if (index !== -1) {
+        setCurrentSubsheetIndex(index);
+      }
+    }
+  }, [currentFilter, subsheets]);
+
+  useEffect(() => {
+    if (currentFilter?.type === 'subpart' && currentFilter?.id) {
+      const index = subparts.findIndex(s => s.subpart_id === currentFilter.id);
+      if (index !== -1) {
+        setCurrentSubpartIndex(index);
+      }
+    }
+  }, [currentFilter, subparts]);
+
   const handleViewChildren = (
     type: 'release' | 'subsheet' | 'subpart',
     id: number
@@ -231,6 +283,83 @@ export default function LeadSmartSkylabTileTables({
     }
   };
 
+  // Navigation functions for cycling through sx tiles
+  const handleNavigateRelease = (direction: 'prev' | 'next') => {
+    if (releases.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = currentReleaseIndex === 0 ? releases.length - 1 : currentReleaseIndex - 1;
+    } else {
+      newIndex = currentReleaseIndex === releases.length - 1 ? 0 : currentReleaseIndex + 1;
+    }
+    
+    setCurrentReleaseIndex(newIndex);
+    const release = releases[newIndex];
+    onFilterApply('release', release.release_id);
+  };
+
+  const handleNavigateSubsheet = (direction: 'prev' | 'next') => {
+    if (subsheets.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = currentSubsheetIndex === 0 ? subsheets.length - 1 : currentSubsheetIndex - 1;
+    } else {
+      newIndex = currentSubsheetIndex === subsheets.length - 1 ? 0 : currentSubsheetIndex + 1;
+    }
+    
+    setCurrentSubsheetIndex(newIndex);
+    const subsheet = subsheets[newIndex];
+    onFilterApply('subsheet', subsheet.subsheet_id);
+  };
+
+  const handleNavigateSubpart = (direction: 'prev' | 'next') => {
+    if (subparts.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = currentSubpartIndex === 0 ? subparts.length - 1 : currentSubpartIndex - 1;
+    } else {
+      newIndex = currentSubpartIndex === subparts.length - 1 ? 0 : currentSubpartIndex + 1;
+    }
+    
+    setCurrentSubpartIndex(newIndex);
+    const subpart = subparts[newIndex];
+    onFilterApply('subpart', subpart.subpart_id);
+  };
+
+  // Navigation functions for cycling through vc (view children) tiles
+  const handleNavigateReleaseVC = (direction: 'prev' | 'next') => {
+    if (releases.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = currentReleaseIndex === 0 ? releases.length - 1 : currentReleaseIndex - 1;
+    } else {
+      newIndex = currentReleaseIndex === releases.length - 1 ? 0 : currentReleaseIndex + 1;
+    }
+    
+    setCurrentReleaseIndex(newIndex);
+    const release = releases[newIndex];
+    handleViewChildren('release', release.release_id);
+  };
+
+  const handleNavigateSubsheetVC = (direction: 'prev' | 'next') => {
+    if (subsheets.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = currentSubsheetIndex === 0 ? subsheets.length - 1 : currentSubsheetIndex - 1;
+    } else {
+      newIndex = currentSubsheetIndex === subsheets.length - 1 ? 0 : currentSubsheetIndex + 1;
+    }
+    
+    setCurrentSubsheetIndex(newIndex);
+    const subsheet = subsheets[newIndex];
+    handleViewChildren('subsheet', subsheet.subsheet_id);
+  };
+
   return (
     <div className="p-4 bg-white border border-gray-300 rounded">
       {/* Single flex container for all labels and tiles */}
@@ -247,7 +376,74 @@ export default function LeadSmartSkylabTileTables({
             whiteSpace: 'nowrap'
           }}
         >
-          leadsmart_file_releases
+          <span>leadsmart_file_releases</span>
+          {releases.length > 0 && (
+            <>
+              <div className="flex items-center ml-2">
+                <button
+                  className="px-2 py-2.5 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
+                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', cursor: 'default' }}
+                  title="Select X navigation"
+                >
+                  sx
+                </button>
+                <button
+                  onClick={() => handleNavigateRelease('prev')}
+                  className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                  title="Previous release"
+                >
+                  <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <path d="M1 4v6h6" />
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => handleNavigateRelease('next')}
+                  className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                  title="Next release"
+                >
+                  <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <path d="M23 4v6h-6" />
+                    <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="flex items-center ml-2">
+                <button
+                  className="px-2 py-2.5 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
+                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', cursor: 'default' }}
+                  title="View Children navigation"
+                >
+                  vc
+                </button>
+                <button
+                  onClick={() => handleNavigateReleaseVC('prev')}
+                  className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                  title="Previous release (view children)"
+                >
+                  <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <path d="M1 4v6h6" />
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => handleNavigateReleaseVC('next')}
+                  className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                  title="Next release (view children)"
+                >
+                  <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <path d="M23 4v6h-6" />
+                    <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                  </svg>
+                </button>
+              </div>
+            </>
+          )}
         </div>
         
         {/* Release Tiles */}
@@ -333,7 +529,74 @@ export default function LeadSmartSkylabTileTables({
                 whiteSpace: 'nowrap'
               }}
             >
-              leadsmart_subsheets
+              <span>leadsmart_subsheets</span>
+              {subsheets.length > 0 && (
+                <>
+                  <div className="flex items-center ml-2">
+                    <button
+                      className="px-2 py-2.5 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
+                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', cursor: 'default' }}
+                      title="Select X navigation"
+                    >
+                      sx
+                    </button>
+                    <button
+                      onClick={() => handleNavigateSubsheet('prev')}
+                      className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                      title="Previous subsheet"
+                    >
+                      <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M1 4v6h6" />
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handleNavigateSubsheet('next')}
+                      className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                      title="Next subsheet"
+                    >
+                      <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M23 4v6h-6" />
+                        <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className="flex items-center ml-2">
+                    <button
+                      className="px-2 py-2.5 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
+                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', cursor: 'default' }}
+                      title="View Children navigation"
+                    >
+                      vc
+                    </button>
+                    <button
+                      onClick={() => handleNavigateSubsheetVC('prev')}
+                      className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                      title="Previous subsheet (view children)"
+                    >
+                      <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M1 4v6h6" />
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handleNavigateSubsheetVC('next')}
+                      className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                      title="Next subsheet (view children)"
+                    >
+                      <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M23 4v6h-6" />
+                        <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                      </svg>
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
             
             {/* Subsheet Tiles */}
@@ -421,7 +684,40 @@ export default function LeadSmartSkylabTileTables({
                 whiteSpace: 'nowrap'
               }}
             >
-              leadsmart_subparts
+              <span>leadsmart_subparts</span>
+              {subparts.length > 0 && (
+                <div className="flex items-center ml-2">
+                  <button
+                    className="px-2 py-2.5 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
+                    style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', cursor: 'default' }}
+                    title="Select X navigation"
+                  >
+                    sx
+                  </button>
+                  <button
+                    onClick={() => handleNavigateSubpart('prev')}
+                    className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                    style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                    title="Previous subpart"
+                  >
+                    <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <path d="M1 4v6h6" />
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => handleNavigateSubpart('next')}
+                    className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                    style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                    title="Next subpart"
+                  >
+                    <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <path d="M23 4v6h-6" />
+                      <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
             
             {/* Subpart Tiles (no VC column) */}

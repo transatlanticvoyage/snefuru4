@@ -201,7 +201,7 @@ export default function LeadsmartTankClient() {
       {pecChamberVisible && (
         <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
           <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
-            pec_chamber
+            pec_chamber skylab_system
           </div>
           
           {/* Skylab Tile Tables */}
