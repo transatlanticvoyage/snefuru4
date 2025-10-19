@@ -294,6 +294,17 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         headerRows: 0
       };
       
+      // Fetch entity data for join columns in CSV
+      console.log('📋 Fetching entity data for CSV joins...');
+      const { data: allReleases } = await supabase.from('leadsmart_file_releases').select('release_id, release_date');
+      const { data: allSubsheets } = await supabase.from('leadsmart_subsheets').select('subsheet_id, subsheet_name');
+      const { data: allSubparts } = await supabase.from('leadsmart_subparts').select('subpart_id, payout_note');
+      
+      // Create lookup maps for fast access
+      const releaseMap = new Map((allReleases || []).map(r => [r.release_id, r.release_date]));
+      const subsheetMap = new Map((allSubsheets || []).map(s => [s.subsheet_id, s.subsheet_name]));
+      const subpartMap = new Map((allSubparts || []).map(p => [p.subpart_id, p.payout_note]));
+      
       for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
         const startRow = batchNum * batchSize;
         const endRow = startRow + batchSize - 1;
@@ -367,7 +378,14 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           }
           
           if (!isValid) {
-            allInvalidRows.push({ ...row, invalid_reason: invalidReason });
+            // Add join data for CSV export
+            allInvalidRows.push({ 
+              ...row, 
+              invalid_reason: invalidReason,
+              'join.leadsmart_file_releases.release_date': releaseMap.get(row.rel_release_id) || '',
+              'join.leadsmart_subsheets.subsheet_name': subsheetMap.get(row.rel_subsheet_id) || '',
+              'join.leadsmart_subparts.payout_note': subpartMap.get(row.rel_subpart_id) || ''
+            });
           }
           
           return isValid;
@@ -440,8 +458,25 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       return;
     }
     
-    // Get all column names from the first row
-    const columns = Object.keys(invalidRowsData[0]);
+    // Define column order for CSV (with join columns interspersed)
+    const columns = [
+      'global_row_id',
+      'sheet_row_id',
+      'zip_code',
+      'payout',
+      'city_name',
+      'state_code',
+      'user_id',
+      'created_at',
+      'updated_at',
+      'rel_release_id',
+      'join.leadsmart_file_releases.release_date',
+      'rel_subsheet_id',
+      'join.leadsmart_subsheets.subsheet_name',
+      'rel_subpart_id',
+      'join.leadsmart_subparts.payout_note',
+      'invalid_reason'
+    ];
     
     // Create CSV header
     const csvHeader = columns.join(',');
@@ -474,7 +509,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     link.click();
     document.body.removeChild(link);
     
-    console.log(`✅ Downloaded CSV with ${invalidRowsData.length} invalid rows`);
+    console.log(`✅ Downloaded CSV with ${invalidRowsData.length} invalid rows (includes join columns)`);
   };
   
   // Helper functions for progress tracking (database version)
