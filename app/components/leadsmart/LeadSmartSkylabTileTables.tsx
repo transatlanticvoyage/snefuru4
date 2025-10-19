@@ -36,12 +36,37 @@ interface Props {
     type: 'release' | 'subsheet' | 'subpart' | null;
     id: number | null;
   };
+  onCacheRebuildRequest?: () => void;
+}
+
+interface PicoCacheData {
+  releases: {
+    [key: string]: {
+      zip_based_count: number;
+      transformed_count: number;
+      children_count: number;
+    };
+  };
+  subsheets: {
+    [key: string]: {
+      zip_based_count: number;
+      transformed_count: number;
+      children_count: number;
+    };
+  };
+  subparts: {
+    [key: string]: {
+      zip_based_count: number;
+      transformed_count: number;
+    };
+  };
 }
 
 export default function LeadSmartSkylabTileTables({ 
   pageType, 
   onFilterApply,
-  currentFilter 
+  currentFilter,
+  onCacheRebuildRequest
 }: Props) {
   const { user } = useAuth();
   const supabase = createClientComponentClient();
@@ -50,6 +75,10 @@ export default function LeadSmartSkylabTileTables({
   const [releases, setReleases] = useState<FileRelease[]>([]);
   const [subsheets, setSubsheets] = useState<Subsheet[]>([]);
   const [subparts, setSubparts] = useState<Subpart[]>([]);
+  
+  // Cache state
+  const [cacheData, setCacheData] = useState<PicoCacheData | null>(null);
+  const [rebuilding, setRebuilding] = useState(false);
   
   // Selection states for view children
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null);
@@ -62,21 +91,80 @@ export default function LeadSmartSkylabTileTables({
   
   const [loading, setLoading] = useState(true);
 
-  // Fetch releases
-  const fetchReleases = useCallback(async () => {
+  // Load cache from database
+  const loadCache = useCallback(async () => {
     if (!user) return;
     
     try {
       const { data, error } = await supabase
-        .from('leadsmart_file_releases')
-        .select('*')
-        .order('release_id', { ascending: false });
+        .from('leadsmart_pico_count_cache')
+        .select('count_data, last_updated')
+        .eq('user_id', user.id)
+        .maybeSingle();
       
       if (error) throw error;
       
-      // Fetch counts for each release
-      const releasesWithCounts = await Promise.all((data || []).map(async (release) => {
-        const { count: zipBasedCount } = await supabase
+      if (data) {
+        setCacheData(data.count_data as PicoCacheData);
+        console.log('✅ Pico cache loaded:', data.last_updated);
+      } else {
+        console.log('⚠️ No cache found for user, will create on first rebuild');
+        setCacheData(null);
+      }
+    } catch (error) {
+      console.error('Error loading pico cache:', error);
+      setCacheData(null);
+    }
+  }, [user, supabase]);
+
+  // Rebuild cache
+  const rebuildCache = useCallback(async () => {
+    if (!user?.id) {
+      alert('Please log in to rebuild cache');
+      return;
+    }
+    
+    if (rebuilding) {
+      alert('Cache rebuild already in progress');
+      return;
+    }
+    
+    if (!confirm('Rebuild Pico Count Cache?\n\nThis will count all rows in leadsmart_zip_based_data and leadsmart_transformed for all releases, subsheets, and subparts. This may take a few minutes.')) {
+      return;
+    }
+    
+    setRebuilding(true);
+    const startTime = Date.now();
+    
+    try {
+      console.log('🔄 Starting Pico cache rebuild...');
+      
+      // Mark rebuild as in progress
+      await supabase
+        .from('leadsmart_pico_count_cache')
+        .upsert({
+          cache_id: 1, // Will be ignored if row exists
+          user_id: user.id,
+          rebuild_in_progress: true,
+          last_rebuild_started_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        });
+      
+      const newCacheData: PicoCacheData = {
+        releases: {},
+        subsheets: {},
+        subparts: {}
+      };
+      
+      // Step 1: Count for all releases
+      console.log('📊 Step 1/3: Counting releases...');
+      const { data: allReleases } = await supabase
+        .from('leadsmart_file_releases')
+        .select('release_id');
+      
+      for (const release of (allReleases || [])) {
+        const { count: zipCount } = await supabase
           .from('leadsmart_zip_based_data')
           .select('*', { count: 'exact', head: true })
           .eq('rel_release_id', release.release_id);
@@ -91,19 +179,151 @@ export default function LeadSmartSkylabTileTables({
           .select('*', { count: 'exact', head: true })
           .eq('rel_release_id', release.release_id);
         
-        return {
-          ...release,
-          zip_based_count: zipBasedCount || 0,
+        newCacheData.releases[release.release_id] = {
+          zip_based_count: zipCount || 0,
           transformed_count: transformedCount || 0,
           children_count: childrenCount || 0
         };
-      }));
+      }
+      
+      console.log(`✅ Counted ${allReleases?.length || 0} releases`);
+      
+      // Step 2: Count for all subsheets
+      console.log('📊 Step 2/3: Counting subsheets...');
+      const { data: allSubsheets } = await supabase
+        .from('leadsmart_subsheets')
+        .select('subsheet_id');
+      
+      for (const subsheet of (allSubsheets || [])) {
+        const { count: zipCount } = await supabase
+          .from('leadsmart_zip_based_data')
+          .select('*', { count: 'exact', head: true })
+          .eq('rel_subsheet_id', subsheet.subsheet_id);
+        
+        const { count: transformedCount } = await supabase
+          .from('leadsmart_transformed')
+          .select('*', { count: 'exact', head: true })
+          .eq('jrel_subsheet_id', subsheet.subsheet_id);
+        
+        const { count: childrenCount } = await supabase
+          .from('leadsmart_subparts')
+          .select('*', { count: 'exact', head: true })
+          .eq('rel_subsheet_id', subsheet.subsheet_id);
+        
+        newCacheData.subsheets[subsheet.subsheet_id] = {
+          zip_based_count: zipCount || 0,
+          transformed_count: transformedCount || 0,
+          children_count: childrenCount || 0
+        };
+      }
+      
+      console.log(`✅ Counted ${allSubsheets?.length || 0} subsheets`);
+      
+      // Step 3: Count for all subparts
+      console.log('📊 Step 3/3: Counting subparts...');
+      const { data: allSubparts } = await supabase
+        .from('leadsmart_subparts')
+        .select('subpart_id');
+      
+      for (const subpart of (allSubparts || [])) {
+        const { count: zipCount } = await supabase
+          .from('leadsmart_zip_based_data')
+          .select('*', { count: 'exact', head: true })
+          .eq('rel_subpart_id', subpart.subpart_id);
+        
+        const { count: transformedCount } = await supabase
+          .from('leadsmart_transformed')
+          .select('*', { count: 'exact', head: true })
+          .eq('jrel_subpart_id', subpart.subpart_id);
+        
+        newCacheData.subparts[subpart.subpart_id] = {
+          zip_based_count: zipCount || 0,
+          transformed_count: transformedCount || 0
+        };
+      }
+      
+      console.log(`✅ Counted ${allSubparts?.length || 0} subparts`);
+      
+      const duration = Date.now() - startTime;
+      
+      // Save cache to database
+      console.log('💾 Saving cache to database...');
+      const { error: upsertError } = await supabase
+        .from('leadsmart_pico_count_cache')
+        .upsert({
+          user_id: user.id,
+          count_data: newCacheData,
+          last_updated: new Date().toISOString(),
+          rebuild_in_progress: false,
+          last_rebuild_completed_at: new Date().toISOString(),
+          last_rebuild_duration_ms: duration,
+          total_releases_cached: allReleases?.length || 0,
+          total_subsheets_cached: allSubsheets?.length || 0,
+          total_subparts_cached: allSubparts?.length || 0,
+          cache_version: 1
+        }, {
+          onConflict: 'user_id'
+        });
+      
+      if (upsertError) throw upsertError;
+      
+      // Update local cache
+      setCacheData(newCacheData);
+      
+      const durationSeconds = (duration / 1000).toFixed(1);
+      alert(`✅ Pico Cache Rebuilt Successfully!\n\n` +
+        `Releases: ${allReleases?.length || 0}\n` +
+        `Subsheets: ${allSubsheets?.length || 0}\n` +
+        `Subparts: ${allSubparts?.length || 0}\n\n` +
+        `Duration: ${durationSeconds}s`);
+      
+      console.log(`✅ Cache rebuilt in ${durationSeconds}s`);
+      
+      // Refresh data to apply new cache
+      await fetchReleases();
+      
+    } catch (error) {
+      console.error('❌ Error rebuilding pico cache:', error);
+      alert('Failed to rebuild cache. Check console for details.');
+      
+      // Mark rebuild as failed
+      await supabase
+        .from('leadsmart_pico_count_cache')
+        .update({ rebuild_in_progress: false })
+        .eq('user_id', user.id);
+    } finally {
+      setRebuilding(false);
+    }
+  }, [user, supabase]);
+
+  // Fetch releases
+  const fetchReleases = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('leadsmart_file_releases')
+        .select('*')
+        .order('release_id', { ascending: false });
+      
+      if (error) throw error;
+      
+      // Apply counts from cache (FAST!)
+      const releasesWithCounts = (data || []).map((release) => {
+        const cached = cacheData?.releases[release.release_id];
+        return {
+          ...release,
+          zip_based_count: cached?.zip_based_count || 0,
+          transformed_count: cached?.transformed_count || 0,
+          children_count: cached?.children_count || 0
+        };
+      });
       
       setReleases(releasesWithCounts);
     } catch (error) {
       console.error('Error fetching releases:', error);
     }
-  }, [user, supabase]);
+  }, [user, supabase, cacheData]);
 
   // Fetch subsheets
   const fetchSubsheets = useCallback(async () => {
@@ -121,35 +341,22 @@ export default function LeadSmartSkylabTileTables({
       
       if (error) throw error;
       
-      const subsheetsWithCounts = await Promise.all((data || []).map(async (subsheet) => {
-        const { count: zipBasedCount } = await supabase
-          .from('leadsmart_zip_based_data')
-          .select('*', { count: 'exact', head: true })
-          .eq('rel_subsheet_id', subsheet.subsheet_id);
-        
-        const { count: transformedCount } = await supabase
-          .from('leadsmart_transformed')
-          .select('*', { count: 'exact', head: true })
-          .eq('jrel_subsheet_id', subsheet.subsheet_id);
-        
-        const { count: childrenCount } = await supabase
-          .from('leadsmart_subparts')
-          .select('*', { count: 'exact', head: true })
-          .eq('rel_subsheet_id', subsheet.subsheet_id);
-        
+      // Apply counts from cache (FAST!)
+      const subsheetsWithCounts = (data || []).map((subsheet) => {
+        const cached = cacheData?.subsheets[subsheet.subsheet_id];
         return {
           ...subsheet,
-          zip_based_count: zipBasedCount || 0,
-          transformed_count: transformedCount || 0,
-          children_count: childrenCount || 0
+          zip_based_count: cached?.zip_based_count || 0,
+          transformed_count: cached?.transformed_count || 0,
+          children_count: cached?.children_count || 0
         };
-      }));
+      });
       
       setSubsheets(subsheetsWithCounts);
     } catch (error) {
       console.error('Error fetching subsheets:', error);
     }
-  }, [selectedReleaseId, supabase]);
+  }, [selectedReleaseId, supabase, cacheData]);
 
   // Fetch subparts
   const fetchSubparts = useCallback(async () => {
@@ -167,29 +374,39 @@ export default function LeadSmartSkylabTileTables({
       
       if (error) throw error;
       
-      const subpartsWithCounts = await Promise.all((data || []).map(async (subpart) => {
-        const { count: zipBasedCount } = await supabase
-          .from('leadsmart_zip_based_data')
-          .select('*', { count: 'exact', head: true })
-          .eq('rel_subpart_id', subpart.subpart_id);
-        
-        const { count: transformedCount } = await supabase
-          .from('leadsmart_transformed')
-          .select('*', { count: 'exact', head: true })
-          .eq('jrel_subpart_id', subpart.subpart_id);
-        
+      // Apply counts from cache (FAST!)
+      const subpartsWithCounts = (data || []).map((subpart) => {
+        const cached = cacheData?.subparts[subpart.subpart_id];
         return {
           ...subpart,
-          zip_based_count: zipBasedCount || 0,
-          transformed_count: transformedCount || 0
+          zip_based_count: cached?.zip_based_count || 0,
+          transformed_count: cached?.transformed_count || 0
         };
-      }));
+      });
       
       setSubparts(subpartsWithCounts);
     } catch (error) {
       console.error('Error fetching subparts:', error);
     }
-  }, [selectedSubsheetId, supabase]);
+  }, [selectedSubsheetId, supabase, cacheData]);
+
+  // Load cache on mount
+  useEffect(() => {
+    loadCache();
+  }, [loadCache]);
+
+  // Listen for rebuild cache event
+  useEffect(() => {
+    const handleRebuildEvent = () => {
+      rebuildCache();
+    };
+    
+    window.addEventListener('rebuild-pico-cache', handleRebuildEvent);
+    
+    return () => {
+      window.removeEventListener('rebuild-pico-cache', handleRebuildEvent);
+    };
+  }, [rebuildCache]);
 
   useEffect(() => {
     fetchReleases();

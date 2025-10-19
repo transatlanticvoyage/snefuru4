@@ -211,6 +211,11 @@ export default function LeadsmartMorphClient() {
     setJettisonFilter({ type: filterType, id: filterId });
   };
 
+  const handleRebuildPicoCache = () => {
+    // Trigger rebuild via custom event that LeadSmartSkylabTileTables will listen to
+    window.dispatchEvent(new CustomEvent('rebuild-pico-cache'));
+  };
+
   // Filter data based on search
   const filteredData = data.filter(row => {
     if (!searchTerm) return true;
@@ -813,8 +818,15 @@ export default function LeadsmartMorphClient() {
               marginBottom: '0px'
             }}
           >
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
-              pec_chamber skylab_system
+            <div className="flex items-center gap-3" style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
+              <span>pec_chamber skylab_system</span>
+              <button
+                onClick={handleRebuildPicoCache}
+                className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors font-medium"
+                title="Rebuild count cache for Skylab tiles"
+              >
+                🔄 Re-create Pico Count Cache Now
+              </button>
             </div>
             
             {/* Skylab Tile Tables */}
@@ -822,6 +834,7 @@ export default function LeadsmartMorphClient() {
               pageType="morph"
               onFilterApply={(type, id) => setSkylabFilter({ type, id })}
               currentFilter={skylabFilter}
+              onCacheRebuildRequest={handleRebuildPicoCache}
             />
           </div>
         )}

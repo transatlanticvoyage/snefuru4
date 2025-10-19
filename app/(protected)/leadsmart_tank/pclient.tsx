@@ -124,6 +124,11 @@ export default function LeadsmartTankClient() {
     setJettisonFilter({ type: filterType, id: filterId });
   };
 
+  const handleRebuildPicoCache = () => {
+    // Trigger rebuild via custom event that LeadSmartSkylabTileTables will listen to
+    window.dispatchEvent(new CustomEvent('rebuild-pico-cache'));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Mandible Chamber */}
@@ -200,8 +205,15 @@ export default function LeadsmartTankClient() {
       {/* Pec Chamber */}
       {pecChamberVisible && (
         <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
-          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
-            pec_chamber skylab_system
+          <div className="font-bold flex items-center gap-3" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            <span>pec_chamber skylab_system</span>
+            <button
+              onClick={handleRebuildPicoCache}
+              className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors font-medium"
+              title="Rebuild count cache for Skylab tiles"
+            >
+              🔄 Re-create Pico Count Cache Now
+            </button>
           </div>
           
           {/* Skylab Tile Tables */}
@@ -209,6 +221,7 @@ export default function LeadsmartTankClient() {
             pageType="tank"
             onFilterApply={(type, id) => setSkylabFilter({ type, id })}
             currentFilter={skylabFilter}
+            onCacheRebuildRequest={handleRebuildPicoCache}
           />
         </div>
       )}
