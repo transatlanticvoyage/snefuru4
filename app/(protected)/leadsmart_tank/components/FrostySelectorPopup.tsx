@@ -1392,18 +1392,29 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       {/* Transform Confirmation Popup */}
       {showTransformConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
-            <div className="p-6">
-              <div className="flex items-center mb-4">
-                <div className="bg-purple-100 rounded-full p-2 mr-3">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 flex flex-col" style={{ maxHeight: '90vh' }}>
+            {/* Fixed Header */}
+            <div className="p-6 border-b bg-gray-50 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="bg-purple-100 rounded-full p-2 mr-3">
+                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">🔄 Transform Data Confirmation</h3>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">🔄 Transform Data Confirmation</h3>
+                <button
+                  onClick={() => setShowTransformConfirm(false)}
+                  className="text-gray-400 hover:text-gray-600 text-3xl font-bold leading-none"
+                >
+                  ×
+                </button>
               </div>
-              
-              <div className="mb-6">
+            </div>
+            
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
                 <p className="text-gray-700 mb-4 font-medium">
                   Review the transformation statistics before proceeding:
                 </p>
@@ -1577,8 +1588,10 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                     </p>
                   </div>
                 )}
-              </div>
-              
+            </div>
+            
+            {/* Fixed Button Footer */}
+            <div className="p-6 border-t bg-gray-50 flex-shrink-0">
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setShowTransformConfirm(false)}
