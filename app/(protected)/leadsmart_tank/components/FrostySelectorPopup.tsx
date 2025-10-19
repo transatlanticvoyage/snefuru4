@@ -40,6 +40,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
   const [transforming, setTransforming] = useState(false);
   const [showTransformResults, setShowTransformResults] = useState(false);
   const [transformResults, setTransformResults] = useState('');
+  const [currentTransformId, setCurrentTransformId] = useState<string | null>(null);
   const [showTransformConfirm, setShowTransformConfirm] = useState(false);
   const [transformStats, setTransformStats] = useState({
     totalRows: 0,
@@ -354,6 +355,46 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     }
   };
   
+  // Helper functions for progress tracking
+  const saveTransformProgress = (attemptId: string, data: any) => {
+    try {
+      const stored = localStorage.getItem('leadsmart_transform_attempts');
+      const attempts = stored ? JSON.parse(stored) : [];
+      
+      const existingIndex = attempts.findIndex((a: any) => a.id === attemptId);
+      
+      if (existingIndex >= 0) {
+        attempts[existingIndex] = { ...attempts[existingIndex], ...data, lastUpdateTime: new Date().toISOString() };
+      } else {
+        attempts.push({ id: attemptId, ...data, lastUpdateTime: new Date().toISOString() });
+      }
+      
+      localStorage.setItem('leadsmart_transform_attempts', JSON.stringify(attempts));
+    } catch (error) {
+      console.error('Error saving transform progress:', error);
+    }
+  };
+
+  const addTransformLog = (attemptId: string, message: string) => {
+    try {
+      const stored = localStorage.getItem('leadsmart_transform_attempts');
+      const attempts = stored ? JSON.parse(stored) : [];
+      
+      const existingIndex = attempts.findIndex((a: any) => a.id === attemptId);
+      
+      if (existingIndex >= 0) {
+        if (!attempts[existingIndex].logs) {
+          attempts[existingIndex].logs = [];
+        }
+        attempts[existingIndex].logs.push(`[${new Date().toLocaleTimeString()}] ${message}`);
+        attempts[existingIndex].lastUpdateTime = new Date().toISOString();
+        localStorage.setItem('leadsmart_transform_attempts', JSON.stringify(attempts));
+      }
+    } catch (error) {
+      console.error('Error adding transform log:', error);
+    }
+  };
+
   const handleTransform = async () => {
     if (!selectXType || !selectXId) {
       alert('Please select an item first');
@@ -362,6 +403,8 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     
     console.log('🚀 Starting transformation process with batch processing...');
     const startTime = Date.now();
+    const attemptId = `transform_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    setCurrentTransformId(attemptId);
     setTransforming(true);
     
     try {
@@ -387,10 +430,33 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         return;
       }
       
+      // Initialize transform tracking
+      saveTransformProgress(attemptId, {
+        startTime: new Date().toISOString(),
+        status: 'in_progress',
+        entityType: selectXType,
+        entityId: selectXId,
+        totalRows: totalCount,
+        processedRows: 0,
+        currentBatch: 0,
+        totalBatches: Math.ceil(totalCount / 1000),
+        groupsCreated: 0,
+        transformedRecords: 0,
+        updatedRecords: 0,
+        relationsCreated: 0,
+        skippedRows: 0,
+        alreadyTransformedRows: 0,
+        logs: []
+      });
+      
+      addTransformLog(attemptId, `Transform started for ${selectXType} #${selectXId}`);
+      addTransformLog(attemptId, `Total rows to process: ${totalCount.toLocaleString()}`);
+      
       // Process in batches (NO HARD LIMIT!)
       const BATCH_SIZE = 1000;
       const totalBatches = Math.ceil(totalCount / BATCH_SIZE);
       console.log(`📦 Will process ${totalBatches} batches of ${BATCH_SIZE} rows each`);
+      addTransformLog(attemptId, `Will process ${totalBatches} batches of ${BATCH_SIZE} rows each`);
       
       // Track global stats
       let totalProcessed = 0;
@@ -510,9 +576,23 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         });
         
         console.log(`✅ Batch ${batchNum + 1} complete. Groups so far: ${globalGroups.size}`);
+        
+        // Update progress after each batch
+        saveTransformProgress(attemptId, {
+          processedRows: totalProcessed,
+          currentBatch: batchNum + 1,
+          groupsCreated: globalGroups.size,
+          alreadyTransformedRows: totalAlreadyTransformed,
+          skippedRows: totalSkipped
+        });
+        
+        if (batchNum % 10 === 0 || batchNum === totalBatches - 1) {
+          addTransformLog(attemptId, `Batch ${batchNum + 1}/${totalBatches} complete. Processed: ${totalProcessed.toLocaleString()}, Groups: ${globalGroups.size.toLocaleString()}`);
+        }
       }
       
       console.log(`📊 All batches processed. Total groups: ${globalGroups.size}`);
+      addTransformLog(attemptId, `All ${totalBatches} batches processed. Total groups: ${globalGroups.size.toLocaleString()}`);
       
       // Check if we have any valid groups
       if (globalGroups.size === 0) {
@@ -523,12 +603,23 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       
       // Step 3: Insert/update transformed records
       console.log(`🔄 Inserting/updating ${globalGroups.size} transformed records...`);
+      addTransformLog(attemptId, `Starting to insert/update ${globalGroups.size.toLocaleString()} groups...`);
+      
       let groupNum = 0;
       
       for (const [keyStr, groupData] of globalGroups) {
         groupNum++;
         if (groupNum % 100 === 0) {
           console.log(`   Processing group ${groupNum}/${globalGroups.size}...`);
+          
+          // Update progress periodically
+          saveTransformProgress(attemptId, {
+            transformedRecords: transformedCount,
+            updatedRecords: updatedCount,
+            relationsCreated: relationsCount
+          });
+          
+          addTransformLog(attemptId, `Inserting groups: ${groupNum}/${globalGroups.size} (${Math.round((groupNum / globalGroups.size) * 100)}%)`);
         }
         
         const groupKey: GroupKey = JSON.parse(keyStr);
@@ -627,6 +718,23 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         `- ${selectXType}: #${selectXId}`;
       
       console.log(`✅ Transform complete in ${(totalTime / 1000).toFixed(2)}s`);
+      addTransformLog(attemptId, `Transform complete in ${(totalTime / 1000).toFixed(2)}s`);
+      addTransformLog(attemptId, `NEW records: ${transformedCount.toLocaleString()}, UPDATED: ${updatedCount.toLocaleString()}, Relations: ${relationsCount.toLocaleString()}`);
+      
+      // Mark as completed
+      saveTransformProgress(attemptId, {
+        status: 'completed',
+        endTime: new Date().toISOString(),
+        processedRows: totalProcessed,
+        currentBatch: totalBatches,
+        groupsCreated: globalGroups.size,
+        transformedRecords: transformedCount,
+        updatedRecords: updatedCount,
+        relationsCreated: relationsCount,
+        alreadyTransformedRows: totalAlreadyTransformed,
+        skippedRows: totalSkipped
+      });
+      
       setTransformResults(resultMessage);
       setShowTransformResults(true);
       setShowTransformConfirm(false);
@@ -637,10 +745,21 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     } catch (error) {
       console.error('Error transforming data:', error);
       const errorMessage = `❌ TRANSFORM FAILED\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      
+      // Mark as failed
+      saveTransformProgress(attemptId, {
+        status: 'failed',
+        endTime: new Date().toISOString(),
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      addTransformLog(attemptId, `❌ FAILED: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
       setTransformResults(errorMessage);
       setShowTransformResults(true);
     } finally {
       setTransforming(false);
+      setCurrentTransformId(null);
     }
   };
   
@@ -1180,6 +1299,12 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
               </div>
 
               <div className="p-6 border-t bg-gray-50">
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
+                  <p className="text-sm text-blue-800">
+                    📊 <strong>View Detailed Reports:</strong> Visit <a href="/leadsmart_treports" className="underline font-semibold hover:text-blue-600">/leadsmart_treports</a> to track all transform attempts, monitor progress in real-time, and access detailed diagnostic reports.
+                  </p>
+                </div>
+                
                 <div className="flex items-center justify-between">
                   <button
                     onClick={() => {
