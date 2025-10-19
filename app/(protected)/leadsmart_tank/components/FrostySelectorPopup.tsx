@@ -922,6 +922,35 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
             return;
           }
           
+          // DEFENSIVE CHECK: Validate relationship IDs before grouping
+          if (row.rel_release_id === undefined || row.rel_subsheet_id === undefined || row.rel_subpart_id === undefined) {
+            console.error('❌ UNDEFINED REL ID DETECTED IN BATCH DATA:', {
+              global_row_id: row.global_row_id,
+              batch_num: batchNum + 1,
+              rel_release_id: row.rel_release_id,
+              rel_subsheet_id: row.rel_subsheet_id,
+              rel_subpart_id: row.rel_subpart_id,
+              city_name: row.city_name,
+              state_code: row.state_code,
+              payout: row.payout
+            });
+            totalSkipped++;
+            return;
+          }
+
+          // Additional check for null values (should not happen per user's investigation)
+          if (row.rel_release_id === null || row.rel_subsheet_id === null || row.rel_subpart_id === null) {
+            console.error('❌ NULL REL ID DETECTED IN BATCH DATA:', {
+              global_row_id: row.global_row_id,
+              batch_num: batchNum + 1,
+              rel_release_id: row.rel_release_id,
+              rel_subsheet_id: row.rel_subsheet_id,
+              rel_subpart_id: row.rel_subpart_id
+            });
+            totalSkipped++;
+            return;
+          }
+
           // Group by key
           const key = JSON.stringify({
             city_name: cityLower,
@@ -998,6 +1027,28 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         
         const groupKey: GroupKey = JSON.parse(keyStr);
         
+        // DEFENSIVE CHECK: Validate relationship IDs after JSON.parse
+        if (groupKey.rel_release_id === undefined || groupKey.rel_subsheet_id === undefined || groupKey.rel_subpart_id === undefined) {
+          console.error('❌ UNDEFINED REL ID DETECTED AFTER JSON.PARSE:', {
+            groupNum: groupNum,
+            keyStr: keyStr,
+            parsed_groupKey: groupKey,
+            rel_release_id: groupKey.rel_release_id,
+            rel_subsheet_id: groupKey.rel_subsheet_id,
+            rel_subpart_id: groupKey.rel_subpart_id
+          });
+          continue; // Skip this group
+        }
+
+        if (groupKey.rel_release_id === null || groupKey.rel_subsheet_id === null || groupKey.rel_subpart_id === null) {
+          console.error('❌ NULL REL ID DETECTED AFTER JSON.PARSE:', {
+            groupNum: groupNum,
+            keyStr: keyStr,
+            parsed_groupKey: groupKey
+          });
+          continue; // Skip this group
+        }
+        
         // Sort zip codes and prepare as JSONB array
         const aggregatedZipCodes = groupData.zip_codes.sort();
         
@@ -1011,6 +1062,37 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           jrel_subsheet_id: groupKey.rel_subsheet_id,
           jrel_subpart_id: groupKey.rel_subpart_id
         };
+
+        // FINAL DEFENSIVE CHECK: Validate transformedData before database operations
+        if (transformedData.jrel_release_id === undefined || transformedData.jrel_subsheet_id === undefined || transformedData.jrel_subpart_id === undefined) {
+          console.error('❌ UNDEFINED jrel_* VALUES IN TRANSFORMED DATA:', {
+            groupNum: groupNum,
+            transformedData: transformedData,
+            original_groupKey: groupKey
+          });
+          continue; // Skip this group
+        }
+
+        if (transformedData.jrel_release_id === null || transformedData.jrel_subsheet_id === null || transformedData.jrel_subpart_id === null) {
+          console.error('❌ NULL jrel_* VALUES IN TRANSFORMED DATA:', {
+            groupNum: groupNum,
+            transformedData: transformedData,
+            original_groupKey: groupKey
+          });
+          continue; // Skip this group
+        }
+
+        // Log successful validation for first few groups (debugging)
+        if (groupNum <= 5) {
+          console.log(`✅ GROUP ${groupNum} VALIDATION PASSED:`, {
+            jrel_release_id: transformedData.jrel_release_id,
+            jrel_subsheet_id: transformedData.jrel_subsheet_id,
+            jrel_subpart_id: transformedData.jrel_subpart_id,
+            city_name: transformedData.city_name,
+            state_code: transformedData.state_code,
+            payout: transformedData.payout
+          });
+        }
         
         // Insert or get existing transformed record (CHECK ALL 6 GROUPING FIELDS!)
         const { data: existingTransformed, error: checkError } = await supabase
