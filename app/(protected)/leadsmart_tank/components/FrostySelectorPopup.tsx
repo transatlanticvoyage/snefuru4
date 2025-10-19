@@ -65,6 +65,9 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
   // Left pane view state
   const [leftPaneView, setLeftPaneView] = useState<'grid' | 'tile'>('grid');
   
+  // Right pane tab state (tank page only)
+  const [rightPaneTab, setRightPaneTab] = useState<'main' | 'delete'>('main');
+  
   const handleSelectX = (type: 'release' | 'subsheet' | 'subpart', id: number) => {
     setSelectXType(type);
     setSelectXId(id);
@@ -1213,96 +1216,133 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
             
             {pageType === 'tank' ? (
               // Tank page configuration - original transform logic
-              <div className="p-6 flex-1 overflow-auto">
-                <div className="font-bold text-gray-800 mb-4" style={{ fontSize: '16px' }}>
-                  from select_x system:
-                </div>
-              
-              {selectXType && selectXId ? (
-                <div className="mb-6">
-                  <div className="text-lg text-gray-800 mb-2">
-                    {selectXType === 'release' && `release_id - ${selectXId} - ${selectXResultCount.toLocaleString()} results`}
-                    {selectXType === 'subsheet' && `subsheet_id - ${selectXId} - ${selectXResultCount.toLocaleString()} results`}
-                    {selectXType === 'subpart' && `subpart_id - ${selectXId} - ${selectXResultCount.toLocaleString()} results`}
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="p-6">
+                  <div className="font-bold text-gray-800 mb-4" style={{ fontSize: '16px' }}>
+                    from select_x system:
+                  </div>
+                
+                {selectXType && selectXId ? (
+                  <div className="mb-6">
+                    <div className="text-lg text-gray-800 mb-2">
+                      {selectXType === 'release' && `release_id - ${selectXId} - ${selectXResultCount.toLocaleString()} results`}
+                      {selectXType === 'subsheet' && `subsheet_id - ${selectXId} - ${selectXResultCount.toLocaleString()} results`}
+                      {selectXType === 'subpart' && `subpart_id - ${selectXId} - ${selectXResultCount.toLocaleString()} results`}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500 italic mb-6">
+                    No selection made yet. Click select_x on any item.
+                  </div>
+                )}
+                
+                {/* Horizontal Tab System */}
+                <div className="border-b border-gray-300">
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => setRightPaneTab('main')}
+                      className={`px-6 py-2 font-medium transition-colors ${
+                        rightPaneTab === 'main'
+                          ? 'bg-white text-blue-600 border-b-2 border-blue-600'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      main functions
+                    </button>
+                    <button
+                      onClick={() => setRightPaneTab('delete')}
+                      className={`px-6 py-2 font-medium transition-colors ${
+                        rightPaneTab === 'delete'
+                          ? 'bg-white text-red-600 border-b-2 border-red-600'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      delete
+                    </button>
                   </div>
                 </div>
-              ) : (
-                <div className="text-sm text-gray-500 italic mb-6">
-                  No selection made yet. Click select_x on any item.
                 </div>
-              )}
-              
-              <div className="space-y-3">
-                <hr className="border-gray-300" />
                 
-                {/* Info about what will be deleted */}
-                <div className="py-2 px-3 bg-yellow-50 border border-yellow-200 rounded">
-                  <p className="text-sm text-gray-700">
-                    <strong>Delete (method 1):</strong> Deletes rows from <span className="font-mono text-xs">leadsmart_zip_based_data</span> where the selected entity's rel_* column matches.
-                  </p>
-                  {selectXResultCount > 0 && (
-                    <p className="text-sm text-red-600 font-semibold mt-1">
-                      ⚠️ Will delete {selectXResultCount.toLocaleString()} rows
-                    </p>
+                {/* Tab Content */}
+                <div className="flex-1 overflow-auto p-6">
+                  {rightPaneTab === 'main' ? (
+                    // Main Functions Tab
+                    <div className="space-y-3">
+                      <button
+                        onClick={checkTransformStatus}
+                        disabled={!selectXType || !selectXId || transforming}
+                        className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
+                          selectXType && selectXId && !transforming
+                            ? 'bg-purple-600 text-white hover:bg-purple-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {transforming ? 'Transforming...' : 'transform'}
+                      </button>
+                      
+                      <button
+                        onClick={() => {
+                          if (!selectXType || !selectXId) {
+                            alert('Please select an item first');
+                            return;
+                          }
+                          // Dispatch event to jettison table
+                          window.dispatchEvent(new CustomEvent('jettison-filter-apply', {
+                            detail: { type: selectXType, id: selectXId }
+                          }));
+                          // Close selector popup
+                          onClose();
+                        }}
+                        disabled={!selectXType || !selectXId}
+                        className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
+                          selectXType && selectXId
+                            ? 'bg-green-600 text-white hover:bg-green-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        filter main ui table
+                      </button>
+                    </div>
+                  ) : (
+                    // Delete Tab
+                    <div className="space-y-3">
+                      <hr className="border-gray-300" />
+                      
+                      {/* Info about what will be deleted */}
+                      <div className="py-2 px-3 bg-yellow-50 border border-yellow-200 rounded">
+                        <p className="text-sm text-gray-700">
+                          <strong>Delete (method 1):</strong> Deletes rows from <span className="font-mono text-xs">leadsmart_zip_based_data</span> where the selected entity's rel_* column matches.
+                        </p>
+                        {selectXResultCount > 0 && (
+                          <p className="text-sm text-red-600 font-semibold mt-1">
+                            ⚠️ Will delete {selectXResultCount.toLocaleString()} rows
+                          </p>
+                        )}
+                      </div>
+                      
+                      <hr className="border-gray-300" />
+                      
+                      <button
+                        onClick={() => {
+                          if (!selectXType || !selectXId) {
+                            alert('Please select an item first');
+                            return;
+                          }
+                          setShowFirstDeleteConfirm(true);
+                        }}
+                        disabled={!selectXType || !selectXId}
+                        className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
+                          selectXType && selectXId
+                            ? 'bg-red-600 text-white hover:bg-red-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        delete (method 1)
+                      </button>
+                    </div>
                   )}
                 </div>
-                
-                <hr className="border-gray-300" />
-                
-                <button
-                  onClick={() => {
-                    if (!selectXType || !selectXId) {
-                      alert('Please select an item first');
-                      return;
-                    }
-                    setShowFirstDeleteConfirm(true);
-                  }}
-                  disabled={!selectXType || !selectXId}
-                  className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                    selectXType && selectXId
-                      ? 'bg-red-600 text-white hover:bg-red-700'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  delete (method 1)
-                </button>
-                
-                <button
-                  onClick={checkTransformStatus}
-                  disabled={!selectXType || !selectXId || transforming}
-                  className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                    selectXType && selectXId && !transforming
-                      ? 'bg-purple-600 text-white hover:bg-purple-700'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {transforming ? 'Transforming...' : 'transform'}
-                </button>
-                
-                <button
-                  onClick={() => {
-                    if (!selectXType || !selectXId) {
-                      alert('Please select an item first');
-                      return;
-                    }
-                    // Dispatch event to jettison table
-                    window.dispatchEvent(new CustomEvent('jettison-filter-apply', {
-                      detail: { type: selectXType, id: selectXId }
-                    }));
-                    // Close selector popup
-                    onClose();
-                  }}
-                  disabled={!selectXType || !selectXId}
-                  className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                    selectXType && selectXId
-                      ? 'bg-green-600 text-white hover:bg-green-700'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  filter main ui table
-                </button>
               </div>
-            </div>
             ) : (
               // Morph page configuration - blank for now
               <div className="p-6 flex-1 overflow-auto">
