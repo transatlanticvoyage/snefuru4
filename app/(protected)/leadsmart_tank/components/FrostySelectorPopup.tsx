@@ -740,13 +740,15 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           jrel_subpart_id: groupKey.rel_subpart_id
         };
         
-        // Insert or get existing transformed record
+        // Insert or get existing transformed record (CHECK ALL 6 GROUPING FIELDS!)
         const { data: existingTransformed, error: checkError } = await supabase
           .from('leadsmart_transformed')
           .select('mundial_id')
           .eq('city_name', groupKey.city_name)
           .eq('state_code', groupKey.state_code)
           .eq('payout', groupKey.payout)
+          .eq('jrel_release_id', groupKey.rel_release_id)
+          .eq('jrel_subsheet_id', groupKey.rel_subsheet_id)
           .eq('jrel_subpart_id', groupKey.rel_subpart_id)
           .maybeSingle();
         
@@ -755,13 +757,14 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         let mundialId: number;
         
         if (existingTransformed) {
-          // Update existing record
+          // Update existing record (UPDATE ALL jrel_* FIELDS!)
           const { data: updatedData, error: updateError } = await supabase
             .from('leadsmart_transformed')
             .update({
               aggregated_zip_codes: aggregatedZipCodes,
               jrel_release_id: groupKey.rel_release_id,
               jrel_subsheet_id: groupKey.rel_subsheet_id,
+              jrel_subpart_id: groupKey.rel_subpart_id,
               updated_at: new Date().toISOString()
             })
             .eq('mundial_id', existingTransformed.mundial_id)
@@ -799,25 +802,37 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       }
       
       const totalTime = Date.now() - startTime;
+      const processingSpeed = totalProcessed / (totalTime / 1000);
+      
       const resultMessage = `✅ TRANSFORM COMPLETE!\n\n` +
-        `Source Data Analysis:\n` +
-        `- ${totalCount.toLocaleString()} total rows in leadsmart_zip_based_data\n` +
-        `- ${totalProcessed.toLocaleString()} rows processed\n` +
-        `- ${totalAlreadyTransformed.toLocaleString()} rows already transformed (skipped)\n` +
-        `- ${totalSkipped.toLocaleString()} rows skipped (invalid/missing data)\n` +
-        `- ${(totalProcessed - totalAlreadyTransformed - totalSkipped).toLocaleString()} valid rows transformed\n\n` +
-        `Transformed Results:\n` +
-        `- ${transformedCount.toLocaleString()} NEW records created in leadsmart_transformed\n` +
-        `- ${updatedCount.toLocaleString()} existing records updated in leadsmart_transformed\n` +
-        `- ${relationsCount.toLocaleString()} relation records created\n` +
-        `- ${globalGroups.size.toLocaleString()} unique city/state/payout combinations\n\n` +
-        `Performance:\n` +
-        `- Processed in ${totalBatches} batches of ${BATCH_SIZE} rows\n` +
-        `- Total time: ${(totalTime / 1000).toFixed(2)} seconds\n\n` +
-        `Grouping Criteria:\n` +
-        `- city_name, state_code, payout, jrel_subpart_id\n\n` +
-        `Selection:\n` +
-        `- ${selectXType}: #${selectXId}`;
+        `SELECTION:\n` +
+        `• ${selectXType} #${selectXId} (${totalCount.toLocaleString()} rows selected)\n\n` +
+        `SOURCE DATA ANALYSIS:\n` +
+        `• ${totalCount.toLocaleString()} total rows in leadsmart_zip_based_data\n` +
+        `• ${totalProcessed.toLocaleString()} rows processed\n` +
+        `• ${totalAlreadyTransformed.toLocaleString()} rows already transformed (skipped)\n` +
+        `• ${totalSkipped.toLocaleString()} rows skipped (invalid/missing data)\n` +
+        `• ${(totalProcessed - totalAlreadyTransformed - totalSkipped).toLocaleString()} valid rows transformed\n\n` +
+        `TRANSFORMED RESULTS:\n` +
+        `• ${transformedCount.toLocaleString()} NEW records created in leadsmart_transformed\n` +
+        `• ${updatedCount.toLocaleString()} existing records updated\n` +
+        `• ${relationsCount.toLocaleString()} relation records created\n\n` +
+        `GROUPING BREAKDOWN:\n` +
+        `• ${globalGroups.size.toLocaleString()} unique city/state/payout/release/subsheet/subpart combinations\n` +
+        `• Each group aggregates zip codes from source rows\n\n` +
+        `GROUPING CRITERIA (All 6 fields):\n` +
+        `• city_name, state_code, payout\n` +
+        `• jrel_release_id (from rel_release_id)\n` +
+        `• jrel_subsheet_id (from rel_subsheet_id)\n` +
+        `• jrel_subpart_id (from rel_subpart_id)\n\n` +
+        `PERFORMANCE:\n` +
+        `• Processed in ${totalBatches} batches of ${BATCH_SIZE} rows\n` +
+        `• Total time: ${(totalTime / 1000).toFixed(2)} seconds\n` +
+        `• Processing speed: ~${Math.round(processingSpeed)} rows/second\n\n` +
+        `NEXT STEPS:\n` +
+        `✓ Rebuild Pico Count Cache to update Skylab tile counts\n` +
+        `✓ Check /leadsmart_morph to browse transformed data\n` +
+        `✓ View detailed logs for Attempt #${attemptId} on /leadsmart_treports`;
       
       console.log(`✅ Transform complete in ${(totalTime / 1000).toFixed(2)}s`);
       await addTransformLog(attemptId, `Transform complete in ${(totalTime / 1000).toFixed(2)}s`);
@@ -1360,18 +1375,62 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                   </div>
                 )}
                 
-                <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
-                  <p className="text-gray-700 text-sm mb-2">
-                    <strong>What will happen:</strong>
+                <div className="bg-blue-50 border border-blue-300 rounded-md p-4 mb-4">
+                  <p className="text-gray-900 text-sm mb-2 font-semibold">
+                    📊 SELECTION:
                   </p>
-                  <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-                    <li>{transformStats.notYetTransformed.toLocaleString()} rows will be grouped by city/state/payout/subpart</li>
-                    <li>Zip codes will be aggregated with "/" separator</li>
-                    <li>New records will be created in leadsmart_transformed</li>
-                    <li>Relations will be tracked in leadsmart_transformed_relations</li>
-                    <li>Source data in leadsmart_zip_based_data will NOT be modified</li>
+                  <p className="text-gray-700 text-sm ml-4">
+                    • {selectXType} #{selectXId} ({transformStats.totalRows.toLocaleString()} total rows)
+                  </p>
+                </div>
+                
+                <div className="bg-purple-50 border border-purple-300 rounded-md p-4 mb-4">
+                  <p className="text-gray-900 text-sm mb-2 font-semibold">
+                    🔄 GROUPING LOGIC:
+                  </p>
+                  <p className="text-gray-700 text-sm ml-4 mb-2">
+                    Rows will be grouped by ALL 6 criteria:
+                  </p>
+                  <ul className="list-disc list-inside text-gray-700 text-sm ml-6 space-y-1">
+                    <li>city_name</li>
+                    <li>state_code</li>
+                    <li>payout</li>
+                    <li>rel_release_id → <span className="font-semibold">jrel_release_id</span></li>
+                    <li>rel_subsheet_id → <span className="font-semibold">jrel_subsheet_id</span></li>
+                    <li>rel_subpart_id → <span className="font-semibold">jrel_subpart_id</span></li>
+                  </ul>
+                  <p className="text-gray-600 text-xs ml-4 mt-2 italic">
+                    Each unique combination creates ONE record in leadsmart_transformed
+                  </p>
+                </div>
+                
+                <div className="bg-gray-50 border border-gray-300 rounded-md p-4 mb-4">
+                  <p className="text-gray-900 text-sm mb-2 font-semibold">
+                    ✓ WHAT WILL HAPPEN:
+                  </p>
+                  <ul className="list-none text-gray-700 text-sm space-y-1.5">
+                    <li>✓ {transformStats.notYetTransformed.toLocaleString()} rows processed in batches (1,000 per batch)</li>
+                    <li>✓ Zip codes aggregated as JSONB arrays (e.g., ["99501", "99502"])</li>
+                    <li>✓ New grouped records created in <span className="font-mono text-xs">leadsmart_transformed</span></li>
+                    <li>✓ Tracking relations created in <span className="font-mono text-xs">leadsmart_transformed_relations</span></li>
+                    <li>✓ Original rel_* values preserved as jrel_* in transformed table</li>
+                    <li>✓ Source data in <span className="font-mono text-xs">leadsmart_zip_based_data</span> will NOT be modified</li>
                   </ul>
                 </div>
+                
+                {transformStats.notYetTransformed > 10000 && (
+                  <div className="bg-yellow-50 border border-yellow-300 rounded-md p-4 mb-4">
+                    <p className="text-yellow-900 text-sm font-semibold mb-1">
+                      ⏱️ ESTIMATED TIME: {Math.round(transformStats.notYetTransformed / 5000)} - {Math.round(transformStats.notYetTransformed / 3000)} minutes
+                    </p>
+                    <p className="text-yellow-800 text-xs">
+                      • Progress tracked in real-time on <a href="/leadsmart_treports" className="underline font-semibold" target="_blank">/leadsmart_treports</a>
+                    </p>
+                    <p className="text-yellow-800 text-xs">
+                      • Keep browser tab open during process
+                    </p>
+                  </div>
+                )}
               </div>
               
               <div className="flex justify-end space-x-3">
