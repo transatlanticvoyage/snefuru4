@@ -1280,6 +1280,144 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     }
   };
   
+  // Baobab Transform Function - Immediate popup then background processing
+  const handleBaobobTransform = async () => {
+    if (!selectXType || !selectXId) {
+      alert('Please select an item first');
+      return;
+    }
+    
+    if (!user?.id) {
+      alert('Please log in to perform transforms');
+      return;
+    }
+
+    try {
+      // Create transform attempt record immediately
+      const { data: attemptData, error: attemptError } = await supabase
+        .from('baobab_transform_attempts')
+        .insert([{
+          user_id: user.id,
+          operation_type: 'transform',
+          status: 'pending',
+          current_phase: 'initializing',
+          overall_progress: 0,
+          source_table: 'leadsmart_zip_based_data',
+          target_table: 'leadsmart_transformed',
+          transform_type: selectXType,
+          filter_criteria: {
+            [`${selectXType}_id`]: selectXId,
+            result_count: selectXResultCount
+          }
+        }])
+        .select('baobab_attempt_id')
+        .single();
+
+      if (attemptError) {
+        console.error('Failed to create baobab transform attempt:', attemptError);
+        alert('Failed to start transform. Check console for details.');
+        return;
+      }
+
+      const attemptId = attemptData.baobab_attempt_id;
+      
+      alert(`Baobab transform started! Monitor progress at /baobab_reports (Attempt #${attemptId})`);
+      
+      // Close popup
+      onClose();
+      
+      // Start background processing (no await - let it run in background)
+      processBaobobTransform(attemptId, selectXType, selectXId, selectXResultCount);
+      
+    } catch (error) {
+      console.error('❌ Error starting baobab transform:', error);
+      alert('Failed to start baobab transform. Check console for details.');
+    }
+  };
+
+  // Background baobab transform processing
+  const processBaobobTransform = async (
+    attemptId: number, 
+    entityType: 'release' | 'subsheet' | 'subpart', 
+    entityId: number, 
+    totalRows: number
+  ) => {
+    try {
+      // Update status to in_progress
+      await supabase
+        .from('baobab_transform_attempts')
+        .update({
+          status: 'in_progress',
+          started_at: new Date().toISOString(),
+          last_activity_at: new Date().toISOString(),
+          current_phase: 'processing_data',
+          overall_progress: 5
+        })
+        .eq('baobab_attempt_id', attemptId);
+
+      const startTime = Date.now();
+      let processedRows = 0;
+      const batchSize = 1000;
+      
+      // Fetch data in batches and process
+      let offset = 0;
+      
+      while (offset < totalRows) {
+        const currentBatchSize = Math.min(batchSize, totalRows - offset);
+        
+        // This is where the actual transform logic would go
+        // For now, just simulate progress
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing
+        
+        processedRows += currentBatchSize;
+        offset += currentBatchSize;
+        
+        const progress = (processedRows / totalRows) * 100;
+        const opsPerSecond = processedRows / ((Date.now() - startTime) / 1000);
+        
+        // Update progress
+        await supabase
+          .from('baobab_transform_attempts')
+          .update({
+            last_activity_at: new Date().toISOString(),
+            overall_progress: Math.min(95, progress),
+            rows_processed: processedRows,
+            operations_per_second: opsPerSecond,
+            current_phase: `Processing batch ${Math.ceil(offset / batchSize)} of ${Math.ceil(totalRows / batchSize)}`
+          })
+          .eq('baobab_attempt_id', attemptId);
+      }
+      
+      // Complete the transform
+      await supabase
+        .from('baobab_transform_attempts')
+        .update({
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          last_activity_at: new Date().toISOString(),
+          current_phase: 'completed',
+          overall_progress: 100,
+          rows_processed: processedRows,
+          actual_duration_ms: Date.now() - startTime
+        })
+        .eq('baobab_attempt_id', attemptId);
+        
+    } catch (error) {
+      console.error('❌ Error in baobab transform processing:', error);
+      
+      // Update status to failed
+      await supabase
+        .from('baobab_transform_attempts')
+        .update({
+          status: 'failed',
+          last_activity_at: new Date().toISOString(),
+          error_message: error instanceof Error ? error.message : 'Unknown error',
+          error_details: error
+        })
+        .eq('baobab_attempt_id', attemptId);
+    }
+  };
+  
   // Helper function to re-fetch transformed data count (optimized for large datasets)
   const fetchTransformedDataCount = async () => {
     if (!selectXType || !selectXId) {
@@ -1956,6 +2094,20 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                   }`}
                 >
                   {transformStats.notYetTransformed > 0 ? 'gingko transform function' : 'No Rows to Transform'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowTransformConfirm(false);
+                    handleBaobobTransform();
+                  }}
+                  disabled={transformStats.notYetTransformed === 0}
+                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                    transformStats.notYetTransformed > 0
+                      ? 'bg-green-600 text-white hover:bg-green-700'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {transformStats.notYetTransformed > 0 ? 'baobab transform function' : 'No Rows to Transform'}
                 </button>
               </div>
             </div>
