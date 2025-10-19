@@ -12,25 +12,35 @@ const ZhedoriButtonBar = dynamic(
 );
 
 interface TransformAttempt {
-  id: string;
-  startTime: string;
-  endTime?: string;
+  attempt_id: string;
+  user_id: string;
+  start_time: string;
+  end_time?: string;
+  last_update_time: string;
   status: 'in_progress' | 'completed' | 'failed' | 'stalled';
-  entityType: 'release' | 'subsheet' | 'subpart';
-  entityId: number;
-  totalRows: number;
-  processedRows: number;
-  currentBatch: number;
-  totalBatches: number;
-  groupsCreated: number;
-  transformedRecords: number;
-  updatedRecords: number;
-  relationsCreated: number;
-  skippedRows: number;
-  alreadyTransformedRows: number;
-  errorMessage?: string;
-  lastUpdateTime: string;
+  selection_type: 'rel_release_id' | 'rel_subsheet_id' | 'rel_subpart_id';
+  selection_id: number;
+  entity_type: 'release' | 'subsheet' | 'subpart';
+  entity_id: number;
+  total_rows: number;
+  processed_rows: number;
+  current_batch: number;
+  total_batches: number;
+  groups_created: number;
+  transformed_records_new: number;
+  transformed_records_updated: number;
+  relations_created: number;
+  skipped_rows: number;
+  already_transformed_rows: number;
+  error_message?: string;
+  error_details?: any;
   logs: string[];
+  last_processed_batch_start_row?: number;
+  last_processed_batch_end_row?: number;
+  resume_from_batch?: number;
+  rows_per_second?: number;
+  avg_batch_time_seconds?: number;
+  estimated_completion_time?: string;
 }
 
 export default function LeadsmartTreportsPage() {
@@ -42,37 +52,51 @@ export default function LeadsmartTreportsPage() {
   const [selectedAttempt, setSelectedAttempt] = useState<TransformAttempt | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
   
-  // Load attempts from localStorage
-  const loadAttempts = useCallback(() => {
-    const stored = localStorage.getItem('leadsmart_transform_attempts');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setAttempts(parsed);
-        
-        // Check for stalled attempts (no update in 5 minutes)
-        const now = Date.now();
-        const updated = parsed.map((attempt: TransformAttempt) => {
-          if (attempt.status === 'in_progress') {
-            const lastUpdate = new Date(attempt.lastUpdateTime).getTime();
-            const timeSinceUpdate = now - lastUpdate;
-            
-            if (timeSinceUpdate > 5 * 60 * 1000) { // 5 minutes
-              return { ...attempt, status: 'stalled' as const };
-            }
+  // Load attempts from database
+  const loadAttempts = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      // Fetch all attempts for current user
+      const { data, error } = await supabase
+        .from('leadsmart_transform_attempts')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('start_time', { ascending: false });
+      
+      if (error) throw error;
+      
+      // Detect stalled attempts (no update in 5 minutes)
+      const now = Date.now();
+      const stalledIds: string[] = [];
+      
+      const updated = (data || []).map((attempt) => {
+        if (attempt.status === 'in_progress') {
+          const lastUpdate = new Date(attempt.last_update_time).getTime();
+          const timeSinceUpdate = now - lastUpdate;
+          
+          if (timeSinceUpdate > 5 * 60 * 1000) { // 5 minutes
+            stalledIds.push(attempt.attempt_id);
+            return { ...attempt, status: 'stalled' as const };
           }
-          return attempt;
-        });
-        
-        if (JSON.stringify(updated) !== JSON.stringify(parsed)) {
-          setAttempts(updated);
-          localStorage.setItem('leadsmart_transform_attempts', JSON.stringify(updated));
         }
-      } catch (error) {
-        console.error('Error loading attempts:', error);
+        return attempt;
+      });
+      
+      setAttempts(updated);
+      
+      // Update stalled attempts in database
+      if (stalledIds.length > 0) {
+        await supabase
+          .from('leadsmart_transform_attempts')
+          .update({ status: 'stalled' })
+          .in('attempt_id', stalledIds);
       }
+    } catch (error) {
+      console.error('Error loading attempts from database:', error);
+      alert('Failed to load transform attempts. Check console for details.');
     }
-  }, []);
+  }, [user, supabase]);
 
   useEffect(() => {
     if (!user) {
@@ -94,32 +118,60 @@ export default function LeadsmartTreportsPage() {
     return () => clearInterval(interval);
   }, [autoRefresh, loadAttempts]);
 
-  const handleClearAll = () => {
-    if (confirm('Are you sure you want to clear all transform attempt records?')) {
-      localStorage.removeItem('leadsmart_transform_attempts');
-      setAttempts([]);
-      setSelectedAttempt(null);
+  const handleClearAll = async () => {
+    if (!user) return;
+    
+    if (confirm('Are you sure you want to clear all transform attempt records? This will delete them from the database.')) {
+      try {
+        const { error } = await supabase
+          .from('leadsmart_transform_attempts')
+          .delete()
+          .eq('user_id', user.id);
+        
+        if (error) throw error;
+        
+        setAttempts([]);
+        setSelectedAttempt(null);
+        alert('All transform attempts cleared successfully');
+      } catch (error) {
+        console.error('Error clearing attempts:', error);
+        alert('Failed to clear attempts. Check console for details.');
+      }
     }
   };
 
-  const handleDeleteAttempt = (attemptId: string) => {
-    if (confirm('Delete this transform attempt record?')) {
-      const updated = attempts.filter(a => a.id !== attemptId);
-      setAttempts(updated);
-      localStorage.setItem('leadsmart_transform_attempts', JSON.stringify(updated));
-      if (selectedAttempt?.id === attemptId) {
-        setSelectedAttempt(null);
+  const handleDeleteAttempt = async (attemptId: string) => {
+    if (confirm('Delete this transform attempt record from the database?')) {
+      try {
+        const { error } = await supabase
+          .from('leadsmart_transform_attempts')
+          .delete()
+          .eq('attempt_id', attemptId);
+        
+        if (error) throw error;
+        
+        const updated = attempts.filter(a => a.attempt_id !== attemptId);
+        setAttempts(updated);
+        
+        if (selectedAttempt?.attempt_id === attemptId) {
+          setSelectedAttempt(null);
+        }
+        
+        alert('Transform attempt deleted successfully');
+      } catch (error) {
+        console.error('Error deleting attempt:', error);
+        alert('Failed to delete attempt. Check console for details.');
       }
     }
   };
 
   const generateReport = (attempt: TransformAttempt) => {
-    const duration = attempt.endTime 
-      ? Math.round((new Date(attempt.endTime).getTime() - new Date(attempt.startTime).getTime()) / 1000)
-      : Math.round((Date.now() - new Date(attempt.startTime).getTime()) / 1000);
+    const duration = attempt.end_time 
+      ? Math.round((new Date(attempt.end_time).getTime() - new Date(attempt.start_time).getTime()) / 1000)
+      : Math.round((Date.now() - new Date(attempt.start_time).getTime()) / 1000);
     
-    const progress = attempt.totalBatches > 0 
-      ? Math.round((attempt.currentBatch / attempt.totalBatches) * 100) 
+    const progress = attempt.total_batches > 0 
+      ? Math.round((attempt.current_batch / attempt.total_batches) * 100) 
       : 0;
     
     return `
@@ -127,52 +179,55 @@ export default function LeadsmartTreportsPage() {
 LEADSMART TRANSFORM REPORT
 ═══════════════════════════════════════════════════════════════
 
-ATTEMPT ID: ${attempt.id}
+ATTEMPT ID: ${attempt.attempt_id}
 STATUS: ${attempt.status.toUpperCase()}
 
 ═══════════════════════════════════════════════════════════════
 TIMING
 ═══════════════════════════════════════════════════════════════
-Started:        ${new Date(attempt.startTime).toLocaleString()}
-${attempt.endTime ? `Ended:          ${new Date(attempt.endTime).toLocaleString()}` : `Last Update:    ${new Date(attempt.lastUpdateTime).toLocaleString()}`}
+Started:        ${new Date(attempt.start_time).toLocaleString()}
+${attempt.end_time ? `Ended:          ${new Date(attempt.end_time).toLocaleString()}` : `Last Update:    ${new Date(attempt.last_update_time).toLocaleString()}`}
 Duration:       ${Math.floor(duration / 60)}m ${duration % 60}s
-${!attempt.endTime ? `Time Since Update: ${Math.round((Date.now() - new Date(attempt.lastUpdateTime).getTime()) / 1000)}s` : ''}
+${!attempt.end_time ? `Time Since Update: ${Math.round((Date.now() - new Date(attempt.last_update_time).getTime()) / 1000)}s` : ''}
 
 ═══════════════════════════════════════════════════════════════
 SOURCE SELECTION
 ═══════════════════════════════════════════════════════════════
-Entity Type:    ${attempt.entityType}
-Entity ID:      ${attempt.entityId}
+Selection Method: ${attempt.selection_type}
+Selection ID:     ${attempt.selection_id}
+Entity Type:      ${attempt.entity_type}
+Entity ID:        ${attempt.entity_id}
 
 ═══════════════════════════════════════════════════════════════
 PROGRESS
 ═══════════════════════════════════════════════════════════════
-Total Rows:     ${attempt.totalRows.toLocaleString()}
-Processed:      ${attempt.processedRows.toLocaleString()} / ${attempt.totalRows.toLocaleString()} (${progress}%)
-Current Batch:  ${attempt.currentBatch} / ${attempt.totalBatches}
-Batches Left:   ${attempt.totalBatches - attempt.currentBatch}
+Total Rows:     ${attempt.total_rows.toLocaleString()}
+Processed:      ${attempt.processed_rows.toLocaleString()} / ${attempt.total_rows.toLocaleString()} (${progress}%)
+Current Batch:  ${attempt.current_batch} / ${attempt.total_batches}
+Batches Left:   ${attempt.total_batches - attempt.current_batch}
+${attempt.resume_from_batch ? `Resume From:    Batch ${attempt.resume_from_batch}` : ''}
 
 ═══════════════════════════════════════════════════════════════
 RESULTS
 ═══════════════════════════════════════════════════════════════
-Groups Created:         ${attempt.groupsCreated.toLocaleString()}
-NEW Transformed:        ${attempt.transformedRecords.toLocaleString()}
-UPDATED Transformed:    ${attempt.updatedRecords.toLocaleString()}
-Relations Created:      ${attempt.relationsCreated.toLocaleString()}
-Already Transformed:    ${attempt.alreadyTransformedRows.toLocaleString()}
-Skipped (Invalid):      ${attempt.skippedRows.toLocaleString()}
+Groups Created:         ${attempt.groups_created.toLocaleString()}
+NEW Transformed:        ${attempt.transformed_records_new.toLocaleString()}
+UPDATED Transformed:    ${attempt.transformed_records_updated.toLocaleString()}
+Relations Created:      ${attempt.relations_created.toLocaleString()}
+Already Transformed:    ${attempt.already_transformed_rows.toLocaleString()}
+Skipped (Invalid):      ${attempt.skipped_rows.toLocaleString()}
 
 ═══════════════════════════════════════════════════════════════
 PERFORMANCE METRICS
 ═══════════════════════════════════════════════════════════════
-Rows/Second:    ${duration > 0 ? Math.round(attempt.processedRows / duration) : 0}
-Avg Batch Time: ${attempt.currentBatch > 0 ? Math.round(duration / attempt.currentBatch) : 0}s
-${attempt.totalBatches > attempt.currentBatch ? `Est. Remaining: ${Math.round(((attempt.totalBatches - attempt.currentBatch) * (duration / Math.max(attempt.currentBatch, 1))) / 60)}m` : ''}
+Rows/Second:    ${attempt.rows_per_second ? Math.round(attempt.rows_per_second) : (duration > 0 ? Math.round(attempt.processed_rows / duration) : 0)}
+Avg Batch Time: ${attempt.avg_batch_time_seconds ? Math.round(attempt.avg_batch_time_seconds) : (attempt.current_batch > 0 ? Math.round(duration / attempt.current_batch) : 0)}s
+${attempt.total_batches > attempt.current_batch ? `Est. Remaining: ${Math.round(((attempt.total_batches - attempt.current_batch) * (duration / Math.max(attempt.current_batch, 1))) / 60)}m` : ''}
 
 ═══════════════════════════════════════════════════════════════
 STATUS DETAILS
 ═══════════════════════════════════════════════════════════════
-${attempt.status === 'stalled' ? `⚠️ STALLED - No updates for ${Math.round((Date.now() - new Date(attempt.lastUpdateTime).getTime()) / 60000)} minutes
+${attempt.status === 'stalled' ? `⚠️ STALLED - No updates for ${Math.round((Date.now() - new Date(attempt.last_update_time).getTime()) / 60000)} minutes
 
 POSSIBLE CAUSES:
 - Browser tab was backgrounded (throttled)
@@ -188,7 +243,7 @@ RECOMMENDED ACTIONS:
 4. Implement optimizations (bulk inserts, memory management)
 5. Run transform on smaller batches using sx filters
 ` : ''}
-${attempt.status === 'failed' ? `❌ FAILED - ${attempt.errorMessage || 'Unknown error'}
+${attempt.status === 'failed' ? `❌ FAILED - ${attempt.error_message || 'Unknown error'}
 
 RECOMMENDED ACTIONS:
 1. Check error message above
@@ -214,10 +269,12 @@ RESUME COMMAND (If Stalled/Failed)
 
 To continue from where it left off:
 1. Open FrostySelectorPopup on tank page
-2. Select ${attempt.entityType} #${attempt.entityId} with sx
+2. Select ${attempt.entity_type} #${attempt.entity_id} with sx
 3. Click Transform button
-4. System will skip ${attempt.alreadyTransformedRows.toLocaleString()} already-transformed rows
-5. Will process remaining ${(attempt.totalRows - attempt.processedRows).toLocaleString()} rows
+4. System will skip ${attempt.already_transformed_rows.toLocaleString()} already-transformed rows
+5. Will process remaining ${(attempt.total_rows - attempt.processed_rows).toLocaleString()} rows
+
+Selection to use: ${attempt.selection_type} = ${attempt.selection_id}
 
 OR use smaller batches:
 - Use sx to select smaller entities (individual subsheets/subparts)
@@ -226,14 +283,14 @@ OR use smaller batches:
 ═══════════════════════════════════════════════════════════════
 DETAILED LOGS
 ═══════════════════════════════════════════════════════════════
-${attempt.logs.join('\n')}
+${Array.isArray(attempt.logs) ? attempt.logs.join('\n') : 'No logs available'}
 
 ═══════════════════════════════════════════════════════════════
 END OF REPORT
 ═══════════════════════════════════════════════════════════════
 
 Generated: ${new Date().toLocaleString()}
-Report ID: ${attempt.id}
+Report ID: ${attempt.attempt_id}
 `.trim();
   };
 
@@ -370,13 +427,13 @@ Report ID: ${attempt.id}
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {attempts.map((attempt) => {
-                    const progress = attempt.totalBatches > 0 
-                      ? Math.round((attempt.currentBatch / attempt.totalBatches) * 100) 
+                    const progress = attempt.total_batches > 0 
+                      ? Math.round((attempt.current_batch / attempt.total_batches) * 100) 
                       : 0;
                     
                     return (
                       <tr 
-                        key={attempt.id}
+                        key={attempt.attempt_id}
                         className="hover:bg-gray-50 cursor-pointer"
                         onClick={() => setSelectedAttempt(attempt)}
                       >
@@ -386,10 +443,13 @@ Report ID: ${attempt.id}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm font-mono text-gray-900">
-                          {attempt.id.substring(0, 8)}...
+                          {attempt.attempt_id.substring(0, 8)}...
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900">
-                          {attempt.entityType} #{attempt.entityId}
+                          {attempt.entity_type} #{attempt.entity_id}
+                          <div className="text-xs text-gray-500 mt-1">
+                            via {attempt.selection_type}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center space-x-2">
@@ -402,17 +462,17 @@ Report ID: ${attempt.id}
                             <span className="text-xs text-gray-600 font-medium">{progress}%</span>
                           </div>
                           <div className="text-xs text-gray-500 mt-1">
-                            Batch {attempt.currentBatch}/{attempt.totalBatches}
+                            Batch {attempt.current_batch}/{attempt.total_batches}
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-700">
                           <div className="text-xs">
-                            <div>Groups: {attempt.groupsCreated.toLocaleString()}</div>
-                            <div>New: {attempt.transformedRecords.toLocaleString()}, Updated: {attempt.updatedRecords.toLocaleString()}</div>
+                            <div>Groups: {attempt.groups_created.toLocaleString()}</div>
+                            <div>New: {attempt.transformed_records_new.toLocaleString()}, Updated: {attempt.transformed_records_updated.toLocaleString()}</div>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">
-                          {new Date(attempt.startTime).toLocaleString()}
+                          {new Date(attempt.start_time).toLocaleString()}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex space-x-2">
@@ -429,7 +489,7 @@ Report ID: ${attempt.id}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeleteAttempt(attempt.id);
+                                handleDeleteAttempt(attempt.attempt_id);
                               }}
                               className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
                               title="Delete"
@@ -452,7 +512,7 @@ Report ID: ${attempt.id}
           <div className="mt-6 bg-white rounded-lg shadow border border-gray-200">
             <div className="p-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
               <h2 className="text-lg font-bold text-gray-900">
-                Attempt Details: {selectedAttempt.id.substring(0, 16)}...
+                Attempt Details: {selectedAttempt.attempt_id.substring(0, 16)}...
               </h2>
               <button
                 onClick={() => setSelectedAttempt(null)}
@@ -485,7 +545,7 @@ Report ID: ${attempt.id}
                 <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <h3 className="font-bold text-yellow-900 mb-2">⚠️ Transform Incomplete</h3>
                   <p className="text-sm text-yellow-800 mb-4">
-                    This transform {selectedAttempt.status === 'stalled' ? 'stalled' : 'failed'} at batch {selectedAttempt.currentBatch} of {selectedAttempt.totalBatches}.
+                    This transform {selectedAttempt.status === 'stalled' ? 'stalled' : 'failed'} at batch {selectedAttempt.current_batch} of {selectedAttempt.total_batches}.
                     You can resume by running the transform again - it will skip already-transformed rows.
                   </p>
                   <div className="flex space-x-3">
@@ -501,12 +561,14 @@ Report ID: ${attempt.id}
 To resume this transform:
 1. Go to /leadsmart_tank page
 2. Open FrostySelectorPopup (click "open selector" button)
-3. Click sx on ${selectedAttempt.entityType} #${selectedAttempt.entityId}
+3. Click sx on ${selectedAttempt.entity_type} #${selectedAttempt.entity_id}
 4. Click the "Transform" button
-5. System will automatically skip ${selectedAttempt.alreadyTransformedRows.toLocaleString()} already-transformed rows
-6. Will process remaining ${(selectedAttempt.totalRows - selectedAttempt.processedRows).toLocaleString()} rows
+5. System will automatically skip ${selectedAttempt.already_transformed_rows.toLocaleString()} already-transformed rows
+6. Will process remaining ${(selectedAttempt.total_rows - selectedAttempt.processed_rows).toLocaleString()} rows
 
-Progress so far: ${selectedAttempt.processedRows.toLocaleString()} / ${selectedAttempt.totalRows.toLocaleString()} (${Math.round((selectedAttempt.processedRows / selectedAttempt.totalRows) * 100)}%)
+Selection to use: ${selectedAttempt.selection_type} = ${selectedAttempt.selection_id}
+
+Progress so far: ${selectedAttempt.processed_rows.toLocaleString()} / ${selectedAttempt.total_rows.toLocaleString()} (${Math.round((selectedAttempt.processed_rows / selectedAttempt.total_rows) * 100)}%)
                         `.trim();
                         
                         navigator.clipboard.writeText(instructions);
