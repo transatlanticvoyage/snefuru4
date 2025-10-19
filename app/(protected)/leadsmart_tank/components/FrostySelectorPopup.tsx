@@ -68,6 +68,10 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
   // Right pane tab state (tank page only)
   const [rightPaneTab, setRightPaneTab] = useState<'main' | 'delete'>('main');
   
+  // Invalid rows standalone check state
+  const [showInvalidRowsPopup, setShowInvalidRowsPopup] = useState(false);
+  const [checkingInvalidRows, setCheckingInvalidRows] = useState(false);
+  
   const handleSelectX = (type: 'release' | 'subsheet' | 'subpart', id: number) => {
     setSelectXType(type);
     setSelectXId(id);
@@ -451,6 +455,177 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     } catch (error) {
       console.error('❌ Error checking transform status:', error);
       alert('Failed to check transform status. Check console for details.');
+    }
+  };
+  
+  // Check for invalid rows only (without transform status check)
+  const handleCheckInvalidRows = async () => {
+    if (!selectXType || !selectXId) {
+      alert('Please select an item first');
+      return;
+    }
+    
+    setCheckingInvalidRows(true);
+    
+    try {
+      // First check row count
+      let countQuery = supabase.from('leadsmart_zip_based_data').select('*', { count: 'exact', head: true });
+      if (selectXType === 'release') {
+        countQuery = countQuery.eq('rel_release_id', selectXId);
+      } else if (selectXType === 'subsheet') {
+        countQuery = countQuery.eq('rel_subsheet_id', selectXId);
+      } else if (selectXType === 'subpart') {
+        countQuery = countQuery.eq('rel_subpart_id', selectXId);
+      }
+      
+      const { count, error: countError } = await countQuery;
+      if (countError) throw countError;
+      
+      console.log(`📊 Checking ${count?.toLocaleString()} rows for invalid data...`);
+      
+      const batchSize = 1000;
+      const totalBatches = Math.ceil((count || 0) / batchSize);
+      
+      let totalValid = 0;
+      let totalInvalid = 0;
+      const allInvalidRows: any[] = [];
+      
+      // Detailed breakdown
+      const breakdown = {
+        missingCityOnly: 0,
+        missingStateOnly: 0,
+        missingPayoutOnly: 0,
+        missingCityAndState: 0,
+        missingCityAndPayout: 0,
+        missingStateAndPayout: 0,
+        missingAll: 0,
+        headerRows: 0
+      };
+      
+      // Fetch entity data for join columns in CSV
+      console.log('📋 Fetching entity data for CSV joins...');
+      const { data: allReleases } = await supabase.from('leadsmart_file_releases').select('release_id, release_date');
+      const { data: allSubsheets } = await supabase.from('leadsmart_subsheets').select('subsheet_id, subsheet_name');
+      const { data: allSubparts } = await supabase.from('leadsmart_subparts').select('subpart_id, payout_note');
+      
+      const releaseMap = new Map((allReleases || []).map(r => [r.release_id, r.release_date]));
+      const subsheetMap = new Map((allSubsheets || []).map(s => [s.subsheet_id, s.subsheet_name]));
+      const subpartMap = new Map((allSubparts || []).map(p => [p.subpart_id, p.payout_note]));
+      
+      for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
+        const startRow = batchNum * batchSize;
+        const endRow = startRow + batchSize - 1;
+        
+        console.log(`📦 Checking batch ${batchNum + 1}/${totalBatches} (rows ${startRow}-${endRow})...`);
+        
+        let zipQuery = supabase.from('leadsmart_zip_based_data').select('*');
+        if (selectXType === 'release') {
+          zipQuery = zipQuery.eq('rel_release_id', selectXId);
+        } else if (selectXType === 'subsheet') {
+          zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
+        } else if (selectXType === 'subpart') {
+          zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
+        }
+        
+        zipQuery = zipQuery.range(startRow, endRow).order('global_row_id', { ascending: false });
+        
+        const { data: batchData, error: batchError } = await zipQuery;
+        if (batchError) throw batchError;
+        
+        if (!batchData || batchData.length === 0) break;
+        
+        // Check each row for validity
+        batchData.forEach(row => {
+          const hasCity = row.city_name && row.city_name.trim() !== '';
+          const hasState = row.state_code && row.state_code.trim() !== '';
+          const hasPayout = row.payout !== null && row.payout !== undefined;
+          
+          let isValid = true;
+          let invalidReason = '';
+          
+          // Check for header rows first
+          if (hasCity && hasState) {
+            const cityLower = row.city_name.toLowerCase().trim();
+            const stateLower = row.state_code.toLowerCase().trim();
+            if (cityLower === 'city' || cityLower === 'city_name' || cityLower === 'city name' ||
+                stateLower === 'state' || stateLower === 'state_code' || stateLower === 'state_id' || stateLower === 'state abbr') {
+              isValid = false;
+              invalidReason = 'Header row detected';
+              breakdown.headerRows++;
+            }
+          }
+          
+          // Check for missing required fields
+          if (isValid && (!hasCity || !hasState || !hasPayout)) {
+            isValid = false;
+            
+            if (!hasCity && !hasState && !hasPayout) {
+              invalidReason = 'Missing all three: city_name, state_code, payout';
+              breakdown.missingAll++;
+            } else if (!hasCity && !hasState) {
+              invalidReason = 'Missing city_name and state_code';
+              breakdown.missingCityAndState++;
+            } else if (!hasCity && !hasPayout) {
+              invalidReason = 'Missing city_name and payout';
+              breakdown.missingCityAndPayout++;
+            } else if (!hasState && !hasPayout) {
+              invalidReason = 'Missing state_code and payout';
+              breakdown.missingStateAndPayout++;
+            } else if (!hasCity) {
+              invalidReason = 'Missing city_name';
+              breakdown.missingCityOnly++;
+            } else if (!hasState) {
+              invalidReason = 'Missing state_code';
+              breakdown.missingStateOnly++;
+            } else if (!hasPayout) {
+              invalidReason = 'Missing payout';
+              breakdown.missingPayoutOnly++;
+            }
+          }
+          
+          if (isValid) {
+            totalValid++;
+          } else {
+            totalInvalid++;
+            allInvalidRows.push({ 
+              ...row, 
+              invalid_reason: invalidReason,
+              'join.leadsmart_file_releases.release_date': releaseMap.get(row.rel_release_id) || '',
+              'join.leadsmart_subsheets.subsheet_name': subsheetMap.get(row.rel_subsheet_id) || '',
+              'join.leadsmart_subparts.payout_note': subpartMap.get(row.rel_subpart_id) || ''
+            });
+          }
+        });
+      }
+      
+      console.log(`✅ Invalid row check complete. Total: ${count}, Valid: ${totalValid}, Invalid: ${totalInvalid}`);
+      console.log(`   Invalid breakdown:`, breakdown);
+      
+      // Store results
+      setInvalidRowsData(allInvalidRows);
+      setInvalidRowsBreakdown(breakdown);
+      setTransformStats({
+        totalRows: count || 0,
+        alreadyTransformed: 0,
+        notYetTransformed: totalValid,
+        invalidRows: totalInvalid
+      });
+      
+      // Show popup with results
+      setShowInvalidRowsPopup(true);
+      
+      // Auto-download CSV if invalid rows exist
+      if (allInvalidRows.length > 0) {
+        setTimeout(() => {
+          downloadInvalidRowsCSV();
+        }, 500);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error checking invalid rows:', error);
+      alert('Failed to check invalid rows. Check console for details.');
+    } finally {
+      setCheckingInvalidRows(false);
     }
   };
   
@@ -1302,6 +1477,18 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                       >
                         filter main ui table
                       </button>
+                      
+                      <button
+                        onClick={handleCheckInvalidRows}
+                        disabled={!selectXType || !selectXId || checkingInvalidRows}
+                        className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
+                          selectXType && selectXId && !checkingInvalidRows
+                            ? 'bg-orange-600 text-white hover:bg-orange-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {checkingInvalidRows ? 'Checking...' : 'generate invalid row csv file and download it'}
+                      </button>
                     </div>
                   ) : (
                     // Delete Tab
@@ -1743,6 +1930,158 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                     Close
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Invalid Rows Check Results Popup */}
+      {showInvalidRowsPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 flex flex-col" style={{ maxHeight: '90vh' }}>
+            {/* Fixed Header */}
+            <div className="p-6 border-b bg-gray-50 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="bg-orange-100 rounded-full p-2 mr-3">
+                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">📋 Invalid Rows Analysis</h3>
+                </div>
+                <button
+                  onClick={() => setShowInvalidRowsPopup(false)}
+                  className="text-gray-400 hover:text-gray-600 text-3xl font-bold leading-none"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <p className="text-gray-700 mb-4 font-medium">
+                Analysis of invalid rows in your selection:
+              </p>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-700">Total rows in selection:</span>
+                    <span className="font-bold text-gray-900">{transformStats.totalRows.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-700">Valid rows:</span>
+                    <span className="font-bold text-green-600">{transformStats.notYetTransformed.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-t pt-2 mt-2">
+                    <span className="text-gray-700 font-semibold">Invalid rows:</span>
+                    <span className="font-bold text-red-600">{transformStats.invalidRows.toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {transformStats.invalidRows > 0 && (
+                <>
+                  <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                    <div className="font-semibold text-red-800 mb-3">⚠️ Invalid Row Breakdown (currently in leadsmart_zip_based_data):</div>
+                    <div className="space-y-2 text-sm">
+                      {invalidRowsBreakdown.missingCityOnly > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing city_name only:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingCityOnly.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingStateOnly > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing state_code only:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingStateOnly.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingPayoutOnly > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing payout only:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingPayoutOnly.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingCityAndState > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing city_name + state_code:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingCityAndState.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingCityAndPayout > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing city_name + payout:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingCityAndPayout.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingStateAndPayout > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing state_code + payout:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingStateAndPayout.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingAll > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing all three fields:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingAll.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.headerRows > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Header rows (e.g. "City", "State"):</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.headerRows.toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+                    <p className="text-yellow-800 text-sm font-semibold mb-2">📥 CSV Download</p>
+                    <p className="text-yellow-700 text-xs mb-2">
+                      A CSV file with all {transformStats.invalidRows.toLocaleString()} invalid rows has been automatically downloaded. The file includes:
+                    </p>
+                    <ul className="list-disc list-inside text-yellow-700 text-xs ml-2 space-y-1">
+                      <li>All source data columns from leadsmart_zip_based_data</li>
+                      <li>Join columns (release_date, subsheet_name, payout_note)</li>
+                      <li>Invalid reason for each row</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <p className="text-blue-800 text-sm font-semibold mb-1">💡 Next Steps</p>
+                    <p className="text-blue-700 text-xs">
+                      • Review the CSV to identify missing data<br/>
+                      • Fix data in source (update city_name, state_code, or payout)<br/>
+                      • Re-run transform after corrections to process these rows<br/>
+                      • OR use SQL to delete invalid rows if they're not needed
+                    </p>
+                  </div>
+                </>
+              )}
+              
+              {transformStats.invalidRows === 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                  <p className="text-green-800 text-sm font-semibold mb-1">✅ No Invalid Rows Found!</p>
+                  <p className="text-green-700 text-xs">
+                    All {transformStats.totalRows.toLocaleString()} rows in your selection have valid city_name, state_code, and payout values.
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            {/* Fixed Button Footer */}
+            <div className="p-6 border-t bg-gray-50 flex-shrink-0">
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowInvalidRowsPopup(false)}
+                  className="px-4 py-2 bg-gray-600 text-white hover:bg-gray-700 rounded-md font-medium transition-colors"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
