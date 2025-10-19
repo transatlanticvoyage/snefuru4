@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useAuth } from '@/app/context/AuthContext';
 import SelectorFileReleasesGrid from './SelectorFileReleasesGrid';
 import SelectorSubsheetsGrid from './SelectorSubsheetsGrid';
 import SelectorSubpartsGrid from './SelectorSubpartsGrid';
@@ -17,6 +18,7 @@ interface Props {
 
 export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props) {
   const supabase = createClientComponentClient();
+  const { user } = useAuth();
   
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null);
   const [selectedSubsheetId, setSelectedSubsheetId] = useState<number | null>(null);
@@ -40,7 +42,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
   const [transforming, setTransforming] = useState(false);
   const [showTransformResults, setShowTransformResults] = useState(false);
   const [transformResults, setTransformResults] = useState('');
-  const [currentTransformId, setCurrentTransformId] = useState<string | null>(null);
+  const [currentTransformId, setCurrentTransformId] = useState<number | null>(null);
   const [showTransformConfirm, setShowTransformConfirm] = useState(false);
   const [transformStats, setTransformStats] = useState({
     totalRows: 0,
@@ -48,6 +50,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     notYetTransformed: 0,
     invalidRows: 0
   });
+  const [invalidRowsData, setInvalidRowsData] = useState<any[]>([]);
   
   // Left pane view state
   const [leftPaneView, setLeftPaneView] = useState<'grid' | 'tile'>('grid');
@@ -267,6 +270,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       const alreadyTransformedIds = new Set<number>();
       let totalValid = 0;
       let totalInvalid = 0;
+      const allInvalidRows: any[] = [];
       
       for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
         const startRow = batchNum * batchSize;
@@ -290,17 +294,28 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         
         if (!batchData || batchData.length === 0) break;
         
-        // Filter out invalid rows in this batch
+        // Filter out invalid rows in this batch and collect them
         const validRows = batchData.filter(row => {
+          let isValid = true;
+          let invalidReason = '';
+          
           if (!row.city_name || !row.state_code || row.payout === null || row.payout === undefined) {
-            return false;
+            isValid = false;
+            invalidReason = 'Missing required fields (city_name, state_code, or payout)';
+          } else {
+            const cityLower = row.city_name.toLowerCase().trim();
+            const stateLower = row.state_code.toLowerCase().trim();
+            if (cityLower === 'city' || cityLower === 'city_name' || stateLower === 'state' || stateLower === 'state_code') {
+              isValid = false;
+              invalidReason = 'Header row detected (city/state contains header text)';
+            }
           }
-          const cityLower = row.city_name.toLowerCase().trim();
-          const stateLower = row.state_code.toLowerCase().trim();
-          if (cityLower === 'city' || cityLower === 'city_name' || stateLower === 'state' || stateLower === 'state_code') {
-            return false;
+          
+          if (!isValid) {
+            allInvalidRows.push({ ...row, invalid_reason: invalidReason });
           }
-          return true;
+          
+          return isValid;
         });
         
         totalValid += validRows.length;
@@ -342,9 +357,13 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         invalidRows: totalInvalid
       });
       
+      // Store invalid rows for CSV download
+      setInvalidRowsData(allInvalidRows);
+      
       const checkTime = Date.now() - startTime;
       console.log(`✅ Transform status check complete in ${checkTime}ms`);
       console.log(`   Total: ${count}, Already: ${alreadyTransformedCount}, New: ${notYetTransformedCount}, Invalid: ${totalInvalid}`);
+      console.log(`   Invalid rows collected: ${allInvalidRows.length}`);
       
       // Show confirmation popup
       setShowTransformConfirm(true);
@@ -355,71 +374,69 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     }
   };
   
+  // Download invalid rows as CSV
+  const downloadInvalidRowsCSV = () => {
+    if (invalidRowsData.length === 0) {
+      alert('No invalid rows to download');
+      return;
+    }
+    
+    // Get all column names from the first row
+    const columns = Object.keys(invalidRowsData[0]);
+    
+    // Create CSV header
+    const csvHeader = columns.join(',');
+    
+    // Create CSV rows
+    const csvRows = invalidRowsData.map(row => {
+      return columns.map(col => {
+        const value = row[col];
+        // Escape values that contain commas or quotes
+        if (value === null || value === undefined) return '';
+        const stringValue = String(value);
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+          return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+        return stringValue;
+      }).join(',');
+    }).join('\n');
+    
+    // Combine header and rows
+    const csv = csvHeader + '\n' + csvRows;
+    
+    // Create blob and download
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `invalid_rows_${selectXType}_${selectXId}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    console.log(`✅ Downloaded CSV with ${invalidRowsData.length} invalid rows`);
+  };
+  
   // Helper functions for progress tracking (database version)
-  const saveTransformProgress = async (attemptId: string, data: any) => {
+  const saveTransformProgress = async (attemptId: number, data: any) => {
     try {
-      // Require authenticated user for transform tracking
-      if (!user?.id) {
-        console.error('Cannot save transform progress: user not authenticated');
-        return;
-      }
-      
-      // Determine selection type and ID
-      const selectionType = selectXType === 'release' ? 'rel_release_id' 
-        : selectXType === 'subsheet' ? 'rel_subsheet_id' 
-        : 'rel_subpart_id';
-      const selectionId = selectXId;
-      
-      // Check if record exists
-      const { data: existing } = await supabase
+      // Update existing record (record was created at start of handleTransform)
+      const { error } = await supabase
         .from('leadsmart_transform_attempts')
-        .select('attempt_id')
-        .eq('attempt_id', attemptId)
-        .maybeSingle();
+        .update({
+          ...data,
+          last_update_time: new Date().toISOString()
+        })
+        .eq('attempt_id', attemptId);
       
-      if (existing) {
-        // Update existing record
-        const { error } = await supabase
-          .from('leadsmart_transform_attempts')
-          .update({
-            ...data,
-            last_update_time: new Date().toISOString()
-          })
-          .eq('attempt_id', attemptId);
-        
-        if (error) throw error;
-      } else {
-        // Insert new record
-        const { error } = await supabase
-          .from('leadsmart_transform_attempts')
-          .insert([{
-            attempt_id: attemptId,
-            user_id: user.id,
-            selection_type: selectionType,
-            selection_id: selectionId,
-            entity_type: selectXType,
-            entity_id: selectXId,
-            ...data,
-            last_update_time: new Date().toISOString()
-          }]);
-        
-        if (error) throw error;
-      }
+      if (error) throw error;
     } catch (error) {
       console.error('Error saving transform progress to database:', error);
-      // Fallback to localStorage if DB fails
-      try {
-        const stored = localStorage.getItem('leadsmart_transform_attempts_backup');
-        const attempts = stored ? JSON.parse(stored) : [];
-        attempts.push({ id: attemptId, ...data, lastUpdateTime: new Date().toISOString() });
-        localStorage.setItem('leadsmart_transform_attempts_backup', JSON.stringify(attempts));
-      } catch (e) {
-        console.error('Fallback to localStorage also failed:', e);
-      }
     }
   };
 
-  const addTransformLog = async (attemptId: string, message: string) => {
+  const addTransformLog = async (attemptId: number, message: string) => {
     try {
       // Get current logs
       const { data: current } = await supabase
@@ -453,10 +470,51 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       return;
     }
     
+    if (!user?.id) {
+      alert('Please log in to perform transforms');
+      return;
+    }
+    
     console.log('🚀 Starting transformation process with batch processing...');
     const startTime = Date.now();
-    const attemptId = `transform_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    setCurrentTransformId(attemptId);
+    
+    // Create initial database record and get the auto-generated attempt_id
+    let attemptId: number | null = null;
+    
+    try {
+      const selectionType = selectXType === 'release' ? 'rel_release_id' 
+        : selectXType === 'subsheet' ? 'rel_subsheet_id' 
+        : 'rel_subpart_id';
+      
+      const { data: newAttempt, error: insertError } = await supabase
+        .from('leadsmart_transform_attempts')
+        .insert([{
+          user_id: user.id,
+          selection_type: selectionType,
+          selection_id: selectXId,
+          entity_type: selectXType,
+          entity_id: selectXId,
+          status: 'in_progress',
+          total_rows: 0,  // Will update shortly
+          total_batches: 0,  // Will update shortly
+          logs: []
+        }])
+        .select('attempt_id')
+        .single();
+      
+      if (insertError) throw insertError;
+      
+      attemptId = newAttempt.attempt_id;
+      setCurrentTransformId(attemptId);
+      console.log(`📝 Created transform attempt #${attemptId}`);
+      
+    } catch (error) {
+      console.error('❌ Failed to create transform attempt record:', error);
+      alert('Failed to initialize transform tracking. Check console for details.');
+      setTransforming(false);
+      return;
+    }
+    
     setTransforming(true);
     
     try {
@@ -482,21 +540,12 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         return;
       }
       
-      // Initialize transform tracking
+      // Update transform tracking with actual counts
       await saveTransformProgress(attemptId, {
-        start_time: new Date().toISOString(),
-        status: 'in_progress',
         total_rows: totalCount,
         processed_rows: 0,
         current_batch: 0,
-        total_batches: Math.ceil(totalCount / 1000),
-        groups_created: 0,
-        transformed_records_new: 0,
-        transformed_records_updated: 0,
-        relations_created: 0,
-        skipped_rows: 0,
-        already_transformed_rows: 0,
-        logs: []
+        total_batches: Math.ceil(totalCount / 1000)
       });
       
       await addTransformLog(attemptId, `Transform started for ${selectXType} #${selectXId}`);
@@ -1266,9 +1315,21 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                       <span className="font-bold text-green-600">{transformStats.notYetTransformed.toLocaleString()}</span>
                     </div>
                     {transformStats.invalidRows > 0 && (
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center">
                         <span className="text-gray-700">Invalid/header rows:</span>
-                        <span className="font-bold text-red-600">{transformStats.invalidRows.toLocaleString()}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-red-600">{transformStats.invalidRows.toLocaleString()}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              downloadInvalidRowsCSV();
+                            }}
+                            className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded border border-red-300 transition-colors"
+                            title="Download invalid rows as CSV"
+                          >
+                            📥 CSV
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>

@@ -12,7 +12,7 @@ const ZhedoriButtonBar = dynamic(
 );
 
 interface TransformAttempt {
-  attempt_id: string;
+  attempt_id: number;
   user_id: string;
   start_time: string;
   end_time?: string;
@@ -443,7 +443,7 @@ Report ID: ${attempt.attempt_id}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm font-mono text-gray-900">
-                          {attempt.attempt_id.substring(0, 8)}...
+                          #{attempt.attempt_id}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900">
                           {attempt.entity_type} #{attempt.entity_id}
@@ -512,7 +512,7 @@ Report ID: ${attempt.attempt_id}
           <div className="mt-6 bg-white rounded-lg shadow border border-gray-200">
             <div className="p-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
               <h2 className="text-lg font-bold text-gray-900">
-                Attempt Details: {selectedAttempt.attempt_id.substring(0, 16)}...
+                Attempt Details: #{selectedAttempt.attempt_id}
               </h2>
               <button
                 onClick={() => setSelectedAttempt(null)}
