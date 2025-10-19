@@ -1955,7 +1955,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  {transformStats.notYetTransformed > 0 ? 'Yes, Transform Now' : 'No Rows to Transform'}
+                  {transformStats.notYetTransformed > 0 ? 'gingko transform function' : 'No Rows to Transform'}
                 </button>
               </div>
             </div>
