@@ -332,12 +332,12 @@ export default function LeadSmartSkylabTileTables({
       console.log('💾 Saving cache to database...');
       await updateProgress('saving_cache', 95, 'Saving cache to database');
       
-      // Ensure correct JSON key order: releases -> subsheets -> subparts
-      // Force correct key order by creating new object with explicit ordering
+      // Ensure correct JSON key order: releases -> subsheets -> subparts  
+      // Build object manually with precise key insertion order
       const orderedCacheData = {};
-      orderedCacheData.releases = newCacheData.releases;
-      orderedCacheData.subsheets = newCacheData.subsheets;  
-      orderedCacheData.subparts = newCacheData.subparts;
+      orderedCacheData['releases'] = newCacheData.releases;
+      orderedCacheData['subsheets'] = newCacheData.subsheets;
+      orderedCacheData['subparts'] = newCacheData.subparts;
       
       const { error: upsertError } = await supabase
         .from('leadsmart_pico_count_cache')
