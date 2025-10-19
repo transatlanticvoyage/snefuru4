@@ -51,6 +51,16 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     invalidRows: 0
   });
   const [invalidRowsData, setInvalidRowsData] = useState<any[]>([]);
+  const [invalidRowsBreakdown, setInvalidRowsBreakdown] = useState({
+    missingCityOnly: 0,
+    missingStateOnly: 0,
+    missingPayoutOnly: 0,
+    missingCityAndState: 0,
+    missingCityAndPayout: 0,
+    missingStateAndPayout: 0,
+    missingAll: 0,
+    headerRows: 0
+  });
   
   // Left pane view state
   const [leftPaneView, setLeftPaneView] = useState<'grid' | 'tile'>('grid');
@@ -272,6 +282,18 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       let totalInvalid = 0;
       const allInvalidRows: any[] = [];
       
+      // Detailed breakdown of invalid rows
+      const breakdown = {
+        missingCityOnly: 0,
+        missingStateOnly: 0,
+        missingPayoutOnly: 0,
+        missingCityAndState: 0,
+        missingCityAndPayout: 0,
+        missingStateAndPayout: 0,
+        missingAll: 0,
+        headerRows: 0
+      };
+      
       for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
         const startRow = batchNum * batchSize;
         const endRow = startRow + batchSize - 1;
@@ -294,20 +316,53 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         
         if (!batchData || batchData.length === 0) break;
         
-        // Filter out invalid rows in this batch and collect them
+        // Filter out invalid rows in this batch and collect them with detailed categorization
         const validRows = batchData.filter(row => {
           let isValid = true;
           let invalidReason = '';
           
-          if (!row.city_name || !row.state_code || row.payout === null || row.payout === undefined) {
-            isValid = false;
-            invalidReason = 'Missing required fields (city_name, state_code, or payout)';
-          } else {
+          const hasCity = row.city_name && row.city_name.trim() !== '';
+          const hasState = row.state_code && row.state_code.trim() !== '';
+          const hasPayout = row.payout !== null && row.payout !== undefined;
+          
+          // Check for header rows first (they have values but are headers)
+          if (hasCity && hasState) {
             const cityLower = row.city_name.toLowerCase().trim();
             const stateLower = row.state_code.toLowerCase().trim();
-            if (cityLower === 'city' || cityLower === 'city_name' || stateLower === 'state' || stateLower === 'state_code') {
+            if (cityLower === 'city' || cityLower === 'city_name' || cityLower === 'city name' ||
+                stateLower === 'state' || stateLower === 'state_code' || stateLower === 'state_id' || stateLower === 'state abbr') {
               isValid = false;
-              invalidReason = 'Header row detected (city/state contains header text)';
+              invalidReason = 'Header row detected';
+              breakdown.headerRows++;
+            }
+          }
+          
+          // Check for missing required fields
+          if (isValid && (!hasCity || !hasState || !hasPayout)) {
+            isValid = false;
+            
+            // Categorize by specific missing combination
+            if (!hasCity && !hasState && !hasPayout) {
+              invalidReason = 'Missing all three: city_name, state_code, payout';
+              breakdown.missingAll++;
+            } else if (!hasCity && !hasState) {
+              invalidReason = 'Missing city_name and state_code';
+              breakdown.missingCityAndState++;
+            } else if (!hasCity && !hasPayout) {
+              invalidReason = 'Missing city_name and payout';
+              breakdown.missingCityAndPayout++;
+            } else if (!hasState && !hasPayout) {
+              invalidReason = 'Missing state_code and payout';
+              breakdown.missingStateAndPayout++;
+            } else if (!hasCity) {
+              invalidReason = 'Missing city_name';
+              breakdown.missingCityOnly++;
+            } else if (!hasState) {
+              invalidReason = 'Missing state_code';
+              breakdown.missingStateOnly++;
+            } else if (!hasPayout) {
+              invalidReason = 'Missing payout';
+              breakdown.missingPayoutOnly++;
             }
           }
           
@@ -360,10 +415,14 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       // Store invalid rows for CSV download
       setInvalidRowsData(allInvalidRows);
       
+      // Store detailed breakdown of invalid rows
+      setInvalidRowsBreakdown(breakdown);
+      
       const checkTime = Date.now() - startTime;
       console.log(`✅ Transform status check complete in ${checkTime}ms`);
       console.log(`   Total: ${count}, Already: ${alreadyTransformedCount}, New: ${notYetTransformedCount}, Invalid: ${totalInvalid}`);
       console.log(`   Invalid rows collected: ${allInvalidRows.length}`);
+      console.log(`   Invalid breakdown:`, breakdown);
       
       // Show confirmation popup
       setShowTransformConfirm(true);
@@ -804,6 +863,39 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       const totalTime = Date.now() - startTime;
       const processingSpeed = totalProcessed / (totalTime / 1000);
       
+      // Build invalid rows breakdown text
+      let invalidBreakdownText = '';
+      if (totalSkipped > 0) {
+        invalidBreakdownText = `INVALID/SKIPPED ROWS (remain in leadsmart_zip_based_data):\n` +
+          `• Total invalid: ${totalSkipped.toLocaleString()}\n`;
+        
+        if (invalidRowsBreakdown.missingCityOnly > 0) {
+          invalidBreakdownText += `  - Missing city_name only: ${invalidRowsBreakdown.missingCityOnly.toLocaleString()}\n`;
+        }
+        if (invalidRowsBreakdown.missingStateOnly > 0) {
+          invalidBreakdownText += `  - Missing state_code only: ${invalidRowsBreakdown.missingStateOnly.toLocaleString()}\n`;
+        }
+        if (invalidRowsBreakdown.missingPayoutOnly > 0) {
+          invalidBreakdownText += `  - Missing payout only: ${invalidRowsBreakdown.missingPayoutOnly.toLocaleString()}\n`;
+        }
+        if (invalidRowsBreakdown.missingCityAndState > 0) {
+          invalidBreakdownText += `  - Missing city_name + state_code: ${invalidRowsBreakdown.missingCityAndState.toLocaleString()}\n`;
+        }
+        if (invalidRowsBreakdown.missingCityAndPayout > 0) {
+          invalidBreakdownText += `  - Missing city_name + payout: ${invalidRowsBreakdown.missingCityAndPayout.toLocaleString()}\n`;
+        }
+        if (invalidRowsBreakdown.missingStateAndPayout > 0) {
+          invalidBreakdownText += `  - Missing state_code + payout: ${invalidRowsBreakdown.missingStateAndPayout.toLocaleString()}\n`;
+        }
+        if (invalidRowsBreakdown.missingAll > 0) {
+          invalidBreakdownText += `  - Missing all three fields: ${invalidRowsBreakdown.missingAll.toLocaleString()}\n`;
+        }
+        if (invalidRowsBreakdown.headerRows > 0) {
+          invalidBreakdownText += `  - Header rows (e.g. "City", "State"): ${invalidRowsBreakdown.headerRows.toLocaleString()}\n`;
+        }
+        invalidBreakdownText += `\n⚠️ These rows were NOT transformed and remain in the source table.\n\n`;
+      }
+      
       const resultMessage = `✅ TRANSFORM COMPLETE!\n\n` +
         `SELECTION:\n` +
         `• ${selectXType} #${selectXId} (${totalCount.toLocaleString()} rows selected)\n\n` +
@@ -813,6 +905,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         `• ${totalAlreadyTransformed.toLocaleString()} rows already transformed (skipped)\n` +
         `• ${totalSkipped.toLocaleString()} rows skipped (invalid/missing data)\n` +
         `• ${(totalProcessed - totalAlreadyTransformed - totalSkipped).toLocaleString()} valid rows transformed\n\n` +
+        invalidBreakdownText +
         `TRANSFORMED RESULTS:\n` +
         `• ${transformedCount.toLocaleString()} NEW records created in leadsmart_transformed\n` +
         `• ${updatedCount.toLocaleString()} existing records updated\n` +
@@ -1330,22 +1423,75 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                       <span className="font-bold text-green-600">{transformStats.notYetTransformed.toLocaleString()}</span>
                     </div>
                     {transformStats.invalidRows > 0 && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">Invalid/header rows:</span>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-red-600">{transformStats.invalidRows.toLocaleString()}</span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              downloadInvalidRowsCSV();
-                            }}
-                            className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded border border-red-300 transition-colors"
-                            title="Download invalid rows as CSV"
-                          >
-                            📥 CSV
-                          </button>
+                      <>
+                        <div className="flex justify-between items-center border-t pt-2 mt-2">
+                          <span className="text-gray-700 font-semibold">Invalid/header rows:</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-red-600">{transformStats.invalidRows.toLocaleString()}</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                downloadInvalidRowsCSV();
+                              }}
+                              className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded border border-red-300 transition-colors"
+                              title="Download invalid rows as CSV"
+                            >
+                              📥 CSV
+                            </button>
+                          </div>
                         </div>
-                      </div>
+                        <div className="ml-4 mt-2 space-y-1 text-xs text-gray-600 bg-red-50 p-3 rounded border border-red-100">
+                          <div className="font-semibold text-red-800 mb-2">⚠️ Invalid Row Breakdown (will remain in leadsmart_zip_based_data):</div>
+                          {invalidRowsBreakdown.missingCityOnly > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Missing city_name only:</span>
+                              <span className="font-semibold">{invalidRowsBreakdown.missingCityOnly.toLocaleString()}</span>
+                            </div>
+                          )}
+                          {invalidRowsBreakdown.missingStateOnly > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Missing state_code only:</span>
+                              <span className="font-semibold">{invalidRowsBreakdown.missingStateOnly.toLocaleString()}</span>
+                            </div>
+                          )}
+                          {invalidRowsBreakdown.missingPayoutOnly > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Missing payout only:</span>
+                              <span className="font-semibold">{invalidRowsBreakdown.missingPayoutOnly.toLocaleString()}</span>
+                            </div>
+                          )}
+                          {invalidRowsBreakdown.missingCityAndState > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Missing city_name + state_code:</span>
+                              <span className="font-semibold">{invalidRowsBreakdown.missingCityAndState.toLocaleString()}</span>
+                            </div>
+                          )}
+                          {invalidRowsBreakdown.missingCityAndPayout > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Missing city_name + payout:</span>
+                              <span className="font-semibold">{invalidRowsBreakdown.missingCityAndPayout.toLocaleString()}</span>
+                            </div>
+                          )}
+                          {invalidRowsBreakdown.missingStateAndPayout > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Missing state_code + payout:</span>
+                              <span className="font-semibold">{invalidRowsBreakdown.missingStateAndPayout.toLocaleString()}</span>
+                            </div>
+                          )}
+                          {invalidRowsBreakdown.missingAll > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Missing all three fields:</span>
+                              <span className="font-semibold">{invalidRowsBreakdown.missingAll.toLocaleString()}</span>
+                            </div>
+                          )}
+                          {invalidRowsBreakdown.headerRows > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Header rows (e.g. "City", "State"):</span>
+                              <span className="font-semibold">{invalidRowsBreakdown.headerRows.toLocaleString()}</span>
+                            </div>
+                          )}
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
