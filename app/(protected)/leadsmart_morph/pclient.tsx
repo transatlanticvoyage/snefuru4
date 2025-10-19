@@ -79,6 +79,11 @@ export default function LeadsmartMorphClient() {
     type: 'release' | 'subsheet' | 'subpart' | null;
     id: number | null;
   }>({ type: null, id: null });
+  
+  // Pico cache rebuild state
+  const [rebuildCacheFn, setRebuildCacheFn] = useState<(() => void) | null>(null);
+  const [cacheRebuilding, setCacheRebuilding] = useState(false);
+  const [cacheRebuildProgress, setCacheRebuildProgress] = useState(0);
 
   // Define all columns
   const allColumns = [
@@ -209,11 +214,6 @@ export default function LeadsmartMorphClient() {
   
   const handleJettisonFilterChange = (filterType: 'release' | 'subsheet' | 'subpart' | null, filterId: number | null) => {
     setJettisonFilter({ type: filterType, id: filterId });
-  };
-
-  const handleRebuildPicoCache = () => {
-    // Trigger rebuild via custom event that LeadSmartSkylabTileTables will listen to
-    window.dispatchEvent(new CustomEvent('rebuild-pico-cache'));
   };
 
   // Filter data based on search
@@ -821,12 +821,29 @@ export default function LeadsmartMorphClient() {
             <div className="flex items-center gap-3" style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
               <span>pec_chamber skylab_system</span>
               <button
-                onClick={handleRebuildPicoCache}
-                className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors font-medium"
+                onClick={() => rebuildCacheFn?.()}
+                disabled={!rebuildCacheFn || cacheRebuilding}
+                className={`px-3 py-1 text-sm rounded transition-colors font-medium ${
+                  !rebuildCacheFn || cacheRebuilding
+                    ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                }`}
                 title="Rebuild count cache for Skylab tiles"
               >
-                🔄 Re-create Pico Count Cache Now
+                {cacheRebuilding ? '🔄 Rebuilding...' : '🔄 Re-create Pico Count Cache Now'}
               </button>
+              {cacheRebuilding && (
+                <div className="flex-1 max-w-md">
+                  <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden border border-gray-300">
+                    <div
+                      className="h-full bg-purple-600 transition-all duration-300 flex items-center justify-center text-white text-xs font-semibold"
+                      style={{ width: `${cacheRebuildProgress}%` }}
+                    >
+                      {cacheRebuildProgress}%
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             {/* Skylab Tile Tables */}
@@ -834,7 +851,11 @@ export default function LeadsmartMorphClient() {
               pageType="morph"
               onFilterApply={(type, id) => setSkylabFilter({ type, id })}
               currentFilter={skylabFilter}
-              onCacheRebuildRequest={handleRebuildPicoCache}
+              onRegisterRebuild={(fn) => setRebuildCacheFn(() => fn)}
+              onRebuildStatusChange={(rebuilding, progress) => {
+                setCacheRebuilding(rebuilding);
+                setCacheRebuildProgress(progress);
+              }}
             />
           </div>
         )}

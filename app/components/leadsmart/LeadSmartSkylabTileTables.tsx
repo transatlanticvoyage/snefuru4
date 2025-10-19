@@ -36,7 +36,8 @@ interface Props {
     type: 'release' | 'subsheet' | 'subpart' | null;
     id: number | null;
   };
-  onCacheRebuildRequest?: () => void;
+  onRegisterRebuild?: (rebuildFn: () => void) => void;
+  onRebuildStatusChange?: (rebuilding: boolean, progress: number) => void;
 }
 
 interface PicoCacheData {
@@ -66,7 +67,8 @@ export default function LeadSmartSkylabTileTables({
   pageType, 
   onFilterApply,
   currentFilter,
-  onCacheRebuildRequest
+  onRegisterRebuild,
+  onRebuildStatusChange
 }: Props) {
   const { user } = useAuth();
   const supabase = createClientComponentClient();
@@ -79,6 +81,7 @@ export default function LeadSmartSkylabTileTables({
   // Cache state
   const [cacheData, setCacheData] = useState<PicoCacheData | null>(null);
   const [rebuilding, setRebuilding] = useState(false);
+  const [rebuildProgress, setRebuildProgress] = useState(0);
   
   // Selection states for view children
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null);
@@ -129,17 +132,49 @@ export default function LeadSmartSkylabTileTables({
       return;
     }
     
-    if (!confirm('Rebuild Pico Count Cache?\n\nThis will count all rows in leadsmart_zip_based_data and leadsmart_transformed for all releases, subsheets, and subparts. This may take a few minutes.')) {
+    if (!confirm('Rebuild Pico Count Cache?\n\nThis will count all rows in leadsmart_zip_based_data and leadsmart_transformed for all releases, subsheets, and subparts. This may take a few minutes.\n\nYou can monitor progress at /leadsmart_pico')) {
       return;
     }
     
     setRebuilding(true);
+    setRebuildProgress(0);
     const startTime = Date.now();
+    let reportId: number | null = null;
     
     try {
       console.log('🔄 Starting Pico cache rebuild...');
+      setRebuildProgress(5);
       
-      // Mark rebuild as in progress
+      // Clean up any stalled reports first
+      await supabase
+        .from('leadsmart_pico_reports')
+        .update({ status: 'cancelled' })
+        .eq('status', 'in_progress');
+      
+      // Create monitoring record
+      const { data: reportData, error: reportError } = await supabase
+        .from('leadsmart_pico_reports')
+        .insert([{
+          operation_type: 'cache_rebuild',
+          status: 'in_progress',
+          started_at: new Date().toISOString(),
+          last_activity_at: new Date().toISOString(),
+          current_phase: 'initializing',
+          overall_progress: 5.00,
+          operation_logs: []
+        }])
+        .select('report_id')
+        .single();
+      
+      if (reportError) {
+        console.error('Failed to create monitoring record:', reportError);
+        throw reportError;
+      }
+      reportId = reportData.report_id;
+      
+      console.log(`📝 Created monitoring record: ${reportId}`);
+      
+      // Mark rebuild as in progress in old cache table
       await supabase
         .from('leadsmart_pico_count_cache')
         .upsert({
@@ -151,6 +186,26 @@ export default function LeadSmartSkylabTileTables({
           onConflict: 'user_id'
         });
       
+      // Helper function to update progress in both places
+      const updateProgress = async (phase: string, progress: number, message: string, additionalData?: any) => {
+        setRebuildProgress(progress);
+        
+        if (reportId) {
+          try {
+            await supabase
+              .from('leadsmart_pico_reports')
+              .update({
+                current_phase: phase,
+                overall_progress: progress,
+                last_activity_at: new Date().toISOString()
+              })
+              .eq('report_id', reportId);
+          } catch (updateError) {
+            console.warn('Failed to update progress:', updateError);
+          }
+        }
+      };
+      
       const newCacheData: PicoCacheData = {
         releases: {},
         subsheets: {},
@@ -159,11 +214,14 @@ export default function LeadSmartSkylabTileTables({
       
       // Step 1: Count for all releases
       console.log('📊 Step 1/3: Counting releases...');
+      await updateProgress('counting_releases', 10, 'Started counting releases');
       const { data: allReleases } = await supabase
         .from('leadsmart_file_releases')
         .select('release_id');
       
-      for (const release of (allReleases || [])) {
+      const totalReleases = allReleases?.length || 0;
+      for (let i = 0; i < (allReleases || []).length; i++) {
+        const release = allReleases![i];
         const { count: zipCount } = await supabase
           .from('leadsmart_zip_based_data')
           .select('*', { count: 'exact', head: true })
@@ -184,17 +242,26 @@ export default function LeadSmartSkylabTileTables({
           transformed_count: transformedCount || 0,
           children_count: childrenCount || 0
         };
+        
+        // Update progress (releases are 10-40%)
+        await updateProgress('counting_releases', 10 + Math.floor((i + 1) / totalReleases * 30), 
+          `Counted release ${i + 1}/${totalReleases}`, 
+          { release_id: release.release_id, zip_count: zipCount, transformed_count: transformedCount });
       }
       
       console.log(`✅ Counted ${allReleases?.length || 0} releases`);
+      await updateProgress('counting_releases', 40, `Completed counting ${allReleases?.length || 0} releases`);
       
       // Step 2: Count for all subsheets
       console.log('📊 Step 2/3: Counting subsheets...');
+      await updateProgress('counting_subsheets', 40, 'Started counting subsheets');
       const { data: allSubsheets } = await supabase
         .from('leadsmart_subsheets')
         .select('subsheet_id');
       
-      for (const subsheet of (allSubsheets || [])) {
+      const totalSubsheets = allSubsheets?.length || 0;
+      for (let i = 0; i < (allSubsheets || []).length; i++) {
+        const subsheet = allSubsheets![i];
         const { count: zipCount } = await supabase
           .from('leadsmart_zip_based_data')
           .select('*', { count: 'exact', head: true })
@@ -215,17 +282,26 @@ export default function LeadSmartSkylabTileTables({
           transformed_count: transformedCount || 0,
           children_count: childrenCount || 0
         };
+        
+        // Update progress (subsheets are 40-70%)
+        await updateProgress('counting_subsheets', 40 + Math.floor((i + 1) / totalSubsheets * 30), 
+          `Counted subsheet ${i + 1}/${totalSubsheets}`, 
+          { subsheet_id: subsheet.subsheet_id, zip_count: zipCount, transformed_count: transformedCount });
       }
       
       console.log(`✅ Counted ${allSubsheets?.length || 0} subsheets`);
+      await updateProgress('counting_subsheets', 70, `Completed counting ${allSubsheets?.length || 0} subsheets`);
       
       // Step 3: Count for all subparts
       console.log('📊 Step 3/3: Counting subparts...');
+      await updateProgress('counting_subparts', 70, 'Started counting subparts');
       const { data: allSubparts } = await supabase
         .from('leadsmart_subparts')
         .select('subpart_id');
       
-      for (const subpart of (allSubparts || [])) {
+      const totalSubparts = allSubparts?.length || 0;
+      for (let i = 0; i < (allSubparts || []).length; i++) {
+        const subpart = allSubparts![i];
         const { count: zipCount } = await supabase
           .from('leadsmart_zip_based_data')
           .select('*', { count: 'exact', head: true })
@@ -240,19 +316,34 @@ export default function LeadSmartSkylabTileTables({
           zip_based_count: zipCount || 0,
           transformed_count: transformedCount || 0
         };
+        
+        // Update progress (subparts are 70-95%)
+        await updateProgress('counting_subparts', 70 + Math.floor((i + 1) / totalSubparts * 25), 
+          `Counted subpart ${i + 1}/${totalSubparts}`, 
+          { subpart_id: subpart.subpart_id, zip_count: zipCount, transformed_count: transformedCount });
       }
       
       console.log(`✅ Counted ${allSubparts?.length || 0} subparts`);
+      await updateProgress('counting_subparts', 95, `Completed counting ${allSubparts?.length || 0} subparts`);
       
       const duration = Date.now() - startTime;
       
       // Save cache to database
       console.log('💾 Saving cache to database...');
+      await updateProgress('saving_cache', 95, 'Saving cache to database');
+      
+      // Ensure correct JSON key order: releases -> subsheets -> subparts
+      // Force correct key order by creating new object with explicit ordering
+      const orderedCacheData = {};
+      orderedCacheData.releases = newCacheData.releases;
+      orderedCacheData.subsheets = newCacheData.subsheets;  
+      orderedCacheData.subparts = newCacheData.subparts;
+      
       const { error: upsertError } = await supabase
         .from('leadsmart_pico_count_cache')
         .upsert({
           user_id: user.id,
-          count_data: newCacheData,
+          count_data: orderedCacheData,
           last_updated: new Date().toISOString(),
           rebuild_in_progress: false,
           last_rebuild_completed_at: new Date().toISOString(),
@@ -268,14 +359,45 @@ export default function LeadSmartSkylabTileTables({
       if (upsertError) throw upsertError;
       
       // Update local cache
-      setCacheData(newCacheData);
+      setCacheData(orderedCacheData);
       
       const durationSeconds = (duration / 1000).toFixed(1);
+      const totalCacheEntries = (allReleases?.length || 0) + (allSubsheets?.length || 0) + (allSubparts?.length || 0);
+      
+      // Complete monitoring record
+      if (reportId) {
+        await supabase
+          .from('leadsmart_pico_reports')
+          .update({
+            status: 'completed',
+            completed_at: new Date().toISOString(),
+            last_activity_at: new Date().toISOString(),
+            overall_progress: 100.00,
+            current_phase: 'completed',
+            releases_count: allReleases?.length || 0,
+            subsheets_count: allSubsheets?.length || 0,
+            subparts_count: allSubparts?.length || 0,
+            cache_entries_created: totalCacheEntries,
+            operations_per_second: totalCacheEntries / (duration / 1000),
+            cache_data_summary: {
+              total_cache_entries: totalCacheEntries,
+              releases_cached: allReleases?.length || 0,
+              subsheets_cached: allSubsheets?.length || 0,
+              subparts_cached: allSubparts?.length || 0,
+              duration_ms: duration
+            }
+          })
+          .eq('report_id', reportId);
+      }
+      
+      await updateProgress('completed', 100, `Cache rebuild completed in ${durationSeconds}s`);
+      
       alert(`✅ Pico Cache Rebuilt Successfully!\n\n` +
         `Releases: ${allReleases?.length || 0}\n` +
         `Subsheets: ${allSubsheets?.length || 0}\n` +
         `Subparts: ${allSubparts?.length || 0}\n\n` +
-        `Duration: ${durationSeconds}s`);
+        `Duration: ${durationSeconds}s\n\n` +
+        `Monitor at: /leadsmart_pico`);
       
       console.log(`✅ Cache rebuilt in ${durationSeconds}s`);
       
@@ -284,15 +406,33 @@ export default function LeadSmartSkylabTileTables({
       
     } catch (error) {
       console.error('❌ Error rebuilding pico cache:', error);
-      alert('Failed to rebuild cache. Check console for details.');
       
-      // Mark rebuild as failed
+      // Update monitoring record with error
+      if (reportId) {
+        await supabase
+          .from('leadsmart_pico_reports')
+          .update({
+            status: 'failed',
+            last_activity_at: new Date().toISOString(),
+            error_message: error instanceof Error ? error.message : 'Unknown error',
+            error_details: {
+              error: error instanceof Error ? error.stack : String(error),
+              timestamp: new Date().toISOString()
+            }
+          })
+          .eq('report_id', reportId);
+      }
+      
+      alert(`Failed to rebuild cache. Check console for details.\n\nView detailed error info at: /leadsmart_pico`);
+      
+      // Mark rebuild as failed in old table
       await supabase
         .from('leadsmart_pico_count_cache')
         .update({ rebuild_in_progress: false })
         .eq('user_id', user.id);
     } finally {
       setRebuilding(false);
+      setRebuildProgress(0);
     }
   }, [user, supabase]);
 
@@ -395,18 +535,19 @@ export default function LeadSmartSkylabTileTables({
     loadCache();
   }, [loadCache]);
 
-  // Listen for rebuild cache event
+  // Register rebuild function with parent
   useEffect(() => {
-    const handleRebuildEvent = () => {
-      rebuildCache();
-    };
-    
-    window.addEventListener('rebuild-pico-cache', handleRebuildEvent);
-    
-    return () => {
-      window.removeEventListener('rebuild-pico-cache', handleRebuildEvent);
-    };
-  }, [rebuildCache]);
+    if (onRegisterRebuild) {
+      onRegisterRebuild(rebuildCache);
+    }
+  }, [onRegisterRebuild, rebuildCache]);
+
+  // Notify parent of rebuild status changes
+  useEffect(() => {
+    if (onRebuildStatusChange) {
+      onRebuildStatusChange(rebuilding, rebuildProgress);
+    }
+  }, [rebuilding, rebuildProgress, onRebuildStatusChange]);
 
   useEffect(() => {
     fetchReleases();
