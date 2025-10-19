@@ -27,6 +27,11 @@ export default function FileReleasesGrid({ onReleaseSelect }: Props) {
   const [editValue, setEditValue] = useState<string>('');
   const [newRelease, setNewRelease] = useState<Partial<FileRelease> | null>(null);
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null);
+  
+  // Delete confirmation states
+  const [deleteConfirmStep1, setDeleteConfirmStep1] = useState<number | null>(null);
+  const [deleteConfirmStep2, setDeleteConfirmStep2] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchReleases = useCallback(async () => {
     if (!user) return;
@@ -150,6 +155,41 @@ export default function FileReleasesGrid({ onReleaseSelect }: Props) {
     }
   }, [selectedReleaseId, onReleaseSelect]);
 
+  const handleDeleteClick = (releaseId: number) => {
+    setDeleteConfirmStep1(releaseId);
+  };
+
+  const handleDeleteConfirm = async (releaseId: number) => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('leadsmart_file_releases')
+        .delete()
+        .eq('release_id', releaseId);
+      
+      if (error) throw error;
+      
+      // Remove from local state
+      setReleases(prev => prev.filter(r => r.release_id !== releaseId));
+      
+      // Clear selection if this was the selected one
+      if (selectedReleaseId === releaseId) {
+        setSelectedReleaseId(null);
+        onReleaseSelect(null);
+      }
+      
+      setDeleteConfirmStep1(null);
+      setDeleteConfirmStep2(null);
+      
+      alert(`Successfully deleted release #${releaseId}`);
+    } catch (error) {
+      console.error('Error deleting release:', error);
+      alert('Failed to delete release. It may have associated data.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return <div className="p-4 text-sm text-gray-600">Loading...</div>;
   }
@@ -192,6 +232,9 @@ export default function FileReleasesGrid({ onReleaseSelect }: Props) {
               </th>
               <th className="border border-gray-300 px-2 py-2 text-left" style={{ fontWeight: 'bold', fontSize: '14px', textTransform: 'lowercase' }}>
                 created_by
+              </th>
+              <th className="border border-gray-300 px-2 py-2 text-center" style={{ fontWeight: 'bold', fontSize: '14px', width: '80px' }}>
+                delete
               </th>
             </tr>
           </thead>
@@ -236,6 +279,7 @@ export default function FileReleasesGrid({ onReleaseSelect }: Props) {
                 <td className="border border-gray-300 px-2 py-1 text-gray-400">Auto</td>
                 <td className="border border-gray-300 px-2 py-1 text-gray-400">Auto</td>
                 <td className="border border-gray-300 px-2 py-1 text-gray-400">Auto</td>
+                <td className="border border-gray-300 px-2 py-1 text-gray-400 text-center">N/A</td>
               </tr>
             )}
             
@@ -311,11 +355,85 @@ export default function FileReleasesGrid({ onReleaseSelect }: Props) {
                 <td className="border border-gray-300 px-2 py-1 text-gray-600 font-mono text-xs">
                   {release.created_by || ''}
                 </td>
+                <td className="border border-gray-300 px-2 py-1 text-center">
+                  <button
+                    onClick={() => handleDeleteClick(release.release_id)}
+                    className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors"
+                  >
+                    delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      
+      {/* First Delete Confirmation */}
+      {deleteConfirmStep1 !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[200]">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">⚠️ Confirm Delete</h3>
+              <p className="text-gray-700 mb-4">
+                Are you sure you want to delete <strong>Release #{deleteConfirmStep1}</strong>?
+              </p>
+              <p className="text-sm text-gray-600 mb-6">
+                This will only delete the release entity. Any associated data in leadsmart_zip_based_data will remain.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setDeleteConfirmStep1(null)}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setDeleteConfirmStep2(deleteConfirmStep1);
+                    setDeleteConfirmStep1(null);
+                  }}
+                  className="px-4 py-2 bg-yellow-600 text-white hover:bg-yellow-700 rounded-md transition-colors"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Second Delete Confirmation */}
+      {deleteConfirmStep2 !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[200]">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-red-700 mb-4">🚨 Final Confirmation</h3>
+              <p className="text-gray-700 mb-4">
+                <strong>This is your last chance!</strong>
+              </p>
+              <p className="text-gray-700 mb-6">
+                Click "Yes, Delete Now" to permanently delete <strong>Release #{deleteConfirmStep2}</strong>.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setDeleteConfirmStep2(null)}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDeleteConfirm(deleteConfirmStep2)}
+                  disabled={deleting}
+                  className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-md transition-colors disabled:bg-red-400"
+                >
+                  {deleting ? 'Deleting...' : 'Yes, Delete Now'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -38,20 +38,14 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
     'zip_code',
     'payout',
     'city_name',
-    'state_code',
-    '-',
-    '-',
-    '-',
-    '-',
-    '-',
-    '-'
+    'state_code'
   ];
 
   // Initialize with empty grid
   useEffect(() => {
     if (isOpen && gridData.length === 0) {
-      // Start with 20 empty rows
-      const emptyGrid = Array(20).fill(null).map(() => Array(10).fill(''));
+      // Start with 20 empty rows (4 columns)
+      const emptyGrid = Array(20).fill(null).map(() => Array(4).fill(''));
       setGridData(emptyGrid);
     }
   }, [isOpen, gridData.length]);
@@ -71,14 +65,14 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
     
     // Parse the pasted data (assuming TSV format from spreadsheet)
     const rows = pastedText.split('\n').map(row => {
-      // Split by tab, but also handle cases where there might be fewer than 10 columns
+      // Split by tab, but also handle cases where there might be fewer than 4 columns
       const cols = row.split('\t');
-      // Pad with empty strings if fewer than 10 columns
-      while (cols.length < 10) {
+      // Pad with empty strings if fewer than 4 columns
+      while (cols.length < 4) {
         cols.push('');
       }
-      // Take only first 10 columns if more than 10
-      return cols.slice(0, 10);
+      // Take only first 4 columns if more than 4
+      return cols.slice(0, 4);
     });
 
     // Filter out completely empty rows
@@ -92,7 +86,7 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
     
     // Add more empty rows if we have less than 20 total preview rows
     while (previewRows.length < Math.min(20, filteredRows.length)) {
-      previewRows.push(Array(10).fill(''));
+      previewRows.push(Array(4).fill(''));
     }
 
     setGridData(previewRows);
@@ -117,14 +111,14 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
     
     // Parse the pasted data (assuming TSV format from spreadsheet)
     const rows = pastedText.split('\n').map(row => {
-      // Split by tab, but also handle cases where there might be fewer than 10 columns
+      // Split by tab, but also handle cases where there might be fewer than 4 columns
       const cols = row.split('\t');
-      // Pad with empty strings if fewer than 10 columns
-      while (cols.length < 10) {
+      // Pad with empty strings if fewer than 4 columns
+      while (cols.length < 4) {
         cols.push('');
       }
-      // Take only first 10 columns if more than 10
-      return cols.slice(0, 10);
+      // Take only first 4 columns if more than 4
+      return cols.slice(0, 4);
     });
 
     // Filter out completely empty rows
@@ -138,7 +132,7 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
     
     // Add more empty rows if we have less than 20 total preview rows
     while (previewRows.length < Math.min(20, filteredRows.length)) {
-      previewRows.push(Array(10).fill(''));
+      previewRows.push(Array(4).fill(''));
     }
 
     setGridData(previewRows);
@@ -211,7 +205,6 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
           rel_subsheet_id: selectedSubsheetId,
           rel_subpart_id: selectedSubpartId,
           user_id: user.id
-          // Columns 4-9 are placeholder columns and not inserted
         };
       });
       
@@ -283,8 +276,8 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
       <div className="bg-white rounded-lg shadow-xl overflow-hidden" style={{ width: '1800px', height: '100vh', maxHeight: '100vh' }}>
         {/* Two Column Layout - Full Height */}
         <div className="flex h-full">
-          {/* Left Side - ALL Existing Content */}
-          <div className="flex-1 flex flex-col border-r border-gray-300">
+          {/* Left Side - 50% width */}
+          <div className="w-1/2 flex flex-col border-r border-gray-300">
             {/* Header */}
             <div className="p-6 border-b bg-gray-50">
               <div className="flex items-center justify-between mb-4">
@@ -297,7 +290,7 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
                 </button>
               </div>
               <div className="text-sm text-gray-600 mb-4">
-                Paste your spreadsheet data below (up to 12,000 rows). First 4 columns will be mapped to: <span className="font-semibold">zip_code, payout, city_name, state_code</span>. Columns 5-10 are placeholders (not inserted into database).
+                Paste your spreadsheet data below. The 4 columns will be mapped to: <span className="font-semibold">zip_code, payout, city_name, state_code</span>.
               </div>
               
               {/* Action buttons */}
@@ -364,7 +357,7 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
                             rows={4}
                           />
                           <div className="text-xs text-gray-500 mt-1">
-                            Copy 4 columns from Google Sheets (zip_code, payout, city_name, state_code), then paste here. Additional columns can be included but will not be inserted.
+                            Copy 4 columns from Google Sheets (zip_code, payout, city_name, state_code), then paste here.
                           </div>
                         </div>
                         <button
@@ -460,8 +453,8 @@ export default function InsertDataPopup({ isOpen, onClose, onSuccess }: Props) {
           </div>
           {/* End of Left Side */}
 
-          {/* Right Side - File Releases Grid */}
-          <div className="flex-1 bg-white flex flex-col overflow-auto">
+          {/* Right Side - 50% width */}
+          <div className="w-1/2 bg-white flex flex-col overflow-auto">
             <FileReleasesGrid onReleaseSelect={setSelectedReleaseId} />
             <SubsheetsGrid 
               selectedReleaseId={selectedReleaseId} 

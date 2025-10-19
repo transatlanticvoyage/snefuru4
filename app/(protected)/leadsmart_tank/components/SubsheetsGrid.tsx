@@ -28,6 +28,11 @@ export default function SubsheetsGrid({ selectedReleaseId, onSubsheetSelect }: P
   const [editValue, setEditValue] = useState<string>('');
   const [newSubsheet, setNewSubsheet] = useState<Partial<Subsheet> | null>(null);
   const [selectedSubsheetId, setSelectedSubsheetId] = useState<number | null>(null);
+  
+  // Delete confirmation states
+  const [deleteConfirmStep1, setDeleteConfirmStep1] = useState<number | null>(null);
+  const [deleteConfirmStep2, setDeleteConfirmStep2] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchSubsheets = useCallback(async () => {
     if (!selectedReleaseId) {
@@ -131,6 +136,41 @@ export default function SubsheetsGrid({ selectedReleaseId, onSubsheetSelect }: P
     onSubsheetSelect(subsheetId);
   };
 
+  const handleDeleteClick = (subsheetId: number) => {
+    setDeleteConfirmStep1(subsheetId);
+  };
+
+  const handleDeleteConfirm = async (subsheetId: number) => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('leadsmart_subsheets')
+        .delete()
+        .eq('subsheet_id', subsheetId);
+      
+      if (error) throw error;
+      
+      // Remove from local state
+      setSubsheets(prev => prev.filter(s => s.subsheet_id !== subsheetId));
+      
+      // Clear selection if this was the selected one
+      if (selectedSubsheetId === subsheetId) {
+        setSelectedSubsheetId(null);
+        onSubsheetSelect(null);
+      }
+      
+      setDeleteConfirmStep1(null);
+      setDeleteConfirmStep2(null);
+      
+      alert(`Successfully deleted subsheet #${subsheetId}`);
+    } catch (error) {
+      console.error('Error deleting subsheet:', error);
+      alert('Failed to delete subsheet. It may have associated data.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <hr className="border-gray-300" />
@@ -181,6 +221,9 @@ export default function SubsheetsGrid({ selectedReleaseId, onSubsheetSelect }: P
                   <th className="border border-gray-300 px-2 py-2 text-left" style={{ fontWeight: 'bold', fontSize: '14px', textTransform: 'lowercase' }}>
                     created_by
                   </th>
+                  <th className="border border-gray-300 px-2 py-2 text-center" style={{ fontWeight: 'bold', fontSize: '14px', width: '80px' }}>
+                    delete
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -218,6 +261,7 @@ export default function SubsheetsGrid({ selectedReleaseId, onSubsheetSelect }: P
                     <td className="border border-gray-300 px-2 py-1 text-gray-400">Auto</td>
                     <td className="border border-gray-300 px-2 py-1 text-gray-400">Auto</td>
                     <td className="border border-gray-300 px-2 py-1 text-gray-400">Auto</td>
+                    <td className="border border-gray-300 px-2 py-1 text-gray-400 text-center">N/A</td>
                   </tr>
                 )}
                 
@@ -270,11 +314,85 @@ export default function SubsheetsGrid({ selectedReleaseId, onSubsheetSelect }: P
                     <td className="border border-gray-300 px-2 py-1 text-gray-600 font-mono text-xs">
                       {subsheet.created_by || ''}
                     </td>
+                    <td className="border border-gray-300 px-2 py-1 text-center">
+                      <button
+                        onClick={() => handleDeleteClick(subsheet.subsheet_id)}
+                        className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors"
+                      >
+                        delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
+        </div>
+      )}
+      
+      {/* First Delete Confirmation */}
+      {deleteConfirmStep1 !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[200]">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">⚠️ Confirm Delete</h3>
+              <p className="text-gray-700 mb-4">
+                Are you sure you want to delete <strong>Subsheet #{deleteConfirmStep1}</strong>?
+              </p>
+              <p className="text-sm text-gray-600 mb-6">
+                This will only delete the subsheet entity. Any associated data in leadsmart_zip_based_data will remain.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setDeleteConfirmStep1(null)}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setDeleteConfirmStep2(deleteConfirmStep1);
+                    setDeleteConfirmStep1(null);
+                  }}
+                  className="px-4 py-2 bg-yellow-600 text-white hover:bg-yellow-700 rounded-md transition-colors"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Second Delete Confirmation */}
+      {deleteConfirmStep2 !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[200]">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-red-700 mb-4">🚨 Final Confirmation</h3>
+              <p className="text-gray-700 mb-4">
+                <strong>This is your last chance!</strong>
+              </p>
+              <p className="text-gray-700 mb-6">
+                Click "Yes, Delete Now" to permanently delete <strong>Subsheet #{deleteConfirmStep2}</strong>.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setDeleteConfirmStep2(null)}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDeleteConfirm(deleteConfirmStep2)}
+                  disabled={deleting}
+                  className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-md transition-colors disabled:bg-red-400"
+                >
+                  {deleting ? 'Deleting...' : 'Yes, Delete Now'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
