@@ -61,30 +61,6 @@ export default function BaobobReportsClient() {
   const [error, setError] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
-  useEffect(() => {
-    if (isLoading) return;
-    
-    if (!user) {
-      router.push('/auth');
-      return;
-    }
-
-    loadAttempts();
-  }, [user, isLoading, router]);
-
-  // Auto-refresh every 2 seconds when enabled
-  useEffect(() => {
-    if (!autoRefresh || !user) return;
-    
-    const interval = setInterval(() => {
-      loadAttempts();
-    }, 2000);
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [user, router, loadAttempts, autoRefresh]);
-
   // Load transform attempts from database
   const loadAttempts = useCallback(async () => {
     if (!user) return;
@@ -135,6 +111,30 @@ export default function BaobobReportsClient() {
     }
   }, [user, supabase]);
 
+  useEffect(() => {
+    if (isLoading) return;
+    
+    if (!user) {
+      router.push('/auth');
+      return;
+    }
+
+    loadAttempts();
+  }, [user, isLoading, router, loadAttempts]);
+
+  // Auto-refresh every 2 seconds when enabled
+  useEffect(() => {
+    if (!autoRefresh || !user) return;
+    
+    const interval = setInterval(() => {
+      loadAttempts();
+    }, 2000);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [user, router, loadAttempts, autoRefresh]);
+
   // Format duration
   const formatDuration = (start: string, end?: string) => {
     const startTime = new Date(start).getTime();
@@ -163,6 +163,160 @@ export default function BaobobReportsClient() {
       case 'stalled': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'cancelled': return 'bg-gray-100 text-gray-800 border-gray-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  // Cancel a running transform
+  const handleCancelTransform = async (attemptId: number) => {
+    if (!confirm('Cancel this transform? This will stop the background processing.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('baobab_transform_attempts')
+        .update({
+          status: 'cancelled',
+          last_activity_at: new Date().toISOString(),
+          current_phase: 'cancelled by user'
+        })
+        .eq('baobab_attempt_id', attemptId);
+
+      if (error) throw error;
+      
+      alert('Transform cancelled successfully');
+      loadAttempts(); // Refresh the list
+    } catch (err) {
+      console.error('Error cancelling transform:', err);
+      alert('Failed to cancel transform');
+    }
+  };
+
+  // Delete transformed data for a specific attempt
+  const handleDeleteTransformedData = async (attempt: BaobobTransformAttempt) => {
+    const confirmMessage = `Delete ALL transformed data for Attempt #${attempt.baobab_attempt_id}?
+
+This will permanently delete:
+- Records from leadsmart_transformed_relations
+- Records from leadsmart_transformed (if any)
+
+This action CANNOT be undone. Continue?`;
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      // Get the filter criteria from the attempt
+      const filterCriteria = attempt.filter_criteria as any;
+      const transformType = attempt.transform_type;
+      
+      if (!filterCriteria || !transformType) {
+        alert('Cannot determine what data to delete - missing filter criteria');
+        return;
+      }
+
+      // First, let's check what columns actually exist in the table
+      const { data: sampleData, error: sampleError } = await supabase
+        .from('leadsmart_transformed_relations')
+        .select('*')
+        .limit(1);
+      
+      if (sampleError) {
+        console.error('Error checking table schema:', sampleError);
+        alert('Cannot access leadsmart_transformed_relations table');
+        return;
+      }
+      
+      console.log('Sample record from leadsmart_transformed_relations:', sampleData?.[0]);
+      console.log('Available columns:', sampleData?.[0] ? Object.keys(sampleData[0]) : 'No data');
+
+      // Delete from leadsmart_transformed_relations based on the transform type
+      let deleteCount = 0;
+      
+      // Get the correct ID from filter criteria (keys are like "release_id", "subsheet_id", etc.)
+      const releaseId = filterCriteria?.['release_id'] || filterCriteria?.release_id;
+      const subsheetId = filterCriteria?.['subsheet_id'] || filterCriteria?.subsheet_id;  
+      const subpartId = filterCriteria?.['subpart_id'] || filterCriteria?.subpart_id;
+
+      if (transformType === 'release' && releaseId) {
+        console.log('Deleting from leadsmart_transformed_relations where jrel_release_id =', releaseId);
+        const { count, error: deleteError1 } = await supabase
+          .from('leadsmart_transformed_relations')
+          .delete({ count: 'exact' })
+          .eq('jrel_release_id', releaseId);
+        
+        if (deleteError1) {
+          console.error('Delete error from leadsmart_transformed_relations:', deleteError1);
+          throw deleteError1;
+        }
+        console.log('Deleted', count, 'records from leadsmart_transformed_relations');
+        deleteCount += count || 0;
+
+        // Also delete from leadsmart_transformed if it exists
+        const { count: count2, error: deleteError2 } = await supabase
+          .from('leadsmart_transformed')
+          .delete({ count: 'exact' })
+          .eq('jrel_release_id', releaseId);
+        
+        if (deleteError2 && !deleteError2.message?.includes('does not exist')) {
+          throw deleteError2;
+        }
+        deleteCount += count2 || 0;
+
+      } else if (transformType === 'subsheet' && subsheetId) {
+        const { count, error: deleteError1 } = await supabase
+          .from('leadsmart_transformed_relations')
+          .delete({ count: 'exact' })
+          .eq('jrel_subsheet_id', subsheetId);
+        
+        if (deleteError1) throw deleteError1;
+        deleteCount += count || 0;
+
+        // Also delete from leadsmart_transformed if it exists  
+        const { count: count2, error: deleteError2 } = await supabase
+          .from('leadsmart_transformed')
+          .delete({ count: 'exact' })
+          .eq('jrel_subsheet_id', subsheetId);
+        
+        if (deleteError2 && !deleteError2.message?.includes('does not exist')) {
+          throw deleteError2;
+        }
+        deleteCount += count2 || 0;
+
+      } else if (transformType === 'subpart' && subpartId) {
+        const { count, error: deleteError1 } = await supabase
+          .from('leadsmart_transformed_relations')
+          .delete({ count: 'exact' })
+          .eq('jrel_subpart_id', subpartId);
+        
+        if (deleteError1) throw deleteError1;
+        deleteCount += count || 0;
+
+        // Also delete from leadsmart_transformed if it exists
+        const { count: count2, error: deleteError2 } = await supabase
+          .from('leadsmart_transformed')
+          .delete({ count: 'exact' })
+          .eq('jrel_subpart_id', subpartId);
+        
+        if (deleteError2 && !deleteError2.message?.includes('does not exist')) {
+          throw deleteError2;
+        }
+        deleteCount += count2 || 0;
+
+      } else {
+        alert('Cannot determine deletion criteria from this attempt');
+        return;
+      }
+
+      alert(`Successfully deleted ${deleteCount.toLocaleString()} transformed records`);
+      
+    } catch (err) {
+      console.error('Error deleting transformed data:', err);
+      console.error('Filter criteria:', attempt.filter_criteria);
+      console.error('Transform type:', attempt.transform_type);
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+      alert(`Failed to delete transformed data: ${errorMsg}`);
     }
   };
 
@@ -294,7 +448,7 @@ export default function BaobobReportsClient() {
                 </div>
 
                 {/* Duration and Status */}
-                <div className="flex justify-between items-center text-sm text-gray-600">
+                <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
                   <div>
                     Duration: {attempt.started_at ? formatDuration(attempt.started_at, attempt.completed_at) : 'Not started'}
                   </div>
@@ -307,6 +461,36 @@ export default function BaobobReportsClient() {
                     <div>
                       ETA: {new Date(attempt.estimated_completion_time).toLocaleTimeString()}
                     </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-4 border-t border-gray-100">
+                  {/* Cancel Transform Button - Only show for in_progress or stalled */}
+                  {(attempt.status === 'in_progress' || attempt.status === 'stalled') && (
+                    <button
+                      onClick={() => handleCancelTransform(attempt.baobab_attempt_id)}
+                      className="px-3 py-1.5 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition-colors"
+                    >
+                      Cancel Transform
+                    </button>
+                  )}
+                  
+                  {/* Delete Transformed Data Button - Show for completed, failed, or cancelled */}
+                  {(attempt.status === 'completed' || attempt.status === 'failed' || attempt.status === 'cancelled') && (
+                    <button
+                      onClick={() => handleDeleteTransformedData(attempt)}
+                      className="px-3 py-1.5 bg-orange-500 text-white text-sm rounded-md hover:bg-orange-600 transition-colors"
+                    >
+                      Delete Transformed Data
+                    </button>
+                  )}
+                  
+                  {/* Info about what will be deleted */}
+                  {(attempt.status === 'completed' || attempt.status === 'failed' || attempt.status === 'cancelled') && (
+                    <span className="text-xs text-gray-500 self-center ml-2">
+                      ({attempt.transform_type} #{attempt.filter_criteria?.['release_id'] || attempt.filter_criteria?.['subsheet_id'] || attempt.filter_criteria?.['subpart_id'] || 'unknown'})
+                    </span>
                   )}
                 </div>
               </div>

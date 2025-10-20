@@ -1292,6 +1292,17 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       return;
     }
 
+    // Check if there are rows to transform
+    if (selectXResultCount === 0) {
+      alert('No rows selected to transform');
+      return;
+    }
+
+    // Show confirmation
+    if (!confirm(`Start Baobab Transform?\n\nThis will transform ${selectXResultCount.toLocaleString()} rows in the background.\n\nYou can monitor progress at /baobab_reports`)) {
+      return;
+    }
+
     try {
       // Create transform attempt record immediately
       const { data: attemptData, error: attemptError } = await supabase
@@ -1302,20 +1313,35 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           status: 'pending',
           current_phase: 'initializing',
           overall_progress: 0,
+          phase_progress: 0,
+          rows_processed: 0,
+          rows_validated: 0,
+          rows_transformed: 0,
+          rows_inserted: 0,
+          rows_updated: 0,
+          rows_failed: 0,
+          operations_per_second: 0,
+          error_count: 0,
+          batch_size: 1000,
+          timeout_minutes: 30,
+          auto_resume: false,
+          stall_threshold_minutes: 5,
+          is_stalled: false,
+          operation_logs: [],
           source_table: 'leadsmart_zip_based_data',
-          target_table: 'leadsmart_transformed',
+          target_table: 'leadsmart_transformed_relations',
           transform_type: selectXType,
           filter_criteria: {
             [`${selectXType}_id`]: selectXId,
             result_count: selectXResultCount
-          }
+          },
+          last_activity_at: new Date().toISOString()
         }])
         .select('baobab_attempt_id')
         .single();
 
       if (attemptError) {
-        console.error('Failed to create baobab transform attempt:', attemptError);
-        alert('Failed to start transform. Check console for details.');
+        alert('Failed to start transform. Please try again.');
         return;
       }
 
@@ -1330,8 +1356,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       processBaobobTransform(attemptId, selectXType, selectXId, selectXResultCount);
       
     } catch (error) {
-      console.error('❌ Error starting baobab transform:', error);
-      alert('Failed to start baobab transform. Check console for details.');
+      alert('Failed to start baobab transform. Please try again.');
     }
   };
 
@@ -1357,22 +1382,87 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
 
       const startTime = Date.now();
       let processedRows = 0;
+      let transformedRows = 0;
+      let insertedRows = 0;
+      let updatedRows = 0;
       const batchSize = 1000;
       
-      // Fetch data in batches and process
-      let offset = 0;
+      // Step 1: Group data by transformation key
+      const globalGroups = new Map<string, { zip_codes: string[], global_row_ids: number[] }>();
+      const totalBatches = Math.ceil(totalRows / batchSize);
       
-      while (offset < totalRows) {
-        const currentBatchSize = Math.min(batchSize, totalRows - offset);
+      // Process data in batches
+      for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
+        // Check if transform was cancelled
+        const { data: currentAttempt } = await supabase
+          .from('baobab_transform_attempts')
+          .select('status')
+          .eq('baobab_attempt_id', attemptId)
+          .single();
         
-        // This is where the actual transform logic would go
-        // For now, just simulate progress
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing
+        if (currentAttempt?.status === 'cancelled') {
+          return; // Exit processing if cancelled
+        }
         
-        processedRows += currentBatchSize;
-        offset += currentBatchSize;
+        const startRow = batchNum * batchSize;
+        const endRow = Math.min(startRow + batchSize - 1, totalRows - 1);
         
-        const progress = (processedRows / totalRows) * 100;
+        // Fetch batch data
+        let zipQuery = supabase.from('leadsmart_zip_based_data').select('*');
+        if (entityType === 'release') {
+          zipQuery = zipQuery.eq('rel_release_id', entityId);
+        } else if (entityType === 'subsheet') {
+          zipQuery = zipQuery.eq('rel_subsheet_id', entityId);
+        } else if (entityType === 'subpart') {
+          zipQuery = zipQuery.eq('rel_subpart_id', entityId);
+        }
+        
+        const { data: batchData, error: batchError } = await zipQuery
+          .range(startRow, endRow)
+          .order('global_row_id');
+        
+        if (batchError) throw batchError;
+        
+        // Process each row in the batch
+        (batchData || []).forEach((row: any) => {
+          processedRows++;
+          
+          // Skip if already transformed
+          if (row.transform_status === 'transformed') {
+            return;
+          }
+          
+          // Validate required fields
+          const cityLower = row.city_name?.toLowerCase().trim();
+          const stateLower = row.state_code?.toLowerCase().trim();
+          
+          if (!cityLower || !stateLower || !row.zip_code || !row.payout) {
+            return;
+          }
+          
+          // Create grouping key
+          const key = JSON.stringify({
+            city_name: cityLower,
+            state_code: stateLower,
+            payout: row.payout,
+            rel_release_id: row.rel_release_id,
+            rel_subsheet_id: row.rel_subsheet_id,
+            rel_subpart_id: row.rel_subpart_id
+          });
+          
+          if (!globalGroups.has(key)) {
+            globalGroups.set(key, {
+              zip_codes: [],
+              global_row_ids: []
+            });
+          }
+          
+          const group = globalGroups.get(key)!;
+          group.zip_codes.push(row.zip_code);
+          group.global_row_ids.push(row.global_row_id);
+        });
+        
+        const progress = ((batchNum + 1) / totalBatches) * 50; // First 50% for processing
         const opsPerSecond = processedRows / ((Date.now() - startTime) / 1000);
         
         // Update progress
@@ -1380,12 +1470,114 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           .from('baobab_transform_attempts')
           .update({
             last_activity_at: new Date().toISOString(),
-            overall_progress: Math.min(95, progress),
+            overall_progress: Math.min(50, progress),
             rows_processed: processedRows,
             operations_per_second: opsPerSecond,
-            current_phase: `Processing batch ${Math.ceil(offset / batchSize)} of ${Math.ceil(totalRows / batchSize)}`
+            current_phase: `Processing batch ${batchNum + 1} of ${totalBatches}`
           })
           .eq('baobab_attempt_id', attemptId);
+      }
+      
+      // Step 2: Insert/update transformed records in bulk
+      const batchInsertSize = 1000;
+      let groupNum = 0;
+      const recordsToInsert: any[] = [];
+      const totalGroups = globalGroups.size;
+      
+      for (const [keyStr, groupData] of globalGroups) {
+        groupNum++;
+        const groupKey = JSON.parse(keyStr);
+        
+        // Create aggregated zip codes
+        const uniqueZipCodes = [...new Set(groupData.zip_codes)].sort();
+        const aggregatedZipCodes = uniqueZipCodes.join(',');
+        
+        // Prepare transformed data
+        const transformedData = {
+          jrel_release_id: groupKey.rel_release_id,
+          jrel_subsheet_id: groupKey.rel_subsheet_id,
+          jrel_subpart_id: groupKey.rel_subpart_id,
+          city_name: groupKey.city_name,
+          state_code: groupKey.state_code,
+          aggregated_zip_codes: aggregatedZipCodes,
+          payout: parseFloat(groupKey.payout),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        recordsToInsert.push(transformedData);
+        
+        // Insert in batches
+        if (recordsToInsert.length >= batchInsertSize || groupNum === totalGroups) {
+          // Check if transform was cancelled before bulk insert
+          const { data: currentAttempt } = await supabase
+            .from('baobab_transform_attempts')
+            .select('status')
+            .eq('baobab_attempt_id', attemptId)
+            .single();
+          
+          if (currentAttempt?.status === 'cancelled') {
+            return; // Exit processing if cancelled
+          }
+          // Use upsert (insert with conflict resolution) for bulk operation
+          const { data: insertResult, error: insertError } = await supabase
+            .from('leadsmart_transformed_relations')
+            .upsert(recordsToInsert, {
+              onConflict: 'jrel_release_id,jrel_subsheet_id,jrel_subpart_id,city_name,state_code,payout'
+            });
+          
+          if (insertError) {
+            // If upsert fails, fall back to individual inserts
+            for (const record of recordsToInsert) {
+              const { error: individualError } = await supabase
+                .from('leadsmart_transformed_relations')
+                .insert([record]);
+              
+              if (individualError) {
+                // Record already exists, try update
+                const { error: updateError } = await supabase
+                  .from('leadsmart_transformed_relations')
+                  .update({
+                    aggregated_zip_codes: record.aggregated_zip_codes,
+                    updated_at: new Date().toISOString()
+                  })
+                  .eq('jrel_release_id', record.jrel_release_id)
+                  .eq('jrel_subsheet_id', record.jrel_subsheet_id)
+                  .eq('jrel_subpart_id', record.jrel_subpart_id)
+                  .eq('city_name', record.city_name)
+                  .eq('state_code', record.state_code)
+                  .eq('payout', record.payout);
+                
+                if (!updateError) updatedRows++;
+              } else {
+                insertedRows++;
+              }
+            }
+          } else {
+            insertedRows += recordsToInsert.length;
+          }
+          
+          transformedRows += recordsToInsert.length;
+          recordsToInsert.length = 0; // Clear the batch
+          
+          // Update progress
+          const progress = 50 + ((groupNum / totalGroups) * 50);
+          const opsPerSecond = processedRows / ((Date.now() - startTime) / 1000);
+          
+          await supabase
+            .from('baobab_transform_attempts')
+            .update({
+              last_activity_at: new Date().toISOString(),
+              overall_progress: Math.min(95, progress),
+              rows_processed: processedRows,
+              rows_transformed: transformedRows,
+              rows_inserted: insertedRows,
+              rows_updated: updatedRows,
+              operations_per_second: opsPerSecond,
+              current_phase: `Bulk inserting: ${groupNum.toLocaleString()}/${totalGroups.toLocaleString()}`
+            })
+            .eq('baobab_attempt_id', attemptId);
+        }
       }
       
       // Complete the transform
@@ -1398,13 +1590,15 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           current_phase: 'completed',
           overall_progress: 100,
           rows_processed: processedRows,
+          rows_transformed: transformedRows,
+          rows_inserted: insertedRows,
+          rows_updated: updatedRows,
+          operations_per_second: processedRows / ((Date.now() - startTime) / 1000),
           actual_duration_ms: Date.now() - startTime
         })
         .eq('baobab_attempt_id', attemptId);
         
     } catch (error) {
-      console.error('❌ Error in baobab transform processing:', error);
-      
       // Update status to failed
       await supabase
         .from('baobab_transform_attempts')
@@ -1672,7 +1866,19 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         }`}
                       >
-                        {transforming ? 'Transforming...' : 'transform'}
+                        {transforming ? 'Transforming...' : 'gingko transform'}
+                      </button>
+                      
+                      <button
+                        onClick={handleBaobobTransform}
+                        disabled={!selectXType || !selectXId || transforming}
+                        className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
+                          selectXType && selectXId && !transforming
+                            ? 'bg-green-600 text-white hover:bg-green-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {transforming ? 'Processing...' : 'baobab transform'}
                       </button>
                       
                       <button
@@ -2093,21 +2299,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  {transformStats.notYetTransformed > 0 ? 'gingko transform function' : 'No Rows to Transform'}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowTransformConfirm(false);
-                    handleBaobobTransform();
-                  }}
-                  disabled={transformStats.notYetTransformed === 0}
-                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                    transformStats.notYetTransformed > 0
-                      ? 'bg-green-600 text-white hover:bg-green-700'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {transformStats.notYetTransformed > 0 ? 'baobab transform function' : 'No Rows to Transform'}
+                  {transformStats.notYetTransformed > 0 ? 'Start Transform' : 'No Rows to Transform'}
                 </button>
               </div>
             </div>
