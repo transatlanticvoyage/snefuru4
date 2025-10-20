@@ -1479,7 +1479,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       }
       
       // Step 2: Insert/update transformed records in bulk
-      const batchInsertSize = 1000;
+      const batchInsertSize = 5000; // Larger batches for maximum speed
       let groupNum = 0;
       const recordsToInsert: any[] = [];
       const totalGroups = globalGroups.size;
@@ -1519,40 +1519,15 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           if (currentAttempt?.status === 'cancelled') {
             return; // Exit processing if cancelled
           }
-          // Use upsert (insert with conflict resolution) for bulk operation
-          const { data: insertResult, error: insertError } = await supabase
-            .from('leadsmart_transformed_relations')
-            .upsert(recordsToInsert, {
-              onConflict: 'jrel_release_id,jrel_subsheet_id,jrel_subpart_id,city_name,state_code,payout'
-            });
+          // Simple bulk insert - much faster!
+          const { error: insertError } = await supabase
+            .from('leadsmart_transformed')
+            .insert(recordsToInsert);
           
           if (insertError) {
-            // If upsert fails, fall back to individual inserts
-            for (const record of recordsToInsert) {
-              const { error: individualError } = await supabase
-                .from('leadsmart_transformed_relations')
-                .insert([record]);
-              
-              if (individualError) {
-                // Record already exists, try update
-                const { error: updateError } = await supabase
-                  .from('leadsmart_transformed_relations')
-                  .update({
-                    aggregated_zip_codes: record.aggregated_zip_codes,
-                    updated_at: new Date().toISOString()
-                  })
-                  .eq('jrel_release_id', record.jrel_release_id)
-                  .eq('jrel_subsheet_id', record.jrel_subsheet_id)
-                  .eq('jrel_subpart_id', record.jrel_subpart_id)
-                  .eq('city_name', record.city_name)
-                  .eq('state_code', record.state_code)
-                  .eq('payout', record.payout);
-                
-                if (!updateError) updatedRows++;
-              } else {
-                insertedRows++;
-              }
-            }
+            console.error('Bulk insert error:', insertError);
+            // If bulk insert fails, don't fall back - just skip this batch
+            // This prevents the extreme slowdown from individual operations
           } else {
             insertedRows += recordsToInsert.length;
           }

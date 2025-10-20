@@ -216,97 +216,73 @@ This action CANNOT be undone. Continue?`;
         return;
       }
 
-      // First, let's check what columns actually exist in the table
-      const { data: sampleData, error: sampleError } = await supabase
-        .from('leadsmart_transformed_relations')
-        .select('*')
-        .limit(1);
+      // The much simpler approach: delete by baobab_attempt_id!
+      // This will delete all relations created by this specific transform attempt
+      console.log('Deleting from leadsmart_transformed_relations where baobab_attempt_id =', attempt.baobab_attempt_id);
       
-      if (sampleError) {
-        console.error('Error checking table schema:', sampleError);
-        alert('Cannot access leadsmart_transformed_relations table');
-        return;
+      const { count: relationsCount, error: relationsError } = await supabase
+        .from('leadsmart_transformed_relations')
+        .delete({ count: 'exact' })
+        .eq('baobab_attempt_id', attempt.baobab_attempt_id);
+      
+      if (relationsError) {
+        console.error('Delete error from leadsmart_transformed_relations:', relationsError);
+        throw relationsError;
       }
       
-      console.log('Sample record from leadsmart_transformed_relations:', sampleData?.[0]);
-      console.log('Available columns:', sampleData?.[0] ? Object.keys(sampleData[0]) : 'No data');
+      console.log('Deleted', relationsCount, 'relation records');
+      let deleteCount = relationsCount || 0;
 
-      // Delete from leadsmart_transformed_relations based on the transform type
-      let deleteCount = 0;
-      
-      // Get the correct ID from filter criteria (keys are like "release_id", "subsheet_id", etc.)
+      // Also delete from leadsmart_transformed based on the transform criteria
+      // Get the correct ID from filter criteria
       const releaseId = filterCriteria?.['release_id'] || filterCriteria?.release_id;
       const subsheetId = filterCriteria?.['subsheet_id'] || filterCriteria?.subsheet_id;  
       const subpartId = filterCriteria?.['subpart_id'] || filterCriteria?.subpart_id;
 
       if (transformType === 'release' && releaseId) {
-        console.log('Deleting from leadsmart_transformed_relations where jrel_release_id =', releaseId);
-        const { count, error: deleteError1 } = await supabase
-          .from('leadsmart_transformed_relations')
-          .delete({ count: 'exact' })
-          .eq('jrel_release_id', releaseId);
-        
-        if (deleteError1) {
-          console.error('Delete error from leadsmart_transformed_relations:', deleteError1);
-          throw deleteError1;
-        }
-        console.log('Deleted', count, 'records from leadsmart_transformed_relations');
-        deleteCount += count || 0;
-
-        // Also delete from leadsmart_transformed if it exists
-        const { count: count2, error: deleteError2 } = await supabase
+        console.log('Deleting from leadsmart_transformed where jrel_release_id =', releaseId);
+        const { count: transformedCount, error: transformedError } = await supabase
           .from('leadsmart_transformed')
           .delete({ count: 'exact' })
           .eq('jrel_release_id', releaseId);
         
-        if (deleteError2 && !deleteError2.message?.includes('does not exist')) {
-          throw deleteError2;
+        if (transformedError) {
+          console.error('Delete error from leadsmart_transformed:', transformedError);
+          throw transformedError;
         }
-        deleteCount += count2 || 0;
+        console.log('Deleted', transformedCount, 'transformed records');
+        deleteCount += transformedCount || 0;
 
       } else if (transformType === 'subsheet' && subsheetId) {
-        const { count, error: deleteError1 } = await supabase
-          .from('leadsmart_transformed_relations')
-          .delete({ count: 'exact' })
-          .eq('jrel_subsheet_id', subsheetId);
-        
-        if (deleteError1) throw deleteError1;
-        deleteCount += count || 0;
-
-        // Also delete from leadsmart_transformed if it exists  
-        const { count: count2, error: deleteError2 } = await supabase
+        console.log('Deleting from leadsmart_transformed where jrel_subsheet_id =', subsheetId);
+        const { count: transformedCount, error: transformedError } = await supabase
           .from('leadsmart_transformed')
           .delete({ count: 'exact' })
           .eq('jrel_subsheet_id', subsheetId);
         
-        if (deleteError2 && !deleteError2.message?.includes('does not exist')) {
-          throw deleteError2;
+        if (transformedError) {
+          console.error('Delete error from leadsmart_transformed:', transformedError);
+          throw transformedError;
         }
-        deleteCount += count2 || 0;
+        console.log('Deleted', transformedCount, 'transformed records');
+        deleteCount += transformedCount || 0;
 
       } else if (transformType === 'subpart' && subpartId) {
-        const { count, error: deleteError1 } = await supabase
-          .from('leadsmart_transformed_relations')
-          .delete({ count: 'exact' })
-          .eq('jrel_subpart_id', subpartId);
-        
-        if (deleteError1) throw deleteError1;
-        deleteCount += count || 0;
-
-        // Also delete from leadsmart_transformed if it exists
-        const { count: count2, error: deleteError2 } = await supabase
+        console.log('Deleting from leadsmart_transformed where jrel_subpart_id =', subpartId);
+        const { count: transformedCount, error: transformedError } = await supabase
           .from('leadsmart_transformed')
           .delete({ count: 'exact' })
           .eq('jrel_subpart_id', subpartId);
         
-        if (deleteError2 && !deleteError2.message?.includes('does not exist')) {
-          throw deleteError2;
+        if (transformedError) {
+          console.error('Delete error from leadsmart_transformed:', transformedError);
+          throw transformedError;
         }
-        deleteCount += count2 || 0;
+        console.log('Deleted', transformedCount, 'transformed records');
+        deleteCount += transformedCount || 0;
 
       } else {
-        alert('Cannot determine deletion criteria from this attempt');
-        return;
+        console.log('No specific transform criteria found, only deleted relations');
       }
 
       alert(`Successfully deleted ${deleteCount.toLocaleString()} transformed records`);
