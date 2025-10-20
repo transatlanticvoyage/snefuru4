@@ -1060,7 +1060,8 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           aggregated_zip_codes: aggregatedZipCodes,
           jrel_release_id: groupKey.rel_release_id,
           jrel_subsheet_id: groupKey.rel_subsheet_id,
-          jrel_subpart_id: groupKey.rel_subpart_id
+          jrel_subpart_id: groupKey.rel_subpart_id,
+          baobab_attempt_id: attemptId
         };
 
         // FINAL DEFENSIVE CHECK: Validate transformedData before database operations
@@ -1119,6 +1120,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
               jrel_release_id: groupKey.rel_release_id,
               jrel_subsheet_id: groupKey.rel_subsheet_id,
               jrel_subpart_id: groupKey.rel_subpart_id,
+              baobab_attempt_id: attemptId,
               updated_at: new Date().toISOString()
             })
             .eq('mundial_id', existingTransformed.mundial_id)
@@ -1144,7 +1146,8 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         // Create relation records
         const relationRecords = groupData.global_row_ids.map(globalRowId => ({
           original_global_id: globalRowId,
-          transformed_mundial_id: mundialId
+          transformed_mundial_id: mundialId,
+          baobab_attempt_id: attemptId
         }));
         
         const { error: relationsError } = await supabase
@@ -1478,38 +1481,18 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           .eq('baobab_attempt_id', attemptId);
       }
       
-      // Step 2: Insert/update transformed records in bulk
-      const batchInsertSize = 5000; // Larger batches for maximum speed
+      // Step 2: Process each group individually (OPTIMIZED APPROACH)
       let groupNum = 0;
-      const recordsToInsert: any[] = [];
+      let transformedCount = 0;
+      let updatedCount = 0;
+      let relationsCount = 0;
       const totalGroups = globalGroups.size;
       
       for (const [keyStr, groupData] of globalGroups) {
         groupNum++;
-        const groupKey = JSON.parse(keyStr);
         
-        // Create aggregated zip codes
-        const uniqueZipCodes = [...new Set(groupData.zip_codes)].sort();
-        const aggregatedZipCodes = uniqueZipCodes.join(',');
-        
-        // Prepare transformed data
-        const transformedData = {
-          jrel_release_id: groupKey.rel_release_id,
-          jrel_subsheet_id: groupKey.rel_subsheet_id,
-          jrel_subpart_id: groupKey.rel_subpart_id,
-          city_name: groupKey.city_name,
-          state_code: groupKey.state_code,
-          aggregated_zip_codes: aggregatedZipCodes,
-          payout: parseFloat(groupKey.payout),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        
-        recordsToInsert.push(transformedData);
-        
-        // Insert in batches
-        if (recordsToInsert.length >= batchInsertSize || groupNum === totalGroups) {
-          // Check if transform was cancelled before bulk insert
+        // Check if transform was cancelled
+        if (groupNum % 100 === 0) {
           const { data: currentAttempt } = await supabase
             .from('baobab_transform_attempts')
             .select('status')
@@ -1519,23 +1502,89 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           if (currentAttempt?.status === 'cancelled') {
             return; // Exit processing if cancelled
           }
-          // Simple bulk insert - much faster!
-          const { error: insertError } = await supabase
+        }
+        
+        const groupKey = JSON.parse(keyStr);
+        
+        // Sort zip codes and prepare as JSONB array
+        const aggregatedZipCodes = groupData.zip_codes.sort();
+        
+        // Prepare data for leadsmart_transformed
+        const transformedData = {
+          city_name: groupKey.city_name,
+          state_code: groupKey.state_code,
+          payout: groupKey.payout,
+          aggregated_zip_codes: aggregatedZipCodes,
+          jrel_release_id: groupKey.rel_release_id,
+          jrel_subsheet_id: groupKey.rel_subsheet_id,
+          jrel_subpart_id: groupKey.rel_subpart_id,
+          baobab_attempt_id: attemptId
+        };
+        
+        // Insert or get existing transformed record (CHECK ALL 6 GROUPING FIELDS!)
+        const { data: existingTransformed, error: checkError } = await supabase
+          .from('leadsmart_transformed')
+          .select('mundial_id')
+          .eq('city_name', groupKey.city_name)
+          .eq('state_code', groupKey.state_code)
+          .eq('payout', groupKey.payout)
+          .eq('jrel_release_id', groupKey.rel_release_id)
+          .eq('jrel_subsheet_id', groupKey.rel_subsheet_id)
+          .eq('jrel_subpart_id', groupKey.rel_subpart_id)
+          .maybeSingle();
+        
+        if (checkError) throw checkError;
+        
+        let mundialId: number;
+        
+        if (existingTransformed) {
+          // Update existing record
+          const { data: updatedData, error: updateError } = await supabase
             .from('leadsmart_transformed')
-            .insert(recordsToInsert);
+            .update({
+              aggregated_zip_codes: aggregatedZipCodes,
+              jrel_release_id: groupKey.rel_release_id,
+              jrel_subsheet_id: groupKey.rel_subsheet_id,
+              jrel_subpart_id: groupKey.rel_subpart_id,
+              baobab_attempt_id: attemptId,
+              updated_at: new Date().toISOString()
+            })
+            .eq('mundial_id', existingTransformed.mundial_id)
+            .select('mundial_id')
+            .single();
           
-          if (insertError) {
-            console.error('Bulk insert error:', insertError);
-            // If bulk insert fails, don't fall back - just skip this batch
-            // This prevents the extreme slowdown from individual operations
-          } else {
-            insertedRows += recordsToInsert.length;
-          }
+          if (updateError) throw updateError;
+          mundialId = updatedData.mundial_id;
+          updatedCount++;
+        } else {
+          // Insert new record
+          const { data: insertedData, error: insertError } = await supabase
+            .from('leadsmart_transformed')
+            .insert([transformedData])
+            .select('mundial_id')
+            .single();
           
-          transformedRows += recordsToInsert.length;
-          recordsToInsert.length = 0; // Clear the batch
-          
-          // Update progress
+          if (insertError) throw insertError;
+          mundialId = insertedData.mundial_id;
+          transformedCount++;
+        }
+        
+        // Create relation records immediately (NO COMPLEX MATCHING!)
+        const relationRecords = groupData.global_row_ids.map(globalRowId => ({
+          original_global_id: globalRowId,
+          transformed_mundial_id: mundialId,
+          baobab_attempt_id: attemptId
+        }));
+        
+        const { error: relationsError } = await supabase
+          .from('leadsmart_transformed_relations')
+          .insert(relationRecords);
+        
+        if (relationsError) throw relationsError;
+        relationsCount += relationRecords.length;
+        
+        // Update progress every 100 groups
+        if (groupNum % 100 === 0 || groupNum === totalGroups) {
           const progress = 50 + ((groupNum / totalGroups) * 50);
           const opsPerSecond = processedRows / ((Date.now() - startTime) / 1000);
           
@@ -1545,15 +1594,20 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
               last_activity_at: new Date().toISOString(),
               overall_progress: Math.min(95, progress),
               rows_processed: processedRows,
-              rows_transformed: transformedRows,
-              rows_inserted: insertedRows,
-              rows_updated: updatedRows,
+              rows_transformed: transformedCount + updatedCount,
+              rows_inserted: transformedCount,
+              rows_updated: updatedCount,
               operations_per_second: opsPerSecond,
-              current_phase: `Bulk inserting: ${groupNum.toLocaleString()}/${totalGroups.toLocaleString()}`
+              current_phase: `Processing groups: ${groupNum.toLocaleString()}/${totalGroups.toLocaleString()}`
             })
             .eq('baobab_attempt_id', attemptId);
         }
       }
+      
+      // Update final counts
+      transformedRows = transformedCount + updatedCount;
+      insertedRows = transformedCount;
+      updatedRows = updatedCount;
       
       // Complete the transform
       await supabase

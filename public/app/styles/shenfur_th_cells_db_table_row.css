@@ -1,0 +1,201 @@
+
+
+
+
+/*=================================================================*/
+
+
+/* Target your existing <th> with bg + patterned overlay */
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_transformed {
+  position: relative;
+  background-color: #fcdddd; /* your existing bg color */
+}
+
+/* Overlay: very-light, tintable STAR outlines arranged with gaps */
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_transformed::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>\
+  <!-- Draw a hollow star inside the top-left 16x16 cell; rest of 32x32 tile is empty -->\
+  <g transform='translate(0,0)'>\
+    <!-- Star centered at (8,8) with points defined manually -->\
+    <path d='M8 1 \
+             L9.902 5.854 \
+             L15 6.2 \
+             L11 9.446 \
+             L12.236 14.5 \
+             L8 11.8 \
+             L3.764 14.5 \
+             L5 9.446 \
+             L1 6.2 \
+             L6.098 5.854 Z' \
+          fill='none' stroke='black' stroke-opacity='0.12' stroke-width='1' \
+          stroke-linejoin='round' stroke-linecap='round'/>\
+  </g>\
+</svg>");
+  background-size: 32px 32px;
+  background-repeat: repeat;
+  background-position: 0 0;
+
+  mix-blend-mode: multiply; /* allows stroke to tint with bg */
+}
+
+
+
+
+/*================= 2025__10_17 -  https://chatgpt.com/c/68f3829f-8c38-8332-8ba5-fcdda9773ff9 ================================================*/
+
+/* Target your existing <th> with bg + patterned overlay */
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_zip_based_data {
+  position: relative;
+  background-color: #c4dcfa; /* your existing bg color */
+}
+
+/* Overlay: very-light, tintable pentagon outlines arranged with gaps */
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_zip_based_data::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  /* Tile is 32x32 to create:
+     - row pattern: show one 16px-high row, skip the next 16px
+     - col pattern: within shown rows, show at x=0..16 cell, skip the x=16..32 cell
+     => net result: pentagon, space, pentagon, space; next row empty; repeat
+  */
+  background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>\
+  <!-- Draw a single pentagon inside the top-left 16x16 cell; the rest of the 32x32 tile is empty -->\
+  <g transform='translate(0,0)'>\
+    <path d='M8 3 L12.76 6.46 L10.94 12.05 L5.06 12.05 L3.24 6.46 Z' \
+          fill='none' stroke='black' stroke-opacity='0.12' stroke-width='1' \
+          stroke-linejoin='round'/>\
+  </g>\
+</svg>");
+  background-size: 32px 32px;     /* 16px cell shown, 16px cell skipped in both axes */
+  background-repeat: repeat;
+  background-position: 0 0;
+
+  /* Keep lines tintable by your background color (very light on white) */
+  mix-blend-mode: multiply;
+}
+
+
+
+/*================= 2025__10_17 -  ================================================*/
+
+/*=
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_zip_based_data {background-color:#c4dcfa;}
+
+====*/
+
+/*================= 2025__10_17 -  ================================================*/
+tr.shenfur_db_table_name_tr th.for_db_table_leadsmart_subparts {background-color:#f4e69e;}
+
+
+/*================= 2025__10_17 -  ================================================*/
+
+div.cell_inner_wrapper_div {padding: 4px 4px 4px 4px;}
+
+/*=================================================================*/
+
+* shenfur_th_cells_db_table_row.css */
+/* CSS for database table row styling */
+
+
+tr.shenfur_db_table_name_tr th.for_db_table_industries {background-color:#f4e69f;}
+
+
+/*=========== GLOBAL DB Table BG Colors And Textures ======================================================*/
+tr.shenfur_db_table_name_tr th.for_db_table_addresspren {background-color:#c7d1f5;}
+tr.shenfur_db_table_name_tr th.for_db_table_addressglub {background-color:#c7f5e9;}
+
+
+/*=================================================================*/
+tr.shenfur_db_table_name_tr th.for_db_table_sitespren {background-color:#f5b7b7;}
+
+
+
+
+/* table.utg_addressjar tr.shenfur_db_table_name_tr th.for_db_field_addresspren_addresspren_id {background-color:#000;}*/
+
+
+
+table.utg_addressjar tr.shenfur_db_table_name_tr th.for_db_table_addresspren {background-color:#c7d1f5;}
+
+/* ==========================================================*/
+
+
+/*
+for_db_field_addresspren_addresspren_id
+for_db_field_addresspren_address_label
+for_db_field_addressglub_addressglub_id
+etc 
+*/
+
+/* ============================================================================================== */
+/* CELL INNER WRAPPER DIV STYLING                                                                */
+/* Remove padding from table cells and apply to inner wrapper divs                               */
+/* ============================================================================================== */
+
+/* Table layout controlled by TD content, not TH content */
+table.utg_addressjar {
+  table-layout: auto;
+  width: max-content;
+}
+
+/* Remove padding from table cells themselves */
+table.utg_addressjar th,
+table.utg_addressjar td {
+  padding: 0;
+}
+
+/* Apply padding and styling to inner wrapper divs */
+table.utg_addressjar .cell_inner_wrapper_div {
+  padding: 4px 8px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* TD cells determine column width - prevent text wrapping to get natural width */
+table.utg_addressjar td .cell_inner_wrapper_div {
+  white-space: nowrap;
+}
+
+/* TH cells adapt to TD-determined width with text overflow control */
+table.utg_addressjar th .cell_inner_wrapper_div {
+  /* Allow text to wrap up to 2 lines, then hide overflow */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
+  max-height: 2.6em; /* 2 lines at 1.3 line-height */
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: none;
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
+}
+
+/* Fallback for browsers that don't support -webkit-line-clamp */
+@supports not (-webkit-line-clamp: 2) {
+  table.utg_addressjar th .cell_inner_wrapper_div {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.6em;
+    line-height: 1.3;
+  }
+}
+
+/* END CELL INNER WRAPPER DIV STYLING */
+/* ============================================================================================== */
+
+
+

@@ -16,6 +16,7 @@ const ZhedoriButtonBar = dynamic(
 
 interface LeadsmartTransformed {
   mundial_id: number;
+  baobab_attempt_id: number | null;
   jrel_release_id: number | null;
   jrel_subsheet_id: number | null;
   jrel_subpart_id: number | null;
@@ -80,6 +81,10 @@ export default function LeadsmartMorphClient() {
     id: number | null;
   }>({ type: null, id: null });
   
+  // Filter state for baobab attempts
+  const [baobobFilter, setBaobobFilter] = useState<number | null>(null);
+  const [baobobAttempts, setBaobobAttempts] = useState<any[]>([]);
+  
   // Pico cache rebuild state
   const [rebuildCacheFn, setRebuildCacheFn] = useState<(() => void) | null>(null);
   const [cacheRebuilding, setCacheRebuilding] = useState(false);
@@ -88,6 +93,7 @@ export default function LeadsmartMorphClient() {
   // Define all columns
   const allColumns = [
     'mundial_id',
+    'baobab_attempt_id',
     'jrel_release_id',
     'jrel_subsheet_id',
     'jrel_subpart_id',
@@ -159,12 +165,33 @@ export default function LeadsmartMorphClient() {
     fetchData();
   }, [user, router]);
   
-  // Refetch when jettison filter changes
+  // Load baobab attempts on mount
+  useEffect(() => {
+    if (user) {
+      loadBaobobAttempts();
+    }
+  }, [user]);
+
+  // Refetch when filters change
   useEffect(() => {
     if (user) {
       fetchData();
     }
-  }, [jettisonFilter, skylabFilter]);
+  }, [jettisonFilter, skylabFilter, baobobFilter]);
+
+  const loadBaobobAttempts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('baobab_transform_attempts')
+        .select('baobab_attempt_id, rows_processed, rows_inserted, created_at')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setBaobobAttempts(data || []);
+    } catch (err) {
+      console.error('Error loading baobab attempts:', err);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -196,7 +223,14 @@ export default function LeadsmartMorphClient() {
         }
       }
       
-      query = query.order('mundial_id', { ascending: false });
+      // Apply baobab attempt filter if active
+      if (baobobFilter) {
+        query = query.eq('baobab_attempt_id', baobobFilter);
+      }
+      
+      query = query
+        .order('mundial_id', { ascending: false })
+        .limit(1000); // Limit to prevent timeout
       
       const { data: fetchedData, error: fetchError } = await query;
 
@@ -846,6 +880,28 @@ export default function LeadsmartMorphClient() {
               )}
             </div>
             
+            {/* Baobab Attempt Filter */}
+            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginTop: '20px', marginBottom: '12px' }}>
+              baobab_attempt_id
+            </div>
+            
+            <select
+              value={baobobFilter || ''}
+              onChange={(e) => setBaobobFilter(e.target.value ? parseInt(e.target.value) : null)}
+              className="px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
+              style={{ marginBottom: '20px', minWidth: '400px' }}
+            >
+              <option value="" disabled>
+                (id) - (number of records processed) - (number of records inserted) - (created_at)
+              </option>
+              <option value="">All Attempts</option>
+              {baobobAttempts.map((attempt) => (
+                <option key={attempt.baobab_attempt_id} value={attempt.baobab_attempt_id}>
+                  ({attempt.baobab_attempt_id}) - ({attempt.rows_processed?.toLocaleString() || '0'}) - ({attempt.rows_inserted?.toLocaleString() || '0'}) - ({new Date(attempt.created_at).toLocaleDateString()})
+                </option>
+              ))}
+            </select>
+            
             {/* Skylab Tile Tables */}
             <LeadSmartSkylabTileTables
               pageType="morph"
@@ -1113,7 +1169,7 @@ export default function LeadsmartMorphClient() {
                   {paginatedColumns.map(col => {
                     const isEditing = editingCell?.id === row.mundial_id && editingCell?.field === col;
                     const value = row[col as keyof LeadsmartTransformed];
-                    const isReadOnly = col === 'mundial_id' || col === 'created_at' || col === 'updated_at';
+                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'created_at' || col === 'updated_at';
                     
                     return (
                       <td 

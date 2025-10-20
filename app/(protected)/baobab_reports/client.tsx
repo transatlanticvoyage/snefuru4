@@ -60,6 +60,230 @@ export default function BaobobReportsClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  
+  // Invalid rows popup state
+  const [showInvalidRowsPopup, setShowInvalidRowsPopup] = useState(false);
+  const [selectedAttemptForInvalidRows, setSelectedAttemptForInvalidRows] = useState<BaobobTransformAttempt | null>(null);
+  const [invalidRowsData, setInvalidRowsData] = useState<any[]>([]);
+  const [invalidRowsBreakdown, setInvalidRowsBreakdown] = useState<any>({});
+  const [invalidRowsStats, setInvalidRowsStats] = useState<any>({});
+  const [loadingInvalidRows, setLoadingInvalidRows] = useState(false);
+
+  // Fetch invalid rows for a specific attempt
+  const fetchInvalidRowsForAttempt = async (attempt: BaobobTransformAttempt) => {
+    if (!user || attempt.status !== 'completed') return;
+    
+    try {
+      setLoadingInvalidRows(true);
+      setSelectedAttemptForInvalidRows(attempt);
+      
+      // Query leadsmart_zip_based_data for records that match the attempt's filter criteria
+      // but are NOT in leadsmart_transformed_relations with this baobab_attempt_id
+      let baseQuery = supabase
+        .from('leadsmart_zip_based_data')
+        .select(`
+          *,
+          leadsmart_file_releases!inner(release_date),
+          leadsmart_subsheets!inner(subsheet_name),
+          leadsmart_subparts!inner(payout_note)
+        `);
+      
+      // Apply filter criteria from the attempt
+      if (attempt.filter_criteria) {
+        if (attempt.filter_criteria.release_id) {
+          baseQuery = baseQuery.eq('rel_release_id', attempt.filter_criteria.release_id);
+        }
+        if (attempt.filter_criteria.subsheet_id) {
+          baseQuery = baseQuery.eq('rel_subsheet_id', attempt.filter_criteria.subsheet_id);
+        }
+        if (attempt.filter_criteria.subpart_id) {
+          baseQuery = baseQuery.eq('rel_subpart_id', attempt.filter_criteria.subpart_id);
+        }
+      }
+      
+      // Get all rows that match the criteria
+      const { data: allMatchingRows, error: allRowsError } = await baseQuery;
+      if (allRowsError) throw allRowsError;
+      
+      if (!allMatchingRows || allMatchingRows.length === 0) {
+        setInvalidRowsData([]);
+        setInvalidRowsBreakdown({});
+        setInvalidRowsStats({ totalRows: 0, validRows: 0, invalidRows: 0 });
+        setShowInvalidRowsPopup(true);
+        return;
+      }
+      
+      // Get global_row_ids that WERE transformed (have relations with this baobab_attempt_id)
+      const globalRowIds = allMatchingRows.map(row => row.global_row_id);
+      const batchSize = 500; // Avoid URL length limits
+      const transformedIds = new Set<number>();
+      
+      for (let i = 0; i < globalRowIds.length; i += batchSize) {
+        const batch = globalRowIds.slice(i, i + batchSize);
+        const { data: relations, error: relError } = await supabase
+          .from('leadsmart_transformed_relations')
+          .select('original_global_id')
+          .in('original_global_id', batch)
+          .eq('baobab_attempt_id', attempt.baobab_attempt_id);
+        
+        if (relError) throw relError;
+        relations?.forEach(rel => transformedIds.add(rel.original_global_id));
+      }
+      
+      // Find invalid rows (not transformed)
+      const invalidRows: any[] = [];
+      const breakdown = {
+        missingCityOnly: 0,
+        missingStateOnly: 0,
+        missingPayoutOnly: 0,
+        missingCityAndState: 0,
+        missingCityAndPayout: 0,
+        missingStateAndPayout: 0,
+        missingAll: 0,
+        headerRows: 0
+      };
+      
+      allMatchingRows.forEach(row => {
+        // Skip if this row was successfully transformed
+        if (transformedIds.has(row.global_row_id)) return;
+        
+        const hasCity = row.city_name && row.city_name.trim() !== '';
+        const hasState = row.state_code && row.state_code.trim() !== '';
+        const hasPayout = row.payout !== null && row.payout !== undefined;
+        
+        let invalidReason = '';
+        
+        // Check for header rows first
+        if (hasCity && hasState) {
+          const cityLower = row.city_name.toLowerCase().trim();
+          const stateLower = row.state_code.toLowerCase().trim();
+          if (cityLower === 'city' || cityLower === 'city_name' || cityLower === 'city name' ||
+              stateLower === 'state' || stateLower === 'state_code' || stateLower === 'state_id' || stateLower === 'state abbr') {
+            invalidReason = 'Header row detected';
+            breakdown.headerRows++;
+          }
+        }
+        
+        // Check for missing required fields
+        if (!invalidReason && (!hasCity || !hasState || !hasPayout)) {
+          if (!hasCity && !hasState && !hasPayout) {
+            invalidReason = 'Missing all three: city_name, state_code, payout';
+            breakdown.missingAll++;
+          } else if (!hasCity && !hasState) {
+            invalidReason = 'Missing city_name and state_code';
+            breakdown.missingCityAndState++;
+          } else if (!hasCity && !hasPayout) {
+            invalidReason = 'Missing city_name and payout';
+            breakdown.missingCityAndPayout++;
+          } else if (!hasState && !hasPayout) {
+            invalidReason = 'Missing state_code and payout';
+            breakdown.missingStateAndPayout++;
+          } else if (!hasCity) {
+            invalidReason = 'Missing city_name';
+            breakdown.missingCityOnly++;
+          } else if (!hasState) {
+            invalidReason = 'Missing state_code';
+            breakdown.missingStateOnly++;
+          } else if (!hasPayout) {
+            invalidReason = 'Missing payout';
+            breakdown.missingPayoutOnly++;
+          }
+        }
+        
+        if (invalidReason) {
+          invalidRows.push({
+            ...row,
+            invalid_reason: invalidReason,
+            'join.leadsmart_file_releases.release_date': row.leadsmart_file_releases?.release_date || '',
+            'join.leadsmart_subsheets.subsheet_name': row.leadsmart_subsheets?.subsheet_name || '',
+            'join.leadsmart_subparts.payout_note': row.leadsmart_subparts?.payout_note || ''
+          });
+        }
+      });
+      
+      setInvalidRowsData(invalidRows);
+      setInvalidRowsBreakdown(breakdown);
+      setInvalidRowsStats({
+        totalRows: allMatchingRows.length,
+        validRows: transformedIds.size,
+        invalidRows: invalidRows.length
+      });
+      setShowInvalidRowsPopup(true);
+      
+    } catch (error) {
+      console.error('Error fetching invalid rows:', error);
+      alert('Failed to fetch invalid rows. Check console for details.');
+    } finally {
+      setLoadingInvalidRows(false);
+    }
+  };
+  
+  // Download invalid rows as CSV
+  const downloadInvalidRowsCSV = () => {
+    if (invalidRowsData.length === 0 || !selectedAttemptForInvalidRows) {
+      alert('No invalid rows to download');
+      return;
+    }
+    
+    // Define column order for CSV (with join columns interspersed)
+    const columns = [
+      'global_row_id',
+      'sheet_row_id',
+      'zip_code',
+      'payout',
+      'city_name',
+      'state_code',
+      'user_id',
+      'created_at',
+      'updated_at',
+      'rel_release_id',
+      'join.leadsmart_file_releases.release_date',
+      'rel_subsheet_id',
+      'join.leadsmart_subsheets.subsheet_name',
+      'rel_subpart_id',
+      'join.leadsmart_subparts.payout_note',
+      'invalid_reason'
+    ];
+    
+    // Create CSV header
+    const csvHeader = columns.join(',');
+    
+    // Create CSV rows
+    const csvRows = invalidRowsData.map(row => {
+      return columns.map(col => {
+        const value = row[col];
+        // Escape values that contain commas or quotes
+        if (value === null || value === undefined) return '';
+        const stringValue = String(value);
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+          return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+        return stringValue;
+      }).join(',');
+    }).join('\n');
+    
+    // Combine header and rows
+    const csv = csvHeader + '\n' + csvRows;
+    
+    // Create blob and download
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    
+    const attemptInfo = selectedAttemptForInvalidRows.transform_type + '_' + 
+      (selectedAttemptForInvalidRows.filter_criteria?.release_id || 
+       selectedAttemptForInvalidRows.filter_criteria?.subsheet_id || 
+       selectedAttemptForInvalidRows.filter_criteria?.subpart_id || 'unknown');
+    
+    link.setAttribute('download', `invalid_rows_baobab_${selectedAttemptForInvalidRows.baobab_attempt_id}_${attemptInfo}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    console.log(`✅ Downloaded CSV with ${invalidRowsData.length} invalid rows for baobab attempt ${selectedAttemptForInvalidRows.baobab_attempt_id}`);
+  };
 
   // Load transform attempts from database
   const loadAttempts = useCallback(async () => {
@@ -452,6 +676,24 @@ This action CANNOT be undone. Continue?`;
                     </button>
                   )}
                   
+                  {/* Invalid Rows Report Button - Show for completed attempts */}
+                  {attempt.status === 'completed' && (
+                    <button
+                      onClick={() => fetchInvalidRowsForAttempt(attempt)}
+                      disabled={loadingInvalidRows}
+                      className={`px-3 py-1.5 text-white text-sm rounded-md transition-colors ${
+                        loadingInvalidRows 
+                          ? 'bg-gray-400 cursor-not-allowed' 
+                          : 'bg-blue-500 hover:bg-blue-600'
+                      }`}
+                    >
+                      {loadingInvalidRows && selectedAttemptForInvalidRows?.baobab_attempt_id === attempt.baobab_attempt_id 
+                        ? 'Loading...' 
+                        : 'Open Report Popup with Invalid Rows CSV'
+                      }
+                    </button>
+                  )}
+                  
                   {/* Delete Transformed Data Button - Show for completed, failed, or cancelled */}
                   {(attempt.status === 'completed' || attempt.status === 'failed' || attempt.status === 'cancelled') && (
                     <button
@@ -474,6 +716,172 @@ This action CANNOT be undone. Continue?`;
           </div>
         )}
       </div>
+      
+      {/* Invalid Rows Analysis Popup */}
+      {showInvalidRowsPopup && selectedAttemptForInvalidRows && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 flex flex-col" style={{ maxHeight: '90vh' }}>
+            {/* Fixed Header */}
+            <div className="p-6 border-b bg-gray-50 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="bg-orange-100 rounded-full p-2 mr-3">
+                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">📋 Invalid Rows Analysis</h3>
+                    <p className="text-sm text-gray-600">
+                      Baobab Attempt #{selectedAttemptForInvalidRows.baobab_attempt_id} - {selectedAttemptForInvalidRows.transform_type} #{selectedAttemptForInvalidRows.filter_criteria?.release_id || selectedAttemptForInvalidRows.filter_criteria?.subsheet_id || selectedAttemptForInvalidRows.filter_criteria?.subpart_id || 'unknown'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowInvalidRowsPopup(false)}
+                  className="text-gray-400 hover:text-gray-600 text-3xl font-bold leading-none"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <p className="text-gray-700 mb-4 font-medium">
+                Analysis of rows that were NOT transformed in this baobab attempt:
+              </p>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-700">Total rows in selection:</span>
+                    <span className="font-bold text-gray-900">{invalidRowsStats.totalRows?.toLocaleString() || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-700">Successfully transformed:</span>
+                    <span className="font-bold text-green-600">{invalidRowsStats.validRows?.toLocaleString() || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-t pt-2 mt-2">
+                    <span className="text-gray-700 font-semibold">Invalid/untransformed rows:</span>
+                    <span className="font-bold text-red-600">{invalidRowsStats.invalidRows?.toLocaleString() || 0}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {invalidRowsStats.invalidRows > 0 && (
+                <>
+                  <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                    <div className="font-semibold text-red-800 mb-3">⚠️ Invalid Row Breakdown (remained untransformed):</div>
+                    <div className="space-y-2 text-sm">
+                      {invalidRowsBreakdown.missingCityOnly > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing city_name only:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingCityOnly.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingStateOnly > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing state_code only:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingStateOnly.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingPayoutOnly > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing payout only:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingPayoutOnly.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingCityAndState > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing city_name + state_code:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingCityAndState.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingCityAndPayout > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing city_name + payout:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingCityAndPayout.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingStateAndPayout > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing state_code + payout:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingStateAndPayout.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.missingAll > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Missing all three fields:</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingAll.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {invalidRowsBreakdown.headerRows > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">• Header rows (e.g. \"City\", \"State\"):</span>
+                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.headerRows.toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="text-yellow-800 text-sm font-semibold">📥 CSV Download</p>
+                      <button
+                        onClick={downloadInvalidRowsCSV}
+                        className="px-3 py-1 text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded border border-yellow-300 transition-colors"
+                        title="Download invalid rows as CSV"
+                      >
+                        📥 Download CSV
+                      </button>
+                    </div>
+                    <p className="text-yellow-700 text-xs mb-2">
+                      Download CSV with all {invalidRowsStats.invalidRows?.toLocaleString() || 0} invalid rows. The file includes:
+                    </p>
+                    <ul className="list-disc list-inside text-yellow-700 text-xs ml-2 space-y-1">
+                      <li>All source data columns from leadsmart_zip_based_data</li>
+                      <li>Join columns (release_date, subsheet_name, payout_note)</li>
+                      <li>Invalid reason for each row</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <p className="text-blue-800 text-sm font-semibold mb-1">💡 Next Steps</p>
+                    <p className="text-blue-700 text-xs">
+                      • Review the CSV to identify missing data<br/>
+                      • Fix data in source (update city_name, state_code, or payout)<br/>
+                      • Re-run baobab transform after corrections to process these rows<br/>
+                      • OR use SQL to delete invalid rows if they're not needed
+                    </p>
+                  </div>
+                </>
+              )}
+              
+              {invalidRowsStats.invalidRows === 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                  <p className="text-green-800 text-sm font-semibold mb-1">✅ No Invalid Rows Found!</p>
+                  <p className="text-green-700 text-xs">
+                    All {invalidRowsStats.totalRows?.toLocaleString() || 0} rows in your selection were successfully transformed.
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            {/* Fixed Button Footer */}
+            <div className="p-6 border-t bg-gray-50 flex-shrink-0">
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowInvalidRowsPopup(false)}
+                  className="px-4 py-2 bg-gray-600 text-white hover:bg-gray-700 rounded-md font-medium transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
