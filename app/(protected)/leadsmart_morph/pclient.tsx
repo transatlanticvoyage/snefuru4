@@ -36,6 +36,7 @@ export default function LeadsmartMorphClient() {
 
   // Data state
   const [data, setData] = useState<LeadsmartTransformed[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -214,14 +215,21 @@ export default function LeadsmartMorphClient() {
         .from('leadsmart_transformed')
         .select('*');
       
+      let countQuery = supabase
+        .from('leadsmart_transformed')
+        .select('*', { count: 'exact', head: true });
+      
       // Apply jettison filter if active
       if (jettisonFilter && jettisonFilter.type && jettisonFilter.id) {
         if (jettisonFilter.type === 'release') {
           query = query.eq('jrel_release_id', jettisonFilter.id);
+          countQuery = countQuery.eq('jrel_release_id', jettisonFilter.id);
         } else if (jettisonFilter.type === 'subsheet') {
           query = query.eq('jrel_subsheet_id', jettisonFilter.id);
+          countQuery = countQuery.eq('jrel_subsheet_id', jettisonFilter.id);
         } else if (jettisonFilter.type === 'subpart') {
           query = query.eq('jrel_subpart_id', jettisonFilter.id);
+          countQuery = countQuery.eq('jrel_subpart_id', jettisonFilter.id);
         }
       }
       
@@ -229,37 +237,53 @@ export default function LeadsmartMorphClient() {
       if (skylabFilter && skylabFilter.type && skylabFilter.id) {
         if (skylabFilter.type === 'release') {
           query = query.eq('jrel_release_id', skylabFilter.id);
+          countQuery = countQuery.eq('jrel_release_id', skylabFilter.id);
         } else if (skylabFilter.type === 'subsheet') {
           query = query.eq('jrel_subsheet_id', skylabFilter.id);
+          countQuery = countQuery.eq('jrel_subsheet_id', skylabFilter.id);
         } else if (skylabFilter.type === 'subpart') {
           query = query.eq('jrel_subpart_id', skylabFilter.id);
+          countQuery = countQuery.eq('jrel_subpart_id', skylabFilter.id);
         }
       }
       
       // Apply baobab attempt filter if active
       if (baobobFilter) {
         query = query.eq('baobab_attempt_id', baobobFilter);
+        countQuery = countQuery.eq('baobab_attempt_id', baobobFilter);
       }
       
       query = query.order('mundial_id', { ascending: false });
       
-      // Apply appropriate limits based on filtering
+      // Apply reasonable limits to prevent timeout
       const hasNoFilters = !jettisonFilter?.type && !skylabFilter?.type && !baobobFilter;
       if (hasNoFilters) {
-        query = query.limit(100000); // Conservative limit when NO filters applied
-        console.log('Applied 100k limit - no filters active');
+        query = query.limit(5000); // Reasonable limit when NO filters applied
+        console.log('Applied 5k limit - no filters active');
+      } else if (baobobFilter) {
+        // When baobab filter is active, apply a reasonable limit for performance
+        query = query.limit(10000); // Reasonable limit for baobab filtered queries
+        console.log('Applied 10k limit - baobab filter active:', baobobFilter);
       } else {
-        // When filtered, use a high limit to get all results (Supabase max is ~1M)
-        query = query.limit(500000); // High limit for filtered queries
-        console.log('Applied 500k limit - filters active:', { jettisonFilter, skylabFilter, baobobFilter });
+        // When jettison/skylab filters active, use moderate limit
+        query = query.limit(50000); // Balanced limit for jettison/skylab filtered queries
+        console.log('Applied 50k limit - jettison/skylab filters active:', { jettisonFilter, skylabFilter });
       }
       
-      const { data: fetchedData, error: fetchError } = await query;
+      // Execute both queries in parallel
+      const [{ data: fetchedData, error: fetchError }, { count, error: countError }] = await Promise.all([
+        query,
+        countQuery
+      ]);
+      
       console.log('Fetched data count:', fetchedData?.length);
+      console.log('Total database count:', count);
 
       if (fetchError) throw fetchError;
+      if (countError) throw countError;
 
       setData(fetchedData || []);
+      setTotalCount(count || 0);
       setError(null);
     } catch (err: any) {
       console.error('Error fetching data:', err);
@@ -804,7 +828,7 @@ export default function LeadsmartMorphClient() {
     setSearchTerm('');
   };
 
-  // City matching function
+  // City matching function - highly optimized version
   const runCityMatchingProcess = async () => {
     if (!selectedBaobobAttemptForCities) {
       alert('Please select a baobab_attempt_id first');
@@ -813,98 +837,99 @@ export default function LeadsmartMorphClient() {
 
     setCityMatchingInProgress(true);
     setCityMatchingProgress(0);
-    setCityMatchingStatus('Starting city matching process...');
+    setCityMatchingStatus('Starting optimized city matching process...');
 
     try {
-      // Step 1: Get all records for the selected baobab_attempt_id
-      setCityMatchingStatus('Fetching records to process...');
-      const { data: recordsToProcess, error: fetchError } = await supabase
+      // Check how many records need processing
+      setCityMatchingStatus('Checking records to process...');
+      const { count: recordsToProcess, error: countError } = await supabase
         .from('leadsmart_transformed')
-        .select('mundial_id, city_name, state_code, fk_city_id')
+        .select('*', { count: 'exact', head: true })
         .eq('baobab_attempt_id', selectedBaobobAttemptForCities)
-        .is('fk_city_id', null); // Only process records that don't already have a city assigned
+        .is('fk_city_id', null);
 
-      if (fetchError) throw fetchError;
+      if (countError) throw countError;
 
-      if (!recordsToProcess || recordsToProcess.length === 0) {
+      if (!recordsToProcess || recordsToProcess === 0) {
         setCityMatchingStatus('No records found to process');
         setCityMatchingInProgress(false);
         return;
       }
 
-      setCityMatchingStatus(`Found ${recordsToProcess.length} records to process`);
+      setCityMatchingStatus(`Found ${recordsToProcess} records to process`);
       setCityMatchingProgress(10);
 
-      // Step 2: Get all cities for matching
-      setCityMatchingStatus('Loading cities database...');
-      const { data: cities, error: citiesError } = await supabase
-        .from('cities')
-        .select('city_id, city_name, state_code');
-
-      if (citiesError) throw citiesError;
-
-      setCityMatchingProgress(20);
-      setCityMatchingStatus(`Loaded ${cities?.length || 0} cities. Starting matching process...`);
-
-      // Step 3: Process records in batches
-      const BATCH_SIZE = 50;
+      // Process in manageable batches
+      const BATCH_SIZE = 500; // Smaller batches for better performance
       let processedCount = 0;
-      const totalRecords = recordsToProcess.length;
-      const updates: { mundial_id: number; fk_city_id: number }[] = [];
+      let totalUpdated = 0;
 
-      for (let i = 0; i < recordsToProcess.length; i += BATCH_SIZE) {
-        const batch = recordsToProcess.slice(i, i + BATCH_SIZE);
+      while (processedCount < recordsToProcess) {
+        const batchNum = Math.floor(processedCount / BATCH_SIZE) + 1;
+        setCityMatchingStatus(`Processing batch ${batchNum} (${processedCount}/${recordsToProcess})...`);
         
-        for (const record of batch) {
-          if (record.city_name && record.state_code) {
-            // Find matching city by city_name and state_code
-            const matchingCity = cities?.find(city => 
-              city.city_name?.toLowerCase().trim() === record.city_name?.toLowerCase().trim() &&
-              city.state_code?.toLowerCase().trim() === record.state_code?.toLowerCase().trim()
-            );
+        // Get a batch of records that need city assignment
+        const { data: batch, error: batchError } = await supabase
+          .from('leadsmart_transformed')
+          .select('mundial_id, city_name, state_code')
+          .eq('baobab_attempt_id', selectedBaobobAttemptForCities)
+          .is('fk_city_id', null)
+          .not('city_name', 'is', null)
+          .not('state_code', 'is', null)
+          .limit(BATCH_SIZE);
 
-            if (matchingCity) {
-              updates.push({
-                mundial_id: record.mundial_id,
-                fk_city_id: matchingCity.city_id
-              });
+        if (batchError) throw batchError;
+        if (!batch || batch.length === 0) break;
+
+        // For each record in the batch, find the matching city and update immediately
+        const updatePromises = batch.map(async (record) => {
+          try {
+            // Find the matching city
+            const { data: matchingCities, error: cityError } = await supabase
+              .from('cities')
+              .select('city_id')
+              .ilike('city_name', record.city_name.trim())
+              .ilike('state_code', record.state_code.trim())
+              .limit(1);
+
+            if (cityError || !matchingCities || matchingCities.length === 0) {
+              return null;
             }
+
+            // Update the record with the found city_id
+            const { error: updateError } = await supabase
+              .from('leadsmart_transformed')
+              .update({ fk_city_id: matchingCities[0].city_id })
+              .eq('mundial_id', record.mundial_id);
+
+            if (updateError) {
+              console.error(`Error updating record ${record.mundial_id}:`, updateError);
+              return null;
+            }
+
+            return record.mundial_id;
+          } catch (error) {
+            console.error(`Error processing record ${record.mundial_id}:`, error);
+            return null;
           }
+        });
 
-          processedCount++;
-          const progress = 20 + (processedCount / totalRecords) * 60; // 20% to 80%
-          setCityMatchingProgress(Math.floor(progress));
-          setCityMatchingStatus(`Processed ${processedCount}/${totalRecords} records. Found ${updates.length} matches.`);
-        }
+        // Wait for all updates in this batch to complete
+        const results = await Promise.all(updatePromises);
+        const successfulUpdates = results.filter(result => result !== null).length;
+        totalUpdated += successfulUpdates;
 
-        // Small delay to prevent UI blocking
-        await new Promise(resolve => setTimeout(resolve, 10));
-      }
+        processedCount += batch.length;
+        const progress = 10 + (processedCount / recordsToProcess) * 80;
+        setCityMatchingProgress(Math.floor(progress));
+        setCityMatchingStatus(`Batch ${batchNum} complete: ${successfulUpdates}/${batch.length} updated. Total: ${totalUpdated}`);
 
-      // Step 4: Apply updates in batches
-      setCityMatchingStatus(`Saving ${updates.length} city assignments...`);
-      setCityMatchingProgress(85);
-
-      for (let i = 0; i < updates.length; i += BATCH_SIZE) {
-        const updateBatch = updates.slice(i, i + BATCH_SIZE);
-        
-        for (const update of updateBatch) {
-          const { error: updateError } = await supabase
-            .from('leadsmart_transformed')
-            .update({ fk_city_id: update.fk_city_id })
-            .eq('mundial_id', update.mundial_id);
-
-          if (updateError) {
-            console.error(`Error updating record ${update.mundial_id}:`, updateError);
-          }
-        }
-
-        const updateProgress = 85 + ((i + updateBatch.length) / updates.length) * 15; // 85% to 100%
-        setCityMatchingProgress(Math.floor(updateProgress));
+        // Small delay to prevent overwhelming the database
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
 
       setCityMatchingProgress(100);
-      setCityMatchingStatus(`✅ Complete! Processed ${totalRecords} records, assigned ${updates.length} cities.`);
+      setCityMatchingStatus(`✅ Complete! Updated ${totalUpdated} out of ${recordsToProcess} records.`);
 
       // Refresh the data to show updated fk_city_id values
       setTimeout(() => {
@@ -1164,7 +1189,7 @@ export default function LeadsmartMorphClient() {
                     <div style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                       <span style={{ fontWeight: 'bold' }}>row pagination</span>
                       <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
-                        Showing <span style={{ fontWeight: 'bold' }}>{paginatedData.length.toLocaleString()}</span> of <span style={{ fontWeight: 'bold' }}>{filteredAndSortedData.length.toLocaleString()}</span> results
+                        Showing <span style={{ fontWeight: 'bold' }}>{paginatedData.length.toLocaleString()}</span> of <span style={{ fontWeight: 'bold' }}>{totalCount.toLocaleString()}</span> results
                       </span>
                     </div>
                   </td>
