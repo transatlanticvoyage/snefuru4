@@ -1003,287 +1003,96 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         setTransforming(false);
         return;
       }
-      
-      // Step 3: Insert/update transformed records
-      console.log(`🔄 Inserting/updating ${globalGroups.size} transformed records...`);
-      await addTransformLog(attemptId, `Starting to insert/update ${globalGroups.size.toLocaleString()} groups...`);
-      
-      let groupNum = 0;
-      
-      for (const [keyStr, groupData] of globalGroups) {
-        groupNum++;
-        if (groupNum % 100 === 0) {
-          console.log(`   Processing group ${groupNum}/${globalGroups.size}...`);
-          
-          // Update progress periodically
-          await saveTransformProgress(attemptId, {
-            transformed_records_new: transformedCount,
-            transformed_records_updated: updatedCount,
-            relations_created: relationsCount
-          });
-          
-          await addTransformLog(attemptId, `Inserting groups: ${groupNum}/${globalGroups.size} (${Math.round((groupNum / globalGroups.size) * 100)}%)`);
-        }
-        
-        const groupKey: GroupKey = JSON.parse(keyStr);
-        
-        // DEFENSIVE CHECK: Validate relationship IDs after JSON.parse
-        if (groupKey.rel_release_id === undefined || groupKey.rel_subsheet_id === undefined || groupKey.rel_subpart_id === undefined) {
-          console.error('❌ UNDEFINED REL ID DETECTED AFTER JSON.PARSE:', {
-            groupNum: groupNum,
-            keyStr: keyStr,
-            parsed_groupKey: groupKey,
-            rel_release_id: groupKey.rel_release_id,
-            rel_subsheet_id: groupKey.rel_subsheet_id,
-            rel_subpart_id: groupKey.rel_subpart_id
-          });
-          continue; // Skip this group
-        }
-
-        if (groupKey.rel_release_id === null || groupKey.rel_subsheet_id === null || groupKey.rel_subpart_id === null) {
-          console.error('❌ NULL REL ID DETECTED AFTER JSON.PARSE:', {
-            groupNum: groupNum,
-            keyStr: keyStr,
-            parsed_groupKey: groupKey
-          });
-          continue; // Skip this group
-        }
-        
-        // Sort zip codes and prepare as JSONB array
-        const aggregatedZipCodes = groupData.zip_codes.sort();
-        
-        // Prepare data for leadsmart_transformed
-        const transformedData = {
-          city_name: groupKey.city_name,
-          state_code: groupKey.state_code,
-          payout: groupKey.payout,
-          aggregated_zip_codes: aggregatedZipCodes,
-          jrel_release_id: groupKey.rel_release_id,
-          jrel_subsheet_id: groupKey.rel_subsheet_id,
-          jrel_subpart_id: groupKey.rel_subpart_id,
-          baobab_attempt_id: attemptId
-        };
-
-        // FINAL DEFENSIVE CHECK: Validate transformedData before database operations
-        if (transformedData.jrel_release_id === undefined || transformedData.jrel_subsheet_id === undefined || transformedData.jrel_subpart_id === undefined) {
-          console.error('❌ UNDEFINED jrel_* VALUES IN TRANSFORMED DATA:', {
-            groupNum: groupNum,
-            transformedData: transformedData,
-            original_groupKey: groupKey
-          });
-          continue; // Skip this group
-        }
-
-        if (transformedData.jrel_release_id === null || transformedData.jrel_subsheet_id === null || transformedData.jrel_subpart_id === null) {
-          console.error('❌ NULL jrel_* VALUES IN TRANSFORMED DATA:', {
-            groupNum: groupNum,
-            transformedData: transformedData,
-            original_groupKey: groupKey
-          });
-          continue; // Skip this group
-        }
-
-        // Log successful validation for first few groups (debugging)
-        if (groupNum <= 5) {
-          console.log(`✅ GROUP ${groupNum} VALIDATION PASSED:`, {
-            jrel_release_id: transformedData.jrel_release_id,
-            jrel_subsheet_id: transformedData.jrel_subsheet_id,
-            jrel_subpart_id: transformedData.jrel_subpart_id,
-            city_name: transformedData.city_name,
-            state_code: transformedData.state_code,
-            payout: transformedData.payout
-          });
-        }
-        
-        // Insert or get existing transformed record (CHECK ALL 6 GROUPING FIELDS!)
-        const { data: existingTransformed, error: checkError } = await supabase
-          .from('leadsmart_transformed')
-          .select('mundial_id')
-          .eq('city_name', groupKey.city_name)
-          .eq('state_code', groupKey.state_code)
-          .eq('payout', groupKey.payout)
-          .eq('jrel_release_id', groupKey.rel_release_id)
-          .eq('jrel_subsheet_id', groupKey.rel_subsheet_id)
-          .eq('jrel_subpart_id', groupKey.rel_subpart_id)
-          .maybeSingle();
-        
-        if (checkError) throw checkError;
-        
-        let mundialId: number;
-        
-        if (existingTransformed) {
-          // Update existing record (UPDATE ALL jrel_* FIELDS!)
-          const { data: updatedData, error: updateError } = await supabase
-            .from('leadsmart_transformed')
-            .update({
-              aggregated_zip_codes: aggregatedZipCodes,
-              jrel_release_id: groupKey.rel_release_id,
-              jrel_subsheet_id: groupKey.rel_subsheet_id,
-              jrel_subpart_id: groupKey.rel_subpart_id,
-              baobab_attempt_id: attemptId,
-              updated_at: new Date().toISOString()
-            })
-            .eq('mundial_id', existingTransformed.mundial_id)
-            .select('mundial_id')
-            .single();
-          
-          if (updateError) throw updateError;
-          mundialId = updatedData.mundial_id;
-          updatedCount++;
-        } else {
-          // Insert new record
-          const { data: insertedData, error: insertError } = await supabase
-            .from('leadsmart_transformed')
-            .insert([transformedData])
-            .select('mundial_id')
-            .single();
-          
-          if (insertError) throw insertError;
-          mundialId = insertedData.mundial_id;
-          transformedCount++;
-        }
-        
-        // Create relation records
-        const relationRecords = groupData.global_row_ids.map(globalRowId => ({
-          original_global_id: globalRowId,
-          transformed_mundial_id: mundialId,
-          baobab_attempt_id: attemptId
-        }));
-        
-        const { error: relationsError } = await supabase
-          .from('leadsmart_transformed_relations')
-          .insert(relationRecords);
-        
-        if (relationsError) throw relationsError;
-        relationsCount += relationRecords.length;
-      }
-      
-      const totalTime = Date.now() - startTime;
-      const processingSpeed = totalProcessed / (totalTime / 1000);
-      
-      // Build invalid rows breakdown text
-      let invalidBreakdownText = '';
-      if (totalSkipped > 0) {
-        invalidBreakdownText = `INVALID/SKIPPED ROWS (remain in leadsmart_zip_based_data):\n` +
-          `• Total invalid: ${totalSkipped.toLocaleString()}\n`;
-        
-        if (invalidRowsBreakdown.missingCityOnly > 0) {
-          invalidBreakdownText += `  - Missing city_name only: ${invalidRowsBreakdown.missingCityOnly.toLocaleString()}\n`;
-        }
-        if (invalidRowsBreakdown.missingStateOnly > 0) {
-          invalidBreakdownText += `  - Missing state_code only: ${invalidRowsBreakdown.missingStateOnly.toLocaleString()}\n`;
-        }
-        if (invalidRowsBreakdown.missingPayoutOnly > 0) {
-          invalidBreakdownText += `  - Missing payout only: ${invalidRowsBreakdown.missingPayoutOnly.toLocaleString()}\n`;
-        }
-        if (invalidRowsBreakdown.missingCityAndState > 0) {
-          invalidBreakdownText += `  - Missing city_name + state_code: ${invalidRowsBreakdown.missingCityAndState.toLocaleString()}\n`;
-        }
-        if (invalidRowsBreakdown.missingCityAndPayout > 0) {
-          invalidBreakdownText += `  - Missing city_name + payout: ${invalidRowsBreakdown.missingCityAndPayout.toLocaleString()}\n`;
-        }
-        if (invalidRowsBreakdown.missingStateAndPayout > 0) {
-          invalidBreakdownText += `  - Missing state_code + payout: ${invalidRowsBreakdown.missingStateAndPayout.toLocaleString()}\n`;
-        }
-        if (invalidRowsBreakdown.missingAll > 0) {
-          invalidBreakdownText += `  - Missing all three fields: ${invalidRowsBreakdown.missingAll.toLocaleString()}\n`;
-        }
-        if (invalidRowsBreakdown.headerRows > 0) {
-          invalidBreakdownText += `  - Header rows (e.g. "City", "State"): ${invalidRowsBreakdown.headerRows.toLocaleString()}\n`;
-        }
-        invalidBreakdownText += `\n⚠️ These rows were NOT transformed and remain in the source table.\n\n`;
-      }
-      
-      const resultMessage = `✅ TRANSFORM COMPLETE!\n\n` +
-        `SELECTION:\n` +
-        `• ${selectXType} #${selectXId} (${totalCount.toLocaleString()} rows selected)\n\n` +
-        `SOURCE DATA ANALYSIS:\n` +
-        `• ${totalCount.toLocaleString()} total rows in leadsmart_zip_based_data\n` +
-        `• ${totalProcessed.toLocaleString()} rows processed\n` +
-        `• ${totalAlreadyTransformed.toLocaleString()} rows already transformed (skipped)\n` +
-        `• ${totalSkipped.toLocaleString()} rows skipped (invalid/missing data)\n` +
-        `• ${(totalProcessed - totalAlreadyTransformed - totalSkipped).toLocaleString()} valid rows transformed\n\n` +
-        invalidBreakdownText +
-        `TRANSFORMED RESULTS:\n` +
-        `• ${transformedCount.toLocaleString()} NEW records created in leadsmart_transformed\n` +
-        `• ${updatedCount.toLocaleString()} existing records updated\n` +
-        `• ${relationsCount.toLocaleString()} relation records created\n\n` +
-        `GROUPING BREAKDOWN:\n` +
-        `• ${globalGroups.size.toLocaleString()} unique city/state/payout/release/subsheet/subpart combinations\n` +
-        `• Each group aggregates zip codes from source rows\n\n` +
-        `GROUPING CRITERIA (All 6 fields):\n` +
-        `• city_name, state_code, payout\n` +
-        `• jrel_release_id (from rel_release_id)\n` +
-        `• jrel_subsheet_id (from rel_subsheet_id)\n` +
-        `• jrel_subpart_id (from rel_subpart_id)\n\n` +
-        `PERFORMANCE:\n` +
-        `• Processed in ${totalBatches} batches of ${BATCH_SIZE} rows\n` +
-        `• Total time: ${(totalTime / 1000).toFixed(2)} seconds\n` +
-        `• Processing speed: ~${Math.round(processingSpeed)} rows/second\n\n` +
-        `NEXT STEPS:\n` +
-        `✓ Rebuild Pico Count Cache to update Skylab tile counts\n` +
-        `✓ Check /leadsmart_morph to browse transformed data\n` +
-        `✓ View detailed logs for Attempt #${attemptId} on /leadsmart_treports`;
-      
-      console.log(`✅ Transform complete in ${(totalTime / 1000).toFixed(2)}s`);
-      await addTransformLog(attemptId, `Transform complete in ${(totalTime / 1000).toFixed(2)}s`);
-      await addTransformLog(attemptId, `NEW records: ${transformedCount.toLocaleString()}, UPDATED: ${updatedCount.toLocaleString()}, Relations: ${relationsCount.toLocaleString()}`);
-      
-      // Calculate performance metrics
-      const durationSeconds = totalTime / 1000;
-      const rowsPerSecond = totalProcessed / durationSeconds;
-      const avgBatchTime = durationSeconds / totalBatches;
-      
-      // Mark as completed
-      await saveTransformProgress(attemptId, {
-        status: 'completed',
-        end_time: new Date().toISOString(),
-        processed_rows: totalProcessed,
-        current_batch: totalBatches,
-        groups_created: globalGroups.size,
-        transformed_records_new: transformedCount,
-        transformed_records_updated: updatedCount,
-        relations_created: relationsCount,
-        already_transformed_rows: totalAlreadyTransformed,
-        skipped_rows: totalSkipped,
-        rows_per_second: rowsPerSecond,
-        avg_batch_time_seconds: avgBatchTime
-      });
-      
-      setTransformResults(resultMessage);
-      setShowTransformResults(true);
-      setShowTransformConfirm(false);
-      
-      // Refresh transformed data count
-      await fetchTransformedDataCount();
-      
     } catch (error) {
-      console.error('Error transforming data:', error);
-      const errorMessage = `❌ TRANSFORM FAILED\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      
-      // Mark as failed
-      await saveTransformProgress(attemptId, {
-        status: 'failed',
-        end_time: new Date().toISOString(),
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-        error_details: {
-          message: error instanceof Error ? error.message : 'Unknown error',
-          stack: error instanceof Error ? error.stack : undefined,
-          timestamp: new Date().toISOString()
-        }
-      });
-      
-      await addTransformLog(attemptId, `❌ FAILED: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      
-      setTransformResults(errorMessage);
-      setShowTransformResults(true);
-    } finally {
+      console.error('Error in transform process:', error);
       setTransforming(false);
-      setCurrentTransformId(null);
     }
   };
-  
-  // Baobab Transform Function - Immediate popup then background processing
+
+  // Helper function to re-fetch transformed data count (optimized for large datasets)
+  const fetchTransformedDataCount = async () => {
+    if (!selectXType || !selectXId) {
+      setTransformedDataCount(0);
+      return;
+    }
+    
+    try {
+      // Count total zip-based data for this selection
+      let countQuery = supabase
+        .from('leadsmart_zip_based_data')
+        .select('*', { count: 'exact', head: true });
+
+      if (selectXType === 'release') {
+        countQuery = countQuery.eq('rel_release_id', selectXId);
+      } else if (selectXType === 'subsheet') {
+        countQuery = countQuery.eq('rel_subsheet_id', selectXId);
+      } else if (selectXType === 'subpart') {
+        countQuery = countQuery.eq('rel_subpart_id', selectXId);
+      }
+      
+      const { count: totalZipRows, error: countError } = await countQuery;
+      if (countError) throw countError;
+      
+      if (!totalZipRows || totalZipRows === 0) {
+        setTransformedDataCount(0);
+        return;
+      }
+      
+      // Process in batches to find transformed rows
+      const batchSize = 10000;
+      const totalBatches = Math.ceil(totalZipRows / batchSize);
+      const uniqueTransformedIds = new Set<number>();
+      
+      for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
+        const startRow = batchNum * batchSize;
+        const endRow = startRow + batchSize - 1;
+        
+        // Get zip-based data for this batch
+        let zipQuery = supabase
+          .from('leadsmart_zip_based_data')
+          .select('global_row_id');
+
+        if (selectXType === 'release') {
+          zipQuery = zipQuery.eq('rel_release_id', selectXId);
+        } else if (selectXType === 'subsheet') {
+          zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
+        } else if (selectXType === 'subpart') {
+          zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
+        }
+        
+        zipQuery = zipQuery.range(startRow, endRow);
+        
+        const { data: zipData, error: zipError } = await zipQuery;
+        if (zipError) throw zipError;
+        
+        if (zipData && zipData.length > 0) {
+          const globalRowIds = zipData.map(row => row.global_row_id);
+          
+          // Get relations for these global_row_ids
+          const { data: relationsData, error: relationsError } = await supabase
+            .from('leadsmart_transformed_relations')
+            .select('transformed_mundial_id')
+            .in('original_global_id', globalRowIds);
+          
+          if (relationsError) throw relationsError;
+          
+          relationsData?.forEach((r) => {
+            if (r.transformed_mundial_id !== null) {
+              uniqueTransformedIds.add(r.transformed_mundial_id);
+            }
+          });
+        }
+      }
+      
+      console.log(`✅ Found ${uniqueTransformedIds.size} transformed records`);
+      setTransformedDataCount(uniqueTransformedIds.size);
+    } catch (error) {
+      console.error('❌ Error fetching transformed data count:', error);
+      setTransformedDataCount(0);
+    }
+  };
+
+  // Baobab Transform Handler - Optimized for Performance  
   const handleBaobobTransform = async () => {
     if (!selectXType || !selectXId) {
       alert('Please select an item first');
@@ -1302,7 +1111,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
     }
 
     // Show confirmation
-    if (!confirm(`Start Baobab Transform?\n\nThis will transform ${selectXResultCount.toLocaleString()} rows in the background.\n\nYou can monitor progress at /baobab_reports`)) {
+    if (!confirm(`Start Baobab Transform?\n\nThis will transform ${selectXResultCount.toLocaleString()} rows using the optimized bulk processing approach.\n\nYou can monitor progress at /baobab_reports`)) {
       return;
     }
 
@@ -1325,14 +1134,14 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           rows_failed: 0,
           operations_per_second: 0,
           error_count: 0,
-          batch_size: 1000,
+          batch_size: 5000,
           timeout_minutes: 30,
           auto_resume: false,
           stall_threshold_minutes: 5,
           is_stalled: false,
           operation_logs: [],
           source_table: 'leadsmart_zip_based_data',
-          target_table: 'leadsmart_transformed_relations',
+          target_table: 'leadsmart_transformed',
           transform_type: selectXType,
           filter_criteria: {
             [`${selectXType}_id`]: selectXId,
@@ -1344,13 +1153,14 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         .single();
 
       if (attemptError) {
+        console.error('Error creating transform attempt:', attemptError);
         alert('Failed to start transform. Please try again.');
         return;
       }
 
       const attemptId = attemptData.baobab_attempt_id;
       
-      alert(`Baobab transform started! Monitor progress at /baobab_reports (Attempt #${attemptId})`);
+      alert(`🌳 Baobab transform started! Monitor progress at /baobab_reports (Attempt #${attemptId})`);
       
       // Close popup
       onClose();
@@ -1359,11 +1169,12 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       processBaobobTransform(attemptId, selectXType, selectXId, selectXResultCount);
       
     } catch (error) {
+      console.error('Error starting baobab transform:', error);
       alert('Failed to start baobab transform. Please try again.');
     }
   };
 
-  // Background baobab transform processing
+  // Optimized Background Processing (Restored Original Bulk Approach)
   const processBaobobTransform = async (
     attemptId: number, 
     entityType: 'release' | 'subsheet' | 'subpart', 
@@ -1386,36 +1197,24 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
       const startTime = Date.now();
       let processedRows = 0;
       let transformedRows = 0;
-      let insertedRows = 0;
-      let updatedRows = 0;
-      const batchSize = 1000;
+      const BATCH_SIZE = 5000; // Optimized for performance
       
-      // Step 1: Group data by transformation key
+      console.log(`🌳 Starting Baobab transform with optimized bulk processing (${BATCH_SIZE} batch size)`);
+      
+      // Step 1: Group data by transformation key using bulk operations
       const globalGroups = new Map<string, { zip_codes: string[], global_row_ids: number[] }>();
-      const totalBatches = Math.ceil(totalRows / batchSize);
+      const totalBatches = Math.ceil(totalRows / BATCH_SIZE);
       
-      // Process data in batches
       for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
-        // Check if transform was cancelled
-        const { data: currentAttempt } = await supabase
-          .from('baobab_transform_attempts')
-          .select('status')
-          .eq('baobab_attempt_id', attemptId)
-          .single();
-        
-        if (currentAttempt?.status === 'cancelled') {
-          return; // Exit processing if cancelled
-        }
-        
-        const startRow = batchNum * batchSize;
-        const endRow = Math.min(startRow + batchSize - 1, totalRows - 1);
+        const startRow = batchNum * BATCH_SIZE;
+        const endRow = Math.min(startRow + BATCH_SIZE - 1, totalRows - 1);
         
         // Fetch batch data
         let zipQuery = supabase.from('leadsmart_zip_based_data').select('*');
         if (entityType === 'release') {
           zipQuery = zipQuery.eq('rel_release_id', entityId);
         } else if (entityType === 'subsheet') {
-          zipQuery = zipQuery.eq('rel_subsheet_id', entityId);
+          zipQuery = zipQuery.eq('rel_subsheet_id', entityId);  
         } else if (entityType === 'subpart') {
           zipQuery = zipQuery.eq('rel_subpart_id', entityId);
         }
@@ -1425,15 +1224,11 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           .order('global_row_id');
         
         if (batchError) throw batchError;
+        if (!batchData?.length) continue;
         
-        // Process each row in the batch
-        (batchData || []).forEach((row: any) => {
+        // Process batch data
+        batchData.forEach((row: any) => {
           processedRows++;
-          
-          // Skip if already transformed
-          if (row.transform_status === 'transformed') {
-            return;
-          }
           
           // Validate required fields
           const cityLower = row.city_name?.toLowerCase().trim();
@@ -1443,7 +1238,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
             return;
           }
           
-          // Create grouping key
+          // Create grouping key  
           const key = JSON.stringify({
             city_name: cityLower,
             state_code: stateLower,
@@ -1454,10 +1249,7 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           });
           
           if (!globalGroups.has(key)) {
-            globalGroups.set(key, {
-              zip_codes: [],
-              global_row_ids: []
-            });
+            globalGroups.set(key, { zip_codes: [], global_row_ids: [] });
           }
           
           const group = globalGroups.get(key)!;
@@ -1465,10 +1257,11 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           group.global_row_ids.push(row.global_row_id);
         });
         
-        const progress = ((batchNum + 1) / totalBatches) * 50; // First 50% for processing
-        const opsPerSecond = processedRows / ((Date.now() - startTime) / 1000);
+        const progress = ((batchNum + 1) / totalBatches) * 50;
+        const opsPerSecond = Math.round(processedRows / ((Date.now() - startTime) / 1000));
         
-        // Update progress
+        console.log(`🌳 Processed batch ${batchNum + 1}/${totalBatches} - ${opsPerSecond} ops/sec`);
+        
         await supabase
           .from('baobab_transform_attempts')
           .update({
@@ -1476,252 +1269,237 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
             overall_progress: Math.min(50, progress),
             rows_processed: processedRows,
             operations_per_second: opsPerSecond,
-            current_phase: `Processing batch ${batchNum + 1} of ${totalBatches}`
+            current_phase: `Processing batch ${batchNum + 1}/${totalBatches} - ${opsPerSecond} ops/sec`
           })
           .eq('baobab_attempt_id', attemptId);
       }
       
-      // Step 2: Process each group individually (OPTIMIZED APPROACH)
-      let groupNum = 0;
-      let transformedCount = 0;
-      let updatedCount = 0;
-      let relationsCount = 0;
-      const totalGroups = globalGroups.size;
+      console.log(`🌳 Grouped ${processedRows} rows into ${globalGroups.size} transformation groups`);
       
+      await supabase
+        .from('baobab_transform_attempts')
+        .update({
+          current_phase: 'inserting_transformed_records',
+          overall_progress: 55
+        })
+        .eq('baobab_attempt_id', attemptId);
+      
+      // Step 2: Process transformations in batches to avoid memory/database limits
+      const allRecordsToInsert: any[] = [];
+      const globalRowIdToGroupMap = new Map<number, string>();
+      
+      // Prepare all transformation records
       for (const [keyStr, groupData] of globalGroups) {
-        groupNum++;
-        
-        // Check if transform was cancelled
-        if (groupNum % 100 === 0) {
-          const { data: currentAttempt } = await supabase
-            .from('baobab_transform_attempts')
-            .select('status')
-            .eq('baobab_attempt_id', attemptId)
-            .single();
-          
-          if (currentAttempt?.status === 'cancelled') {
-            return; // Exit processing if cancelled
-          }
-        }
-        
         const groupKey = JSON.parse(keyStr);
         
-        // Sort zip codes and prepare as JSONB array
-        const aggregatedZipCodes = groupData.zip_codes.sort();
+        // Create aggregated zip codes
+        const uniqueZipCodes = [...new Set(groupData.zip_codes)].sort();
+        const aggregatedZipCodes = uniqueZipCodes.join(',');
         
-        // Prepare data for leadsmart_transformed
-        const transformedData = {
+        // Prepare transformed record with validation
+        const transformedRecord = {
+          jrel_release_id: groupKey.rel_release_id || null,
+          jrel_subsheet_id: groupKey.rel_subsheet_id || null, 
+          jrel_subpart_id: groupKey.rel_subpart_id || null,
           city_name: groupKey.city_name,
           state_code: groupKey.state_code,
-          payout: groupKey.payout,
           aggregated_zip_codes: aggregatedZipCodes,
-          jrel_release_id: groupKey.rel_release_id,
-          jrel_subsheet_id: groupKey.rel_subsheet_id,
-          jrel_subpart_id: groupKey.rel_subpart_id,
+          payout: parseFloat(groupKey.payout) || 0,
           baobab_attempt_id: attemptId
         };
         
-        // Insert or get existing transformed record (CHECK ALL 6 GROUPING FIELDS!)
-        const { data: existingTransformed, error: checkError } = await supabase
-          .from('leadsmart_transformed')
-          .select('mundial_id')
-          .eq('city_name', groupKey.city_name)
-          .eq('state_code', groupKey.state_code)
-          .eq('payout', groupKey.payout)
-          .eq('jrel_release_id', groupKey.rel_release_id)
-          .eq('jrel_subsheet_id', groupKey.rel_subsheet_id)
-          .eq('jrel_subpart_id', groupKey.rel_subpart_id)
-          .maybeSingle();
-        
-        if (checkError) throw checkError;
-        
-        let mundialId: number;
-        
-        if (existingTransformed) {
-          // Update existing record
-          const { data: updatedData, error: updateError } = await supabase
-            .from('leadsmart_transformed')
-            .update({
-              aggregated_zip_codes: aggregatedZipCodes,
-              jrel_release_id: groupKey.rel_release_id,
-              jrel_subsheet_id: groupKey.rel_subsheet_id,
-              jrel_subpart_id: groupKey.rel_subpart_id,
-              baobab_attempt_id: attemptId,
-              updated_at: new Date().toISOString()
-            })
-            .eq('mundial_id', existingTransformed.mundial_id)
-            .select('mundial_id')
-            .single();
-          
-          if (updateError) throw updateError;
-          mundialId = updatedData.mundial_id;
-          updatedCount++;
-        } else {
-          // Insert new record
-          const { data: insertedData, error: insertError } = await supabase
-            .from('leadsmart_transformed')
-            .insert([transformedData])
-            .select('mundial_id')
-            .single();
-          
-          if (insertError) throw insertError;
-          mundialId = insertedData.mundial_id;
-          transformedCount++;
+        // Validate required fields
+        if (!transformedRecord.city_name || !transformedRecord.state_code) {
+          console.warn('🌳 Skipping invalid record - missing city/state:', transformedRecord);
+          continue;
         }
         
-        // Create relation records immediately (NO COMPLEX MATCHING!)
-        const relationRecords = groupData.global_row_ids.map(globalRowId => ({
-          original_global_id: globalRowId,
-          transformed_mundial_id: mundialId,
-          baobab_attempt_id: attemptId
-        }));
+        allRecordsToInsert.push(transformedRecord);
         
-        const { error: relationsError } = await supabase
-          .from('leadsmart_transformed_relations')
-          .insert(relationRecords);
+        // Map global_row_ids to this group for relations
+        groupData.global_row_ids.forEach(globalRowId => {
+          globalRowIdToGroupMap.set(globalRowId, keyStr);
+        });
+      }
+      
+      console.log(`🌳 Starting transformation insert: ${allRecordsToInsert.length} records in batches`);
+      
+      // Insert transformed records in smaller batches
+      const INSERT_BATCH_SIZE = 1000;
+      const transformBatches = Math.ceil(allRecordsToInsert.length / INSERT_BATCH_SIZE);
+      const insertedRecords: any[] = [];
+      
+      for (let batchNum = 0; batchNum < transformBatches; batchNum++) {
+        const batchStart = batchNum * INSERT_BATCH_SIZE;
+        const batchEnd = Math.min(batchStart + INSERT_BATCH_SIZE, allRecordsToInsert.length);
+        const batchRecords = allRecordsToInsert.slice(batchStart, batchEnd);
         
-        if (relationsError) throw relationsError;
-        relationsCount += relationRecords.length;
+        console.log(`🌳 Inserting transform batch ${batchNum + 1}/${transformBatches} (${batchRecords.length} records)`);
         
-        // Update progress every 100 groups
-        if (groupNum % 100 === 0 || groupNum === totalGroups) {
-          const progress = 50 + ((groupNum / totalGroups) * 50);
-          const opsPerSecond = processedRows / ((Date.now() - startTime) / 1000);
+        // Log the first record for debugging
+        if (batchNum === 0) {
+          console.log('🌳 Sample record being inserted:', JSON.stringify(batchRecords[0], null, 2));
+        }
+        
+        const { data: batchInserted, error: insertError } = await supabase
+          .from('leadsmart_transformed')
+          .insert(batchRecords)
+          .select('mundial_id');
+        
+        if (insertError) {
+          console.error('🌳 Insert error details:', {
+            error: insertError,
+            message: insertError.message,
+            details: insertError.details,
+            hint: insertError.hint,
+            code: insertError.code,
+            batchSize: batchRecords.length,
+            batchNumber: batchNum + 1,
+            sampleRecord: batchRecords[0]
+          });
           
+          // Update attempt with specific error info
           await supabase
             .from('baobab_transform_attempts')
             .update({
-              last_activity_at: new Date().toISOString(),
-              overall_progress: Math.min(95, progress),
-              rows_processed: processedRows,
-              rows_transformed: transformedCount + updatedCount,
-              rows_inserted: transformedCount,
-              rows_updated: updatedCount,
-              operations_per_second: opsPerSecond,
-              current_phase: `Processing groups: ${groupNum.toLocaleString()}/${totalGroups.toLocaleString()}`
+              status: 'failed',
+              error_message: `Insert failed at batch ${batchNum + 1}: ${insertError.message}`,
+              error_details: insertError
             })
             .eq('baobab_attempt_id', attemptId);
+          
+          throw new Error(`Insert failed at batch ${batchNum + 1}: ${insertError.message}`);
         }
+        
+        if (batchInserted) {
+          insertedRecords.push(...batchInserted);
+        }
+        
+        const insertProgress = 60 + ((batchNum + 1) / transformBatches) * 20; // 60-80%
+        
+        await supabase
+          .from('baobab_transform_attempts')
+          .update({
+            current_phase: `Inserted ${insertedRecords.length}/${allRecordsToInsert.length} transformed records`,
+            overall_progress: Math.round(insertProgress),
+            rows_inserted: insertedRecords.length
+          })
+          .eq('baobab_attempt_id', attemptId);
       }
       
-      // Update final counts
-      transformedRows = transformedCount + updatedCount;
-      insertedRows = transformedCount;
-      updatedRows = updatedCount;
+      console.log(`🌳 Inserted ${insertedRecords.length} transformed records. Creating relations...`);
       
-      // Complete the transform
+      await supabase
+        .from('baobab_transform_attempts')
+        .update({
+          current_phase: 'creating_relations',
+          overall_progress: 85
+        })
+        .eq('baobab_attempt_id', attemptId);
+      
+      // Step 3: Create relations in batches
+      const relationsToInsert: any[] = [];
+      
+      // Map inserted records back to their original groups
+      insertedRecords.forEach((record, recordIndex) => {
+        const originalRecord = allRecordsToInsert[recordIndex];
+        const groupKey = JSON.stringify({
+          city_name: originalRecord.city_name,
+          state_code: originalRecord.state_code,
+          payout: originalRecord.payout,
+          rel_release_id: originalRecord.jrel_release_id,
+          rel_subsheet_id: originalRecord.jrel_subsheet_id,
+          rel_subpart_id: originalRecord.jrel_subpart_id
+        });
+        
+        const groupData = globalGroups.get(groupKey);
+        if (groupData) {
+          groupData.global_row_ids.forEach(globalRowId => {
+            relationsToInsert.push({
+              original_global_id: globalRowId,
+              transformed_mundial_id: record.mundial_id,
+              baobab_attempt_id: attemptId
+            });
+          });
+        }
+      });
+      
+      console.log(`🌳 Creating ${relationsToInsert.length} relations in batches`);
+      
+      // Insert relations in batches
+      const RELATIONS_BATCH_SIZE = 5000;
+      const relationsBatches = Math.ceil(relationsToInsert.length / RELATIONS_BATCH_SIZE);
+      
+      for (let batchNum = 0; batchNum < relationsBatches; batchNum++) {
+        const batchStart = batchNum * RELATIONS_BATCH_SIZE;
+        const batchEnd = Math.min(batchStart + RELATIONS_BATCH_SIZE, relationsToInsert.length);
+        const batchRelations = relationsToInsert.slice(batchStart, batchEnd);
+        
+        console.log(`🌳 Inserting relations batch ${batchNum + 1}/${relationsBatches} (${batchRelations.length} relations)`);
+        
+        const { error: relationsError } = await supabase
+          .from('leadsmart_transformed_relations')
+          .insert(batchRelations);
+        
+        if (relationsError) {
+          console.error('Relations insert error:', relationsError);
+          throw relationsError;
+        }
+        
+        const relationsProgress = 85 + ((batchNum + 1) / relationsBatches) * 10; // 85-95%
+        
+        await supabase
+          .from('baobab_transform_attempts')
+          .update({
+            current_phase: `Created ${Math.min(batchEnd, relationsToInsert.length)}/${relationsToInsert.length} relations`,
+            overall_progress: Math.round(relationsProgress)
+          })
+          .eq('baobab_attempt_id', attemptId);
+      }
+      
+      transformedRows = insertedRecords.length;
+      const totalTime = (Date.now() - startTime) / 1000;
+      const finalOpsPerSecond = Math.round(processedRows / totalTime);
+      
+      console.log(`🌳 Baobab transform complete! ${transformedRows} records transformed, ${relationsToInsert.length} relations created in ${totalTime.toFixed(1)}s (${finalOpsPerSecond} ops/sec)`);
+      
+      // Mark as completed
       await supabase
         .from('baobab_transform_attempts')
         .update({
           status: 'completed',
           completed_at: new Date().toISOString(),
           last_activity_at: new Date().toISOString(),
-          current_phase: 'completed',
           overall_progress: 100,
-          rows_processed: processedRows,
           rows_transformed: transformedRows,
-          rows_inserted: insertedRows,
-          rows_updated: updatedRows,
-          operations_per_second: processedRows / ((Date.now() - startTime) / 1000),
-          actual_duration_ms: Date.now() - startTime
+          rows_inserted: transformedRows,
+          operations_per_second: finalOpsPerSecond,
+          current_phase: `Completed - ${transformedRows} transformed, ${relationsToInsert.length} relations created`
         })
         .eq('baobab_attempt_id', attemptId);
         
     } catch (error) {
-      // Update status to failed
+      console.error('🌳 Baobab transform error:', error);
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorDetails = {
+        error: error,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        attemptId: attemptId
+      };
+      
+      console.error('🌳 Full error details:', errorDetails);
+      
       await supabase
         .from('baobab_transform_attempts')
         .update({
           status: 'failed',
           last_activity_at: new Date().toISOString(),
-          error_message: error instanceof Error ? error.message : 'Unknown error',
-          error_details: error
+          error_message: errorMessage,
+          error_details: errorDetails
         })
         .eq('baobab_attempt_id', attemptId);
-    }
-  };
-  
-  // Helper function to re-fetch transformed data count (optimized for large datasets)
-  const fetchTransformedDataCount = async () => {
-    if (!selectXType || !selectXId) {
-      setTransformedDataCount(0);
-      return;
-    }
-    
-    try {
-      console.log('📊 Fetching transformed data count...');
-      
-      // Get total count of zip_based_data rows
-      let countQuery = supabase.from('leadsmart_zip_based_data').select('*', { count: 'exact', head: true });
-      
-      if (selectXType === 'release') {
-        countQuery = countQuery.eq('rel_release_id', selectXId);
-      } else if (selectXType === 'subsheet') {
-        countQuery = countQuery.eq('rel_subsheet_id', selectXId);
-      } else if (selectXType === 'subpart') {
-        countQuery = countQuery.eq('rel_subpart_id', selectXId);
-      }
-      
-      const { count: totalZipRows, error: countError } = await countQuery;
-      if (countError) throw countError;
-      
-      if (!totalZipRows || totalZipRows === 0) {
-        setTransformedDataCount(0);
-        return;
-      }
-      
-      // Process in batches to find transformed rows
-      const BATCH_SIZE = 1000;
-      const totalBatches = Math.ceil(totalZipRows / BATCH_SIZE);
-      const uniqueTransformedIds = new Set<number>();
-      
-      for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
-        const startRow = batchNum * BATCH_SIZE;
-        const endRow = startRow + BATCH_SIZE - 1;
-        
-        let zipQuery = supabase.from('leadsmart_zip_based_data').select('global_row_id');
-        if (selectXType === 'release') {
-          zipQuery = zipQuery.eq('rel_release_id', selectXId);
-        } else if (selectXType === 'subsheet') {
-          zipQuery = zipQuery.eq('rel_subsheet_id', selectXId);
-        } else if (selectXType === 'subpart') {
-          zipQuery = zipQuery.eq('rel_subpart_id', selectXId);
-        }
-        
-        zipQuery = zipQuery.range(startRow, endRow);
-        
-        const { data: zipBatch, error: zipError } = await zipQuery;
-        if (zipError) throw zipError;
-        
-        if (!zipBatch || zipBatch.length === 0) break;
-        
-        const globalRowIds = zipBatch.map(row => row.global_row_id);
-        
-        // Check relations in sub-batches (to avoid URL length limits)
-        const subBatchSize = 500;
-        for (let i = 0; i < globalRowIds.length; i += subBatchSize) {
-          const subBatch = globalRowIds.slice(i, i + subBatchSize);
-          
-          const { data: relationsData, error: relationsError } = await supabase
-            .from('leadsmart_transformed_relations')
-            .select('transformed_mundial_id')
-            .in('original_global_id', subBatch);
-          
-          if (relationsError) throw relationsError;
-          
-          relationsData?.forEach(r => {
-            if (r.transformed_mundial_id !== null) {
-              uniqueTransformedIds.add(r.transformed_mundial_id);
-            }
-          });
-        }
-      }
-      
-      console.log(`✅ Found ${uniqueTransformedIds.size} transformed records`);
-      setTransformedDataCount(uniqueTransformedIds.size);
-    } catch (error) {
-      console.error('❌ Error fetching transformed data count:', error);
-      setTransformedDataCount(0);
     }
   };
 
@@ -1734,12 +1512,12 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
         <div className="flex h-full">
           {/* Left Pane - Grids with counts */}
           <div className="flex-1 bg-white flex flex-col overflow-auto border-r border-gray-300">
-            {/* Header - now part of left pane */}
+            {/* Header */}
             <div className="p-6 border-b bg-gray-50 flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-2xl font-bold text-gray-800">FrostySelectorPopup</span>
-                  <span className="text-sm text-gray-600 ml-2">(central component for the "tank" and "morph" pages)</span>
+                  <h2 className="text-3xl font-bold text-gray-800">🧊 Frosty Select {pageType === 'tank' ? '- tank' : '- morph'}</h2>
+                  <p className="text-sm text-gray-600 mt-1">Central component for the "{pageType}" page</p>
                 </div>
                 <button
                   onClick={onClose}
@@ -1749,244 +1527,240 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                 </button>
               </div>
             </div>
-            
-            {/* Tab System */}
-            <div className="flex border-b border-gray-300 bg-gray-50 flex-shrink-0">
+
+            {/* Main Content */}
+            <div className="flex-1 p-6 overflow-auto">
+              {leftPaneView === 'grid' ? (
+                // Grid View - full selector components
+                <>
+                  <SelectorFileReleasesGrid 
+                    onReleaseSelect={setSelectedReleaseId} 
+                    selectXType={selectXType} 
+                    selectXId={selectXId} 
+                    onSelectX={handleSelectX} 
+                  />
+                  <SelectorSubsheetsGrid 
+                    selectedReleaseId={selectedReleaseId}
+                    onSubsheetSelect={setSelectedSubsheetId}
+                    selectXType={selectXType}
+                    selectXId={selectXId}
+                    onSelectX={handleSelectX}
+                  />
+                  <SelectorSubpartsGrid 
+                    selectedSubsheetId={selectedSubsheetId}
+                    onSubpartSelect={setSelectedSubpartId}
+                    selectXType={selectXType}
+                    selectXId={selectXId}
+                    onSelectX={handleSelectX}
+                  />
+                </>
+              ) : (
+                // Tile View - compact tile layout
+                <>
+                  <TileFileReleasesView
+                    onReleaseSelect={setSelectedReleaseId}
+                    selectXType={selectXType}
+                    selectXId={selectXId}
+                    onSelectX={handleSelectX}
+                  />
+                  <TileSubsheetsView
+                    selectedReleaseId={selectedReleaseId}
+                    onSubsheetSelect={setSelectedSubsheetId}
+                    selectXType={selectXType}
+                    selectXId={selectXId}
+                    onSelectX={handleSelectX}
+                  />
+                  <TileSubpartsView
+                    selectedSubsheetId={selectedSubsheetId}
+                    onSubpartSelect={setSelectedSubpartId}
+                    selectXType={selectXType}
+                    selectXId={selectXId}
+                    onSelectX={handleSelectX}
+                  />
+                </>
+              )}
+            </div>
+
+            {/* View Toggle at bottom */}
+            <div className="p-6 border-t bg-gray-50 flex justify-center space-x-4 flex-shrink-0">
               <button
                 onClick={() => setLeftPaneView('grid')}
-                className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                   leftPaneView === 'grid'
-                    ? 'bg-white text-gray-900 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
                 }`}
               >
-                Grid View
+                📊 Grid View
               </button>
               <button
                 onClick={() => setLeftPaneView('tile')}
-                className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                   leftPaneView === 'tile'
-                    ? 'bg-white text-gray-900 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
                 }`}
               >
-                Tile View
+                🧱 Tile View
               </button>
             </div>
-            
-            {/* Tab Content */}
-            {leftPaneView === 'grid' ? (
-              <>
-                <SelectorFileReleasesGrid 
-                  onReleaseSelect={setSelectedReleaseId}
-                  selectXType={selectXType}
-                  selectXId={selectXId}
-                  onSelectX={handleSelectX}
-                />
-                <SelectorSubsheetsGrid 
-                  selectedReleaseId={selectedReleaseId} 
-                  onSubsheetSelect={setSelectedSubsheetId}
-                  selectXType={selectXType}
-                  selectXId={selectXId}
-                  onSelectX={handleSelectX}
-                />
-                <SelectorSubpartsGrid 
-                  selectedSubsheetId={selectedSubsheetId}
-                  onSubpartSelect={setSelectedSubpartId}
-                  selectXType={selectXType}
-                  selectXId={selectXId}
-                  onSelectX={handleSelectX}
-                />
-              </>
-            ) : (
-              // Tile View - compact mini-tables
-              <div className="flex-1 overflow-auto">
-                <TileFileReleasesView
-                  onReleaseSelect={setSelectedReleaseId}
-                  selectXType={selectXType}
-                  selectXId={selectXId}
-                  onSelectX={handleSelectX}
-                />
-                <TileSubsheetsView
-                  selectedReleaseId={selectedReleaseId}
-                  onSubsheetSelect={setSelectedSubsheetId}
-                  selectXType={selectXType}
-                  selectXId={selectXId}
-                  onSelectX={handleSelectX}
-                />
-                <TileSubpartsView
-                  selectedSubsheetId={selectedSubsheetId}
-                  onSubpartSelect={setSelectedSubpartId}
-                  selectXType={selectXType}
-                  selectXId={selectXId}
-                  onSelectX={handleSelectX}
-                />
-              </div>
-            )}
           </div>
-
-          {/* Right Pane - Selection Info and Actions */}
-          <div className="flex-1 bg-gray-50 flex flex-col">
-            {/* Config Header Bar */}
-            <div className="bg-black text-white px-6 py-3 font-mono text-sm">
-              selector popup component configured for: /{pageType === 'tank' ? 'leadsmart_tank' : 'leadsmart_morph'}
-            </div>
-            
+          
+          {/* Right Pane - Actions */}
+          <div className="w-2/5 bg-white flex flex-col">
             {pageType === 'tank' ? (
-              // Tank page configuration - original transform logic
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="p-6">
-                  <div className="font-bold text-gray-800 mb-4" style={{ fontSize: '16px' }}>
-                    from select_x system:
-                  </div>
-                
-                {selectXType && selectXId ? (
-                  <div className="mb-6">
-                    <div className="text-lg text-gray-800 mb-2">
-                      {selectXType === 'release' && `release_id - ${selectXId} - ${selectXResultCount.toLocaleString()} results`}
-                      {selectXType === 'subsheet' && `subsheet_id - ${selectXId} - ${selectXResultCount.toLocaleString()} results`}
-                      {selectXType === 'subpart' && `subpart_id - ${selectXId} - ${selectXResultCount.toLocaleString()} results`}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-gray-500 italic mb-6">
-                    No selection made yet. Click select_x on any item.
-                  </div>
-                )}
-                
-                {/* Horizontal Tab System */}
-                <div className="border-b border-gray-300">
-                  <div className="flex space-x-1">
-                    <button
-                      onClick={() => setRightPaneTab('main')}
-                      className={`px-6 py-2 font-medium transition-colors ${
-                        rightPaneTab === 'main'
-                          ? 'bg-white text-blue-600 border-b-2 border-blue-600'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      main functions
-                    </button>
-                    <button
-                      onClick={() => setRightPaneTab('delete')}
-                      className={`px-6 py-2 font-medium transition-colors ${
-                        rightPaneTab === 'delete'
-                          ? 'bg-white text-red-600 border-b-2 border-red-600'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      delete
-                    </button>
-                  </div>
-                </div>
+              // Tank page configuration
+              <div className="flex-1 flex flex-col">
+                {/* Tab Navigation */}
+                <div className="flex border-b border-gray-300 bg-gray-50">
+                  <button
+                    onClick={() => setRightPaneTab('main')}
+                    className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
+                      rightPaneTab === 'main'
+                        ? 'bg-white text-gray-900 border-b-2 border-blue-600'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    🏠 Main Actions
+                  </button>
+                  <button
+                    onClick={() => setRightPaneTab('delete')}
+                    className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
+                      rightPaneTab === 'delete'
+                        ? 'bg-white text-gray-900 border-b-2 border-red-600'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    🗑️ Delete
+                  </button>
                 </div>
                 
-                {/* Tab Content */}
-                <div className="flex-1 overflow-auto p-6">
-                  {rightPaneTab === 'main' ? (
-                    // Main Functions Tab
-                    <div className="space-y-3">
-                      <button
-                        onClick={checkTransformStatus}
-                        disabled={!selectXType || !selectXId || transforming}
-                        className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                          selectXType && selectXId && !transforming
-                            ? 'bg-purple-600 text-white hover:bg-purple-700'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                      >
-                        {transforming ? 'Transforming...' : 'gingko transform'}
-                      </button>
-                      
-                      <button
-                        onClick={handleBaobobTransform}
-                        disabled={!selectXType || !selectXId || transforming}
-                        className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                          selectXType && selectXId && !transforming
-                            ? 'bg-green-600 text-white hover:bg-green-700'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                      >
-                        {transforming ? 'Processing...' : 'baobab transform'}
-                      </button>
-                      
-                      <button
-                        onClick={() => {
-                          if (!selectXType || !selectXId) {
-                            alert('Please select an item first');
-                            return;
-                          }
-                          // Dispatch event to jettison table
-                          window.dispatchEvent(new CustomEvent('jettison-filter-apply', {
-                            detail: { type: selectXType, id: selectXId }
-                          }));
-                          // Close selector popup
-                          onClose();
-                        }}
-                        disabled={!selectXType || !selectXId}
-                        className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                          selectXType && selectXId
-                            ? 'bg-green-600 text-white hover:bg-green-700'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                      >
-                        filter main ui table
-                      </button>
-                      
+                {rightPaneTab === 'main' ? (
+                  // Main Actions Tab
+                  <div className="p-6 flex-1 overflow-auto">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4">Actions</h3>
+                    
+                    {/* Selection Display */}
+                    {selectXType && selectXId && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <h4 className="font-medium text-blue-900 mb-2">📋 Currently Selected</h4>
+                        <p className="text-blue-800 capitalize">
+                          <strong>{selectXType}</strong>: ID #{selectXId}
+                        </p>
+                        <p className="text-blue-700 text-sm mt-1">
+                          Result Count: <strong>{selectXResultCount.toLocaleString()}</strong> items
+                        </p>
+                        <p className="text-blue-700 text-sm">
+                          Associated Transformed: <strong>{transformedDataCount.toLocaleString()}</strong> records
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="space-y-4">
                       <button
                         onClick={handleCheckInvalidRows}
                         disabled={!selectXType || !selectXId || checkingInvalidRows}
-                        className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                          selectXType && selectXId && !checkingInvalidRows
-                            ? 'bg-orange-600 text-white hover:bg-orange-700'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
+                        className="w-full p-3 bg-purple-600 text-white hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md font-medium transition-colors flex items-center justify-center"
                       >
-                        {checkingInvalidRows ? 'Checking...' : 'generate invalid row csv file and download it'}
+                        {checkingInvalidRows ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                            Checking Invalid Rows...
+                          </>
+                        ) : (
+                          <>🔍 Check Invalid Rows</>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={handleTransform}
+                        disabled={!selectXType || !selectXId || transforming}
+                        className="w-full p-3 bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md font-medium transition-colors flex items-center justify-center"
+                      >
+                        {transforming ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                            Transforming...
+                          </>
+                        ) : (
+                          <>🔄 Transform Data</>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={handleBaobobTransform}
+                        disabled={!selectXType || !selectXId || transforming}
+                        className="w-full p-3 bg-orange-600 text-white hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md font-medium transition-colors flex items-center justify-center"
+                      >
+                        {transforming ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                            Baobab Transforming...
+                          </>
+                        ) : (
+                          <>🌳 Baobab Transform</>
+                        )}
                       </button>
                     </div>
-                  ) : (
-                    // Delete Tab
-                    <div className="space-y-3">
-                      <hr className="border-gray-300" />
-                      
-                      {/* Info about what will be deleted */}
-                      <div className="py-2 px-3 bg-yellow-50 border border-yellow-200 rounded">
-                        <p className="text-sm text-gray-700">
-                          <strong>Delete (method 1):</strong> Deletes rows from <span className="font-mono text-xs">leadsmart_zip_based_data</span> where the selected entity's rel_* column matches.
+                    
+                    {/* Transform Results */}
+                    {showTransformResults && (
+                      <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+                        <h4 className="font-medium text-gray-800 mb-2">Transform Results</h4>
+                        <pre className="text-sm text-gray-700 whitespace-pre-wrap max-h-64 overflow-y-auto">
+                          {transformResults}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  // Delete Tab
+                  <div className="p-6 flex-1 overflow-auto">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4">🗑️ Delete Operations</h3>
+                    
+                    {/* Selection Display for Delete */}
+                    {selectXType && selectXId ? (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                        <h4 className="font-medium text-red-900 mb-2">📋 Selected for Deletion</h4>
+                        <p className="text-red-800 capitalize">
+                          <strong>{selectXType}</strong>: ID #{selectXId}
                         </p>
-                        {selectXResultCount > 0 && (
-                          <p className="text-sm text-red-600 font-semibold mt-1">
-                            ⚠️ Will delete {selectXResultCount.toLocaleString()} rows
+                        <p className="text-red-700 text-sm mt-1">
+                          Will delete: <strong>{selectXResultCount.toLocaleString()}</strong> rows from zip-based data
+                        </p>
+                        {deleteAssociatedData && transformedDataCount > 0 && (
+                          <p className="text-red-700 text-sm">
+                            + <strong>{transformedDataCount.toLocaleString()}</strong> associated transformed records
                           </p>
                         )}
                       </div>
-                      
-                      <hr className="border-gray-300" />
-                      
-                      <button
-                        onClick={() => {
-                          if (!selectXType || !selectXId) {
-                            alert('Please select an item first');
-                            return;
-                          }
-                          setShowFirstDeleteConfirm(true);
-                        }}
-                        disabled={!selectXType || !selectXId}
-                        className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                          selectXType && selectXId
-                            ? 'bg-red-600 text-white hover:bg-red-700'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                      >
-                        delete (method 1)
-                      </button>
-                    </div>
-                  )}
-                </div>
+                    ) : (
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+                        <p className="text-gray-600">Please select a release, subsheet, or subpart to delete.</p>
+                      </div>
+                    )}
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => setShowFirstDeleteConfirm(true)}
+                      disabled={!selectXType || !selectXId || deleting}
+                      className="w-full p-3 bg-red-600 text-white hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md font-medium transition-colors flex items-center justify-center"
+                    >
+                      {deleting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                          Deleting...
+                        </>
+                      ) : (
+                        <>🗑️ Delete Selected Data</>
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
-              // Morph page configuration - blank for now
+              // Morph page configuration
               <div className="p-6 flex-1 overflow-auto">
                 <div className="text-gray-500 italic text-sm">
                   Morph page configuration - coming soon
@@ -1996,553 +1770,6 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
           </div>
         </div>
       </div>
-      
-      {/* First Delete Confirmation Popup */}
-      {showFirstDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
-          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
-            <div className="p-6">
-              <div className="flex items-center mb-4">
-                <div className="bg-yellow-100 rounded-full p-2 mr-3">
-                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">⚠️ Warning: Deletion Requested</h3>
-              </div>
-              <div className="mb-6">
-                <p className="text-gray-700 mb-4">
-                  <strong>Delete (method 1)</strong> will delete rows from <span className="font-mono text-xs">leadsmart_zip_based_data</span> based on your selection:
-                </p>
-                <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-                  <p className="text-red-800 font-medium">
-                    {selectXType === 'release' && `Selected: Release ID ${selectXId}`}
-                    {selectXType === 'subsheet' && `Selected: Subsheet ID ${selectXId}`}
-                    {selectXType === 'subpart' && `Selected: Subpart ID ${selectXId}`}
-                  </p>
-                  <p className="text-red-700 text-sm mt-2">
-                    Will delete <strong>{selectXResultCount.toLocaleString()} rows</strong> from leadsmart_zip_based_data where 
-                    {selectXType === 'release' && ` rel_release_id = ${selectXId}`}
-                    {selectXType === 'subsheet' && ` rel_subsheet_id = ${selectXId}`}
-                    {selectXType === 'subpart' && ` rel_subpart_id = ${selectXId}`}
-                  </p>
-                </div>
-                <p className="text-gray-700">
-                  This will <strong>NOT</strong> delete the entity itself (release/subsheet/subpart). Are you sure you want to continue?
-                </p>
-              </div>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowFirstDeleteConfirm(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    setShowFirstDeleteConfirm(false);
-                    setShowSecondDeleteConfirm(true);
-                  }}
-                  className="px-4 py-2 bg-yellow-600 text-white hover:bg-yellow-700 rounded-md transition-colors font-medium"
-                >
-                  I Understand, Continue
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Second Delete Confirmation Popup */}
-      {showSecondDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
-          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
-            <div className="p-6">
-              <div className="flex items-center mb-4">
-                <div className="bg-red-100 rounded-full p-2 mr-3">
-                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">🚨 Final Confirmation Required</h3>
-              </div>
-              <div className="mb-6">
-                <p className="text-gray-700 mb-4">
-                  <strong>This is your last chance to cancel!</strong>
-                </p>
-                <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-                  <p className="text-red-800 font-medium mb-2">Clicking "Yes, Delete Now" will:</p>
-                  <ul className="list-disc list-inside text-red-700 space-y-1 text-sm">
-                    <li className="font-semibold">Delete {selectXResultCount.toLocaleString()} rows from leadsmart_zip_based_data where 
-                    {selectXType === 'release' && ` rel_release_id = ${selectXId}`}
-                    {selectXType === 'subsheet' && ` rel_subsheet_id = ${selectXId}`}
-                    {selectXType === 'subpart' && ` rel_subpart_id = ${selectXId}`}
-                    </li>
-                    <li>NOT delete the {selectXType} entity itself (#{selectXId})</li>
-                    <li>Cannot be undone once completed</li>
-                  </ul>
-                </div>
-                <p className="text-gray-700 font-medium">
-                  Are you absolutely sure you want to proceed?
-                </p>
-              </div>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowSecondDeleteConfirm(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-md transition-colors font-medium disabled:bg-red-400"
-                >
-                  {deleting ? 'Deleting...' : 'Yes, Delete Now'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Transform Confirmation Popup */}
-      {showTransformConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 flex flex-col" style={{ maxHeight: '90vh' }}>
-            {/* Fixed Header */}
-            <div className="p-6 border-b bg-gray-50 flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-purple-100 rounded-full p-2 mr-3">
-                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">🔄 Transform Data Confirmation</h3>
-                </div>
-                <button
-                  onClick={() => setShowTransformConfirm(false)}
-                  className="text-gray-400 hover:text-gray-600 text-3xl font-bold leading-none"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-            
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-                <p className="text-gray-700 mb-4 font-medium">
-                  Review the transformation statistics before proceeding:
-                </p>
-                
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-700">Total rows in selection:</span>
-                      <span className="font-bold text-gray-900">{transformStats.totalRows.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-700">Already transformed:</span>
-                      <span className="font-bold text-orange-600">{transformStats.alreadyTransformed.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-700">Not yet transformed:</span>
-                      <span className="font-bold text-green-600">{transformStats.notYetTransformed.toLocaleString()}</span>
-                    </div>
-                    {transformStats.invalidRows > 0 && (
-                      <>
-                        <div className="flex justify-between items-center border-t pt-2 mt-2">
-                          <span className="text-gray-700 font-semibold">Invalid/header rows:</span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-red-600">{transformStats.invalidRows.toLocaleString()}</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                downloadInvalidRowsCSV();
-                              }}
-                              className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded border border-red-300 transition-colors"
-                              title="Download invalid rows as CSV"
-                            >
-                              📥 CSV
-                            </button>
-                          </div>
-                        </div>
-                        <div className="ml-4 mt-2 space-y-1 text-xs text-gray-600 bg-red-50 p-3 rounded border border-red-100">
-                          <div className="font-semibold text-red-800 mb-2">⚠️ Invalid Row Breakdown (will remain in leadsmart_zip_based_data):</div>
-                          {invalidRowsBreakdown.missingCityOnly > 0 && (
-                            <div className="flex justify-between">
-                              <span>• Missing city_name only:</span>
-                              <span className="font-semibold">{invalidRowsBreakdown.missingCityOnly.toLocaleString()}</span>
-                            </div>
-                          )}
-                          {invalidRowsBreakdown.missingStateOnly > 0 && (
-                            <div className="flex justify-between">
-                              <span>• Missing state_code only:</span>
-                              <span className="font-semibold">{invalidRowsBreakdown.missingStateOnly.toLocaleString()}</span>
-                            </div>
-                          )}
-                          {invalidRowsBreakdown.missingPayoutOnly > 0 && (
-                            <div className="flex justify-between">
-                              <span>• Missing payout only:</span>
-                              <span className="font-semibold">{invalidRowsBreakdown.missingPayoutOnly.toLocaleString()}</span>
-                            </div>
-                          )}
-                          {invalidRowsBreakdown.missingCityAndState > 0 && (
-                            <div className="flex justify-between">
-                              <span>• Missing city_name + state_code:</span>
-                              <span className="font-semibold">{invalidRowsBreakdown.missingCityAndState.toLocaleString()}</span>
-                            </div>
-                          )}
-                          {invalidRowsBreakdown.missingCityAndPayout > 0 && (
-                            <div className="flex justify-between">
-                              <span>• Missing city_name + payout:</span>
-                              <span className="font-semibold">{invalidRowsBreakdown.missingCityAndPayout.toLocaleString()}</span>
-                            </div>
-                          )}
-                          {invalidRowsBreakdown.missingStateAndPayout > 0 && (
-                            <div className="flex justify-between">
-                              <span>• Missing state_code + payout:</span>
-                              <span className="font-semibold">{invalidRowsBreakdown.missingStateAndPayout.toLocaleString()}</span>
-                            </div>
-                          )}
-                          {invalidRowsBreakdown.missingAll > 0 && (
-                            <div className="flex justify-between">
-                              <span>• Missing all three fields:</span>
-                              <span className="font-semibold">{invalidRowsBreakdown.missingAll.toLocaleString()}</span>
-                            </div>
-                          )}
-                          {invalidRowsBreakdown.headerRows > 0 && (
-                            <div className="flex justify-between">
-                              <span>• Header rows (e.g. "City", "State"):</span>
-                              <span className="font-semibold">{invalidRowsBreakdown.headerRows.toLocaleString()}</span>
-                            </div>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-                
-                {transformStats.alreadyTransformed > 0 && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
-                    <div className="flex items-start">
-                      <svg className="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
-                      </svg>
-                      <div>
-                        <p className="text-yellow-800 font-semibold text-sm mb-1">Warning: Some rows already transformed</p>
-                        <p className="text-yellow-700 text-sm">
-                          {transformStats.alreadyTransformed.toLocaleString()} row{transformStats.alreadyTransformed !== 1 ? 's have' : ' has'} already been transformed and will be skipped to prevent duplicates.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                {transformStats.notYetTransformed === 0 && (
-                  <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-                    <p className="text-red-800 font-semibold">⚠️ No new rows to transform!</p>
-                    <p className="text-red-700 text-sm mt-1">
-                      All valid rows have already been transformed. There is nothing new to process.
-                    </p>
-                  </div>
-                )}
-                
-                <div className="bg-blue-50 border border-blue-300 rounded-md p-4 mb-4">
-                  <p className="text-gray-900 text-sm mb-2 font-semibold">
-                    📊 SELECTION:
-                  </p>
-                  <p className="text-gray-700 text-sm ml-4">
-                    • {selectXType} #{selectXId} ({transformStats.totalRows.toLocaleString()} total rows)
-                  </p>
-                </div>
-                
-                <div className="bg-purple-50 border border-purple-300 rounded-md p-4 mb-4">
-                  <p className="text-gray-900 text-sm mb-2 font-semibold">
-                    🔄 GROUPING LOGIC:
-                  </p>
-                  <p className="text-gray-700 text-sm ml-4 mb-2">
-                    Rows will be grouped by ALL 6 criteria:
-                  </p>
-                  <ul className="list-disc list-inside text-gray-700 text-sm ml-6 space-y-1">
-                    <li>city_name</li>
-                    <li>state_code</li>
-                    <li>payout</li>
-                    <li>rel_release_id → <span className="font-semibold">jrel_release_id</span></li>
-                    <li>rel_subsheet_id → <span className="font-semibold">jrel_subsheet_id</span></li>
-                    <li>rel_subpart_id → <span className="font-semibold">jrel_subpart_id</span></li>
-                  </ul>
-                  <p className="text-gray-600 text-xs ml-4 mt-2 italic">
-                    Each unique combination creates ONE record in leadsmart_transformed
-                  </p>
-                </div>
-                
-                <div className="bg-gray-50 border border-gray-300 rounded-md p-4 mb-4">
-                  <p className="text-gray-900 text-sm mb-2 font-semibold">
-                    ✓ WHAT WILL HAPPEN:
-                  </p>
-                  <ul className="list-none text-gray-700 text-sm space-y-1.5">
-                    <li>✓ {transformStats.notYetTransformed.toLocaleString()} rows processed in batches (1,000 per batch)</li>
-                    <li>✓ Zip codes aggregated as JSONB arrays (e.g., ["99501", "99502"])</li>
-                    <li>✓ New grouped records created in <span className="font-mono text-xs">leadsmart_transformed</span></li>
-                    <li>✓ Tracking relations created in <span className="font-mono text-xs">leadsmart_transformed_relations</span></li>
-                    <li>✓ Original rel_* values preserved as jrel_* in transformed table</li>
-                    <li>✓ Source data in <span className="font-mono text-xs">leadsmart_zip_based_data</span> will NOT be modified</li>
-                  </ul>
-                </div>
-                
-                {transformStats.notYetTransformed > 10000 && (
-                  <div className="bg-yellow-50 border border-yellow-300 rounded-md p-4 mb-4">
-                    <p className="text-yellow-900 text-sm font-semibold mb-1">
-                      ⏱️ ESTIMATED TIME: {Math.round(transformStats.notYetTransformed / 5000)} - {Math.round(transformStats.notYetTransformed / 3000)} minutes
-                    </p>
-                    <p className="text-yellow-800 text-xs">
-                      • Progress tracked in real-time on <a href="/leadsmart_treports" className="underline font-semibold" target="_blank">/leadsmart_treports</a>
-                    </p>
-                    <p className="text-yellow-800 text-xs">
-                      • Keep browser tab open during process
-                    </p>
-                  </div>
-                )}
-            </div>
-            
-            {/* Fixed Button Footer */}
-            <div className="p-6 border-t bg-gray-50 flex-shrink-0">
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowTransformConfirm(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    setShowTransformConfirm(false);
-                    handleTransform();
-                  }}
-                  disabled={transformStats.notYetTransformed === 0}
-                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                    transformStats.notYetTransformed > 0
-                      ? 'bg-purple-600 text-white hover:bg-purple-700'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {transformStats.notYetTransformed > 0 ? 'Start Transform' : 'No Rows to Transform'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Transform Results Popup */}
-      {showTransformResults && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
-          <div className="bg-white rounded-lg shadow-xl" style={{ width: '800px', height: '100vh', maxHeight: '100vh' }}>
-            <div className="flex flex-col h-full">
-              <div className="p-6 border-b bg-gray-50">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold text-gray-800">Transform Results</h3>
-                  <button
-                    onClick={() => setShowTransformResults(false)}
-                    className="text-gray-400 hover:text-gray-600 text-3xl font-bold leading-none"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex-1 overflow-auto p-6">
-                <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 font-mono text-sm whitespace-pre-wrap">
-                  {transformResults}
-                </div>
-              </div>
-
-              <div className="p-6 border-t bg-gray-50">
-                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <p className="text-sm text-blue-800">
-                    📊 <strong>View Detailed Reports:</strong> Visit <a href="/leadsmart_treports" className="underline font-semibold hover:text-blue-600">/leadsmart_treports</a> to track all transform attempts, monitor progress in real-time, and access detailed diagnostic reports.
-                  </p>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(transformResults);
-                      alert('Results copied to clipboard!');
-                    }}
-                    className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md font-medium transition-colors"
-                  >
-                    📋 Copy to Clipboard
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowTransformResults(false);
-                    }}
-                    className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-md font-medium transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Invalid Rows Check Results Popup */}
-      {showInvalidRowsPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 flex flex-col" style={{ maxHeight: '90vh' }}>
-            {/* Fixed Header */}
-            <div className="p-6 border-b bg-gray-50 flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-orange-100 rounded-full p-2 mr-3">
-                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">📋 Invalid Rows Analysis</h3>
-                </div>
-                <button
-                  onClick={() => setShowInvalidRowsPopup(false)}
-                  className="text-gray-400 hover:text-gray-600 text-3xl font-bold leading-none"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-            
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <p className="text-gray-700 mb-4 font-medium">
-                Analysis of invalid rows in your selection:
-              </p>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Total rows in selection:</span>
-                    <span className="font-bold text-gray-900">{transformStats.totalRows.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Valid rows:</span>
-                    <span className="font-bold text-green-600">{transformStats.notYetTransformed.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-t pt-2 mt-2">
-                    <span className="text-gray-700 font-semibold">Invalid rows:</span>
-                    <span className="font-bold text-red-600">{transformStats.invalidRows.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-              
-              {transformStats.invalidRows > 0 && (
-                <>
-                  <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-                    <div className="font-semibold text-red-800 mb-3">⚠️ Invalid Row Breakdown (currently in leadsmart_zip_based_data):</div>
-                    <div className="space-y-2 text-sm">
-                      {invalidRowsBreakdown.missingCityOnly > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-700">• Missing city_name only:</span>
-                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingCityOnly.toLocaleString()}</span>
-                        </div>
-                      )}
-                      {invalidRowsBreakdown.missingStateOnly > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-700">• Missing state_code only:</span>
-                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingStateOnly.toLocaleString()}</span>
-                        </div>
-                      )}
-                      {invalidRowsBreakdown.missingPayoutOnly > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-700">• Missing payout only:</span>
-                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingPayoutOnly.toLocaleString()}</span>
-                        </div>
-                      )}
-                      {invalidRowsBreakdown.missingCityAndState > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-700">• Missing city_name + state_code:</span>
-                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingCityAndState.toLocaleString()}</span>
-                        </div>
-                      )}
-                      {invalidRowsBreakdown.missingCityAndPayout > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-700">• Missing city_name + payout:</span>
-                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingCityAndPayout.toLocaleString()}</span>
-                        </div>
-                      )}
-                      {invalidRowsBreakdown.missingStateAndPayout > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-700">• Missing state_code + payout:</span>
-                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingStateAndPayout.toLocaleString()}</span>
-                        </div>
-                      )}
-                      {invalidRowsBreakdown.missingAll > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-700">• Missing all three fields:</span>
-                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.missingAll.toLocaleString()}</span>
-                        </div>
-                      )}
-                      {invalidRowsBreakdown.headerRows > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-700">• Header rows (e.g. "City", "State"):</span>
-                          <span className="font-semibold text-gray-900">{invalidRowsBreakdown.headerRows.toLocaleString()}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
-                    <p className="text-yellow-800 text-sm font-semibold mb-2">📥 CSV Download</p>
-                    <p className="text-yellow-700 text-xs mb-2">
-                      A CSV file with all {transformStats.invalidRows.toLocaleString()} invalid rows has been automatically downloaded. The file includes:
-                    </p>
-                    <ul className="list-disc list-inside text-yellow-700 text-xs ml-2 space-y-1">
-                      <li>All source data columns from leadsmart_zip_based_data</li>
-                      <li>Join columns (release_date, subsheet_name, payout_note)</li>
-                      <li>Invalid reason for each row</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                    <p className="text-blue-800 text-sm font-semibold mb-1">💡 Next Steps</p>
-                    <p className="text-blue-700 text-xs">
-                      • Review the CSV to identify missing data<br/>
-                      • Fix data in source (update city_name, state_code, or payout)<br/>
-                      • Re-run transform after corrections to process these rows<br/>
-                      • OR use SQL to delete invalid rows if they're not needed
-                    </p>
-                  </div>
-                </>
-              )}
-              
-              {transformStats.invalidRows === 0 && (
-                <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                  <p className="text-green-800 text-sm font-semibold mb-1">✅ No Invalid Rows Found!</p>
-                  <p className="text-green-700 text-xs">
-                    All {transformStats.totalRows.toLocaleString()} rows in your selection have valid city_name, state_code, and payout values.
-                  </p>
-                </div>
-              )}
-            </div>
-            
-            {/* Fixed Button Footer */}
-            <div className="p-6 border-t bg-gray-50 flex-shrink-0">
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowInvalidRowsPopup(false)}
-                  className="px-4 py-2 bg-gray-600 text-white hover:bg-gray-700 rounded-md font-medium transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
-

@@ -24,6 +24,7 @@ interface LeadsmartTransformed {
   state_code: string | null;
   payout: number | null;
   aggregated_zip_codes: string[] | null;
+  fk_city_id: number | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -53,6 +54,10 @@ export default function LeadsmartMorphClient() {
   // Editing state
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
+  
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Popup state
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -62,6 +67,13 @@ export default function LeadsmartMorphClient() {
   // Zip codes popup state
   const [zipCodesPopupOpen, setZipCodesPopupOpen] = useState(false);
   const [zipCodesPopupData, setZipCodesPopupData] = useState<string[]>([]);
+  
+  // Cities assignment popup state
+  const [citiesAssignmentPopupOpen, setCitiesAssignmentPopupOpen] = useState(false);
+  const [selectedBaobobAttemptForCities, setSelectedBaobobAttemptForCities] = useState<number | null>(null);
+  const [cityMatchingInProgress, setCityMatchingInProgress] = useState(false);
+  const [cityMatchingProgress, setCityMatchingProgress] = useState(0);
+  const [cityMatchingStatus, setCityMatchingStatus] = useState<string>('');
 
   // Chamber visibility state (integrated with bezel system)
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
@@ -101,6 +113,7 @@ export default function LeadsmartMorphClient() {
     'state_code',
     'payout',
     'aggregated_zip_codes',
+    'fk_city_id',
     'created_at',
     'updated_at'
   ];
@@ -228,11 +241,21 @@ export default function LeadsmartMorphClient() {
         query = query.eq('baobab_attempt_id', baobobFilter);
       }
       
-      query = query
-        .order('mundial_id', { ascending: false })
-        .limit(1000); // Limit to prevent timeout
+      query = query.order('mundial_id', { ascending: false });
+      
+      // Apply appropriate limits based on filtering
+      const hasNoFilters = !jettisonFilter?.type && !skylabFilter?.type && !baobobFilter;
+      if (hasNoFilters) {
+        query = query.limit(100000); // Conservative limit when NO filters applied
+        console.log('Applied 100k limit - no filters active');
+      } else {
+        // When filtered, use a high limit to get all results (Supabase max is ~1M)
+        query = query.limit(500000); // High limit for filtered queries
+        console.log('Applied 500k limit - filters active:', { jettisonFilter, skylabFilter, baobobFilter });
+      }
       
       const { data: fetchedData, error: fetchError } = await query;
+      console.log('Fetched data count:', fetchedData?.length);
 
       if (fetchError) throw fetchError;
 
@@ -250,21 +273,49 @@ export default function LeadsmartMorphClient() {
     setJettisonFilter({ type: filterType, id: filterId });
   };
 
-  // Filter data based on search
-  const filteredData = data.filter(row => {
-    if (!searchTerm) return true;
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      row.city_name?.toLowerCase().includes(searchLower) ||
-      row.state_code?.toLowerCase().includes(searchLower) ||
-      row.aggregated_zip_codes?.some(zip => zip.toLowerCase().includes(searchLower)) ||
-      row.payout?.toString().includes(searchLower)
-    );
-  });
+  // Filter and sort data
+  const filteredAndSortedData = data
+    .filter(row => {
+      if (!searchTerm) return true;
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        row.city_name?.toLowerCase().includes(searchLower) ||
+        row.state_code?.toLowerCase().includes(searchLower) ||
+        (typeof row.aggregated_zip_codes === 'string' && row.aggregated_zip_codes.toLowerCase().includes(searchLower)) ||
+        (Array.isArray(row.aggregated_zip_codes) && row.aggregated_zip_codes.some(zip => zip.toLowerCase().includes(searchLower))) ||
+        row.payout?.toString().includes(searchLower)
+      );
+    })
+    .sort((a, b) => {
+      if (!sortColumn) return 0;
+      
+      const aValue = a[sortColumn as keyof LeadsmartTransformed];
+      const bValue = b[sortColumn as keyof LeadsmartTransformed];
+      
+      // Handle null/undefined values
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return sortDirection === 'asc' ? 1 : -1;
+      if (bValue == null) return sortDirection === 'asc' ? -1 : 1;
+      
+      // Handle number sorting (for payout)
+      if (sortColumn === 'payout') {
+        const aNum = Number(aValue);
+        const bNum = Number(bValue);
+        return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+      }
+      
+      // Handle string sorting
+      const aStr = String(aValue).toLowerCase();
+      const bStr = String(bValue).toLowerCase();
+      
+      if (aStr < bStr) return sortDirection === 'asc' ? -1 : 1;
+      if (aStr > bStr) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
 
   // Paginate rows
-  const totalRowPages = Math.ceil(filteredData.length / rowsPerPage);
-  const paginatedData = filteredData.slice(
+  const totalRowPages = Math.ceil(filteredAndSortedData.length / rowsPerPage);
+  const paginatedData = filteredAndSortedData.slice(
     (currentRowPage - 1) * rowsPerPage,
     currentRowPage * rowsPerPage
   );
@@ -314,6 +365,18 @@ export default function LeadsmartMorphClient() {
     setSelectedRows(newSelected);
   };
 
+  // Handle column sorting
+  const handleSort = (columnName: string) => {
+    if (sortColumn === columnName) {
+      // Toggle direction if same column
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // New column, default to ascending
+      setSortColumn(columnName);
+      setSortDirection('asc');
+    }
+  };
+
   // Row Pagination Components (matching sitejar4 style)
   // Bar 1: Items per page selector
   const RowPaginationBar1 = () => {
@@ -328,7 +391,7 @@ export default function LeadsmartMorphClient() {
                 type="button"
                 onClick={() => {
                   if (value === 'All') {
-                    setRowsPerPage(filteredData.length || 1000);
+                    setRowsPerPage(filteredAndSortedData.length || 1000);
                   } else {
                     setRowsPerPage(value as number);
                   }
@@ -338,7 +401,7 @@ export default function LeadsmartMorphClient() {
                   px-2 py-2.5 text-sm font-medium border -mr-px cursor-pointer
                   ${value === 10 ? 'rounded-l' : ''}
                   ${value === 'All' ? 'rounded-r' : ''}
-                  ${(value === 'All' && rowsPerPage >= filteredData.length) || rowsPerPage === value
+                  ${(value === 'All' && rowsPerPage >= filteredAndSortedData.length) || rowsPerPage === value
                     ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 focus:bg-blue-700 focus:text-white'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                   }
@@ -361,7 +424,7 @@ export default function LeadsmartMorphClient() {
 
   // Bar 2: Page navigation
   const RowPaginationBar2 = () => {
-    if (filteredData.length === 0) return null;
+    if (filteredAndSortedData.length === 0) return null;
     
     return (
       <div className="flex items-center">
@@ -633,9 +696,16 @@ export default function LeadsmartMorphClient() {
   // Handle inline editing
   const startEditing = (id: number, field: string, currentValue: any) => {
     setEditingCell({ id, field });
-    // For JSONB arrays, display as newline-separated values
-    if (field === 'aggregated_zip_codes' && Array.isArray(currentValue)) {
-      setEditValue(currentValue.join('\n'));
+    // For aggregated_zip_codes, handle both array and string formats
+    if (field === 'aggregated_zip_codes') {
+      if (Array.isArray(currentValue)) {
+        setEditValue(currentValue.join('\n'));
+      } else if (typeof currentValue === 'string' && currentValue.trim()) {
+        // Convert comma-separated string to newline-separated for editing
+        setEditValue(currentValue.split(',').map(zip => zip.trim()).join('\n'));
+      } else {
+        setEditValue('');
+      }
     } else {
       setEditValue(currentValue?.toString() || '');
     }
@@ -648,8 +718,9 @@ export default function LeadsmartMorphClient() {
       // Convert editValue to appropriate format based on field
       let valueToSave: any = editValue;
       if (editingCell.field === 'aggregated_zip_codes') {
-        // Convert newline-separated text to array
-        valueToSave = editValue.split('\n').filter(z => z.trim());
+        // Convert newline-separated text to comma-separated string (current DB format)
+        const zipCodes = editValue.split('\n').filter(z => z.trim());
+        valueToSave = zipCodes.length > 0 ? zipCodes.join(',') : null;
       }
 
       const { error: updateError } = await supabase
@@ -681,7 +752,7 @@ export default function LeadsmartMorphClient() {
     try {
       const { data: newRow, error: insertError } = await supabase
         .from('leadsmart_transformed')
-        .insert([{ city_name: '', state_code: '', payout: null, aggregated_zip_codes: [] }])
+        .insert([{ city_name: '', state_code: '', payout: null, aggregated_zip_codes: null }])
         .select()
         .single();
 
@@ -733,6 +804,125 @@ export default function LeadsmartMorphClient() {
     setSearchTerm('');
   };
 
+  // City matching function
+  const runCityMatchingProcess = async () => {
+    if (!selectedBaobobAttemptForCities) {
+      alert('Please select a baobab_attempt_id first');
+      return;
+    }
+
+    setCityMatchingInProgress(true);
+    setCityMatchingProgress(0);
+    setCityMatchingStatus('Starting city matching process...');
+
+    try {
+      // Step 1: Get all records for the selected baobab_attempt_id
+      setCityMatchingStatus('Fetching records to process...');
+      const { data: recordsToProcess, error: fetchError } = await supabase
+        .from('leadsmart_transformed')
+        .select('mundial_id, city_name, state_code, fk_city_id')
+        .eq('baobab_attempt_id', selectedBaobobAttemptForCities)
+        .is('fk_city_id', null); // Only process records that don't already have a city assigned
+
+      if (fetchError) throw fetchError;
+
+      if (!recordsToProcess || recordsToProcess.length === 0) {
+        setCityMatchingStatus('No records found to process');
+        setCityMatchingInProgress(false);
+        return;
+      }
+
+      setCityMatchingStatus(`Found ${recordsToProcess.length} records to process`);
+      setCityMatchingProgress(10);
+
+      // Step 2: Get all cities for matching
+      setCityMatchingStatus('Loading cities database...');
+      const { data: cities, error: citiesError } = await supabase
+        .from('cities')
+        .select('city_id, city_name, state_code');
+
+      if (citiesError) throw citiesError;
+
+      setCityMatchingProgress(20);
+      setCityMatchingStatus(`Loaded ${cities?.length || 0} cities. Starting matching process...`);
+
+      // Step 3: Process records in batches
+      const BATCH_SIZE = 50;
+      let processedCount = 0;
+      const totalRecords = recordsToProcess.length;
+      const updates: { mundial_id: number; fk_city_id: number }[] = [];
+
+      for (let i = 0; i < recordsToProcess.length; i += BATCH_SIZE) {
+        const batch = recordsToProcess.slice(i, i + BATCH_SIZE);
+        
+        for (const record of batch) {
+          if (record.city_name && record.state_code) {
+            // Find matching city by city_name and state_code
+            const matchingCity = cities?.find(city => 
+              city.city_name?.toLowerCase().trim() === record.city_name?.toLowerCase().trim() &&
+              city.state_code?.toLowerCase().trim() === record.state_code?.toLowerCase().trim()
+            );
+
+            if (matchingCity) {
+              updates.push({
+                mundial_id: record.mundial_id,
+                fk_city_id: matchingCity.city_id
+              });
+            }
+          }
+
+          processedCount++;
+          const progress = 20 + (processedCount / totalRecords) * 60; // 20% to 80%
+          setCityMatchingProgress(Math.floor(progress));
+          setCityMatchingStatus(`Processed ${processedCount}/${totalRecords} records. Found ${updates.length} matches.`);
+        }
+
+        // Small delay to prevent UI blocking
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+
+      // Step 4: Apply updates in batches
+      setCityMatchingStatus(`Saving ${updates.length} city assignments...`);
+      setCityMatchingProgress(85);
+
+      for (let i = 0; i < updates.length; i += BATCH_SIZE) {
+        const updateBatch = updates.slice(i, i + BATCH_SIZE);
+        
+        for (const update of updateBatch) {
+          const { error: updateError } = await supabase
+            .from('leadsmart_transformed')
+            .update({ fk_city_id: update.fk_city_id })
+            .eq('mundial_id', update.mundial_id);
+
+          if (updateError) {
+            console.error(`Error updating record ${update.mundial_id}:`, updateError);
+          }
+        }
+
+        const updateProgress = 85 + ((i + updateBatch.length) / updates.length) * 15; // 85% to 100%
+        setCityMatchingProgress(Math.floor(updateProgress));
+      }
+
+      setCityMatchingProgress(100);
+      setCityMatchingStatus(`✅ Complete! Processed ${totalRecords} records, assigned ${updates.length} cities.`);
+
+      // Refresh the data to show updated fk_city_id values
+      setTimeout(() => {
+        fetchData();
+      }, 1000);
+
+    } catch (error: any) {
+      console.error('City matching error:', error);
+      setCityMatchingStatus(`❌ Error: ${error.message}`);
+    } finally {
+      setTimeout(() => {
+        setCityMatchingInProgress(false);
+        setCityMatchingProgress(0);
+        setCityMatchingStatus('');
+      }, 3000);
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -779,6 +969,12 @@ export default function LeadsmartMorphClient() {
                 className="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700 transition-colors"
               >
                 selector popup
+              </button>
+              <button
+                onClick={() => setCitiesAssignmentPopupOpen(true)}
+                className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition-colors"
+              >
+                assign cities
               </button>
             </div>
           </div>
@@ -968,7 +1164,7 @@ export default function LeadsmartMorphClient() {
                     <div style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                       <span style={{ fontWeight: 'bold' }}>row pagination</span>
                       <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
-                        Showing <span style={{ fontWeight: 'bold' }}>{paginatedData.length}</span> of <span style={{ fontWeight: 'bold' }}>{filteredData.length}</span> results
+                        Showing <span style={{ fontWeight: 'bold' }}>{paginatedData.length.toLocaleString()}</span> of <span style={{ fontWeight: 'bold' }}>{filteredAndSortedData.length.toLocaleString()}</span> results
                       </span>
                     </div>
                   </td>
@@ -1124,6 +1320,9 @@ export default function LeadsmartMorphClient() {
                     ))
                   );
                   
+                  const isSortable = col === 'payout';
+                  const isCurrentlySorted = sortColumn === col;
+                  
                   return (
                     <th 
                       key={`col-${col}`}
@@ -1131,11 +1330,20 @@ export default function LeadsmartMorphClient() {
                       style={{ 
                         padding: '0px',
                         border: '1px solid gray',
-                        backgroundColor: isActiveFilterColumn ? '#ffff99' : undefined
+                        backgroundColor: isActiveFilterColumn ? '#ffff99' : undefined,
+                        cursor: isSortable ? 'pointer' : 'default'
                       }}
+                      onClick={isSortable ? () => handleSort(col) : undefined}
+                      title={isSortable ? `Click to sort by ${col}` : undefined}
                     >
-                      <div className="cell_inner_wrapper_div">
+                      <div className="cell_inner_wrapper_div" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                         <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>{col}</span>
+                        {isSortable && (
+                          <span style={{ fontSize: '10px', opacity: isCurrentlySorted ? 1 : 0.3 }}>
+                            {isCurrentlySorted && sortDirection === 'asc' ? '↑' : 
+                             isCurrentlySorted && sortDirection === 'desc' ? '↓' : '↕'}
+                          </span>
+                        )}
                       </div>
                     </th>
                   );
@@ -1169,7 +1377,7 @@ export default function LeadsmartMorphClient() {
                   {paginatedColumns.map(col => {
                     const isEditing = editingCell?.id === row.mundial_id && editingCell?.field === col;
                     const value = row[col as keyof LeadsmartTransformed];
-                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'created_at' || col === 'updated_at';
+                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'created_at' || col === 'updated_at';
                     
                     return (
                       <td 
@@ -1198,12 +1406,56 @@ export default function LeadsmartMorphClient() {
                               className="w-full px-2 py-1 border border-blue-500 focus:outline-none"
                               rows={3}
                             />
-                          ) : col === 'aggregated_zip_codes' && Array.isArray(value) ? (
+                          ) : col === 'aggregated_zip_codes' && (Array.isArray(value) || (typeof value === 'string' && value.trim())) ? (
+                            (() => {
+                              // Parse zip codes from either array or string format
+                              const zipCodes = Array.isArray(value) 
+                                ? value 
+                                : value.split(',').map(zip => zip.trim()).filter(zip => zip);
+                              
+                              return (
+                                <>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setZipCodesPopupData(zipCodes);
+                                      setZipCodesPopupOpen(true);
+                                    }}
+                                    style={{
+                                      border: '1px solid #666',
+                                      padding: '4px 8px',
+                                      borderRadius: '4px',
+                                      background: '#f0f0f0',
+                                      cursor: 'pointer',
+                                      fontWeight: 'bold',
+                                      fontSize: '12px',
+                                      minWidth: '30px',
+                                      textAlign: 'center'
+                                    }}
+                                    title="Click to view all zip codes"
+                                  >
+                                    {zipCodes.length}
+                                  </button>
+                                  <span 
+                                    style={{ 
+                                      cursor: 'default',
+                                      color: 'inherit',
+                                      flex: 1,
+                                      marginLeft: '8px'
+                                    }}
+                                  >
+                                    {zipCodes.slice(0, 2).join(' / ')}
+                                    {zipCodes.length > 2 ? ' ...' : ''}
+                                  </span>
+                                </>
+                              );
+                            })()
+                          ) : col === 'aggregated_zip_codes' ? (
                             <>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setZipCodesPopupData(value);
+                                  setZipCodesPopupData([]);
                                   setZipCodesPopupOpen(true);
                                 }}
                                 style={{
@@ -1219,17 +1471,17 @@ export default function LeadsmartMorphClient() {
                                 }}
                                 title="Click to view all zip codes"
                               >
-                                {value.length}
+                                0
                               </button>
                               <span 
                                 style={{ 
-                                  cursor: 'pointer',
-                                  color: 'inherit',
-                                  flex: 1
+                                  cursor: 'default',
+                                  color: '#888',
+                                  flex: 1,
+                                  marginLeft: '8px'
                                 }}
                               >
-                                {value.slice(0, 2).join(' / ')}
-                                {value.length > 2 ? ' ...' : ''}
+                                No zip codes
                               </span>
                             </>
                           ) : (
@@ -1330,11 +1582,23 @@ export default function LeadsmartMorphClient() {
                   aggregated_zip_codes (one per line)
                 </label>
                 <textarea
-                  value={popupData.aggregated_zip_codes?.join('\n') || ''}
-                  onChange={(e) => setPopupData({ 
-                    ...popupData, 
-                    aggregated_zip_codes: e.target.value.split('\n').filter(z => z.trim())
-                  })}
+                  value={(() => {
+                    const zipCodes = popupData.aggregated_zip_codes;
+                    if (Array.isArray(zipCodes)) {
+                      return zipCodes.join('\n');
+                    } else if (typeof zipCodes === 'string' && zipCodes.trim()) {
+                      return zipCodes.split(',').map(zip => zip.trim()).join('\n');
+                    }
+                    return '';
+                  })()}
+                  onChange={(e) => {
+                    // Save as comma-separated string to match DB format
+                    const zipCodes = e.target.value.split('\n').filter(z => z.trim());
+                    setPopupData({ 
+                      ...popupData, 
+                      aggregated_zip_codes: zipCodes.length > 0 ? zipCodes.join(',') : null
+                    });
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded"
                   rows={3}
                   placeholder="Enter zip codes, one per line"
@@ -1398,9 +1662,28 @@ export default function LeadsmartMorphClient() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
-              All Zip Codes ({zipCodesPopupData.length})
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>
+                All Zip Codes ({zipCodesPopupData.length})
+              </h3>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(zipCodesPopupData.join('\n'));
+                  // Show temporary success feedback
+                  const btn = document.activeElement as HTMLButtonElement;
+                  const originalText = btn.textContent;
+                  btn.textContent = '✓ Copied!';
+                  btn.style.backgroundColor = '#10b981';
+                  setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.backgroundColor = '#3b82f6';
+                  }, 1500);
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition-colors text-sm"
+              >
+                📋 Copy All
+              </button>
+            </div>
             
             <textarea
               value={zipCodesPopupData.join('\n')}
@@ -1423,19 +1706,105 @@ export default function LeadsmartMorphClient() {
             
             <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
               <button
-                onClick={() => {
-                  navigator.clipboard.writeText(zipCodesPopupData.join('\n'));
-                  alert('Zip codes copied to clipboard!');
-                }}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition-colors"
-              >
-                Copy All
-              </button>
-              <button
                 onClick={() => setZipCodesPopupOpen(false)}
                 className="bg-gray-300 hover:bg-gray-400 text-black font-medium px-4 py-2 rounded transition-colors"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Cities Assignment Popup */}
+      {citiesAssignmentPopupOpen && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+          onClick={() => !cityMatchingInProgress && setCitiesAssignmentPopupOpen(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              padding: '24px',
+              borderRadius: '8px',
+              maxWidth: '600px',
+              width: '90%',
+              maxHeight: '80vh',
+              overflow: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
+              Assign Cities
+            </h3>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                baobab_attempt_id
+              </label>
+              <select
+                value={selectedBaobobAttemptForCities || ''}
+                onChange={(e) => setSelectedBaobobAttemptForCities(e.target.value ? parseInt(e.target.value) : null)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
+                disabled={cityMatchingInProgress}
+              >
+                <option value="" disabled>
+                  (id) - (number of records processed) - (number of records inserted) - (created_at)
+                </option>
+                {baobobAttempts.map((attempt) => (
+                  <option key={attempt.baobab_attempt_id} value={attempt.baobab_attempt_id}>
+                    ({attempt.baobab_attempt_id}) - ({attempt.rows_processed?.toLocaleString() || '0'}) - ({attempt.rows_inserted?.toLocaleString() || '0'}) - ({new Date(attempt.created_at).toLocaleDateString()})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {cityMatchingInProgress && (
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>
+                  Progress: {cityMatchingProgress}%
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden border border-gray-300">
+                  <div
+                    className="h-full bg-green-600 transition-all duration-300 flex items-center justify-center text-white text-xs font-semibold"
+                    style={{ width: `${cityMatchingProgress}%` }}
+                  >
+                    {cityMatchingProgress}%
+                  </div>
+                </div>
+                {cityMatchingStatus && (
+                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                    {cityMatchingStatus}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setCitiesAssignmentPopupOpen(false)}
+                disabled={cityMatchingInProgress}
+                className="bg-gray-300 hover:bg-gray-400 text-black font-medium px-4 py-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={runCityMatchingProcess}
+                disabled={cityMatchingInProgress || !selectedBaobobAttemptForCities}
+                className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {cityMatchingInProgress ? 'Processing...' : 'run city matching process for leadsmart_transformed.fk_city_id'}
               </button>
             </div>
           </div>
