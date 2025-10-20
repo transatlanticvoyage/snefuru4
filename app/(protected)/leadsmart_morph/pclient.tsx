@@ -884,12 +884,12 @@ export default function LeadsmartMorphClient() {
         // For each record in the batch, find the matching city and update immediately
         const updatePromises = batch.map(async (record) => {
           try {
-            // Find the matching city
+            // Find the matching city using proper case-insensitive matching
             const { data: matchingCities, error: cityError } = await supabase
               .from('cities')
               .select('city_id')
-              .ilike('city_name', record.city_name.trim())
-              .ilike('state_code', record.state_code.trim())
+              .filter('city_name', 'ilike', record.city_name.trim())
+              .filter('state_code', 'ilike', record.state_code.trim())
               .limit(1);
 
             if (cityError || !matchingCities || matchingCities.length === 0) {
