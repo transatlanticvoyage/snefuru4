@@ -580,33 +580,97 @@ export default function LeadSmartSkylabTileTables({
     }
   }, [subparts.length, currentSubpartIndex]);
 
-  // Sync navigation indices with current filter
+  // Restore and maintain hierarchy based on current filter
   useEffect(() => {
-    if (currentFilter?.type === 'release' && currentFilter?.id) {
+    if (!currentFilter?.type || !currentFilter?.id) return;
+
+    if (currentFilter.type === 'release') {
       const index = releases.findIndex(r => r.release_id === currentFilter.id);
       if (index !== -1) {
         setCurrentReleaseIndex(index);
+        // Ensure the release is expanded to show its subsheets
+        if (selectedReleaseId !== currentFilter.id) {
+          setSelectedReleaseId(currentFilter.id);
+        }
       }
     }
   }, [currentFilter, releases]);
 
   useEffect(() => {
-    if (currentFilter?.type === 'subsheet' && currentFilter?.id) {
-      const index = subsheets.findIndex(s => s.subsheet_id === currentFilter.id);
-      if (index !== -1) {
-        setCurrentSubsheetIndex(index);
-      }
+    if (!currentFilter?.type || !currentFilter?.id) return;
+
+    if (currentFilter.type === 'subsheet') {
+      // First find the subsheet and ensure its parent release data is loaded
+      const findSubsheetAndExpand = async () => {
+        if (subsheets.length === 0) {
+          // If subsheets aren't loaded, we need to find the parent release first
+          const { data: subsheetData } = await supabase
+            .from('leadsmart_subsheets')
+            .select('subsheet_id, rel_release_id')
+            .eq('subsheet_id', currentFilter.id)
+            .single();
+          
+          if (subsheetData?.rel_release_id) {
+            setSelectedReleaseId(subsheetData.rel_release_id);
+          }
+        } else {
+          const index = subsheets.findIndex(s => s.subsheet_id === currentFilter.id);
+          if (index !== -1) {
+            setCurrentSubsheetIndex(index);
+            const subsheet = subsheets[index];
+            if (subsheet.rel_release_id && selectedReleaseId !== subsheet.rel_release_id) {
+              setSelectedReleaseId(subsheet.rel_release_id);
+            }
+          }
+        }
+      };
+      
+      findSubsheetAndExpand();
     }
-  }, [currentFilter, subsheets]);
+  }, [currentFilter, subsheets, selectedReleaseId, supabase]);
 
   useEffect(() => {
-    if (currentFilter?.type === 'subpart' && currentFilter?.id) {
-      const index = subparts.findIndex(s => s.subpart_id === currentFilter.id);
-      if (index !== -1) {
-        setCurrentSubpartIndex(index);
-      }
+    if (!currentFilter?.type || !currentFilter?.id) return;
+
+    if (currentFilter.type === 'subpart') {
+      const findSubpartAndExpand = async () => {
+        if (subparts.length === 0) {
+          // If subparts aren't loaded, we need to find the parent hierarchy first
+          const { data: subpartData } = await supabase
+            .from('leadsmart_subparts')
+            .select('subpart_id, rel_subsheet_id')
+            .eq('subpart_id', currentFilter.id)
+            .single();
+          
+          if (subpartData?.rel_subsheet_id) {
+            setSelectedSubsheetId(subpartData.rel_subsheet_id);
+            
+            // Also get the grandparent release
+            const { data: subsheetData } = await supabase
+              .from('leadsmart_subsheets')
+              .select('subsheet_id, rel_release_id')
+              .eq('subsheet_id', subpartData.rel_subsheet_id)
+              .single();
+            
+            if (subsheetData?.rel_release_id) {
+              setSelectedReleaseId(subsheetData.rel_release_id);
+            }
+          }
+        } else {
+          const index = subparts.findIndex(s => s.subpart_id === currentFilter.id);
+          if (index !== -1) {
+            setCurrentSubpartIndex(index);
+            const subpart = subparts[index];
+            if (subpart.rel_subsheet_id && selectedSubsheetId !== subpart.rel_subsheet_id) {
+              setSelectedSubsheetId(subpart.rel_subsheet_id);
+            }
+          }
+        }
+      };
+      
+      findSubpartAndExpand();
     }
-  }, [currentFilter, subparts]);
+  }, [currentFilter, subparts, selectedSubsheetId, supabase]);
 
   const handleViewChildren = (
     type: 'release' | 'subsheet' | 'subpart',
@@ -629,14 +693,93 @@ export default function LeadSmartSkylabTileTables({
     }
   };
 
-  const handleSelectX = (
+  const handleSelectX = async (
     type: 'release' | 'subsheet' | 'subpart',
     id: number
   ) => {
     // Check if clicking the same filter to deselect
     if (currentFilter?.type === type && currentFilter?.id === id) {
       onFilterApply(null, null);
-    } else {
+      return;
+    }
+
+    // Before applying filter, ensure the hierarchy will be properly expanded
+    try {
+      if (type === 'release') {
+        // Ensure the release is expanded to show subsheets
+        setSelectedReleaseId(id);
+      } else if (type === 'subsheet') {
+        // Find and expand the parent release
+        let parentReleaseId: number | null = null;
+        
+        const subsheet = subsheets.find(s => s.subsheet_id === id);
+        if (subsheet?.rel_release_id) {
+          parentReleaseId = subsheet.rel_release_id;
+        } else {
+          // Query database if not in memory
+          const { data: subsheetData } = await supabase
+            .from('leadsmart_subsheets')
+            .select('rel_release_id')
+            .eq('subsheet_id', id)
+            .single();
+          
+          parentReleaseId = subsheetData?.rel_release_id || null;
+        }
+        
+        if (parentReleaseId) {
+          setSelectedReleaseId(parentReleaseId);
+        }
+        
+      } else if (type === 'subpart') {
+        // Find and expand both parent subsheet and grandparent release
+        let parentSubsheetId: number | null = null;
+        let grandparentReleaseId: number | null = null;
+        
+        const subpart = subparts.find(s => s.subpart_id === id);
+        if (subpart?.rel_subsheet_id) {
+          parentSubsheetId = subpart.rel_subsheet_id;
+          
+          const parentSubsheet = subsheets.find(s => s.subsheet_id === parentSubsheetId);
+          if (parentSubsheet?.rel_release_id) {
+            grandparentReleaseId = parentSubsheet.rel_release_id;
+          }
+        }
+        
+        // If not found in memory, query database
+        if (!parentSubsheetId) {
+          const { data: subpartData } = await supabase
+            .from('leadsmart_subparts')
+            .select('rel_subsheet_id')
+            .eq('subpart_id', id)
+            .single();
+          
+          parentSubsheetId = subpartData?.rel_subsheet_id || null;
+        }
+        
+        if (parentSubsheetId && !grandparentReleaseId) {
+          const { data: subsheetData } = await supabase
+            .from('leadsmart_subsheets')
+            .select('rel_release_id')
+            .eq('subsheet_id', parentSubsheetId)
+            .single();
+          
+          grandparentReleaseId = subsheetData?.rel_release_id || null;
+        }
+        
+        if (parentSubsheetId) {
+          setSelectedSubsheetId(parentSubsheetId);
+        }
+        if (grandparentReleaseId) {
+          setSelectedReleaseId(grandparentReleaseId);
+        }
+      }
+      
+      // Apply the filter after ensuring hierarchy is expanded
+      onFilterApply(type, id);
+      
+    } catch (error) {
+      console.error('Error maintaining hierarchy:', error);
+      // Still apply the filter even if hierarchy setup fails
       onFilterApply(type, id);
     }
   };

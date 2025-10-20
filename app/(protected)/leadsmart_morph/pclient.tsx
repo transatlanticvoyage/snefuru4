@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -27,6 +27,7 @@ interface LeadsmartTransformed {
   fk_city_id: number | null;
   created_at: string | null;
   updated_at: string | null;
+  city_population?: number | null;
 }
 
 export default function LeadsmartMorphClient() {
@@ -98,6 +99,9 @@ export default function LeadsmartMorphClient() {
   const [baobobFilter, setBaobobFilter] = useState<number | null>(null);
   const [baobobAttempts, setBaobobAttempts] = useState<any[]>([]);
   
+  // City population filter state
+  const [cityPopulationFilter, setCityPopulationFilter] = useState<string>('all');
+  
   // Pico cache rebuild state
   const [rebuildCacheFn, setRebuildCacheFn] = useState<(() => void) | null>(null);
   const [cacheRebuilding, setCacheRebuilding] = useState(false);
@@ -115,6 +119,7 @@ export default function LeadsmartMorphClient() {
     'payout',
     'aggregated_zip_codes',
     'fk_city_id',
+    'city_population',
     'created_at',
     'updated_at'
   ];
@@ -213,7 +218,12 @@ export default function LeadsmartMorphClient() {
       
       let query = supabase
         .from('leadsmart_transformed')
-        .select('*');
+        .select(`
+          *,
+          cities!fk_city_id (
+            city_population
+          )
+        `);
       
       let countQuery = supabase
         .from('leadsmart_transformed')
@@ -282,7 +292,27 @@ export default function LeadsmartMorphClient() {
       if (fetchError) throw fetchError;
       if (countError) throw countError;
 
-      setData(fetchedData || []);
+      // Process the data to flatten city population from the joined cities table
+      const processedData = (fetchedData || []).map(row => ({
+        ...row,
+        city_population: row.cities?.city_population || null
+      }));
+
+      console.log('🔍 DEBUG: Raw data from database:', processedData.length, 'rows');
+      console.log('🔍 DEBUG: Payout values in raw data:', processedData.map(r => r.payout).filter(p => p !== null).sort((a, b) => b - a).slice(0, 10));
+      const target73Row = processedData.find(r => Math.abs(r.payout - 73.24) < 0.001);
+      console.log('🔍 DEBUG: Looking for payout ~73.24:', target73Row);
+      if (target73Row) {
+        console.log('🔍 DEBUG: Found target row details:', {
+          payout: target73Row.payout,
+          baobab_attempt_id: target73Row.baobab_attempt_id,
+          jrel_subpart_id: target73Row.jrel_subpart_id,
+          city_name: target73Row.city_name,
+          city_population: target73Row.city_population
+        });
+      }
+
+      setData(processedData);
       setTotalCount(count || 0);
       setError(null);
     } catch (err: any) {
@@ -298,7 +328,12 @@ export default function LeadsmartMorphClient() {
   };
 
   // Filter and sort data
-  const filteredAndSortedData = data
+  const filteredAndSortedData = useMemo(() => {
+    console.log('🔍 DEBUG: Recalculating filteredAndSortedData');
+    console.log('🔍 DEBUG: Input data length:', data.length);
+    console.log('🔍 DEBUG: Filters active - cityPopulationFilter:', cityPopulationFilter, 'searchTerm:', searchTerm);
+    
+    const afterSearchFilter = data
     .filter(row => {
       if (!searchTerm) return true;
       const searchLower = searchTerm.toLowerCase();
@@ -309,23 +344,79 @@ export default function LeadsmartMorphClient() {
         (Array.isArray(row.aggregated_zip_codes) && row.aggregated_zip_codes.some(zip => zip.toLowerCase().includes(searchLower))) ||
         row.payout?.toString().includes(searchLower)
       );
-    })
+    });
+    
+    console.log('🔍 DEBUG: After search filter:', afterSearchFilter.length, 'rows');
+    console.log('🔍 DEBUG: Payout values after search:', afterSearchFilter.map(r => r.payout).filter(p => p !== null).sort((a, b) => b - a).slice(0, 5));
+    console.log('🔍 DEBUG: Target 73.24 after search filter:', afterSearchFilter.find(r => Math.abs(r.payout - 73.24) < 0.001) ? 'FOUND' : 'NOT FOUND');
+    
+    const afterPopulationFilter = afterSearchFilter.filter(row => {
+      // Apply city population filter
+      const population = row.city_population;
+      
+      switch (cityPopulationFilter) {
+        case '50k-400k':
+          return population != null && population >= 50000 && population <= 400000;
+        case '75k-325k':
+          return population != null && population >= 75000 && population <= 325000;
+        case 'no-null-zero':
+          return population != null && population >= 1;
+        case 'all':
+        default:
+          return true;
+      }
+    });
+    
+    console.log('🔍 DEBUG: After city population filter:', afterPopulationFilter.length, 'rows');
+    console.log('🔍 DEBUG: Payout values after population filter:', afterPopulationFilter.map(r => r.payout).filter(p => p !== null).sort((a, b) => b - a).slice(0, 5));
+    const target73AfterPopFilter = afterPopulationFilter.find(r => Math.abs(r.payout - 73.24) < 0.001);
+    console.log('🔍 DEBUG: Target 73.24 after population filter:', target73AfterPopFilter ? 'FOUND' : 'NOT FOUND');
+    if (target73AfterPopFilter) {
+      console.log('🔍 DEBUG: Target 73.24 city_population:', target73AfterPopFilter.city_population);
+    }
+    
+    const sortedData = afterPopulationFilter
     .sort((a, b) => {
-      if (!sortColumn) return 0;
+      if (!sortColumn) {
+        console.log('🔍 DEBUG SORT: No sort column, keeping original order');
+        return 0;
+      }
+      
+      console.log('🔍 DEBUG SORT: Sorting by column:', sortColumn, 'direction:', sortDirection);
       
       const aValue = a[sortColumn as keyof LeadsmartTransformed];
       const bValue = b[sortColumn as keyof LeadsmartTransformed];
       
+      // Debug specific payout values we're looking for
+      if (sortColumn === 'payout' && (aValue === 73.24 || bValue === 73.24 || Math.abs(aValue - 73.24) < 0.001 || Math.abs(bValue - 73.24) < 0.001)) {
+        console.log('🔍 DEBUG SORT: Found 73.24 (or very close)! Comparing', aValue, 'vs', bValue, 'types:', typeof aValue, typeof bValue);
+      }
+      
       // Handle null/undefined values
       if (aValue == null && bValue == null) return 0;
-      if (aValue == null) return sortDirection === 'asc' ? 1 : -1;
-      if (bValue == null) return sortDirection === 'asc' ? -1 : 1;
       
-      // Handle number sorting (for payout)
-      if (sortColumn === 'payout') {
+      // Special handling for city_population - treat nulls as lowest values
+      if (sortColumn === 'city_population') {
+        if (aValue == null) return sortDirection === 'asc' ? -1 : 1;
+        if (bValue == null) return sortDirection === 'asc' ? 1 : -1;
+      } else {
+        // Default null handling for other columns
+        if (aValue == null) return sortDirection === 'asc' ? 1 : -1;
+        if (bValue == null) return sortDirection === 'asc' ? -1 : 1;
+      }
+      
+      // Handle number sorting (for payout and city_population)
+      if (sortColumn === 'payout' || sortColumn === 'city_population') {
         const aNum = Number(aValue);
         const bNum = Number(bValue);
-        return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+        const result = sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+        
+        // Debug payout sorting specifically
+        if (sortColumn === 'payout' && (aValue === 73.24 || bValue === 73.24)) {
+          console.log('🔍 DEBUG SORT: Payout comparison result:', aNum, sortDirection === 'asc' ? '<->' : '<->', bNum, '=', result);
+        }
+        
+        return result;
       }
       
       // Handle string sorting
@@ -336,6 +427,18 @@ export default function LeadsmartMorphClient() {
       if (aStr > bStr) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
+    
+    console.log('🔍 DEBUG: After sorting (sortColumn:', sortColumn, 'sortDirection:', sortDirection, '):', sortedData.length, 'rows');
+    console.log('🔍 DEBUG: Final payout values (top 10):', sortedData.map(r => r.payout).filter(p => p !== null).slice(0, 10));
+    const target73Final = sortedData.find(r => Math.abs(r.payout - 73.24) < 0.001);
+    console.log('🔍 DEBUG: Target 73.24 final result:', target73Final ? 'FOUND' : 'NOT FOUND');
+    if (target73Final) {
+      const index = sortedData.findIndex(r => Math.abs(r.payout - 73.24) < 0.001);
+      console.log('🔍 DEBUG: Target 73.24 position in sorted array:', index, 'of', sortedData.length);
+    }
+    
+    return sortedData;
+  }, [data, searchTerm, cityPopulationFilter, sortColumn, sortDirection]);
 
   // Paginate rows
   const totalRowPages = Math.ceil(filteredAndSortedData.length / rowsPerPage);
@@ -391,11 +494,17 @@ export default function LeadsmartMorphClient() {
 
   // Handle column sorting
   const handleSort = (columnName: string) => {
+    console.log('🔍 DEBUG SORT CLICK: User clicked to sort by', columnName);
+    console.log('🔍 DEBUG SORT CLICK: Current sortColumn:', sortColumn, 'sortDirection:', sortDirection);
+    
     if (sortColumn === columnName) {
       // Toggle direction if same column
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      const newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      console.log('🔍 DEBUG SORT CLICK: Toggling direction to:', newDirection);
+      setSortDirection(newDirection);
     } else {
       // New column, default to ascending
+      console.log('🔍 DEBUG SORT CLICK: Setting new column:', columnName, 'direction: asc');
       setSortColumn(columnName);
       setSortDirection('asc');
     }
@@ -455,10 +564,23 @@ export default function LeadsmartMorphClient() {
         <div className="flex items-center">
           <span className="text-xs text-gray-600 mr-2">Row page:</span>
           <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+            {/* First page button */}
+            <button
+              onClick={() => setCurrentRowPage(1)}
+              disabled={currentRowPage === 1}
+              className="relative inline-flex items-center rounded-l-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ 
+                fontSize: '14px', 
+                paddingTop: '10px', 
+                paddingBottom: '10px'
+              }}
+            >
+              ≪
+            </button>
             {/* Previous button - Circular refresh wheel */}
             <button
               onClick={handleRowPagePrev}
-              className="relative inline-flex items-center rounded-l-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
+              className="relative inline-flex items-center px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
               style={{ 
                 fontSize: '14px', 
                 paddingTop: '10px', 
@@ -511,7 +633,7 @@ export default function LeadsmartMorphClient() {
             {/* Next button - Circular refresh wheel */}
             <button
               onClick={handleRowPageNext}
-              className="relative inline-flex items-center rounded-r-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
+              className="relative inline-flex items-center px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
               style={{ 
                 fontSize: '14px', 
                 paddingTop: '10px', 
@@ -522,6 +644,19 @@ export default function LeadsmartMorphClient() {
                 <path d="M23 4v6h-6" />
                 <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
               </svg>
+            </button>
+            {/* Last page button */}
+            <button
+              onClick={() => setCurrentRowPage(totalRowPages)}
+              disabled={currentRowPage === totalRowPages}
+              className="relative inline-flex items-center rounded-r-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ 
+                fontSize: '14px', 
+                paddingTop: '10px', 
+                paddingBottom: '10px'
+              }}
+            >
+              ≫
             </button>
           </nav>
         </div>
@@ -1019,8 +1154,8 @@ export default function LeadsmartMorphClient() {
               sinus_chamber
             </div>
             
-            {/* Create new buttons */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+            {/* Create new buttons and city population filter */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', alignItems: 'center' }}>
               <button
                 onClick={handleCreateNewInline}
                 className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md transition-colors text-sm"
@@ -1033,6 +1168,28 @@ export default function LeadsmartMorphClient() {
               >
                 create new (popup)
               </button>
+              
+              {/* City Population Filter */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '16px' }}>
+                <span style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                  city_population
+                </span>
+                <select
+                  value={cityPopulationFilter}
+                  onChange={(e) => setCityPopulationFilter(e.target.value)}
+                  style={{
+                    padding: '4px 8px',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    fontSize: '14px'
+                  }}
+                >
+                  <option value="all">all (no filter)</option>
+                  <option value="50k-400k">50k-400k only</option>
+                  <option value="75k-325k">75k-325k only</option>
+                  <option value="no-null-zero">do not show null or 0 population cities ("1" population or more only)</option>
+                </select>
+              </div>
             </div>
           </div>
         )}
@@ -1294,14 +1451,16 @@ export default function LeadsmartMorphClient() {
                 {paginatedColumns.map(col => (
                   <th 
                     key={`table-${col}`}
-                    className={`for_db_table_leadsmart_transformed for_db_column_${col}`}
+                    className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : `for_db_table_leadsmart_transformed for_db_column_${col}`}
                     style={{ 
                       padding: '0px',
                       border: '1px solid gray'
                     }}
                   >
                     <div className="cell_inner_wrapper_div">
-                      <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>leadsmart_transformed</span>
+                      <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>
+                        {col === 'city_population' ? 'cities' : 'leadsmart_transformed'}
+                      </span>
                     </div>
                   </th>
                 ))}
@@ -1345,13 +1504,13 @@ export default function LeadsmartMorphClient() {
                     ))
                   );
                   
-                  const isSortable = col === 'payout';
+                  const isSortable = col === 'payout' || col === 'city_population';
                   const isCurrentlySorted = sortColumn === col;
                   
                   return (
                     <th 
                       key={`col-${col}`}
-                      className={`for_db_table_leadsmart_transformed for_db_column_${col}`}
+                      className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : `for_db_table_leadsmart_transformed for_db_column_${col}`}
                       style={{ 
                         padding: '0px',
                         border: '1px solid gray',
@@ -1362,7 +1521,9 @@ export default function LeadsmartMorphClient() {
                       title={isSortable ? `Click to sort by ${col}` : undefined}
                     >
                       <div className="cell_inner_wrapper_div" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>{col}</span>
+                        <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>
+                          {col === 'city_population' ? 'city_population' : col}
+                        </span>
                         {isSortable && (
                           <span style={{ fontSize: '10px', opacity: isCurrentlySorted ? 1 : 0.3 }}>
                             {isCurrentlySorted && sortDirection === 'asc' ? '↑' : 
@@ -1402,12 +1563,12 @@ export default function LeadsmartMorphClient() {
                   {paginatedColumns.map(col => {
                     const isEditing = editingCell?.id === row.mundial_id && editingCell?.field === col;
                     const value = row[col as keyof LeadsmartTransformed];
-                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'created_at' || col === 'updated_at';
+                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'created_at' || col === 'updated_at' || col === 'city_population';
                     
                     return (
                       <td 
                         key={`${row.mundial_id}-${col}`}
-                        className={`for_db_table_leadsmart_transformed for_db_column_${col}`}
+                        className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : `for_db_table_leadsmart_transformed for_db_column_${col}`}
                         style={{ 
                           padding: '0px',
                           border: '1px solid gray'
@@ -1509,6 +1670,16 @@ export default function LeadsmartMorphClient() {
                                 No zip codes
                               </span>
                             </>
+                          ) : col === 'city_population' ? (
+                            <span 
+                              style={{ 
+                                cursor: 'default',
+                                color: '#888',
+                                fontWeight: value ? 'normal' : 'normal'
+                              }}
+                            >
+                              {value ? Number(value).toLocaleString() : ''}
+                            </span>
                           ) : (
                             <span 
                               style={{ 

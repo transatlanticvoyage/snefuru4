@@ -408,10 +408,23 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
         <div className="flex items-center">
           <span className="text-xs text-gray-600 mr-2">Row page:</span>
           <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+            {/* First page button */}
+            <button
+              onClick={() => setCurrentRowPage(1)}
+              disabled={currentRowPage === 1}
+              className="relative inline-flex items-center rounded-l-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ 
+                fontSize: '14px', 
+                paddingTop: '10px', 
+                paddingBottom: '10px'
+              }}
+            >
+              ≪
+            </button>
             {/* Previous button - Circular refresh wheel */}
             <button
               onClick={() => setCurrentRowPage(currentRowPage === 1 ? totalRowPages : currentRowPage - 1)}
-              className="relative inline-flex items-center rounded-l-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
+              className="relative inline-flex items-center px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
               style={{ 
                 fontSize: '14px', 
                 paddingTop: '10px', 
@@ -464,7 +477,7 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
             {/* Next button - Circular refresh wheel */}
             <button
               onClick={() => setCurrentRowPage(currentRowPage === totalRowPages ? 1 : currentRowPage + 1)}
-              className="relative inline-flex items-center rounded-r-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
+              className="relative inline-flex items-center px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
               style={{ 
                 fontSize: '14px', 
                 paddingTop: '10px', 
@@ -475,6 +488,19 @@ export default function LeadsmartTankTable({ refreshTrigger, jettisonFilter, sky
                 <path d="M23 4v6h-6" />
                 <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
               </svg>
+            </button>
+            {/* Last page button */}
+            <button
+              onClick={() => setCurrentRowPage(totalRowPages)}
+              disabled={currentRowPage === totalRowPages}
+              className="relative inline-flex items-center rounded-r-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ 
+                fontSize: '14px', 
+                paddingTop: '10px', 
+                paddingBottom: '10px'
+              }}
+            >
+              ≫
             </button>
           </nav>
         </div>
