@@ -296,19 +296,6 @@ export default function LeadsmartMorphClient() {
         city_population: row.cities?.city_population || null
       }));
 
-      console.log('🔍 DEBUG: Raw data from database:', processedData.length, 'rows');
-      console.log('🔍 DEBUG: Payout values in raw data:', processedData.map(r => r.payout).filter(p => p !== null).sort((a, b) => b - a).slice(0, 10));
-      const target73Row = processedData.find(r => Math.abs(r.payout - 73.24) < 0.001);
-      console.log('🔍 DEBUG: Looking for payout ~73.24:', target73Row);
-      if (target73Row) {
-        console.log('🔍 DEBUG: Found target row details:', {
-          payout: target73Row.payout,
-          baobab_attempt_id: target73Row.baobab_attempt_id,
-          jrel_subpart_id: target73Row.jrel_subpart_id,
-          city_name: target73Row.city_name,
-          city_population: target73Row.city_population
-        });
-      }
 
       setData(processedData);
       setTotalCount(count || 0);
@@ -327,10 +314,6 @@ export default function LeadsmartMorphClient() {
 
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
-    console.log('🔍 DEBUG: Recalculating filteredAndSortedData');
-    console.log('🔍 DEBUG: Input data length:', data.length);
-    console.log('🔍 DEBUG: Filters active - cityPopulationFilter:', cityPopulationFilter, 'searchTerm:', searchTerm);
-    
     const afterSearchFilter = data
     .filter(row => {
       if (!searchTerm) return true;
@@ -343,11 +326,7 @@ export default function LeadsmartMorphClient() {
         row.payout?.toString().includes(searchLower)
       );
     });
-    
-    console.log('🔍 DEBUG: After search filter:', afterSearchFilter.length, 'rows');
-    console.log('🔍 DEBUG: Payout values after search:', afterSearchFilter.map(r => r.payout).filter(p => p !== null).sort((a, b) => b - a).slice(0, 5));
-    console.log('🔍 DEBUG: Target 73.24 after search filter:', afterSearchFilter.find(r => Math.abs(r.payout - 73.24) < 0.001) ? 'FOUND' : 'NOT FOUND');
-    
+
     const afterPopulationFilter = afterSearchFilter.filter(row => {
       // Apply city population filter
       const population = row.city_population;
@@ -364,31 +343,15 @@ export default function LeadsmartMorphClient() {
           return true;
       }
     });
-    
-    console.log('🔍 DEBUG: After city population filter:', afterPopulationFilter.length, 'rows');
-    console.log('🔍 DEBUG: Payout values after population filter:', afterPopulationFilter.map(r => r.payout).filter(p => p !== null).sort((a, b) => b - a).slice(0, 5));
-    const target73AfterPopFilter = afterPopulationFilter.find(r => Math.abs(r.payout - 73.24) < 0.001);
-    console.log('🔍 DEBUG: Target 73.24 after population filter:', target73AfterPopFilter ? 'FOUND' : 'NOT FOUND');
-    if (target73AfterPopFilter) {
-      console.log('🔍 DEBUG: Target 73.24 city_population:', target73AfterPopFilter.city_population);
-    }
-    
+
     const sortedData = afterPopulationFilter
     .sort((a, b) => {
       if (!sortColumn) {
-        console.log('🔍 DEBUG SORT: No sort column, keeping original order');
         return 0;
       }
-      
-      console.log('🔍 DEBUG SORT: Sorting by column:', sortColumn, 'direction:', sortDirection);
-      
+
       const aValue = a[sortColumn as keyof LeadsmartTransformed];
       const bValue = b[sortColumn as keyof LeadsmartTransformed];
-      
-      // Debug specific payout values we're looking for
-      if (sortColumn === 'payout' && (aValue === 73.24 || bValue === 73.24 || Math.abs(aValue - 73.24) < 0.001 || Math.abs(bValue - 73.24) < 0.001)) {
-        console.log('🔍 DEBUG SORT: Found 73.24 (or very close)! Comparing', aValue, 'vs', bValue, 'types:', typeof aValue, typeof bValue);
-      }
       
       // Handle null/undefined values
       if (aValue == null && bValue == null) return 0;
@@ -407,14 +370,7 @@ export default function LeadsmartMorphClient() {
       if (sortColumn === 'payout' || sortColumn === 'city_population') {
         const aNum = Number(aValue);
         const bNum = Number(bValue);
-        const result = sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
-        
-        // Debug payout sorting specifically
-        if (sortColumn === 'payout' && (aValue === 73.24 || bValue === 73.24)) {
-          console.log('🔍 DEBUG SORT: Payout comparison result:', aNum, sortDirection === 'asc' ? '<->' : '<->', bNum, '=', result);
-        }
-        
-        return result;
+        return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
       }
       
       // Handle string sorting
@@ -425,16 +381,7 @@ export default function LeadsmartMorphClient() {
       if (aStr > bStr) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-    
-    console.log('🔍 DEBUG: After sorting (sortColumn:', sortColumn, 'sortDirection:', sortDirection, '):', sortedData.length, 'rows');
-    console.log('🔍 DEBUG: Final payout values (top 10):', sortedData.map(r => r.payout).filter(p => p !== null).slice(0, 10));
-    const target73Final = sortedData.find(r => Math.abs(r.payout - 73.24) < 0.001);
-    console.log('🔍 DEBUG: Target 73.24 final result:', target73Final ? 'FOUND' : 'NOT FOUND');
-    if (target73Final) {
-      const index = sortedData.findIndex(r => Math.abs(r.payout - 73.24) < 0.001);
-      console.log('🔍 DEBUG: Target 73.24 position in sorted array:', index, 'of', sortedData.length);
-    }
-    
+
     return sortedData;
   }, [data, searchTerm, cityPopulationFilter, sortColumn, sortDirection]);
 
@@ -492,17 +439,11 @@ export default function LeadsmartMorphClient() {
 
   // Handle column sorting
   const handleSort = (columnName: string) => {
-    console.log('🔍 DEBUG SORT CLICK: User clicked to sort by', columnName);
-    console.log('🔍 DEBUG SORT CLICK: Current sortColumn:', sortColumn, 'sortDirection:', sortDirection);
-    
     if (sortColumn === columnName) {
       // Toggle direction if same column
-      const newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-      console.log('🔍 DEBUG SORT CLICK: Toggling direction to:', newDirection);
-      setSortDirection(newDirection);
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       // New column, default to ascending
-      console.log('🔍 DEBUG SORT CLICK: Setting new column:', columnName, 'direction: asc');
       setSortColumn(columnName);
       setSortDirection('asc');
     }

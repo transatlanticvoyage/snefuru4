@@ -44,6 +44,35 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
   const [transformResults, setTransformResults] = useState('');
   const [currentTransformId, setCurrentTransformId] = useState<number | null>(null);
   const [showTransformConfirm, setShowTransformConfirm] = useState(false);
+
+  // Copy function for notes
+  const handleCopyNotes = async () => {
+    const notesText = `NOTE TO SELF NEXT THINGS MUST DO
+
+Add baobab_group_id To ui table plus entire system and use manual sql insert to update from 48 id system
+========================================
+Update pico cache system to calculate based on baobab group id (must create new db column baobab_group_id for grouping attempts -> integreate column as ui column in morph ui table grid, etc.)
+
+Update Skylab tiles to display from cached info from the new system 
+========================================
+Add notes to frosty Popup that in future we need invalid header row stuff etc and link to example csv with data format that we want and example data 
+
+/app/(protected)/leadsmart_tank/example_invalid_rows_csv_file/invalid_rows_release_3_2025-10-19 (3).csv
+
+
+========================================
+make note to update the gingko function:
+to store all of the rel_ id stuff and baobab stuff just like the current baobab function does (might want to rename baobab function itself since we have db columns named after this that could become part of a broader/shared dynamic between baobab and gingko)
+
+NOTE: gingko means the transform function that runs from plain "transform" function button and was built before baobab - gingko function might not be denoted in the code by this name - it might just be called "transform", etc.`;
+
+    try {
+      await navigator.clipboard.writeText(notesText);
+      // Could add a toast notification here if desired
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
   const [transformStats, setTransformStats] = useState({
     totalRows: 0,
     alreadyTransformed: 0,
@@ -1702,6 +1731,46 @@ export default function FrostySelectorPopup({ isOpen, onClose, pageType }: Props
                           <>🌳 Baobab Transform</>
                         )}
                       </button>
+                    </div>
+
+                    {/* Notes Section */}
+                    <div className="mt-8">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-lg font-medium text-gray-800">Development Notes</h4>
+                        <button
+                          onClick={handleCopyNotes}
+                          className="px-3 py-1 bg-blue-600 text-white hover:bg-blue-700 rounded-md text-sm font-medium transition-colors flex items-center"
+                        >
+                          📋 Copy Notes
+                        </button>
+                      </div>
+                      
+                      <textarea
+                        readOnly
+                        value={`NOTE TO SELF NEXT THINGS MUST DO
+
+Add baobab_group_id To ui table plus entire system and use manual sql insert to update from 48 id system
+========================================
+Update pico cache system to calculate based on baobab group id (must create new db column baobab_group_id for grouping attempts -> integreate column as ui column in morph ui table grid, etc.)
+
+Update Skylab tiles to display from cached info from the new system 
+========================================
+Add notes to frosty Popup that in future we need invalid header row stuff etc and link to example csv with data format that we want and example data 
+
+/app/(protected)/leadsmart_tank/example_invalid_rows_csv_file/invalid_rows_release_3_2025-10-19 (3).csv
+
+
+========================================
+make note to update the gingko function:
+to store all of the rel_ id stuff and baobab stuff just like the current baobab function does (might want to rename baobab function itself since we have db columns named after this that could become part of a broader/shared dynamic between baobab and gingko)
+
+NOTE: gingko means the transform function that runs from plain "transform" function button and was built before baobab - gingko function might not be denoted in the code by this name - it might just be called "transform", etc.`}
+                        className="w-full h-64 p-3 border border-gray-300 rounded-lg bg-gray-50 text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        style={{ 
+                          fontSize: '12px',
+                          lineHeight: '1.4'
+                        }}
+                      />
                     </div>
                     
                     {/* Transform Results */}
