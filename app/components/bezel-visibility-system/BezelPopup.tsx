@@ -48,11 +48,12 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   const [cnjar1ProtozoicChamberVisible, setCnjar1ProtozoicChamberVisible] = useState(true);
   const [cnjar1MesozoicChamberVisible, setCnjar1MesozoicChamberVisible] = useState(true);
 
-  // Chamber visibility states for /leadsmart_morph (default to true/visible)
+  // Chamber visibility states for /leadsmart_morph (default to true/visible except cardio_chamber)
   const [leadsmartMorphMandibleChamberVisible, setLeadsmartMorphMandibleChamberVisible] = useState(true);
   const [leadsmartMorphSinusChamberVisible, setLeadsmartMorphSinusChamberVisible] = useState(true);
-  const [leadsmartMorphCardioChamberVisible, setLeadsmartMorphCardioChamberVisible] = useState(true);
+  const [leadsmartMorphCardioChamberVisible, setLeadsmartMorphCardioChamberVisible] = useState(false);
   const [leadsmartMorphPecChamberVisible, setLeadsmartMorphPecChamberVisible] = useState(true);
+  const [leadsmartMorphRocketChamberVisible, setLeadsmartMorphRocketChamberVisible] = useState(true);
 
   useEffect(() => {
     // Check if current page has bezel configuration
@@ -573,11 +574,24 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
       const savedCardio = localStorage.getItem('leadsmartMorph_cardioChamberVisible');
       if (savedCardio !== null) {
         setLeadsmartMorphCardioChamberVisible(JSON.parse(savedCardio));
+      } else {
+        // Default to false (hidden) and save it
+        setLeadsmartMorphCardioChamberVisible(false);
+        localStorage.setItem('leadsmartMorph_cardioChamberVisible', JSON.stringify(false));
       }
       
       const savedPec = localStorage.getItem('leadsmartMorph_pecChamberVisible');
       if (savedPec !== null) {
         setLeadsmartMorphPecChamberVisible(JSON.parse(savedPec));
+      }
+      
+      const savedRocket = localStorage.getItem('leadsmartMorph_rocketChamberVisible');
+      if (savedRocket !== null) {
+        setLeadsmartMorphRocketChamberVisible(JSON.parse(savedRocket));
+      } else {
+        // Default to true (visible) and save it
+        setLeadsmartMorphRocketChamberVisible(true);
+        localStorage.setItem('leadsmartMorph_rocketChamberVisible', JSON.stringify(true));
       }
     }
   }, [pathname]);
@@ -619,6 +633,16 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     
     window.dispatchEvent(new CustomEvent('leadsmartMorph-chamber-toggle', { 
       detail: { chamber: 'pec_chamber', visible: checked } 
+    }));
+  };
+
+  // Handle leadsmart_morph rocket chamber toggle
+  const handleLeadsmartMorphRocketChamberToggle = (checked: boolean) => {
+    setLeadsmartMorphRocketChamberVisible(checked);
+    localStorage.setItem('leadsmartMorph_rocketChamberVisible', JSON.stringify(checked));
+    
+    window.dispatchEvent(new CustomEvent('leadsmartMorph-chamber-toggle', { 
+      detail: { chamber: 'rocket_chamber', visible: checked } 
     }));
   };
 
@@ -1274,6 +1298,29 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
                     <div className="mt-3 text-sm text-gray-600">
                       <p>Toggle visibility of the pec chamber on the Leadsmart Morph page.</p>
                       <p>Current state: <strong>{leadsmartMorphPecChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Rocket Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={leadsmartMorphRocketChamberVisible}
+                          onChange={(e) => handleLeadsmartMorphRocketChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        rocket_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the rocket chamber on the Leadsmart Morph page.</p>
+                      <p>Current state: <strong>{leadsmartMorphRocketChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
                       <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
                     </div>
                   </div>

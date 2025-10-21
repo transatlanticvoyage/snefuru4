@@ -14,6 +14,11 @@ const ZhedoriButtonBar = dynamic(
   { ssr: false }
 );
 
+const BezelButton = dynamic(
+  () => import('@/app/components/bezel-visibility-system/BezelButton'),
+  { ssr: false }
+);
+
 interface LeadsmartTransformed {
   mundial_id: number;
   baobab_attempt_id: number | null;
@@ -80,8 +85,9 @@ export default function LeadsmartMorphClient() {
   // Chamber visibility state (integrated with bezel system)
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
   const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
-  const [cardioChamberVisible, setCardioChamberVisible] = useState(true);
+  const [cardioChamberVisible, setCardioChamberVisible] = useState(false);
   const [pecChamberVisible, setPecChamberVisible] = useState(true);
+  const [rocketChamberVisible, setRocketChamberVisible] = useState(true);
   
   // Filter state for jettison table
   const [jettisonFilter, setJettisonFilter] = useState<{
@@ -139,11 +145,24 @@ export default function LeadsmartMorphClient() {
     const savedCardio = localStorage.getItem('leadsmartMorph_cardioChamberVisible');
     if (savedCardio !== null) {
       setCardioChamberVisible(JSON.parse(savedCardio));
+    } else {
+      // Default to false (hidden) and save it
+      setCardioChamberVisible(false);
+      localStorage.setItem('leadsmartMorph_cardioChamberVisible', JSON.stringify(false));
     }
     
     const savedPec = localStorage.getItem('leadsmartMorph_pecChamberVisible');
     if (savedPec !== null) {
       setPecChamberVisible(JSON.parse(savedPec));
+    }
+    
+    const savedRocket = localStorage.getItem('leadsmartMorph_rocketChamberVisible');
+    if (savedRocket !== null) {
+      setRocketChamberVisible(JSON.parse(savedRocket));
+    } else {
+      // Default to true (visible) and save it
+      setRocketChamberVisible(true);
+      localStorage.setItem('leadsmartMorph_rocketChamberVisible', JSON.stringify(true));
     }
   }, []);
 
@@ -164,6 +183,9 @@ export default function LeadsmartMorphClient() {
           break;
         case 'pec_chamber':
           setPecChamberVisible(visible);
+          break;
+        case 'rocket_chamber':
+          setRocketChamberVisible(visible);
           break;
       }
     };
@@ -1234,16 +1256,17 @@ export default function LeadsmartMorphClient() {
         )}
 
         {/* Rocket Chamber */}
-        <div 
-          className="rocket_chamber_div" 
-          style={{ 
-            border: '1px solid black', 
-            padding: 0,
-            margin: 0,
-            position: 'relative',
-            marginBottom: '0px'
-          }}
-        >
+        {rocketChamberVisible && (
+          <div 
+            className="rocket_chamber chamber_div" 
+            style={{ 
+              border: '1px solid black', 
+              padding: 0,
+              margin: 0,
+              position: 'relative',
+              marginBottom: '0px'
+            }}
+          >
           <div style={{ 
             position: 'absolute', 
             top: '4px', 
@@ -1360,6 +1383,7 @@ export default function LeadsmartMorphClient() {
             </table>
           </div>
         </div>
+        )}
 
         {/* Main UI Table Grid */}
         <div style={{ marginTop: '0px' }}>
@@ -1945,6 +1969,9 @@ export default function LeadsmartMorphClient() {
           </div>
         </div>
       )}
+      
+      {/* Bezel Button */}
+      <BezelButton />
     </>
   );
 }
