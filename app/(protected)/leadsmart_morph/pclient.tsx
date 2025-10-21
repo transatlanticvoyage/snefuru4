@@ -271,13 +271,11 @@ export default function LeadsmartMorphClient() {
         query = query.limit(5000); // Reasonable limit when NO filters applied
         console.log('Applied 5k limit - no filters active');
       } else if (baobobFilter) {
-        // When baobab filter is active, apply a reasonable limit for performance
-        query = query.limit(10000); // Reasonable limit for baobab filtered queries
-        console.log('Applied 10k limit - baobab filter active:', baobobFilter);
+        // When baobab filter is active, no limit applied - load all matching rows
+        console.log('No limit applied - baobab filter active:', baobobFilter);
       } else {
-        // When jettison/skylab filters active, use moderate limit
-        query = query.limit(50000); // Balanced limit for jettison/skylab filtered queries
-        console.log('Applied 50k limit - jettison/skylab filters active:', { jettisonFilter, skylabFilter });
+        // When jettison/skylab filters active, no limit applied - load all matching rows
+        console.log('No limit applied - jettison/skylab filters active:', { jettisonFilter, skylabFilter });
       }
       
       // Execute both queries in parallel
