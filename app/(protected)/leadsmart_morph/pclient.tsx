@@ -1052,13 +1052,7 @@ export default function LeadsmartMorphClient() {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Loading data...</div>
-      </div>
-    );
-  }
+  // Remove the full-screen loading overlay - let the page remain visible
 
   return (
     <>
@@ -1307,9 +1301,15 @@ export default function LeadsmartMorphClient() {
                   <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center', width: '30%' }}>
                     <div style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                       <span style={{ fontWeight: 'bold' }}>row pagination</span>
-                      <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
-                        Showing <span style={{ fontWeight: 'bold' }}>{paginatedData.length.toLocaleString()}</span> of <span style={{ fontWeight: 'bold' }}>{totalCount.toLocaleString()}</span> results
-                      </span>
+                      {loading ? (
+                        <span style={{ fontSize: '14px', fontWeight: 'normal', color: '#3b82f6' }}>
+                          🔄 Loading data...
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
+                          Showing <span style={{ fontWeight: 'bold' }}>{paginatedData.length.toLocaleString()}</span> of <span style={{ fontWeight: 'bold' }}>{totalCount.toLocaleString()}</span> results
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center', width: '20%' }}>
@@ -1386,12 +1386,33 @@ export default function LeadsmartMorphClient() {
         )}
 
         {/* Main UI Table Grid */}
-        <div style={{ marginTop: '0px' }}>
+        <div style={{ marginTop: '0px', position: 'relative' }}>
+          {loading && (
+            <div style={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0, 
+              backgroundColor: 'rgba(255, 255, 255, 0.8)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              zIndex: 10,
+              pointerEvents: 'none'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', color: '#3b82f6' }}>
+                🔄 Refreshing data...
+              </div>
+            </div>
+          )}
           <table 
             style={{ 
               borderCollapse: 'collapse', 
               width: 'auto',
-              border: '1px solid gray'
+              border: '1px solid gray',
+              opacity: loading ? 0.6 : 1,
+              transition: 'opacity 0.2s ease-in-out'
             }}
           >
             <thead>
