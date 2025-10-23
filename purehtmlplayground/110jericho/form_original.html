@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Compiled - Blog Style Layout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            background-color: #000;
+        }
+        
+        .site-header {
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .site-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .site-nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+        
+        .site-nav a {
+            color: #666;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        
+        .site-nav a:hover {
+            color: #333;
+        }
+        
+        .main-wrapper {
+            background-color: #000;
+            min-height: calc(100vh - 160px);
+        }
+        
+        .content-area {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            min-height: 600px;
+        }
+        
+        .main-content {
+            padding: 40px 60px;
+        }
+        
+        .post-header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        
+        .post-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .post-meta {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .post-content {
+            color: #444;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+        
+        .post-content h2 {
+            font-size: 28px;
+            margin: 30px 0 15px;
+            color: #333;
+        }
+        
+        .post-content h3 {
+            font-size: 22px;
+            margin: 25px 0 10px;
+            color: #333;
+        }
+        
+        .post-content p {
+            margin-bottom: 20px;
+        }
+        
+        .post-content blockquote {
+            border-left: 4px solid #ddd;
+            padding-left: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #666;
+        }
+        
+        .post-content ul,
+        .post-content ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+        
+        .post-content li {
+            margin-bottom: 10px;
+        }
+        
+        .site-footer {
+            background-color: #222;
+            color: #999;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .main-content {
+                padding: 30px 20px;
+            }
+            
+            .post-title {
+                font-size: 28px;
+            }
+            
+            .post-content {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <a href="#" class="site-title">Rail1 Blog</a>
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="main-wrapper">
+        <div class="content-area">
+            <main class="main-content">
+                <hr>
+                <h2>Full Compiled Form</h2>
+                <hr>
+
+                <!--==================================================================================================================-->
+                <!--==================================================================================================================-->
+
+
+                <section class="est-wrap" id="estimate-widget">
+                  <!-- live region for screen readers -->
+                  <div class="sr-only" aria-live="polite" aria-atomic="true" id="est-aria-live"></div>
+
+                  <form id="estimateForm" action="https://formspree.io/f/mwprrbgr" method="POST" novalidate>
+                    <div class="est-card" role="group" aria-labelledby="est-title">
+                      <h1 class="est-title" id="est-title">Get A Free Estimate Today!</h1>
+
+                      <!-- ===== STEP 1 ===== -->
+                      <div class="form-step" data-step="1" aria-labelledby="step1-heading">
+                        <h2 class="est-subhead" id="step1-heading" tabindex="-1">Get a Free Estimate Now</h2>
+                        <hr class="est-rule">
+
+                        <label class="block" for="service_needed">
+                          <span class="label">Service needed:</span>
+                          <select id="service_needed" name="service_needed" required aria-describedby="service-help">
+                            <option value="" selected disabled>Select</option>
+                            <option>Roof Repair</option>
+                            <option>Roof Replacement</option>
+                            <option>Inspection</option>
+                            <option>Gutter Install/Repair</option>
+                            <option>Siding</option>
+                            <option>Other</option>
+                          </select>
+                          <div id="service-help" class="help">Choose the closest match.</div>
+                        </label>
+
+                        <fieldset class="fs" aria-describedby="status-help">
+                          <legend>Choose the appropriate status for this project:</legend>
+                          <div class="chip-row" role="radiogroup" aria-label="Project status">
+                            <label class="chip">
+                              <input type="radio" name="project_status" value="Ready to Hire" required>
+                              <span>Ready to Hire</span>
+                            </label>
+                            <label class="chip">
+                              <input type="radio" name="project_status" value="Planning & Budgeting">
+                              <span>Planning &amp; Budgeting</span>
+                            </label>
+                          </div>
+                          <div id="status-help" class="help">This helps prioritize your request.</div>
+                        </fieldset>
+
+                        <fieldset class="fs" aria-describedby="timeline-help">
+                          <legend>What is the timeline for this project?</legend>
+                          <div class="chip-grid" role="radiogroup" aria-label="Project timeline">
+                            <label class="chip">
+                              <input type="radio" name="timeline" value="Timing is Flexible" required>
+                              <span>Timing is Flexible</span>
+                            </label>
+                            <label class="chip">
+                              <input type="radio" name="timeline" value="Within 1 week">
+                              <span>Within 1 week</span>
+                            </label>
+                            <label class="chip">
+                              <input type="radio" name="timeline" value="1 - 2 Weeks">
+                              <span>1 - 2 Weeks</span>
+                            </label>
+                            <label class="chip">
+                              <input type="radio" name="timeline" value="More than 2 Weeks">
+                              <span>More than 2 Weeks</span>
+                            </label>
+                          </div>
+                          <div id="timeline-help" class="help">An estimate window is fine.</div>
+                        </fieldset>
+
+                        <fieldset class="fs">
+                          <legend>Are you currently the owner of this home?</legend>
+                          <div class="chip-col" role="radiogroup" aria-label="Property owner">
+                            <label class="chip">
+                              <input type="radio" name="property_owner" value="Yes" required>
+                              <span>Yes</span>
+                            </label>
+                            <label class="chip">
+                              <input type="radio" name="property_owner" value="No, but I am authorized to make improvements">
+                              <span>No, but I am authorized to make improvements</span>
+                            </label>
+                            <label class="chip">
+                              <input type="radio" name="property_owner" value="No">
+                              <span>No</span>
+                            </label>
+                          </div>
+                        </fieldset>
+
+                        <div class="btn-row">
+                          <button type="button" class="btn btn-yellow next" id="to-step-2" aria-controls="step2-heading">Next</button>
+                        </div>
+                      </div>
+
+                      <!-- ===== STEP 2 ===== -->
+                      <div class="form-step hidden" data-step="2" aria-hidden="true" aria-labelledby="step2-heading">
+                        <h2 class="est-subhead" id="step2-heading" tabindex="-1">Contact information</h2>
+                        <hr class="est-rule">
+
+                        <div class="grid-2">
+                          <label class="block" for="first_name">
+                            <span class="label">First Name</span>
+                            <input id="first_name" type="text" name="first_name" required autocomplete="given-name" aria-required="true">
+                          </label>
+                          <label class="block" for="last_name">
+                            <span class="label">Last Name</span>
+                            <input id="last_name" type="text" name="last_name" required autocomplete="family-name" aria-required="true">
+                          </label>
+                        </div>
+
+                        <div class="grid-2">
+                          <label class="block" for="phone">
+                            <span class="label">Phone Number</span>
+                            <input id="phone" type="tel" name="phone" required autocomplete="tel" inputmode="tel" aria-required="true">
+                          </label>
+                          <label class="block" for="email">
+                            <span class="label">Email</span>
+                            <input id="email" type="email" name="email" required autocomplete="email" aria-required="true">
+                          </label>
+                        </div>
+
+                        <div class="grid-2">
+                          <label class="block" for="street">
+                            <span class="label">Street Name</span>
+                            <input id="street" type="text" name="street" placeholder="100 Main St" required autocomplete="address-line1">
+                          </label>
+                          <label class="block" for="zip">
+                            <span class="label">Zip Code</span>
+                            <input id="zip" type="text" name="zip" required inputmode="numeric" pattern="[0-9]{5}" aria-describedby="zip-help">
+                          </label>
+                        </div>
+                        <div id="zip-help" class="help">5-digit ZIP code</div>
+
+                        <label class="block" for="message">
+                          <span class="label">Message</span>
+                          <textarea id="message" name="message" rows="5"></textarea>
+                        </label>
+
+                        <!-- Metadata -->
+                        <input type="hidden" name="_subject" value="New Free Estimate Request">
+                        <input type="hidden" name="page_url" value="">
+                        <!-- Honeypot -->
+                        <label class="sr-only" for="_gotcha">Leave this field blank</label>
+                        <input id="_gotcha" type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                        <!-- Inline error summary -->
+                        <div class="error-summary" id="errorSummary" role="alert" aria-live="assertive" hidden></div>
+
+                        <div class="btn-row">
+                          <button type="button" class="btn btn-outline prev" aria-controls="step1-heading">Back</button>
+                          <button type="submit" class="btn btn-yellow">Send</button>
+                        </div>
+
+                        <p class="disclaimer">
+                          We respect your privacy and want to make sure you are aware that by submitting your contact information you
+                          agree to be contacted about this request by phone, text, or email. Message and data rates may apply.
+                        </p>
+                      </div>
+                    </div>
+                  </form>
+
+                  <!-- Thank You -->
+                  <div id="thankyouPanel" class="hidden" aria-labelledby="thanks-heading">
+                    <div style="text-align:center; padding:12px 8px 8px;">
+                      <h1 class="est-title" style="margin-bottom:18px;">Get A Free Estimate Today!</h1>
+                      <img src="https://i.imgur.com/0v1qR0N.png" alt="Success checkmark" width="130" height="130" style="display:block;margin:0 auto 12px;">
+                      <h2 id="thanks-heading" style="font-size:36px; margin:8px 0 8px; font-weight:800; color:#111;" tabindex="-1">Thank you!</h2>
+                      <p style="font-size:22px; line-height:1.35; font-weight:700; color:#111; max-width:720px; margin:0 auto 14px;">
+                        A contractor from our trusted network has been notified of your request and will be contacting you shortly.
+                      </p>
+                      <p style="opacity:.7; max-width:720px; margin:10px auto 6px;">
+                        If you are not available by phone they will contact you by email.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                <style>
+                /* Accessibility helpers */
+                .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+                .help{font-size:.85rem;color:#2d2d2d;opacity:.9;margin-top:4px}
+
+                /* Container and card */
+                .est-wrap{background:#fff;padding:16px}
+                .est-card{background:#e17d1e;border-radius:12px;padding:22px 22px 26px;max-width:680px;margin:0 auto;color:#222;position:relative}
+
+                /* Headings / divider */
+                .est-title{margin:0 0 6px;color:#184f84;font-weight:800;font-size:30px;line-height:1.2}
+                .est-subhead{margin:6px 0 0;font-size:20px;font-weight:800;color:#222}
+                .est-rule{border:0;height:2px;background:#d9d9d9;margin:10px 0 16px}
+
+                /* Inputs */
+                .block{display:block;margin:10px 0}
+                .label{display:block;font-weight:700;margin:0 0 6px}
+                input[type=text],input[type=email],input[type=tel],select,textarea{
+                  width:100%;background:#fff;border:1px solid #cfcfcf;border-radius:8px;padding:11px 12px;outline:none;font:inherit;line-height:1.4
+                }
+                textarea{min-height:120px}
+                ::placeholder{color:#6d6d6d;opacity:1}
+
+                /* Radios as chips */
+                .fs{border:0;padding:0;margin:14px 0}
+                .fs legend{font-weight:700;margin-bottom:6px;color:#333}
+                .chip-row,.chip-grid,.chip-col{display:flex;gap:12px;flex-wrap:wrap}
+                .chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+                .chip{display:inline-flex;align-items:center;gap:10px;background:#f3f3f3;border-radius:999px;padding:10px 14px;border:1px solid #d0d0d0}
+                .chip input{margin:0;accent-color:#f39c12}
+                .chip span{font-size:14px;white-space:nowrap}
+
+                /* Buttons */
+                .btn{font-weight:800;border-radius:999px;border:0;cursor:pointer;padding:12px 16px;font-size:15px;line-height:1}
+                .btn-yellow{background:linear-gradient(#ffcc66,#f39c12);color:#000;box-shadow:inset 0 -1px 0 rgba(0,0,0,.15)}
+                .btn-yellow:hover{filter:brightness(1.03)}
+                .btn-outline{background:#fff;color:#000;box-shadow:inset 0 0 0 2px rgba(0,0,0,.35)}
+                .btn-row{display:flex;gap:12px;margin-top:10px}
+
+                /* Error styles & focus */
+                :focus{outline:3px solid #2b90ff;outline-offset:2px}
+                .err{border-color:#d93025!important;box-shadow:0 0 0 2px rgba(217,48,37,.15)}
+                .error-msg{color:#d93025;font-size:.85rem;margin-top:6px}
+                .error-summary{background:#fff;border-left:4px solid #d93025;padding:10px 12px;margin:10px 0;border-radius:8px;color:#111}
+
+                /* Layout */
+                .hidden{display:none!important}
+                .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+                @media (max-width:640px){
+                  .grid-2{grid-template-columns:1fr}
+                  .est-card{padding:18px 16px 22px}
+                  .est-title{font-size:26px}
+                }
+
+                /* Thank-you */
+                #thankyouPanel{text-align:center}
+                #thankyouPanel .est-title{color:#184f84;margin-bottom:8px}
+
+                /* Honeypot (bot trap) */
+                .hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+                </style>
+
+                <script>
+                (function(){
+                  const form = document.getElementById('estimateForm');
+                  if(!form) return;
+
+                  // Capture page URL
+                  const urlField = form.querySelector('input[name="page_url"]');
+                  if (urlField) urlField.value = window.location.href;
+
+                  const card = form.querySelector('.est-card');
+                  const steps = Array.prototype.slice.call(form.querySelectorAll('.form-step'));
+                  const live = document.getElementById('est-aria-live');
+                  const thankyou = document.getElementById('thankyouPanel');
+
+                  const stepHeadings = {
+                    1: document.getElementById('step1-heading'),
+                    2: document.getElementById('step2-heading')
+                  };
+
+                  function announce(msg){ if(live) live.textContent = msg; }
+
+                  function visibleIndex(){
+                    for (let i=0;i<steps.length;i++){ if(!steps[i].classList.contains('hidden')) return i; }
+                    return 0;
+                  }
+
+                  function showStep(i){
+                    steps.forEach((s,k)=>{
+                      const hide = (k!==i);
+                      s.classList.toggle('hidden', hide);
+                      s.setAttribute('aria-hidden', hide ? 'true':'false');
+                    });
+                    const stepNum = i+1;
+                    const h = stepHeadings[stepNum];
+                    if(h){ h.setAttribute('tabindex','-1'); h.focus({preventScroll:false}); }
+                    announce('Step ' + stepNum + ' of ' + steps.length);
+                    // clear any summary when moving
+                    const sum = document.getElementById('errorSummary');
+                    if (sum) { sum.hidden = true; sum.textContent=''; }
+                  }
+
+                  function clearErrors(scope){
+                    const fields = scope.querySelectorAll('input,select,textarea');
+                    fields.forEach(el=>{
+                      el.classList.remove('err');
+                      el.setAttribute('aria-invalid','false');
+                      const wrap = el.closest('.block') || el.closest('.fs') || el.parentElement;
+                      if (!wrap) return;
+                      const old = wrap.querySelector('.error-msg');
+                      if (old) old.remove();
+                    });
+                  }
+
+                  // inline message helper
+                  function addError(el, msg){
+                    const wrap = el.closest('.block') || el.closest('.fs') || el.parentElement;
+                    if (!wrap) return;
+                    el.classList.add('err');
+                    el.setAttribute('aria-invalid','true');
+                    const m = document.createElement('div');
+                    m.className = 'error-msg';
+                    m.textContent = msg;
+                    wrap.appendChild(m);
+                  }
+
+                  function validateStep(i){
+                    const step = steps[i];
+                    clearErrors(step);
+                    let ok = true;
+
+                    const required = step.querySelectorAll('[required]');
+                    // For radios: check by group
+                    const radioNames = new Set();
+                    required.forEach(el=>{
+                      if (el.type === 'radio') radioNames.add(el.name);
+                    });
+                    radioNames.forEach(name=>{
+                      const checked = step.querySelector('input[type="radio"][name="'+name+'"]:checked');
+                      if (!checked){
+                        ok = false;
+                        const anyRadio = step.querySelector('input[type="radio"][name="'+name+'"]');
+                        addError(anyRadio, 'Please choose an option.');
+                      }
+                    });
+
+                    // Non-radio requireds
+                    required.forEach(el=>{
+                      if (el.type === 'radio') return;
+                      const v = (el.value || '').trim();
+                      if (!v){
+                        ok = false;
+                        addError(el, 'This field is required.');
+                      }
+                      if (el.id === 'zip' && v && !/^\d{5}$/.test(v)){
+                        ok = false;
+                        addError(el, 'Enter a valid 5-digit ZIP.');
+                      }
+                      if (el.id === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){
+                        ok = false;
+                        addError(el, 'Enter a valid email address.');
+                      }
+                    });
+
+                    // error summary
+                    const sum = document.getElementById('errorSummary');
+                    if (!ok && sum && i===1){
+                      sum.hidden = false;
+                      sum.textContent = 'Please fix the highlighted fields before sending.';
+                    }
+                    return ok;
+                  }
+
+                  // Next / Back
+                  form.addEventListener('click', function(e){
+                    const next = e.target.closest('.next');
+                    const prev = e.target.closest('.prev');
+                    if (next){
+                      const i = visibleIndex();
+                      if (validateStep(i)) showStep(Math.min(steps.length-1, i+1));
+                    }
+                    if (prev){
+                      const i = visibleIndex();
+                      showStep(Math.max(0, i-1));
+                    }
+                  });
+
+                  // Submit to Formspree via AJAX (stay on page, show custom thank-you)
+                  form.addEventListener('submit', async function(e){
+                    e.preventDefault();
+                    // Ensure on final step & valid
+                    const i = visibleIndex();
+                    if (i !== steps.length-1){
+                      if (validateStep(steps.length-1)) showStep(steps.length-1);
+                      return;
+                    }
+                    if (!validateStep(i)) return;
+
+                    // Bot trap
+                    const hp = document.getElementById('_gotcha');
+                    if (hp && hp.value) { // silently succeed
+                      form.classList.add('hidden'); thankyou.classList.remove('hidden'); return;
+                    }
+
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
+
+                    const fd = new FormData(form);
+                    try{
+                      const resp = await fetch(form.action, {
+                        method: 'POST',
+                        body: fd,
+                        headers: { 'Accept': 'application/json' } // JSON = no redirect
+                      });
+                      if (resp.ok){
+                        form.classList.add('hidden');
+                        thankyou.classList.remove('hidden');
+                        const h = document.getElementById('thanks-heading');
+                        if (h) h.focus();
+                        form.reset();
+                        announce('Form submitted successfully.');
+                      } else {
+                        // Try to read Formspree error messages
+                        let msg = 'There was a problem submitting your form. Please try again.';
+                        try{
+                          const data = await resp.json();
+                          if (data && data.errors && data.errors.length){
+                            msg = data.errors.map(e => e.message).join(', ');
+                          }
+                        }catch(_){}
+                        alert(msg);
+                        announce('Submission failed.');
+                      }
+                    }catch(err){
+                      alert('Network error. Please check your connection and try again.');
+                      announce('Network error occurred.');
+                    }finally{
+                      if (submitBtn){ submitBtn.disabled = false; submitBtn.textContent = 'Send'; }
+                    }
+                  });
+
+                  // init
+                  showStep(0);
+                })();
+                </script>
+            </main>
+        </div>
+    </div>
+    
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Rail1 Blog. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

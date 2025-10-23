@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rail1 - Blog Style Layout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            background-color: #000;
+        }
+        
+        .site-header {
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .site-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .site-nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+        
+        .site-nav a {
+            color: #666;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        
+        .site-nav a:hover {
+            color: #333;
+        }
+        
+        .main-wrapper {
+            background-color: #000;
+            min-height: calc(100vh - 160px);
+        }
+        
+        .content-area {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            min-height: 600px;
+        }
+        
+        .main-content {
+            padding: 40px 60px;
+        }
+        
+        .post-header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        
+        .post-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .post-meta {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .post-content {
+            color: #444;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+        
+        .post-content h2 {
+            font-size: 28px;
+            margin: 30px 0 15px;
+            color: #333;
+        }
+        
+        .post-content h3 {
+            font-size: 22px;
+            margin: 25px 0 10px;
+            color: #333;
+        }
+        
+        .post-content p {
+            margin-bottom: 20px;
+        }
+        
+        .post-content blockquote {
+            border-left: 4px solid #ddd;
+            padding-left: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #666;
+        }
+        
+        .post-content ul,
+        .post-content ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+        
+        .post-content li {
+            margin-bottom: 10px;
+        }
+        
+        .site-footer {
+            background-color: #222;
+            color: #999;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .main-content {
+                padding: 30px 20px;
+            }
+            
+            .post-title {
+                font-size: 28px;
+            }
+            
+            .post-content {
+                font-size: 16px;
+            }
+        }
+    </style>
+<!------------------------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------->
+<!-------------------- BEGIN MORSE STYLE AREA ----------------------------------------------->
+<!------------------------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------->
+<style>
+/* Accessibility helpers */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.est-help{font-size:.85rem;color:#2d2d2d;opacity:.9;margin-top:4px}
+
+/* Container and card */
+.est-wrap{background:#fff;padding:16px}
+.est-card{background:#e17d1e;border-radius:12px;padding:22px 22px 26px;max-width:680px;margin:0 auto;color:#222;position:relative}
+
+/* Headings / divider */
+.est-title{margin:0 0 6px;color:#184f84;font-weight:800;font-size:30px;line-height:1.2}
+.est-subhead{margin:6px 0 0;font-size:20px;font-weight:800;color:#222}
+.est-rule{border:0;height:2px;background:#d9d9d9;margin:10px 0 16px}
+
+/* Inputs */
+.est-block{display:block;margin:10px 0}
+.est-label{display:block;font-weight:700;margin:0 0 6px}
+input[type=text],input[type=email],input[type=tel],textarea{
+  width:100%;background:#fff;border:1px solid #cfcfcf;border-radius:8px;padding:11px 12px;outline:none;font:inherit;line-height:1.4
+}
+select{
+  width:auto;min-width:260px;background:#fff;border:1px solid #cfcfcf;border-radius:8px;padding:11px 12px;outline:none;font:inherit;line-height:1.4
+}
+textarea{min-height:120px}
+::placeholder{color:#6d6d6d;opacity:1}
+
+/* Radios as chips */
+.est-fs{border:0;padding:0;margin:14px 0}
+.est-fs legend{font-weight:700;margin-bottom:6px;color:#333}
+.est-chip-row,.est-chip-grid{display:flex;gap:12px;flex-wrap:wrap}
+.est-chip-col{display:flex;flex-direction:column;gap:12px}
+.est-chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.est-chip{display:inline-flex;align-items:center;gap:10px;background:#e2e2e2;border-radius:999px;padding:10px 14px;border:1px solid #d0d0d0;min-width:100px;width:fit-content}
+.est-chip input{margin:0;accent-color:#007bff}
+.est-chip span{font-size:14px;white-space:nowrap}
+.est-chip:has(input:checked){background:#fffde2}
+
+/* Buttons */
+.est-btn{font-weight:800;border-radius:999px;border:0;cursor:pointer;padding:12px 16px;font-size:15px;line-height:1}
+.est-btn-yellow{background:linear-gradient(#ffcc66,#f39c12);color:#000;box-shadow:inset 0 -1px 0 rgba(0,0,0,.15)}
+.est-btn-yellow:hover{filter:brightness(1.03)}
+.est-btn-outline{background:#fff;color:#000;box-shadow:inset 0 0 0 2px rgba(0,0,0,.35)}
+.est-btn-submit{background:var(--e-global-color-accent, #4472e5);color:#fff;box-shadow:inset 0 -1px 0 rgba(0,0,0,.15)}
+.est-btn-submit:hover{filter:brightness(1.1)}
+.est-btn-row{display:flex;gap:12px;margin-top:10px}
+
+/* Error styles & focus */
+:focus{outline:3px solid #2b90ff;outline-offset:2px}
+.est-err{border-color:#d93025!important;box-shadow:0 0 0 2px rgba(217,48,37,.15)}
+.est-error-msg{color:#d93025;font-size:.85rem;margin-top:6px}
+.est-error-summary{background:#fff;border-left:4px solid #d93025;padding:10px 12px;margin:10px 0;border-radius:8px;color:#111}
+
+/* Layout */
+/*=================================================================*/
+/*=================================================================*/
+/*========== HIDDEN CLASS COMMENTED OUT FOR DEV VIEWING ==========*/
+/*=================================================================*/
+/* .est-hidden{display:none!important} */
+/*=================================================================*/
+/*=================================================================*/
+.est-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){
+  .est-grid-2{grid-template-columns:1fr}
+  .est-card{padding:18px 16px 22px}
+  .est-title{font-size:26px}
+}
+
+/* Thank-you */
+#thankyouPanel{text-align:center}
+#thankyouPanel .est-title{color:#184f84;margin-bottom:8px}
+
+/* Honeypot (bot trap) */
+.est-hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+
+/* Disclaimer */
+.est-disclaimer{font-size:12px;color:#666;margin-top:15px;line-height:1.4}
+
+
+
+</style>
+<!------------------------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------->
+<!-------------------- END MORSE STYLE AREA ----------------------------------------------->
+<!------------------------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------->
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <a href="#" class="site-title">Rail1 Blog</a>
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="main-wrapper">
+        <div class="content-area">
+            <main class="main-content">
+                <hr>
+<!--------------------------------------------------------------------------------------------->
+                <hr>
+                <h2>Full Form System Expanded</h2>
+                <hr>
+<!--------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------->
+<section class="est-wrap" id="estimate-widget">
+  <!-- live region for screen readers -->
+  <div class="sr-only" aria-live="polite" aria-atomic="true" id="est-aria-live"></div>
+<!--------------------------------------------------------------------------------------------->
+  <form id="estimateForm" action="https://formspree.io/f/mwprrbgr" method="POST" novalidate>
+	<div class="est-card" role="group" aria-labelledby="est-title">
+	  <h1 class="est-title" id="est-title">Get A Free Estimate Today!</h1>
+<!--------------------------------------------------------------------------------------------->
+	  <!-- ===== STEP 1 ===== -->
+	  <div class="form-step" data-step="1" aria-labelledby="step1-heading">
+		<h2 class="est-subhead" id="step1-heading" tabindex="-1">Get a Free Estimate Now</h2>
+		<hr class="est-rule">
+
+		<label class="est-block" for="service_needed">
+		  <span class="est-label">Service needed:</span>
+		  <select id="service_needed" name="service_needed" required aria-describedby="service-help">
+			<option value="" selected disabled>Select</option>
+			<option>Roof Repair</option>
+			<option>Roof Replacement</option>
+			<option>Inspection</option>
+			<option>Gutter Install/Repair</option>
+			<option>Siding</option>
+			<option>Other</option>
+		  </select>
+		  <div id="service-help" class="est-help">Choose the closest match.</div>
+		</label>
+
+		<fieldset class="est-fs" aria-describedby="status-help">
+		  <legend>Choose the appropriate status for this project:</legend>
+		  <div class="est-chip-row" role="radiogroup" aria-label="Project status">
+			<label class="est-chip">
+			  <input type="radio" name="project_status" value="Ready to Hire" required>
+			  <span>Ready to Hire</span>
+			</label>
+			<label class="est-chip">
+			  <input type="radio" name="project_status" value="Planning & Budgeting">
+			  <span>Planning &amp; Budgeting</span>
+			</label>
+		  </div>
+		  <div id="status-help" class="est-help">This helps prioritize your request.</div>
+		</fieldset>
+
+		<fieldset class="est-fs" aria-describedby="timeline-help">
+		  <legend>What is the timeline for this project?</legend>
+		  <div class="est-chip-grid" role="radiogroup" aria-label="Project timeline">
+			<label class="est-chip">
+			  <input type="radio" name="timeline" value="Timing is Flexible" required>
+			  <span>Timing is Flexible</span>
+			</label>
+			<label class="est-chip">
+			  <input type="radio" name="timeline" value="Within 1 week">
+			  <span>Within 1 week</span>
+			</label>
+			<label class="est-chip">
+			  <input type="radio" name="timeline" value="1 - 2 Weeks">
+			  <span>1 - 2 Weeks</span>
+			</label>
+			<label class="est-chip">
+			  <input type="radio" name="timeline" value="More than 2 Weeks">
+			  <span>More than 2 Weeks</span>
+			</label>
+		  </div>
+		  <div id="timeline-help" class="est-help">An estimate window is fine.</div>
+		</fieldset>
+
+		<fieldset class="est-fs">
+		  <legend>Are you currently the owner of this home?</legend>
+		  <div class="est-chip-col" role="radiogroup" aria-label="Property owner">
+			<label class="est-chip">
+			  <input type="radio" name="property_owner" value="Yes" required>
+			  <span>Yes</span>
+			</label>
+			<label class="est-chip">
+			  <input type="radio" name="property_owner" value="No, but I am authorized to make improvements">
+			  <span>No, but I am authorized to make improvements</span>
+			</label>
+			<label class="est-chip">
+			  <input type="radio" name="property_owner" value="No">
+			  <span>No</span>
+			</label>
+		  </div>
+		</fieldset>
+
+		<div class="est-btn-row">
+		  <button type="button" class="est-btn est-btn-yellow next" id="to-step-2" aria-controls="step2-heading">Next</button>
+		</div>
+	  </div>
+
+	  <!-- ===== STEP 2 ===== -->
+	  <div class="form-step est-hidden" data-step="2" aria-hidden="true" aria-labelledby="step2-heading">
+		<h2 class="est-subhead" id="step2-heading" tabindex="-1">Contact information</h2>
+		<hr class="est-rule">
+
+		<div class="est-grid-2">
+		  <label class="est-block" for="first_name">
+			<span class="est-label">First Name</span>
+			<input id="first_name" type="text" name="first_name" required autocomplete="given-name" aria-required="true">
+		  </label>
+		  <label class="est-block" for="last_name">
+			<span class="est-label">Last Name</span>
+			<input id="last_name" type="text" name="last_name" required autocomplete="family-name" aria-required="true">
+		  </label>
+		</div>
+
+		<div class="est-grid-2">
+		  <label class="est-block" for="phone">
+			<span class="est-label">Phone Number</span>
+			<input id="phone" type="tel" name="phone" required autocomplete="tel" inputmode="tel" aria-required="true">
+		  </label>
+		  <label class="est-block" for="email">
+			<span class="est-label">Email</span>
+			<input id="email" type="email" name="email" required autocomplete="email" aria-required="true">
+		  </label>
+		</div>
+
+		<div class="est-grid-2">
+		  <label class="est-block" for="street">
+			<span class="est-label">Street Name</span>
+			<input id="street" type="text" name="street" placeholder="100 Main St" required autocomplete="address-line1">
+		  </label>
+		  <label class="est-block" for="zip">
+			<span class="est-label">Zip Code</span>
+			<input id="zip" type="text" name="zip" required inputmode="numeric" pattern="[0-9]{5}" aria-describedby="zip-help">
+		  </label>
+		</div>
+		<div id="zip-help" class="est-help">5-digit ZIP code</div>
+
+		<label class="est-block" for="message">
+		  <span class="est-label">Message</span>
+		  <textarea id="message" name="message" rows="5"></textarea>
+		</label>
+
+		<!-- Metadata -->
+		<input type="hidden" name="_subject" value="New Free Estimate Request">
+		<input type="hidden" name="page_url" value="">
+		<!-- Honeypot -->
+		<label class="sr-only" for="_gotcha">Leave this field blank</label>
+		<input id="_gotcha" type="text" name="_gotcha" class="est-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+		<!-- Inline error summary -->
+		<div class="est-error-summary" id="errorSummary" role="alert" aria-live="assertive" hidden></div>
+
+		<div class="est-btn-row">
+		  <button type="submit" class="est-btn est-btn-submit">Send</button>
+		</div>
+
+		<p class="est-disclaimer">
+		  We respect your privacy and want to make sure you are aware that by submitting your contact information you
+		  agree to be contacted about this request by phone, text, or email. Message and data rates may apply.
+		</p>
+	  </div>
+	</div>
+  </form>
+
+<!--------------------------------------------------------------------------------------------->
+  <!-- Thank You -->
+  <div id="thankyouPanel" class="est-hidden" aria-labelledby="thanks-heading">
+	<div style="text-align:center; padding:12px 8px 8px;">
+	  <h1 class="est-title" style="margin-bottom:18px;">Get A Free Estimate Today!</h1>
+	  <img src="https://i.imgur.com/0v1qR0N.png" alt="Success checkmark" width="130" height="130" style="display:block;margin:0 auto 12px;">
+	  <h2 id="thanks-heading" style="font-size:36px; margin:8px 0 8px; font-weight:800; color:#111;" tabindex="-1">Thank you!</h2>
+	  <p style="font-size:22px; line-height:1.35; font-weight:700; color:#111; max-width:720px; margin:0 auto 14px;">
+		A contractor from our trusted network has been notified of your request and will be contacting you shortly.
+	  </p>
+	  <p style="opacity:.7; max-width:720px; margin:10px auto 6px;">
+		If you are not available by phone they will contact you by email.
+	  </p>
+	</div>
+  </div>
+<!--------------------------------------------------------------------------------------------->
+ 
+</section>
+
+
+
+<!--------------------------------------------------------------------------------------------->
+                <hr>
+                <h2>Step 1 Preview</h2>
+                <hr>
+<!--------------------------------------------------------------------------------------------->
+
+
+
+
+<!--------------------------------------------------------------------------------------------->
+                <hr>
+                <h2>Step 2 Preview</h2>
+                <hr>
+<!--------------------------------------------------------------------------------------------->
+
+
+
+
+<!--------------------------------------------------------------------------------------------->
+                <hr>
+                <h2>Step 3 (feedback message)</h2>
+                <hr>
+<!--------------------------------------------------------------------------------------------->
+
+
+
+
+
+
+<!--------------------------------------------------------------------------------------------->
+            </main>
+        </div>
+    </div>
+    
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Rail1 Blog. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
