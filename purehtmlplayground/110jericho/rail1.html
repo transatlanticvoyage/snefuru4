@@ -178,8 +178,8 @@
 .est-card{background:var(--e-global-color-accent, #4BA3FF);border-radius:12px;padding:22px 22px 26px;max-width:680px;margin:0 auto;color:#222;position:relative}
 
 /* Headings / divider */
-.est-title{margin:0 0 6px;color:#184f84;font-weight:800;font-size:30px;line-height:1.2}
-.est-subhead{margin:6px 0 0;font-size:20px;font-weight:800;color:#222}
+.est-title{margin:0 0 6px !important;color:#222 !important;font-weight:800 !important;font-size:20px !important;line-height:1.2 !important}
+.est-subhead{display:block;margin:6px 0 0 !important;font-size:16px !important;font-weight:800 !important;color:#222 !important}
 .est-rule{border:0;height:2px;background:#d9d9d9;margin:10px 0 16px}
 
 /* Inputs */
@@ -238,13 +238,13 @@ textarea{min-height:120px}
   .est-grid-2:has(#phone){grid-template-columns:1fr}
   .est-grid-2:has(#street){grid-template-columns:1fr}
   .est-card{padding:18px 16px 22px}
-  .est-title{font-size:26px}
+  .est-title{font-size:18px !important}
   .est-chip-grid{display:flex;flex-direction:column;gap:12px;max-width:100%}
 }
 
 /* Thank-you */
 #thankyouPanel{text-align:center}
-#thankyouPanel .est-title{color:#184f84;margin-bottom:8px}
+#thankyouPanel .est-title{color:#222 !important;margin-bottom:8px}
 
 /* Honeypot (bot trap) */
 .est-hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
@@ -292,11 +292,11 @@ textarea{min-height:120px}
 <!--------------------------------------------------------------------------------------------->
   <form id="estimateForm" action="https://formspree.io/f/mwprrbgr" method="POST" novalidate>
 	<div class="est-card" role="group" aria-labelledby="est-title">
-	  <h1 class="est-title" id="est-title">Get A Free Estimate Today!</h1>
+	  <h2 class="est-title" id="est-title">Get A Free Estimate Today!</h2>
 <!--------------------------------------------------------------------------------------------->
 	  <!-- ===== STEP 1 ===== -->
 	  <div class="form-step" data-step="1" aria-labelledby="step1-heading">
-		<h2 class="est-subhead" id="step1-heading" tabindex="-1">Get a Free Estimate Now</h2>
+		<strong class="est-subhead" id="step1-heading" tabindex="-1">Get a Free Estimate Now</strong>
 		<hr class="est-rule">
 
 		<label class="est-block" for="service_needed">
@@ -376,7 +376,7 @@ textarea{min-height:120px}
 
 	  <!-- ===== STEP 2 ===== -->
 	  <div class="form-step est-hidden" data-step="2" aria-hidden="true" aria-labelledby="step2-heading">
-		<h2 class="est-subhead" id="step2-heading" tabindex="-1">Contact Information</h2>
+		<strong class="est-subhead" id="step2-heading" tabindex="-1">Contact Information</strong>
 		<hr class="est-rule">
 
 		<div class="est-grid-2">
@@ -443,7 +443,7 @@ textarea{min-height:120px}
   <!-- Thank You -->
   <div id="thankyouPanel" class="est-hidden" aria-labelledby="thanks-heading">
 	<div style="text-align:center; padding:12px 8px 8px;">
-	  <h1 class="est-title" style="margin-bottom:18px;">Get A Free Estimate Today!</h1>
+	  <h2 class="est-title" style="margin-bottom:18px;">Get A Free Estimate Today!</h2>
 	  <img src="https://moth.ksit.me/wp-content/uploads/2025/10/green-checkmark-2.png" alt="Success checkmark" width="130" height="130" style="display:block;margin:0 auto 12px;">
 	  <h2 id="thanks-heading" style="font-size:36px; margin:8px 0 8px; font-weight:800; color:#111;" tabindex="-1">Thank you!</h2>
 	  <p style="font-size:22px; line-height:1.35; font-weight:700; color:#111; max-width:720px; margin:0 auto 14px;">
