@@ -171,10 +171,11 @@
 /* Accessibility helpers */
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .est-help{font-size:.85rem;color:#2d2d2d;opacity:.9;margin-top:4px}
+.est-fs .est-help{margin-top:0px;margin-bottom:4px}
 
 /* Container and card */
 .est-wrap{background:#fff;padding:16px}
-.est-card{background:#e17d1e;border-radius:12px;padding:22px 22px 26px;max-width:680px;margin:0 auto;color:#222;position:relative}
+.est-card{background:var(--e-global-color-accent, #4BA3FF);border-radius:12px;padding:22px 22px 26px;max-width:680px;margin:0 auto;color:#222;position:relative}
 
 /* Headings / divider */
 .est-title{margin:0 0 6px;color:#184f84;font-weight:800;font-size:30px;line-height:1.2}
@@ -183,7 +184,8 @@
 
 /* Inputs */
 .est-block{display:block;margin:10px 0}
-.est-label{display:block;font-weight:700;margin:0 0 6px}
+.est-label{display:block;font-weight:700;margin:0 0 0px}
+.est-label + .est-help{margin-top:0px;margin-bottom:4px}
 input[type=text],input[type=email],input[type=tel],textarea{
   width:100%;background:#fff;border:1px solid #cfcfcf;border-radius:8px;padding:11px 12px;outline:none;font:inherit;line-height:1.4
 }
@@ -195,21 +197,22 @@ textarea{min-height:120px}
 
 /* Radios as chips */
 .est-fs{border:0;padding:0;margin:14px 0}
-.est-fs legend{font-weight:700;margin-bottom:6px;color:#333}
-.est-chip-row,.est-chip-grid{display:flex;gap:12px;flex-wrap:wrap}
+.est-fs legend{font-weight:700;margin-bottom:0px;color:#333}
+.est-chip-row{display:flex;gap:12px;flex-wrap:wrap}
 .est-chip-col{display:flex;flex-direction:column;gap:12px}
-.est-chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
-.est-chip{display:inline-flex;align-items:center;gap:10px;background:#e2e2e2;border-radius:999px;padding:10px 14px;border:1px solid #d0d0d0;min-width:100px;width:fit-content}
+.est-chip-grid{display:grid;grid-template-columns:200px 200px;gap:10px 12px;width:fit-content;max-width:400px}
+.est-chip{display:inline-flex;align-items:center;gap:10px;background:#e2e2e2;border-radius:3px;padding:3px;border:1px solid #d0d0d0;min-width:100px;width:fit-content}
+.est-chip-grid .est-chip{width:200px}
 .est-chip input{margin:0;accent-color:#007bff}
 .est-chip span{font-size:14px;white-space:nowrap}
-.est-chip:has(input:checked){background:#fffde2}
+.est-chip:has(input:checked){background:#feffbb}
 
 /* Buttons */
 .est-btn{font-weight:800;border-radius:999px;border:0;cursor:pointer;padding:12px 16px;font-size:15px;line-height:1}
 .est-btn-yellow{background:linear-gradient(#ffcc66,#f39c12);color:#000;box-shadow:inset 0 -1px 0 rgba(0,0,0,.15)}
 .est-btn-yellow:hover{filter:brightness(1.03)}
 .est-btn-outline{background:#fff;color:#000;box-shadow:inset 0 0 0 2px rgba(0,0,0,.35)}
-.est-btn-submit{background:var(--e-global-color-accent, #4472e5);color:#fff;box-shadow:inset 0 -1px 0 rgba(0,0,0,.15)}
+.est-btn-submit{background:var(--e-global-color-primary, #213A52);color:#fff;box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);width:100px}
 .est-btn-submit:hover{filter:brightness(1.1)}
 .est-btn-row{display:flex;gap:12px;margin-top:10px}
 
@@ -228,10 +231,15 @@ textarea{min-height:120px}
 /*=================================================================*/
 /*=================================================================*/
 .est-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.est-grid-2:has(#phone){grid-template-columns:35% 1fr}
+.est-grid-2:has(#street){grid-template-columns:2fr 1fr}
 @media (max-width:640px){
   .est-grid-2{grid-template-columns:1fr}
+  .est-grid-2:has(#phone){grid-template-columns:1fr}
+  .est-grid-2:has(#street){grid-template-columns:1fr}
   .est-card{padding:18px 16px 22px}
   .est-title{font-size:26px}
+  .est-chip-grid{display:flex;flex-direction:column;gap:12px;max-width:100%}
 }
 
 /* Thank-you */
@@ -293,6 +301,7 @@ textarea{min-height:120px}
 
 		<label class="est-block" for="service_needed">
 		  <span class="est-label">Service needed:</span>
+		  <div id="service-help" class="est-help">Choose the closest match.</div>
 		  <select id="service_needed" name="service_needed" required aria-describedby="service-help">
 			<option value="" selected disabled>Select</option>
 			<option>Roof Repair</option>
@@ -302,11 +311,11 @@ textarea{min-height:120px}
 			<option>Siding</option>
 			<option>Other</option>
 		  </select>
-		  <div id="service-help" class="est-help">Choose the closest match.</div>
 		</label>
 
 		<fieldset class="est-fs" aria-describedby="status-help">
 		  <legend>Choose the appropriate status for this project:</legend>
+		  <div id="status-help" class="est-help">This helps prioritize your request.</div>
 		  <div class="est-chip-row" role="radiogroup" aria-label="Project status">
 			<label class="est-chip">
 			  <input type="radio" name="project_status" value="Ready to Hire" required>
@@ -317,11 +326,11 @@ textarea{min-height:120px}
 			  <span>Planning &amp; Budgeting</span>
 			</label>
 		  </div>
-		  <div id="status-help" class="est-help">This helps prioritize your request.</div>
 		</fieldset>
 
 		<fieldset class="est-fs" aria-describedby="timeline-help">
 		  <legend>What is the timeline for this project?</legend>
+		  <div id="timeline-help" class="est-help">An estimate window is fine.</div>
 		  <div class="est-chip-grid" role="radiogroup" aria-label="Project timeline">
 			<label class="est-chip">
 			  <input type="radio" name="timeline" value="Timing is Flexible" required>
@@ -340,7 +349,6 @@ textarea{min-height:120px}
 			  <span>More than 2 Weeks</span>
 			</label>
 		  </div>
-		  <div id="timeline-help" class="est-help">An estimate window is fine.</div>
 		</fieldset>
 
 		<fieldset class="est-fs">
@@ -362,13 +370,13 @@ textarea{min-height:120px}
 		</fieldset>
 
 		<div class="est-btn-row">
-		  <button type="button" class="est-btn est-btn-yellow next" id="to-step-2" aria-controls="step2-heading">Next</button>
+		  <button type="button" class="est-btn est-btn-submit next" id="to-step-2" aria-controls="step2-heading">Next</button>
 		</div>
 	  </div>
 
 	  <!-- ===== STEP 2 ===== -->
 	  <div class="form-step est-hidden" data-step="2" aria-hidden="true" aria-labelledby="step2-heading">
-		<h2 class="est-subhead" id="step2-heading" tabindex="-1">Contact information</h2>
+		<h2 class="est-subhead" id="step2-heading" tabindex="-1">Contact Information</h2>
 		<hr class="est-rule">
 
 		<div class="est-grid-2">
@@ -400,10 +408,9 @@ textarea{min-height:120px}
 		  </label>
 		  <label class="est-block" for="zip">
 			<span class="est-label">Zip Code</span>
-			<input id="zip" type="text" name="zip" required inputmode="numeric" pattern="[0-9]{5}" aria-describedby="zip-help">
+			<input id="zip" type="text" name="zip" required inputmode="numeric" pattern="[0-9]{5}">
 		  </label>
 		</div>
-		<div id="zip-help" class="est-help">5-digit ZIP code</div>
 
 		<label class="est-block" for="message">
 		  <span class="est-label">Message</span>
@@ -437,7 +444,7 @@ textarea{min-height:120px}
   <div id="thankyouPanel" class="est-hidden" aria-labelledby="thanks-heading">
 	<div style="text-align:center; padding:12px 8px 8px;">
 	  <h1 class="est-title" style="margin-bottom:18px;">Get A Free Estimate Today!</h1>
-	  <img src="https://i.imgur.com/0v1qR0N.png" alt="Success checkmark" width="130" height="130" style="display:block;margin:0 auto 12px;">
+	  <img src="https://moth.ksit.me/wp-content/uploads/2025/10/green-checkmark-2.png" alt="Success checkmark" width="130" height="130" style="display:block;margin:0 auto 12px;">
 	  <h2 id="thanks-heading" style="font-size:36px; margin:8px 0 8px; font-weight:800; color:#111;" tabindex="-1">Thank you!</h2>
 	  <p style="font-size:22px; line-height:1.35; font-weight:700; color:#111; max-width:720px; margin:0 auto 14px;">
 		A contractor from our trusted network has been notified of your request and will be contacting you shortly.
