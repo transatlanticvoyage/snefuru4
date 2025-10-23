@@ -50,7 +50,7 @@ export default function LeadsmartMorphClient() {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Pagination state
-  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentRowPage, setCurrentRowPage] = useState(1);
   const [colsPerPage, setColsPerPage] = useState(10);
   const [currentColPage, setCurrentColPage] = useState(1);

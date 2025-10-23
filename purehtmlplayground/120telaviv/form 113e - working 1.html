@@ -1,0 +1,937 @@
+<!-- Multi-Step Lead Form (Elementor-safe, mobile, ADA, Formspree AJAX) -->
+<div class="msf-wrapper" id="lead-form">
+  <!-- Live region for screen readers -->
+  <div class="sr-only" aria-live="polite" aria-atomic="true" id="msf-aria-live"></div>
+
+<!-------------------------------------------------------------------->
+<!---- STEP 1 ---->
+<!-------------------------------------------------------------------->
+  <div id="zeta-form-step-1" data-step="1">
+	<section class="msf-card" aria-labelledby="msf-step1-title">
+	  <header class="msf-card-header">
+		<h2 id="msf-step1-title" tabindex="-1">Get a Free Quote</h2>
+	  </header>
+  
+	  <form id="msf-form" novalidate>
+  
+		<!-- Honeypot (spam trap) -->
+		<label class="sr-only" for="company">Company (Leave this field empty)</label>
+		<input type="text" id="company" name="company" tabindex="-1" autocomplete="off" class="msf-hp" aria-hidden="true">
+  
+		<div class="msf-field msf-inline">
+		  <label for="zip">Zip</label>
+		  <input id="zip" name="zip" type="text" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="" required>
+		</div>
+  
+		<div class="msf-field msf-inline">
+		  <label for="name">Name</label>
+		  <input id="name" name="name" type="text" placeholder="First &amp; Last Name" autocomplete="name" required>
+		</div>
+  
+		<div class="msf-field msf-inline">
+		  <label for="phone">Phone</label>
+		  <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="" required>
+		</div>
+  
+		<!-- Help text aligned to input width -->
+		<div class="msf-field msf-inline">
+		  <label aria-hidden="true" role="presentation"></label>
+		  <div class="msf-help" style="line-height:1.3;font-style:italic;font-size:10px;">
+			Email and phone are needed to provide quotes
+		  </div>
+		</div>
+  
+		<div class="msf-field msf-inline">
+		  <label for="email">Email</label>
+		  <input id="email" name="email" type="email" autocomplete="email" placeholder="" required>
+		</div>
+  
+		<div class="msf-field msf-inline">
+		  <label for="street">Street</label>
+		  <input id="street" name="street" type="text" placeholder="101 Main St" autocomplete="address-line1">
+		</div>
+  
+		<div class="msf-field msf-inline">
+		  <label for="details">Details</label>
+		  <textarea id="details" name="details" rows="3" placeholder="Please provide details for an accurate estimate"></textarea>
+		</div>
+  
+		<div class="msf-actions">
+		  <button type="button" id="to-step-2" class="msf-btn msf-btn-primary" aria-controls="msf-step2-title">
+			GET A FREE QUOTE
+		  </button>
+		</div>
+	  </form>
+	</section>
+  </div>
+
+
+<!-------------------------------------------------------------------->
+<!---- STEP 2 ---->
+<!-------------------------------------------------------------------->
+ <div id="zeta-form-step-2" data-step="2">
+   <section class="msf-card" aria-labelledby="msf-step2-title">
+ 
+	 <!-- Header (unchanged, NO padding added here) -->
+	 <header class="msf-card-header">
+	   <h2 id="msf-step2-title" tabindex="-1">One last thing…</h2>
+	   <p class="msf-subhead">Please tell us about your project</p>
+	 </header>
+ 
+	 <!-- Main form content WITH padding wrapper -->
+	 <div class="msf-card-body">
+	   <div class="msf-field">
+		 <label for="service_needed">Service needed</label>
+		 <select id="service_needed" name="service_needed" required>
+		   <option value="" selected disabled>Select</option>
+		   <option value="General">General</option>
+		   <option value="Inspection">Inspection</option>
+		   <option value="Repair">Repair</option>
+		   <option value="Install">Install</option>
+		   <option value="Other">Other</option>
+		 </select>
+	   </div>
+ 
+	   <fieldset class="msf-field">
+		 <legend>Choose the appropriate status for this project</legend>
+		 <div class="msf-choice-row" role="radiogroup" aria-label="Project status">
+		   <label class="msf-radio">
+			 <input type="radio" name="project_status" value="Ready to hire" required>
+			 <span>Ready to hire</span>
+		   </label>
+		   <label class="msf-radio">
+			 <input type="radio" name="project_status" value="Planning" required>
+			 <span>Planning</span>
+		   </label>
+		 </div>
+	   </fieldset>
+ 
+	   <fieldset class="msf-field">
+		 <legend>What is the timeline for this project?</legend>
+		 <div class="msf-choice-grid" role="radiogroup" aria-label="Project timeline">
+		   <label class="msf-radio">
+			 <input type="radio" name="timeline" value="Timing is Flexible" required>
+			 <span>Timing is Flexible</span>
+		   </label>
+		   <label class="msf-radio">
+			 <input type="radio" name="timeline" value="Within 1 week" required>
+			 <span>Within 1 week</span>
+		   </label>
+		   <label class="msf-radio">
+			 <input type="radio" name="timeline" value="1 - 2 Weeks" required>
+			 <span>1 - 2 Weeks</span>
+		   </label>
+		   <label class="msf-radio">
+			 <input type="radio" name="timeline" value="More than 2 Weeks" required>
+			 <span>More than 2 Weeks</span>
+		   </label>
+		 </div>
+	   </fieldset>
+ 
+	   <div class="msf-actions">
+		 <button type="button" id="back-step-1" class="msf-btn msf-btn-secondary">Back</button>
+		 <button type="button" id="msf-submit" class="msf-btn msf-btn-primary">Submit</button>
+	   </div>
+	 </div>
+   </section>
+ </div>
+
+
+<!-------------------------------------------------------------------->
+<!---- STEP 3 (feedback message) ---->
+<!-------------------------------------------------------------------->
+  <div id="zeta-form-step-3" data-step="3">
+	<section class="msf-card" aria-labelledby="msf-step3-title">
+	  <div class="msf-confirm">
+		<div class="msf-check" aria-hidden="true">✔</div>
+		<h2 id="msf-step3-title" tabindex="-1">Thanks!</h2>
+		<p>A contractor from our trusted network has been sent your request and they will contact you shortly.</p>
+	  </div>
+	</section>
+  </div>
+</div>  <!-- End of main wrapper (id="lead-form") -->
+
+<style>
+  /* ============================================
+	 Multi-Step Form Styles (Global Version)
+	 Uses Elementor --e-global-color-accent
+	 Unified input border control via --msf-field-border
+	 ============================================ */
+  
+  /* scope form-wide tokens here so they're easy to tweak */
+  .msf-wrapper {
+	/* EDIT THIS ONE LINE to change all text/textarea/select borders */
+	--msf-field-border: #cfcfcf;
+  }
+  
+  /* --- Base / Reset-ish --- */
+  .msf-wrapper {
+	max-width: 360px;
+	margin: 0 auto;
+	font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+	color: #222;
+  }
+  .msf-card {
+	background: #fff;
+	border-radius: 10px;
+	box-shadow: 0 2px 6px rgba(0,0,0,.12);
+	overflow: hidden;
+	border: 1px solid rgba(0,0,0,.08);
+  }
+  .msf-card + .msf-card { margin-top: 14px; }
+  .msf-card-header {
+	background: #f8e8c9;
+	padding: 14px 16px;
+	border-bottom: 1px solid rgba(0,0,0,.06);
+  }
+  .msf-card-header h2 {
+	margin: 0;
+	font-size: 20px;
+	line-height: 1.2;
+	color: #1b1b1b;
+  }
+  .msf-subhead { margin: 6px 0 0 0; font-size: 14px; color: #333; }
+  .sr-only {
+	position: absolute !important;
+	height: 1px; width: 1px; overflow: hidden;
+	clip: rect(1px,1px,1px,1px); white-space: nowrap;
+  }
+  
+  #msf-form,
+  .msf-card[data-step="2"] { padding: 14px 16px 16px; }
+  .msf-field { margin-bottom: 10px; }
+  .msf-field label, .msf-field legend {
+	display: block; font-size: 13px; font-weight: 600;
+	margin-bottom: 6px; color: #222;
+  }
+  
+  /* ✅ SINGLE, UNIFIED BORDER RULE FOR ALL TEXT INPUTS/SELECTS/TEXTAREAS */
+  .msf-field :is(
+	input[type="text"],
+	input[type="email"],
+	input[type="tel"],
+	input[type="number"],
+	textarea,
+	select
+  ) {
+	width: 100%;
+	font-size: 15px;
+	line-height: 1.3;
+	padding: 10px 12px;
+	border: 1px solid var(--msf-field-border);
+	border-radius: 6px;
+	background: #fff;
+  }
+  
+  .msf-field textarea { resize: vertical; }
+  .msf-help { font-size: 12px; color: #666; margin-top: 6px; }
+  
+  /* Choices (radio/select layout) */
+  .msf-choice-row, .msf-choice-grid { display: grid; gap: 10px; }
+  .msf-choice-row { grid-template-columns: 1fr 1fr; }
+  .msf-choice-grid { grid-template-columns: 1fr; }
+  @media (min-width:420px){ .msf-choice-grid { grid-template-columns: 1fr 1fr; } }
+  
+  .msf-radio {
+	display: flex; align-items: center; gap: 8px;
+	padding: 10px 12px; border: 1px solid #cfcfcf;
+	border-radius: 6px; background: #fff; cursor: pointer;
+  }
+  
+  
+  /* Buttons */
+  .msf-actions { display: flex; gap: 10px; margin-top: 12px; }
+  .msf-actions .msf-btn { flex: 1; }
+  .msf-btn {
+	display: inline-block; text-align: center; padding: 12px 14px;
+	border-radius: 8px; border: 0; cursor: pointer;
+	font-weight: 700; font-size: 14px;
+  }
+  .msf-btn:focus {
+	outline: 3px solid color-mix(in srgb, var(--e-global-color-accent, #f39c12), white 65%);
+	outline-offset: 2px;
+  }
+  .msf-btn-primary {
+	background: var(--e-global-color-accent, #f39c12) !important;
+	color: #fff !important;
+	background-image: none !important;
+	border: 0;
+  }
+  .msf-btn-primary:hover { filter: brightness(.95); }
+  .msf-btn-secondary { background: #e9e9e9; color: #222; }
+  
+  /* Confirmation Screen */
+  .msf-confirm { text-align: center; padding: 24px 18px; }
+  .msf-check {
+	width: 76px; height: 76px; line-height: 76px; border-radius: 50%;
+	background: #5cc441; color: #fff; font-size: 44px; font-weight: 900;
+	margin: 8px auto 12px; display: flex; align-items: center; justify-content: center;
+  }
+  
+  /* Honeypot hidden but accessible to bots */
+  .msf-hp {
+	position: absolute; left: -9999px; top: auto;
+	width: 1px; height: 1px; overflow: hidden;
+  }
+  
+  /* Error styles */
+  .msf-error { border-color: #d93025 !important; }
+  .msf-error-msg { color: #d93025; font-size: 12px; margin-top: 6px; }
+  
+  /* Error messages below fields in Step 1 */
+  .msf-error-below {
+    margin-left: 57px; /* Align with input column (47px label + 10px gap) */
+    margin-top: 2px; /* Position clearly below the input field */
+    margin-bottom: 4px; /* Space before next field */
+    color: #d93025;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+  
+  /* On mobile, align error message normally */
+  @media (max-width: 420px) {
+    .msf-error-below {
+      margin-left: 0;
+    }
+  }
+  </style>
+  
+  
+  
+  
+  <style>
+  /* Inline label→input layout for preview widgets */
+  .msf-field.msf-inline {
+	display: grid;
+	grid-template-columns: 120px 1fr; /* label | input */
+	align-items: center;
+	gap: 10px;
+  }
+  
+  /* tighten labels when inline so they don't add top spacing */
+  .msf-field.msf-inline label { 
+	margin: 0;
+  }
+  
+  /* mobile: stack nicely */
+  @media (max-width: 420px){
+	.msf-field.msf-inline { grid-template-columns: 1fr; }
+  }
+  </style>
+  
+  <style>
+  /* Inline label→input layout with fixed label width */
+  .msf-field.msf-inline {
+	display: grid;
+	grid-template-columns: 47px 1fr; /* fixed label width | flexible input */
+	align-items: center;
+	gap: 10px;
+  }
+  
+  /* Labels shouldn't push extra spacing */
+  .msf-field.msf-inline label { 
+	margin: 0;
+	width: 47px;
+	min-width: 47px;
+	max-width: 47px;
+	text-align: left;
+	display: inline-block;
+  }
+  
+  /* Responsive: stack on smaller screens */
+  @media (max-width: 420px){
+	.msf-field.msf-inline {
+	  grid-template-columns: 1fr;
+	}
+	.msf-field.msf-inline label {
+	  width: auto;
+	  min-width: 0;
+	  max-width: 100%;
+	}
+  }
+  </style>
+  
+  <style>
+  /* Apply padding ONLY to the body area inside Step 2 */
+  #zeta-form-step-2 .msf-card-body {
+	padding: 4px 6px 6px 6px !important; /* top | right | bottom | left */
+  }
+  </style>
+  
+  
+  
+  <style>
+  /* ============================================
+	 Unified Font Size Control for Input Text & Placeholders
+	 ============================================ */
+  
+  /* 👇 EDIT THIS SINGLE LINE to control input & placeholder font size everywhere */
+  .msf-wrapper {
+	--msf-input-font-size: 14px; /* currently reduced by 2px from 15px */
+  }
+  
+  /* Apply font size to user-entered text */
+  .msf-field input[type="text"],
+  .msf-field input[type="email"],
+  .msf-field input[type="tel"],
+  .msf-field input[type="number"],
+  .msf-field textarea,
+  .msf-field select {
+	font-size: var(--msf-input-font-size) !important;
+  }
+  
+  /* Apply font size to placeholder (default text) */
+  .msf-field input::placeholder,
+  .msf-field textarea::placeholder {
+	font-size: var(--msf-input-font-size) !important;
+	opacity: 0.9; /* keeps it visible but slightly lighter; optional */
+  }
+  </style>
+  
+  <style>
+  /* Let the input column actually shrink in tight spaces */
+  .msf-field.msf-inline > :nth-child(2) {
+	min-width: 0; /* critical for CSS grid: allows 1fr child to shrink */
+  }
+  
+  /* Make form controls respect their container width (no bleed) */
+  .msf-field input[type="text"],
+  .msf-field input[type="email"],
+  .msf-field input[type="tel"],
+  .msf-field input[type="number"],
+  .msf-field textarea,
+  .msf-field select {
+	box-sizing: border-box;  /* include padding/border inside the 100% */
+	max-width: 100%;         /* never exceed the grid column */
+  }
+  
+  /* (Optional but safe)—if you want everything inside to obey border-box */
+  .msf-wrapper, .msf-wrapper * {
+	box-sizing: border-box;
+  }
+  </style>
+  
+  <style>
+  /* --- STOP INPUT JUMP + TIGHTEN VERTICAL SPACING (Step 1 preview only) --- */
+  
+  /* 1) Reduce vertical spacing between fields to exactly 2px */
+  #zeta-form-step-1 .msf-field {
+	margin-bottom: 2px !important;
+  }
+  
+  /* 2) Keep borders identical in all states so nothing "grows" on focus */
+  #zeta-form-step-1 .msf-field input[type="text"],
+  #zeta-form-step-1 .msf-field input[type="email"],
+  #zeta-form-step-1 .msf-field input[type="tel"],
+  #zeta-form-step-1 .msf-field input[type="number"],
+  #zeta-form-step-1 .msf-field textarea,
+  #zeta-form-step-1 .msf-field select,
+  #zeta-form-step-1 .msf-field input[type="text"]:focus,
+  #zeta-form-step-1 .msf-field input[type="email"]:focus,
+  #zeta-form-step-1 .msf-field input[type="tel"]:focus,
+  #zeta-form-step-1 .msf-field input[type="number"]:focus,
+  #zeta-form-step-1 .msf-field textarea:focus,
+  #zeta-form-step-1 .msf-field select:focus,
+  #zeta-form-step-1 .msf-field input[type="text"]:active,
+  #zeta-form-step-1 .msf-field input[type="email"]:active,
+  #zeta-form-step-1 .msf-field input[type="tel"]:active,
+  #zeta-form-step-1 .msf-field input[type="number"]:active,
+  #zeta-form-step-1 .msf-field textarea:active,
+  #zeta-form-step-1 .msf-field select:active,
+  #zeta-form-step-1 .msf-field input[type="email"]:invalid,
+  #zeta-form-step-1 .msf-field textarea:invalid {
+	border: 1px solid var(--msf-field-border, #cfcfcf) !important;
+	box-shadow: none !important;     /* kills theme/invalid focus glow */
+	outline: 0 !important;           /* no focus outline that might shift */
+	background-clip: padding-box;    /* avoids edge artifacts */
+	transition: none;                /* no animated nudge on focus */
+	max-width: 100%;
+	box-sizing: border-box;
+  }
+  
+  /* 3) Normalize autofill so it doesn't create inner glow that looks like a jump */
+  #zeta-form-step-1 .msf-field input:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+	box-shadow: 0 0 0 1000px #fff inset !important;
+	border: 1px solid var(--msf-field-border, #cfcfcf) !important;
+	-webkit-text-fill-color: inherit;
+  }
+  
+  /* 4) In the inline label layout, allow the right column to shrink in small widgets */
+  #zeta-form-step-1 .msf-field.msf-inline > :nth-child(2) {
+	min-width: 0; /* critical to prevent bleed in tight widths */
+  }
+  </style>
+  
+  <style>
+  /* Freeze row spacing on focus so nothing pushes the next field down */
+  #zeta-form-step-1 .msf-field,
+  #zeta-form-step-1 .msf-field:focus-within {
+	margin-bottom: 2px !important;   /* exact spacing you wanted */
+	padding-bottom: 0 !important;    /* prevent padding growth on focus */
+	border-bottom-width: 0 !important; /* prevent row border growth on focus */
+  }
+  
+  /* Keep input/textarea/select box model identical in all states */
+  #zeta-form-step-1 .msf-field input,
+  #zeta-form-step-1 .msf-field textarea,
+  #zeta-form-step-1 .msf-field select,
+  #zeta-form-step-1 .msf-field input:focus,
+  #zeta-form-step-1 .msf-field textarea:focus,
+  #zeta-form-step-1 .msf-field select:focus {
+	box-sizing: border-box !important;
+	border-width: 1px !important;     /* no border thicken on focus */
+	box-shadow: none !important;      /* no glow that can appear as a “jump” */
+	outline: 0 !important;
+	transition: none !important;      /* no micro-animations */
+  }
+  
+  /* If a theme uses :has() on the row, neutralize it too */
+  #zeta-form-step-1 .msf-field:has(input:focus),
+  #zeta-form-step-1 .msf-field:has(textarea:focus),
+  #zeta-form-step-1 .msf-field:has(select:focus) {
+	margin-bottom: 2px !important;
+	padding-bottom: 0 !important;
+	border-bottom-width: 0 !important;
+  }
+  </style>
+  
+  <style>
+  /* STEP 1 header: center + reduce size (20px → 18px) */
+  #zeta-form-step-1 .msf-card-header h2 {
+	text-align: center !important;
+	font-size: 18px !important; /* was 20px */
+  }
+  
+  /* STEP 1 body: reduce left gutter before label text to 60% of current
+	 Original left padding on #msf-form is 16px → 16px * 0.6 = 9.6px */
+  #zeta-form-step-1 #msf-form {
+	padding-left: calc(16px * 0.6) !important; /* ≈ 9.6px */
+  }
+  
+  /* (Optional safety) If any Step 1 content ever sits outside #msf-form,
+	 keep header untouched but reduce left padding for other body blocks too. */
+  #zeta-form-step-1 .msf-card > :not(.msf-card-header) {
+	padding-left: calc(16px * 0.6) !important;
+  }
+  </style>
+  
+  <style>
+  /* Reduce padding for input and textarea text in Step 1 preview only */
+  #zeta-form-step-1 .msf-field input[type="email"],
+  #zeta-form-step-1 .msf-field input[type="text"],
+  #zeta-form-step-1 .msf-field input[type="tel"],
+  #zeta-form-step-1 .msf-field input[type="number"],
+  #zeta-form-step-1 .msf-field textarea {
+	padding: 6px !important;           /* 1px on all sides */
+	box-sizing: border-box !important; /* ensures border + padding do not overflow */
+	line-height: 1.3 !important;       /* keeps text vertically aligned */
+  }
+  
+  /* Make sure placeholder text also aligns elegantly with new padding */
+  /*   ---------#zeta-form-step-1 .msf-field input::placeholder,
+  #zeta-form-step-1 .msf-field textarea::placeholder {
+	padding: 0 !important;    
+  } -----------  */
+  </style>
+  
+  
+  
+  
+  <style>
+  /* Remove spacing between Phone input and the help text directly below it */
+  #zeta-form-step-1 .msf-field.msf-inline:nth-of-type(3),
+  #zeta-form-step-1 .msf-field.msf-inline:nth-of-type(4) {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+  }
+  
+  #zeta-form-step-1 .msf-field.msf-inline:nth-of-type(4) .msf-help {
+	margin-top: 0 !important;
+  }
+  </style>
+  
+  <style>
+  /* ============================================
+	 STEP 2 PREVIEW SELECTOR BOXES - Neutral + Hover
+	 ============================================ */
+  
+  /* Neutral background */
+  #zeta-form-step-2 .msf-radio {
+	background-color: #e7e7e7 !important;
+	color: #000 !important;
+	border: 1px solid #bcbcbc !important;
+	transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  
+  /* Remove any selected / active styling */
+  #zeta-form-step-2 .msf-radio input:checked,
+  #zeta-form-step-2 .msf-radio:has(input:checked),
+  #zeta-form-step-2 .msf-radio input:checked + span,
+  #zeta-form-step-2 .msf-radio input:checked ~ * {
+	color: #000 !important;
+  }
+  
+  /* Hover effect */
+  #zeta-form-step-2 .msf-radio:hover {
+	background-color: yellow !important;
+	color: #000 !important;
+  }
+  </style>
+  <style>
+  /* ============================================
+	 STEP 2 PREVIEW — FINAL SELECTOR STYLES 
+	 (Neutral look, 2px visual spacing, keep borders, hover = yellow)
+	 ============================================ */
+  
+  /* Remove built-in grid gap so margins control visual spacing */
+  #zeta-form-step-2 .msf-choice-row,
+  #zeta-form-step-2 .msf-choice-grid {
+	gap: 0 !important;
+  }
+  
+  /* Each box gets 1px margin (so 2px visual gap between units)
+	 Keep borders and neutral styling */
+  #zeta-form-step-2 .msf-radio {
+	background-color: #e7e7e7 !important;
+	color: #000 !important;
+	border: 1px solid #bcbcbc !important;
+	border-radius: 6px !important;
+	margin: 1px !important;   /* creates 2px gap total between boxes */
+	padding: 1px !important;  /* as requested */
+	transition: background-color 0.15s ease;
+  }
+  
+  /* Hover effect */
+  #zeta-form-step-2 .msf-radio:hover {
+	background-color: yellow !important;
+	color: #000 !important;
+  }
+  
+  
+  </style>
+  
+  <style>
+  /* ============================================
+	 STEP 2 PREVIEW - Increase Label Font Size by 1px
+	 ============================================ */
+  #zeta-form-step-2 .msf-field label,
+  #zeta-form-step-2 .msf-field legend {
+	font-size: calc(13px + 1px) !important; /* becomes 14px */
+  }
+  </style>
+  
+  <style>
+  /* ============================================
+	 STEP 1 PREVIEW - Tighten label line spacing
+	 ============================================ */
+  #zeta-form-step-1 .msf-field label {
+	line-height: 1.3 !important;
+  }
+  </style>
+  
+  <style>
+  /* STEP 1 PREVIEW — top padding = 10px (leaves Step 2 alone) */
+  #zeta-form-step-1 #msf-form { padding-top: 14px !important; }
+  </style>
+  <style>
+  /* ============================================
+	 STEP 2 PREVIEW — Active Selected Chip Background
+	 ============================================ */
+  #zeta-form-step-2 .msf-radio input:checked ~ * {
+	background-color: #feffbb !important; /* soft yellow-green */
+	color: #000 !important; /* keep text readable */
+  }
+  #zeta-form-step-2 .msf-radio:has(input:checked) {
+	background-color: #feffbb!important;
+	color: #000 !important;
+  }
+  </style>
+  
+  <style>
+  
+  
+  /* Normalize Chrome/Brave/Safari autofill so it doesn’t look “darker” */
+  #zeta-form-step-1 .msf-field input:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+	box-shadow: 0 0 0 1000px #fff inset !important;
+	border: 1px solid var(--step1-border) !important;
+	border-radius: var(--step1-radius) !important;
+	-webkit-text-fill-color: inherit;
+  }
+  
+  
+  
+  /* ============================================
+	 STEP 1 — Final Unified Border + Radius Styling (strong specificity)
+	 ============================================ */
+  #zeta-form-step-1 {
+	--step1-border: #b3b3b3;  /* tweak color here */
+	--step1-radius: 3px;      /* tweak roundness here */
+  }
+  
+  #zeta-form-step-1 form#msf-form .msf-field :is(
+	input[type="text"],
+	input[type="email"],
+	input[type="tel"],
+	input[type="number"],
+	textarea,
+	select
+  ):not([type="radio"]):not([type="checkbox"]) {
+	border: 1px solid var(--step1-border) !important;
+	border-radius: var(--step1-radius) !important;
+	background-color: #ffffff !important;
+	box-shadow: none !important;
+	outline: none !important;
+	background-clip: padding-box !important;
+	appearance: none;
+	-webkit-appearance: none;
+  }
+  
+  /* Keep the same look on focus/active/invalid */
+  #zeta-form-step-1 form#msf-form .msf-field :is(
+	input[type="text"],
+	input[type="email"],
+	input[type="tel"],
+	input[type="number"],
+	textarea,
+	select
+  ):is(:focus, :active, :invalid):not([type="radio"]):not([type="checkbox"]) {
+	border-color: var(--step1-border) !important;
+	border-radius: var(--step1-radius) !important;
+	box-shadow: none !important;
+	outline: none !important;
+  }
+  
+  /* Autofill normalization (stops Chrome from changing border color) */
+  #zeta-form-step-1 form#msf-form .msf-field input:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+	box-shadow: 0 0 0 1000px #ffffff inset !important;
+	border: 1px solid var(--step1-border) !important;
+	border-radius: var(--step1-radius) !important;
+	-webkit-text-fill-color: inherit !important;
+  }
+  
+  
+  
+  
+  </style>
+
+  <style>
+  /* Initially hide steps 2 and 3 */
+  #zeta-form-step-2, 
+  #zeta-form-step-3 {
+    display: none;
+  }
+  </style>
+
+
+<script>
+(function(){
+  'use strict';
+  
+  // Check if our form exists before running
+  const wrapper = document.getElementById('lead-form');
+  if (!wrapper) {
+    console.warn('Multi-step form: #lead-form not found');
+    return;
+  }
+  
+  // Check for duplicate IDs that might cause conflicts
+  const criticalIds = ['lead-form', 'msf-form', 'zeta-form-step-1', 'zeta-form-step-2', 'zeta-form-step-3'];
+  for (const id of criticalIds) {
+    if (document.querySelectorAll('#' + id).length > 1) {
+      console.error('Multi-step form: Duplicate ID detected: ' + id);
+      return; // Exit to prevent conflicts
+    }
+  }
+  
+  const form = wrapper.querySelector('#msf-form');
+  const live = wrapper.querySelector('#msf-aria-live');
+  
+  if (!form) {
+    console.warn('Multi-step form: #msf-form not found within wrapper');
+    return;
+  }
+
+  const stepTitles = {
+	1: wrapper.querySelector('#msf-step1-title'),
+	2: wrapper.querySelector('#msf-step2-title'),
+	3: wrapper.querySelector('#msf-step3-title'),
+  };
+
+  function showStep(n){
+	// Only manipulate elements within our wrapper
+	const step1 = wrapper.querySelector('#zeta-form-step-1');
+	const step2 = wrapper.querySelector('#zeta-form-step-2');
+	const step3 = wrapper.querySelector('#zeta-form-step-3');
+	
+	if (step1) step1.style.display = 'none';
+	if (step2) step2.style.display = 'none';
+	if (step3) step3.style.display = 'none';
+	
+	// Show the current step
+	const currentStep = wrapper.querySelector('#zeta-form-step-' + n);
+	if (currentStep) currentStep.style.display = 'block';
+	
+	// Announce change & move focus
+	const title = stepTitles[n];
+	if (title) {
+	  title.setAttribute('tabindex','-1');
+	  title.focus({ preventScroll:false });
+	}
+	if (live) live.textContent = 'Step ' + n + ' of 3';
+  }
+
+  function clearErrors(node){
+	// Remove all error messages that were placed below fields
+	const allErrors = wrapper.querySelectorAll('.msf-error-below');
+	allErrors.forEach(err => err.remove());
+	
+	// Remove error styling from fields
+	const fields = node.querySelectorAll('input, textarea, select');
+	fields.forEach(el => {
+	  el.classList.remove('msf-error');
+	});
+  }
+
+  // Basic validation for step 1 before moving on
+  function validateStep1(){
+	const requiredIds = ['zip','name','phone','email'];
+	let ok = true;
+	clearErrors(wrapper.querySelector('#zeta-form-step-1'));
+
+	requiredIds.forEach(id => {
+	  const el = wrapper.querySelector('#' + id);
+	  if (!el) return; // Skip if element not found
+	  const wrap = el.closest('.msf-field');
+
+	  if (!el.value.trim()) {
+		ok = false;
+		el.classList.add('msf-error');
+		const msg = document.createElement('div');
+		msg.className = 'msf-error-msg msf-error-below';
+		msg.textContent = 'This field is required.';
+		// Insert error message after the field wrapper
+		wrap.parentNode.insertBefore(msg, wrap.nextSibling);
+	  } else if (id === 'zip' && !/^\d{5}$/.test(el.value.trim())) {
+		ok = false;
+		el.classList.add('msf-error');
+		const msg = document.createElement('div');
+		msg.className = 'msf-error-msg msf-error-below';
+		msg.textContent = 'Enter a valid 5-digit ZIP.';
+		// Insert error message after the field wrapper
+		wrap.parentNode.insertBefore(msg, wrap.nextSibling);
+	  } else if (id === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim())) {
+		ok = false;
+		el.classList.add('msf-error');
+		const msg = document.createElement('div');
+		msg.className = 'msf-error-msg msf-error-below';
+		msg.textContent = 'Enter a valid email.';
+		// Insert error message after the field wrapper
+		wrap.parentNode.insertBefore(msg, wrap.nextSibling);
+	  }
+	});
+	return ok;
+  }
+
+  // Move to Step 2
+  const step2Btn = wrapper.querySelector('#to-step-2');
+  if (step2Btn) {
+    step2Btn.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if (!validateStep1()) {
+        if (live) live.textContent = 'Please correct the highlighted fields.';
+        return;
+      }
+      showStep(2);
+    });
+  }
+
+  // Back to Step 1
+  const backBtn = wrapper.querySelector('#back-step-1');
+  if (backBtn) {
+    backBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      showStep(1);
+    });
+  }
+
+  // Submit (AJAX to Formspree)
+  const submitBtn = wrapper.querySelector('#msf-submit');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', async function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      // Quick validation of required fields on step 2
+      clearErrors(wrapper.querySelector('#zeta-form-step-2'));
+
+      const svc = wrapper.querySelector('#service_needed');
+      const status = wrapper.querySelector('input[name="project_status"]:checked');
+      const timeline = wrapper.querySelector('input[name="timeline"]:checked');
+
+	if (!svc.value) {
+	  svc.classList.add('msf-error');
+	  svc.focus();
+	  const msg = document.createElement('div');
+	  msg.className = 'msf-error-msg';
+	  msg.textContent = 'Please select a service.';
+	  svc.closest('.msf-field').appendChild(msg);
+	  if (live) live.textContent = 'Please select a service.';
+	  return;
+	}
+	if (!status) { wrapper.querySelector('input[name="project_status"]').focus(); if (live) live.textContent = 'Please choose project status.'; return; }
+	if (!timeline) { wrapper.querySelector('input[name="timeline"]').focus(); if (live) live.textContent = 'Please choose a timeline.'; return; }
+
+	// Abort if honeypot filled
+	const honeypot = wrapper.querySelector('#company');
+	if (honeypot && honeypot.value) {
+	  showStep(3); return;
+	}
+
+	// Build form data (Step1 + Step2)
+	const fd = new FormData(form);
+	fd.append('service_needed', svc.value);
+	fd.append('project_status', status.value);
+	fd.append('timeline', timeline.value);
+
+	/* ---- Optional metadata (shows in Formspree submission) ---- */
+	fd.append('_subject', 'New Lead - Multi-Step Form');
+	fd.append('page_url', window.location.href);
+	fd.append('form_version', 'v1');
+
+	try {
+	  const endpoint = 'https://formspree.io/f/manpzyyr'; // your Formspree form
+	  const resp = await fetch(endpoint, {
+		method: 'POST',
+		body: fd,
+		headers: { 'Accept': 'application/json' }
+	  });
+
+	  if (resp.ok) {
+		showStep(3);
+		form.reset();
+	  } else {
+		let msg = 'Submission failed. Please try again.';
+		try {
+		  const data = await resp.json();
+		  if (data && data.errors && data.errors.length) {
+			msg = data.errors.map(e => e.message).join(', ');
+		  }
+		} catch(e){}
+		alert(msg);
+	  }
+	} catch (err) {
+	  alert('Network error. Please check your connection and try again.');
+	}
+    });
+  }
+
+  // Start at step 1
+  showStep(1);
+})();
+</script>
