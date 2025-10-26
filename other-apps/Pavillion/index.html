@@ -14,14 +14,19 @@
     <div class="tab-bar">
       <div class="app-title">Pavilion</div>
       <div class="tabs">
-        <button class="tab-button active" data-group="finder">Finder-like View</button>
+        <button class="tab-button active" data-group="finder">Floodtrain View</button>
         <button class="tab-button" data-group="1">Streams 1-5</button>
         <button class="tab-button" data-group="2">Streams 6-10</button>
         <button class="tab-button" data-group="jupiter">jupiter</button>
         <button class="tab-button" data-group="meridian">meridian board</button>
-        <button class="tab-button" data-group="filegun">Filegun</button>
-        <button class="tab-button" data-group="folderjar">FolderJar</button>
-        <button class="tab-button" data-group="fobjectjar">FobjectJar</button>
+        <div class="dropdown-container">
+          <button class="tab-button dropdown-toggle" id="more-dropdown">More ▼</button>
+          <div class="dropdown-menu" id="more-menu">
+            <button class="dropdown-item tab-button" data-group="filegun">Filegun</button>
+            <button class="dropdown-item tab-button" data-group="folderjar">FolderJar</button>
+            <button class="dropdown-item tab-button" data-group="fobjectjar">FobjectJar</button>
+          </div>
+        </div>
       </div>
       <div class="tab-actions">
         <button id="add-folder-btn" class="action-button" style="display: none;">+ Add Folder</button>
@@ -45,10 +50,33 @@
         </div>
         
         <div class="copy-paste-methods" id="copy-paste-methods">
+          <div class="active-drum-indicator">
+            <span class="active-drum-label">active_drum:</span>
+            <span id="active-drum-text" class="active-drum-text">none selected</span>
+          </div>
+          <button id="open-in-finder-btn" class="method-button">open in finder</button>
           <button id="copy-m1-btn" class="method-button">copy (method 1)</button>
           <button id="paste-m1-btn" class="method-button">paste (m1)</button>
           <button id="copy-m2-btn" class="method-button">copy (method 2)</button>
           <button id="paste-m2-btn" class="method-button">paste (m2)</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bar2 - New visual bar -->
+    <div class="bar2">
+      <div class="bar2-label">Bar2</div>
+      <div class="bar2-content">
+        <!-- Column width controls for Floodtrain View -->
+        <div id="column-width-controls" class="column-width-controls" style="display: flex;">
+          <button class="width-button width-label" disabled>main viewer pane column widths:</button>
+          <button class="width-button" data-width="100">100</button>
+          <button class="width-button" data-width="200">200</button>
+          <button class="width-button" data-width="250">250</button>
+          <button class="width-button active" data-width="300">300</button>
+          <button class="width-button" data-width="350">350</button>
+          <button class="width-button" data-width="400">400</button>
+          <button class="width-button" data-width="auto">100%</button>
         </div>
       </div>
     </div>

@@ -16,6 +16,8 @@ let clipboardOperation = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   initializeTabs();
+  initializeDropdownMenu();
+  initializeColumnWidthControls();
   initializeAddFolderButton();
   initializeDragAndDrop();
   initializeContextMenu();
@@ -40,6 +42,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeJupiterActions();
 });
 
+// Update the active drum indicator
+function updateActiveDrumIndicator(drumNumber) {
+  const indicatorText = document.getElementById('active-drum-text');
+  if (!indicatorText) return;
+  
+  switch(drumNumber) {
+    case 1:
+      indicatorText.textContent = 'drum 1 - silo j';
+      break;
+    case 2:
+      indicatorText.textContent = 'drum 2 - silo l - designated items';
+      break;
+    case 3:
+      indicatorText.textContent = 'drum 3 - left of silo m - main viewer pane';
+      break;
+    default:
+      indicatorText.textContent = 'none selected';
+  }
+}
+
 // Simple function to get the target folder for paste operations
 function getTargetPasteFolder() {
   // Just use the current finder path - simple and straightforward
@@ -52,13 +74,100 @@ function getTargetPasteFolder() {
   return null;
 }
 
+function initializeDropdownMenu() {
+  const dropdownToggle = document.getElementById('more-dropdown');
+  const dropdownMenu = document.getElementById('more-menu');
+  
+  if (!dropdownToggle || !dropdownMenu) return;
+  
+  // Toggle dropdown on click
+  dropdownToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdownMenu.classList.toggle('show');
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+      dropdownMenu.classList.remove('show');
+    }
+  });
+  
+  // Handle dropdown item clicks
+  const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+  dropdownItems.forEach(item => {
+    item.addEventListener('click', () => {
+      // Close the dropdown after selection
+      dropdownMenu.classList.remove('show');
+      // The regular tab click handler will handle the rest
+    });
+  });
+}
+
+function initializeColumnWidthControls() {
+  const columnWidthControls = document.getElementById('column-width-controls');
+  let currentColumnWidth = 300; // Default width
+  
+  // Handle column width button clicks
+  const widthButtons = columnWidthControls.querySelectorAll('.width-button:not(.width-label)');
+  widthButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Remove active class from all buttons
+      widthButtons.forEach(btn => btn.classList.remove('active'));
+      // Add active class to clicked button
+      button.classList.add('active');
+      
+      // Get the width value
+      const width = button.dataset.width;
+      
+      if (width === 'auto') {
+        // Set columns to auto width (100%)
+        currentColumnWidth = 'auto';
+        updateFinderColumnWidths('auto');
+      } else {
+        // Set fixed pixel width
+        currentColumnWidth = parseInt(width);
+        updateFinderColumnWidths(currentColumnWidth);
+      }
+    });
+  });
+}
+
+function updateFinderColumnWidths(width) {
+  const finderColumns = document.getElementById('finder-columns');
+  if (!finderColumns) return;
+  
+  const columns = finderColumns.querySelectorAll('.finder-column');
+  columns.forEach(column => {
+    if (width === 'auto') {
+      // Auto width - fit content
+      column.style.width = 'auto';
+      column.style.minWidth = '200px';
+      column.style.maxWidth = 'none';
+    } else {
+      // Fixed pixel width
+      column.style.width = width + 'px';
+      column.style.minWidth = width + 'px';
+      column.style.maxWidth = width + 'px';
+    }
+  });
+}
+
 function initializeTabs() {
   const tabButtons = document.querySelectorAll('.tab-button');
   tabButtons.forEach(button => {
+    // Skip the dropdown toggle button
+    if (button.id === 'more-dropdown') return;
+    
     button.addEventListener('click', async () => {
       const groupId = button.dataset.group;
       
+      // If no groupId, skip (for dropdown toggle)
+      if (!groupId) return;
+      
+      // Remove active from all buttons including dropdown items
       document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.dropdown-item').forEach(btn => btn.classList.remove('active'));
       button.classList.add('active');
       
       document.querySelectorAll('.stream-group').forEach(group => {
@@ -68,10 +177,12 @@ function initializeTabs() {
       
       const addFolderBtn = document.getElementById('add-folder-btn');
       const streamManagement = document.getElementById('stream-management');
+      const columnWidthControls = document.getElementById('column-width-controls');
       
       if (groupId === 'finder') {
         addFolderBtn.style.display = 'none';
         streamManagement.style.display = 'flex';
+        columnWidthControls.style.display = 'flex'; // Show column width controls for Floodtrain View
         if (finderColumns.length === 0) {
           const downloadsPath = await window.electronAPI.getDownloadsPath();
           navigateToFolder(downloadsPath);
@@ -79,9 +190,11 @@ function initializeTabs() {
       } else if (groupId === 'jupiter') {
         addFolderBtn.style.display = 'none';
         streamManagement.style.display = 'none';
+        columnWidthControls.style.display = 'none'; // Hide for other views
       } else if (groupId === 'filegun' || groupId === 'folderjar' || groupId === 'fobjectjar') {
         addFolderBtn.style.display = 'none';
         streamManagement.style.display = 'none';
+        columnWidthControls.style.display = 'none'; // Hide for other views
         // Initialize the page if it's the first time
         if (groupId === 'filegun' && !window.filegunInitialized) {
           initializeFilegun();
@@ -96,6 +209,7 @@ function initializeTabs() {
       } else {
         addFolderBtn.style.display = 'block';
         streamManagement.style.display = 'none';
+        columnWidthControls.style.display = 'none'; // Hide for other views
       }
     });
   });
@@ -319,12 +433,23 @@ async function loadSubfolders(parentElement, folderPath) {
 }
 
 function selectFolder(element, folderPath) {
+  console.log('Silo J: Selecting folder:', folderPath); // Debug log
+  
   document.querySelectorAll('.folder-item').forEach(item => {
     item.classList.remove('selected');
   });
   
   element.classList.add('selected');
   selectedFolder = folderPath;
+  
+  // Clear selections from other areas
+  finderSelectedFiles.clear(); // Clear main viewer selection
+  document.querySelectorAll('.silo-l-stream-item').forEach(item => {
+    item.classList.remove('selected'); // Clear silo L selection
+  });
+  
+  // Update active drum indicator
+  updateActiveDrumIndicator(1); // Drum 1 - silo j
 }
 
 function initializeContextMenu() {
@@ -459,13 +584,22 @@ function initializeFinderView() {
     });
   });
   
-  // Sidebar items
+  // Sidebar items (Favorites section)
   document.querySelectorAll('.sidebar-item').forEach(item => {
     item.addEventListener('click', async () => {
       const pathType = item.dataset.path;
       const path = await window.electronAPI.getSpecialPath(pathType);
       document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
+      
+      // Set selectedFolder and update indicator for silo J
+      selectedFolder = path;
+      updateActiveDrumIndicator(1); // Drum 1 - silo j
+      
+      // Clear selections from other areas
+      finderSelectedFiles.clear();
+      document.querySelectorAll('.silo-l-stream-item').forEach(i => i.classList.remove('selected'));
+      
       navigateToFolder(path);
     });
   });
@@ -532,6 +666,19 @@ function initializeFinderView() {
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
     if (document.getElementById('group-finder').classList.contains('active')) {
+      // Check if user is typing in an input field, textarea, or contenteditable element
+      const activeElement = document.activeElement;
+      const isTypingInField = activeElement && (
+        activeElement.tagName === 'INPUT' || 
+        activeElement.tagName === 'TEXTAREA' || 
+        activeElement.contentEditable === 'true'
+      );
+      
+      // If user is typing in a field, let the browser handle keyboard shortcuts normally
+      if (isTypingInField) {
+        return;
+      }
+      
       if (e.metaKey && e.key === 'a') {
         e.preventDefault();
         selectAllFiles();
@@ -680,7 +827,19 @@ function updateRecentPaths() {
     item.className = 'sidebar-item';
     const name = path.split('/').pop() || 'Root';
     item.textContent = '🕒 ' + name;
-    item.onclick = () => navigateToFolder(path);
+    item.onclick = () => {
+      // Set selectedFolder and update indicator for silo J
+      selectedFolder = path;
+      updateActiveDrumIndicator(1); // Drum 1 - silo j
+      
+      // Clear selections from other areas
+      finderSelectedFiles.clear();
+      document.querySelectorAll('.silo-l-stream-item').forEach(i => i.classList.remove('selected'));
+      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      
+      navigateToFolder(path);
+    };
     recentsContainer.appendChild(item);
   });
 }
@@ -710,6 +869,27 @@ function renderFinderColumns() {
     const columnDiv = document.createElement('div');
     columnDiv.className = 'finder-column';
     
+    // Apply default width of 300px (or get current setting)
+    const activeWidthButton = document.querySelector('.width-button.active[data-width]');
+    if (activeWidthButton) {
+      const width = activeWidthButton.dataset.width;
+      if (width === 'auto') {
+        columnDiv.style.width = 'auto';
+        columnDiv.style.minWidth = '200px';
+        columnDiv.style.maxWidth = 'none';
+      } else {
+        const pixelWidth = parseInt(width);
+        columnDiv.style.width = pixelWidth + 'px';
+        columnDiv.style.minWidth = pixelWidth + 'px';
+        columnDiv.style.maxWidth = pixelWidth + 'px';
+      }
+    } else {
+      // Default to 300px
+      columnDiv.style.width = '300px';
+      columnDiv.style.minWidth = '300px';
+      columnDiv.style.maxWidth = '300px';
+    }
+    
     column.contents.forEach(item => {
       const itemDiv = document.createElement('div');
       itemDiv.className = `finder-item ${item.isDirectory ? 'folder' : 'file'}`;
@@ -734,6 +914,13 @@ function renderFinderColumns() {
             finderSelectedFiles.add(itemPath);
             itemDiv.classList.add('selected');
           }
+          
+          // Update active drum indicator if we have selections
+          if (finderSelectedFiles.size > 0) {
+            updateActiveDrumIndicator(3); // Drum 3 - main viewer pane
+          } else {
+            updateActiveDrumIndicator(0); // None selected
+          }
         } else {
           // Single select
           finderSelectedFiles.clear();
@@ -741,9 +928,21 @@ function renderFinderColumns() {
             el.classList.remove('selected');
           });
           
+          // Clear selections from other areas
+          selectedFolder = null; // Clear silo J selection
+          document.querySelectorAll('.folder-item.selected').forEach(item => {
+            item.classList.remove('selected'); // Clear silo J visual selection
+          });
+          document.querySelectorAll('.silo-l-stream-item').forEach(item => {
+            item.classList.remove('selected'); // Clear silo L selection
+          });
+          
           column.selectedItem = item.name;
           itemDiv.classList.add('selected');
           finderSelectedFiles.add(itemPath);
+          
+          // Update active drum indicator
+          updateActiveDrumIndicator(3); // Drum 3 - main viewer pane
           
           finderColumns = finderColumns.slice(0, columnIndex + 1);
           
@@ -865,6 +1064,15 @@ async function initializeCloudStorage() {
         
         try {
           const path = await window.electronAPI.getSpecialPath(service.id);
+          
+          // Set selectedFolder and update indicator for silo J
+          selectedFolder = path;
+          updateActiveDrumIndicator(1); // Drum 1 - silo j
+          
+          // Clear selections from other areas
+          finderSelectedFiles.clear();
+          document.querySelectorAll('.silo-l-stream-item').forEach(i => i.classList.remove('selected'));
+          
           navigateToFolder(path);
         } catch (error) {
           console.error('Error accessing cloud storage:', error);
@@ -1131,6 +1339,7 @@ async function renderSiloLStreamItems(streamId) {
     const itemDiv = document.createElement('div');
     itemDiv.className = `silo-l-stream-item ${isDirectory ? 'folder' : 'file'}`;
     itemDiv.title = itemPath; // Show full path on hover
+    itemDiv.dataset.path = itemPath; // Store the path for easy access
     
     // Create icon
     const iconSpan = document.createElement('span');
@@ -1150,6 +1359,13 @@ async function renderSiloLStreamItems(streamId) {
       allItems.forEach(item => item.classList.remove('selected'));
       itemDiv.classList.add('selected');
       
+      // Clear selections from other areas
+      selectedFolder = null; // Clear silo J selection
+      finderSelectedFiles.clear(); // Clear main viewer selection
+      
+      // Update active drum indicator
+      updateActiveDrumIndicator(2); // Drum 2 - silo l
+      
       // Navigate to the item in the finder view
       navigateToFolder(itemPath);
     });
@@ -1163,6 +1379,13 @@ function initializePasteButtons() {
   const pasteM1Btn = document.getElementById('paste-m1-btn');
   const pasteM2Btn = document.getElementById('paste-m2-btn');
   const copyM1Btn = document.getElementById('copy-m1-btn');
+  const openInFinderBtn = document.getElementById('open-in-finder-btn');
+  
+  if (openInFinderBtn) {
+    openInFinderBtn.addEventListener('click', async () => {
+      await openSelectedInFinder();
+    });
+  }
   
   if (pasteM1Btn) {
     pasteM1Btn.addEventListener('click', async () => {
@@ -1183,6 +1406,64 @@ function initializePasteButtons() {
     copyM1Btn.addEventListener('click', async () => {
       await copySelectedFiles();
     });
+  }
+}
+
+// Open selected files/folders in Finder
+async function openSelectedInFinder() {
+  let selectedPath = null;
+  
+  console.log('Debug - Opening in Finder...'); // Debug log
+  console.log('- finderSelectedFiles size:', finderSelectedFiles.size);
+  console.log('- selectedFolder value:', selectedFolder);
+  console.log('- folder-item.selected exists:', !!document.querySelector('.folder-item.selected'));
+  console.log('- silo-l-stream-item.selected exists:', !!document.querySelector('.silo-l-stream-item.selected'));
+  
+  // 1. Check main viewer pane (finder view) - priority 1
+  if (finderSelectedFiles.size > 0) {
+    selectedPath = Array.from(finderSelectedFiles)[0];
+    console.log('Using main viewer selection:', selectedPath);
+  }
+  
+  // 2. Check silo J (folder items in streams) - priority 2
+  // First try the global selectedFolder variable (which is set when clicking items)
+  if (!selectedPath && selectedFolder) {
+    selectedPath = selectedFolder;
+    console.log('Using silo J selectedFolder:', selectedPath);
+  }
+  
+  // Also check for the selected class as a fallback
+  if (!selectedPath) {
+    const selectedFolderItem = document.querySelector('.folder-item.selected');
+    if (selectedFolderItem && selectedFolderItem.dataset.path) {
+      selectedPath = selectedFolderItem.dataset.path;
+      console.log('Using silo J DOM selection:', selectedPath);
+    }
+  }
+  
+  // 3. Check silo L (designated items) - priority 3
+  if (!selectedPath) {
+    const selectedSiloLItem = document.querySelector('.silo-l-stream-item.selected');
+    if (selectedSiloLItem && selectedSiloLItem.dataset.path) {
+      selectedPath = selectedSiloLItem.dataset.path;
+      console.log('Using silo L selection:', selectedPath);
+    }
+  }
+  
+  // If no selection found anywhere
+  if (!selectedPath) {
+    showNotification('No item selected in any area', 'error');
+    return;
+  }
+  
+  try {
+    // Open the containing folder in Finder (reveals the item)
+    await window.electronAPI.openInFinder(selectedPath);
+    
+    showNotification('Opened in Finder', 'success');
+  } catch (error) {
+    console.error('Error opening in Finder:', error);
+    showNotification('Failed to open in Finder', 'error');
   }
 }
 
@@ -1241,6 +1522,19 @@ function initializeClipboardOperations() {
     // Only handle shortcuts when in finder view
     const finderGroup = document.getElementById('group-finder');
     if (!finderGroup.classList.contains('active')) {
+      return;
+    }
+    
+    // Check if user is typing in an input field, textarea, or contenteditable element
+    const activeElement = document.activeElement;
+    const isTypingInField = activeElement && (
+      activeElement.tagName === 'INPUT' || 
+      activeElement.tagName === 'TEXTAREA' || 
+      activeElement.contentEditable === 'true'
+    );
+    
+    // If user is typing in a field, let the browser handle keyboard shortcuts normally
+    if (isTypingInField) {
       return;
     }
     

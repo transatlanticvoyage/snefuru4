@@ -369,14 +369,40 @@ ipcMain.handle('get-directory-contents', async (event, dirPath) => {
       })
     );
     
-    contents.sort((a, b) => {
+    // Filter out temporary Office files (~$), .DS_Store files, and other system files
+    const filteredContents = contents.filter(item => {
+      // Filter out .DS_Store files (macOS metadata files)
+      if (item.name === '.DS_Store') {
+        return false;
+      }
+      
+      // Filter out ALL temporary Office files starting with ~$
+      // These are lock/temp files that can't be opened normally anyway
+      if (item.name.startsWith('~$')) {
+        return false;
+      }
+      
+      // Filter out other common temporary/system files
+      if (item.name.startsWith('._')) {  // macOS resource fork files
+        return false;
+      }
+      
+      if (item.name === 'Thumbs.db') {  // Windows thumbnail cache
+        return false;
+      }
+      
+      // Keep all other files
+      return true;
+    });
+    
+    filteredContents.sort((a, b) => {
       if (a.isDirectory === b.isDirectory) {
         return a.name.localeCompare(b.name);
       }
       return a.isDirectory ? -1 : 1;
     });
     
-    return contents;
+    return filteredContents;
   } catch (error) {
     console.error('Error reading directory:', error);
     return [];

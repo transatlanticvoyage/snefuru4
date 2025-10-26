@@ -207,6 +207,81 @@ body {
   -webkit-app-region: drag;
 }
 
+/* Bar2 - New visual bar styles */
+.bar2 {
+  background: linear-gradient(180deg, #f0f0f0 0%, #e0e0e0 100%);
+  border-bottom: 1px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  height: 40px;
+  -webkit-app-region: no-drag;
+}
+
+.bar2-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+  margin-right: 20px;
+}
+
+.bar2-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 10px;
+}
+
+/* Column width controls - adjoined buttons */
+.column-width-controls {
+  display: flex;
+  align-items: center;
+  border: 1px solid #999;
+  border-radius: 4px;
+  overflow: hidden;
+  height: 28px;
+}
+
+.width-button {
+  background: #f5f5f5;
+  border: none;
+  border-right: 1px solid #999;
+  padding: 0 12px;
+  height: 100%;
+  cursor: pointer;
+  font-size: 12px;
+  color: #333;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.width-button:last-child {
+  border-right: none;
+}
+
+.width-button:hover:not(:disabled):not(.active) {
+  background: #e8e8e8;
+}
+
+.width-button.active {
+  background: #007AFF;
+  color: white;
+  font-weight: 600;
+}
+
+.width-button.width-label {
+  background: #ddd;
+  cursor: default;
+  font-weight: 600;
+  padding: 0 8px;
+  color: #555;
+}
+
+.width-button:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
 .app-title {
   font-size: 16px;
   font-weight: 600;
@@ -238,6 +313,56 @@ body {
 }
 
 .tab-button.active {
+  background: #007AFF;
+  color: white;
+}
+
+/* Dropdown styles for More menu */
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  position: relative;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #2a2a2a;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1000;
+  border-radius: 4px;
+  margin-top: 4px;
+  border: 1px solid #3a3a3a;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #e0e0e0;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #3a3a3a;
+}
+
+.dropdown-item.active {
   background: #007AFF;
   color: white;
 }
@@ -290,6 +415,30 @@ body {
   align-items: center;
   gap: 4px;
   margin-left: 10px;
+}
+
+.active-drum-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.active-drum-label {
+  color: #999;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.active-drum-text {
+  color: #00ff00;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 200px;
 }
 
 .method-button {
