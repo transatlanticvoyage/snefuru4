@@ -198,4 +198,204 @@ table.utg_addressjar th .cell_inner_wrapper_div {
 /* ============================================================================================== */
 
 
+/* ============================================================================================== */
+/* LEADSMART_MORPH NARROW COLUMN STYLING WITH TEXT OVERFLOW                                      */
+/* Applied to specific columns to handle text overflow while maintaining content-based width     */
+/* Date: 2025-11-11                                                                             */
+/* Author: Assistant                                                                            */
+/* ============================================================================================== */
+
+/* Force table to auto-layout for content-based sizing */
+.leadsmart-morph-main-table {
+  table-layout: auto !important;
+}
+
+/* Target columns that need narrow width treatment */
+/* The width is determined by the TD content - we only control text overflow in TH cells */
+
+/* Set column widths to minimum content */
+.leadsmart-morph-main-table .for_db_column__abstract_checkbox,
+.leadsmart-morph-main-table .for_db_column_mundial_id,
+.leadsmart-morph-main-table .for_db_column_baobab_attempt_id,
+.leadsmart-morph-main-table .for_db_column_jrel_release_id,
+.leadsmart-morph-main-table .for_db_column_jrel_subsheet_id,
+.leadsmart-morph-main-table .for_db_column_jrel_subpart_id,
+.leadsmart-morph-main-table .for_db_column_city_name,
+.leadsmart-morph-main-table .for_db_column_state_code,
+.leadsmart-morph-main-table .for_db_column_payout,
+.leadsmart-morph-main-table .for_db_column_fk_city_id,
+.leadsmart-morph-main-table .for_db_column_city_population,
+.leadsmart-morph-main-table .for_db_column_multiplied_payout_by_population {
+  width: 1px !important; /* Forces column to shrink to minimum needed */
+  white-space: nowrap !important;
+}
+
+/* Special handling for checkbox column - even narrower */
+.leadsmart-morph-main-table .for_db_column__abstract_checkbox {
+  width: 1px !important;
+  max-width: 60px !important; /* Constrain checkbox column width */
+}
+
+/* Left-align all cells in specified columns (except checkbox which stays centered) */
+.leadsmart-morph-main-table .for_db_column_mundial_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_baobab_attempt_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_jrel_release_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_jrel_subsheet_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_jrel_subpart_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_city_name .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_state_code .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_payout .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_fk_city_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_city_population .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_multiplied_payout_by_population .cell_inner_wrapper_div {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  display: block !important;
+}
+
+/* Checkbox TD cells - minimal width */
+.leadsmart-morph-main-table td.for_db_column__abstract_checkbox .cell_inner_wrapper_div {
+  padding: 4px !important;
+  white-space: nowrap !important;
+  min-width: fit-content !important;
+}
+
+/* TD cells - determine the natural column width */
+.leadsmart-morph-main-table td.for_db_column_mundial_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_baobab_attempt_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_jrel_release_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_jrel_subsheet_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_jrel_subpart_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_city_name .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_state_code .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_payout .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_fk_city_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_city_population .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_multiplied_payout_by_population .cell_inner_wrapper_div {
+  white-space: nowrap !important; /* Prevent wrapping to show full content */
+  padding: 4px 8px !important; /* Consistent padding */
+  min-width: fit-content !important;
+}
+
+/* TH cells - overflow handling with hard cutoff */
+.leadsmart-morph-main-table th.for_db_column__abstract_checkbox,
+.leadsmart-morph-main-table th.for_db_column_mundial_id,
+.leadsmart-morph-main-table th.for_db_column_baobab_attempt_id,
+.leadsmart-morph-main-table th.for_db_column_jrel_release_id,
+.leadsmart-morph-main-table th.for_db_column_jrel_subsheet_id,
+.leadsmart-morph-main-table th.for_db_column_jrel_subpart_id,
+.leadsmart-morph-main-table th.for_db_column_city_name,
+.leadsmart-morph-main-table th.for_db_column_state_code,
+.leadsmart-morph-main-table th.for_db_column_payout,
+.leadsmart-morph-main-table th.for_db_column_fk_city_id,
+.leadsmart-morph-main-table th.for_db_column_city_population,
+.leadsmart-morph-main-table th.for_db_column_multiplied_payout_by_population {
+  position: relative !important;
+  overflow: hidden !important; /* Cut off overflowing content */
+  max-width: 0 !important; /* Force to minimum width */
+  width: 1px !important;
+}
+
+/* Checkbox column special handling for TH */
+.leadsmart-morph-main-table th.for_db_column__abstract_checkbox {
+  max-width: 60px !important;
+}
+
+.leadsmart-morph-main-table th.for_db_column__abstract_checkbox .cell_inner_wrapper_div {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  padding: 4px !important;
+  min-width: 0 !important;
+}
+
+.leadsmart-morph-main-table th.for_db_column_mundial_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_baobab_attempt_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_jrel_release_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_jrel_subsheet_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_jrel_subpart_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_city_name .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_state_code .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_payout .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_fk_city_id .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_city_population .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_multiplied_payout_by_population .cell_inner_wrapper_div {
+  white-space: nowrap !important; /* Single line only */
+  overflow: hidden !important; /* Hide overflow */
+  text-overflow: clip !important; /* Hard cutoff, not ellipsis */
+  display: block !important;
+  padding: 4px 8px !important; /* Match TD padding */
+  min-width: 0 !important;
+}
+
+/* Z-index layering for columns (progressive left to right) */
+/* This ensures cells on the right overlay cells on the left */
+th.for_db_column_mundial_id, td.for_db_column_mundial_id { z-index: 1; }
+th.for_db_column_baobab_attempt_id, td.for_db_column_baobab_attempt_id { z-index: 2; }
+th.for_db_column_jrel_release_id, td.for_db_column_jrel_release_id { z-index: 3; }
+th.for_db_column_jrel_subsheet_id, td.for_db_column_jrel_subsheet_id { z-index: 4; }
+th.for_db_column_jrel_subpart_id, td.for_db_column_jrel_subpart_id { z-index: 5; }
+th.for_db_column_city_population, td.for_db_column_city_population { z-index: 6; }
+th.for_db_column_city_name, td.for_db_column_city_name { z-index: 7; }
+th.for_db_column_state_code, td.for_db_column_state_code { z-index: 8; }
+th.for_db_column_payout, td.for_db_column_payout { z-index: 9; }
+th.for_db_column_fk_city_id, td.for_db_column_fk_city_id { z-index: 10; }
+
+/* Ensure cells have relative positioning for z-index to work */
+.for_db_column_mundial_id,
+.for_db_column_baobab_attempt_id,
+.for_db_column_jrel_release_id,
+.for_db_column_jrel_subsheet_id,
+.for_db_column_jrel_subpart_id,
+.for_db_column_city_name,
+.for_db_column_state_code,
+.for_db_column_payout,
+.for_db_column_fk_city_id,
+.for_db_column_city_population {
+  position: relative;
+}
+
+/* Tooltip styling for TH cells */
+.shenfur_db_table_name_tr th.for_db_column_mundial_id,
+.shenfur_db_table_name_tr th.for_db_column_baobab_attempt_id,
+.shenfur_db_table_name_tr th.for_db_column_jrel_release_id,
+.shenfur_db_table_name_tr th.for_db_column_jrel_subsheet_id,
+.shenfur_db_table_name_tr th.for_db_column_jrel_subpart_id,
+.shenfur_db_table_name_tr th.for_db_column_city_name,
+.shenfur_db_table_name_tr th.for_db_column_state_code,
+.shenfur_db_table_name_tr th.for_db_column_payout,
+.shenfur_db_table_name_tr th.for_db_column_fk_city_id,
+.shenfur_db_table_name_tr th.for_db_column_city_population {
+  cursor: pointer; /* Show it's clickable */
+}
+
+/* Tooltip container styling */
+.morph-column-tooltip {
+  position: absolute;
+  background: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: pre-line;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.morph-column-tooltip.visible {
+  opacity: 1;
+}
+
+/* Vertical separator for city_population column */
+.leadsmart-morph-main-table th.for_db_column_city_population,
+.leadsmart-morph-main-table td.for_db_column_city_population {
+  border-left: 3px solid black !important;
+}
+
+/* END LEADSMART_MORPH NARROW COLUMN STYLING */
+/* ============================================================================================== */
+
 

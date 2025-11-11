@@ -29,6 +29,7 @@ interface LeadsmartTransformed {
   state_code: string | null;
   payout: number | null;
   aggregated_zip_codes: string[] | null;
+  multiplied_payout_by_population: number | null;
   fk_city_id: number | null;
   created_at: string | null;
   updated_at: string | null;
@@ -52,7 +53,7 @@ export default function LeadsmartMorphClient() {
   // Pagination state
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentRowPage, setCurrentRowPage] = useState(1);
-  const [colsPerPage, setColsPerPage] = useState(10);
+  const [colsPerPage, setColsPerPage] = useState(12);
   const [currentColPage, setCurrentColPage] = useState(1);
 
   // Selection state
@@ -81,6 +82,10 @@ export default function LeadsmartMorphClient() {
   const [cityMatchingInProgress, setCityMatchingInProgress] = useState(false);
   const [cityMatchingProgress, setCityMatchingProgress] = useState(0);
   const [cityMatchingStatus, setCityMatchingStatus] = useState<string>('');
+  
+  // Payout multiplier state
+  const [multiplierConfirmStep, setMultiplierConfirmStep] = useState(0);
+  const [multiplierProcessing, setMultiplierProcessing] = useState(false);
 
   // Chamber visibility state (integrated with bezel system)
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
@@ -108,6 +113,18 @@ export default function LeadsmartMorphClient() {
   // City population filter state
   const [cityPopulationFilter, setCityPopulationFilter] = useState<string>('all');
   
+  // City/State filter state
+  const [cityStateFilterInput, setCityStateFilterInput] = useState<string>('');
+  const [cityStateFilter, setCityStateFilter] = useState<{ city: string; state: string } | null>(null);
+  
+  // Column tooltip state
+  const [columnTooltip, setColumnTooltip] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    content: string;
+  }>({ visible: false, x: 0, y: 0, content: '' });
+  
   // Pico cache rebuild state
   const [rebuildCacheFn, setRebuildCacheFn] = useState<(() => void) | null>(null);
   const [cacheRebuilding, setCacheRebuilding] = useState(false);
@@ -120,17 +137,18 @@ export default function LeadsmartMorphClient() {
     'jrel_release_id',
     'jrel_subsheet_id',
     'jrel_subpart_id',
+    'city_population',
     'city_name',
     'state_code',
     'payout',
     'aggregated_zip_codes',
+    'multiplied_payout_by_population',
     'fk_city_id',
-    'city_population',
     'created_at',
     'updated_at'
   ];
 
-  // Initialize chamber visibility from localStorage
+  // Initialize chamber visibility and filters from localStorage
   useEffect(() => {
     const savedMandible = localStorage.getItem('leadsmartMorph_mandibleChamberVisible');
     if (savedMandible !== null) {
@@ -163,6 +181,36 @@ export default function LeadsmartMorphClient() {
       // Default to true (visible) and save it
       setRocketChamberVisible(true);
       localStorage.setItem('leadsmartMorph_rocketChamberVisible', JSON.stringify(true));
+    }
+    
+    // Load saved filter states
+    const savedCityPopFilter = localStorage.getItem('leadsmartMorph_cityPopulationFilter');
+    if (savedCityPopFilter !== null) {
+      setCityPopulationFilter(savedCityPopFilter);
+    }
+    
+    const savedBaobobFilter = localStorage.getItem('leadsmartMorph_baobobFilter');
+    if (savedBaobobFilter !== null) {
+      setBaobobFilter(JSON.parse(savedBaobobFilter));
+    }
+    
+    const savedJettisonFilter = localStorage.getItem('leadsmartMorph_jettisonFilter');
+    if (savedJettisonFilter !== null) {
+      setJettisonFilter(JSON.parse(savedJettisonFilter));
+    }
+    
+    const savedSkylabFilter = localStorage.getItem('leadsmartMorph_skylabFilter');
+    if (savedSkylabFilter !== null) {
+      setSkylabFilter(JSON.parse(savedSkylabFilter));
+    }
+    
+    const savedCityStateFilter = localStorage.getItem('leadsmartMorph_cityStateFilter');
+    if (savedCityStateFilter !== null) {
+      const parsed = JSON.parse(savedCityStateFilter);
+      setCityStateFilter(parsed);
+      if (parsed && parsed.city && parsed.state) {
+        setCityStateFilterInput(`${parsed.city}, ${parsed.state}`);
+      }
     }
   }, []);
 
@@ -331,7 +379,9 @@ export default function LeadsmartMorphClient() {
   };
   
   const handleJettisonFilterChange = (filterType: 'release' | 'subsheet' | 'subpart' | null, filterId: number | null) => {
-    setJettisonFilter({ type: filterType, id: filterId });
+    const newFilter = { type: filterType, id: filterId };
+    setJettisonFilter(newFilter);
+    localStorage.setItem('leadsmartMorph_jettisonFilter', JSON.stringify(newFilter));
   };
 
   // Filter and sort data
@@ -349,7 +399,24 @@ export default function LeadsmartMorphClient() {
       );
     });
 
-    const afterPopulationFilter = afterSearchFilter.filter(row => {
+    const afterCityStateFilter = afterSearchFilter.filter(row => {
+      // Apply city/state filter
+      if (cityStateFilter && cityStateFilter.city && cityStateFilter.state) {
+        const rowCity = row.city_name?.toLowerCase().trim() || '';
+        const rowState = row.state_code?.toLowerCase().trim() || '';
+        const filterCity = cityStateFilter.city.toLowerCase().trim();
+        const filterState = cityStateFilter.state.toLowerCase().trim();
+        
+        // Check for exact match
+        const cityMatch = rowCity === filterCity;
+        const stateMatch = rowState === filterState;
+        
+        return cityMatch && stateMatch;
+      }
+      return true;
+    });
+
+    const afterPopulationFilter = afterCityStateFilter.filter(row => {
       // Apply city population filter
       const population = row.city_population;
       
@@ -413,7 +480,7 @@ export default function LeadsmartMorphClient() {
     });
 
     return sortedData;
-  }, [data, searchTerm, cityPopulationFilter, sortColumn, sortDirection]);
+  }, [data, searchTerm, cityStateFilter, cityPopulationFilter, sortColumn, sortDirection]);
 
   // Paginate rows
   const totalRowPages = Math.ceil(filteredAndSortedData.length / rowsPerPage);
@@ -476,6 +543,76 @@ export default function LeadsmartMorphClient() {
       // New column, default to ascending
       setSortColumn(columnName);
       setSortDirection('asc');
+    }
+  };
+
+  // Handle payout multiplication by population
+  const runPayoutMultiplier = async () => {
+    try {
+      setMultiplierProcessing(true);
+      
+      // Run the update query directly using SQL
+      // This joins leadsmart_transformed with cities table and multiplies payout by city_population
+      const { data, error } = await supabase
+        .from('leadsmart_transformed')
+        .select('mundial_id, payout, fk_city_id')
+        .not('payout', 'is', null);
+      
+      if (error) {
+        console.error('Error fetching data:', error);
+        alert('Error fetching data: ' + error.message);
+        return;
+      }
+      
+      // Process in batches to avoid timeout
+      const batchSize = 100;
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (let i = 0; i < data.length; i += batchSize) {
+        const batch = data.slice(i, i + batchSize);
+        
+        // For each record in batch, fetch city population and calculate
+        for (const record of batch) {
+          if (record.fk_city_id) {
+            // Get city population
+            const { data: cityData, error: cityError } = await supabase
+              .from('cities')
+              .select('city_population')
+              .eq('id', record.fk_city_id)
+              .single();
+            
+            if (!cityError && cityData && cityData.city_population != null) {
+              // Calculate multiplied value
+              const multipliedValue = record.payout * cityData.city_population;
+              
+              // Update the record
+              const { error: updateError } = await supabase
+                .from('leadsmart_transformed')
+                .update({ multiplied_payout_by_population: multipliedValue })
+                .eq('mundial_id', record.mundial_id);
+              
+              if (updateError) {
+                console.error('Error updating record:', record.mundial_id, updateError);
+                errorCount++;
+              } else {
+                successCount++;
+              }
+            }
+          }
+        }
+      }
+      
+      alert(`Multiplication complete!\n\nSuccessfully updated: ${successCount} records\nErrors: ${errorCount} records`);
+      // Refresh the data to show the new values
+      fetchData();
+      
+    } catch (err: any) {
+      console.error('Error:', err);
+      alert('An error occurred: ' + err.message);
+    } finally {
+      setMultiplierProcessing(false);
+      setMultiplierConfirmStep(0);
     }
   };
 
@@ -1139,7 +1276,10 @@ export default function LeadsmartMorphClient() {
                 </span>
                 <select
                   value={cityPopulationFilter}
-                  onChange={(e) => setCityPopulationFilter(e.target.value)}
+                  onChange={(e) => {
+                    setCityPopulationFilter(e.target.value);
+                    localStorage.setItem('leadsmartMorph_cityPopulationFilter', e.target.value);
+                  }}
                   style={{
                     padding: '4px 8px',
                     border: '1px solid #ccc',
@@ -1157,6 +1297,13 @@ export default function LeadsmartMorphClient() {
                   <option value="75k-325k">75k-325k only</option>
                   <option value="no-null-zero">do not show null or 0 population cities ("1" population or more only)</option>
                 </select>
+                <button
+                  onClick={() => setMultiplierConfirmStep(1)}
+                  className="px-4 py-2 bg-orange-600 text-white rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
+                  disabled={multiplierProcessing}
+                >
+                  {multiplierProcessing ? 'Processing...' : 'Run Payout/Population Multiplier Function'}
+                </button>
               </div>
             </div>
           </div>
@@ -1226,32 +1373,103 @@ export default function LeadsmartMorphClient() {
               )}
             </div>
             
-            {/* Baobab Attempt Filter */}
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginTop: '20px', marginBottom: '12px' }}>
-              baobab_attempt_id
+            {/* Baobab Attempt Filter and City/State Filter */}
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '24px', marginTop: '20px', marginBottom: '20px' }}>
+              <div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
+                  baobab_attempt_id
+                </div>
+                <select
+                  value={baobobFilter || ''}
+                  onChange={(e) => {
+                    const newValue = e.target.value ? parseInt(e.target.value) : null;
+                    setBaobobFilter(newValue);
+                    localStorage.setItem('leadsmartMorph_baobobFilter', JSON.stringify(newValue));
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
+                  style={{ minWidth: '400px' }}
+                >
+                  <option value="" disabled>
+                    (id) - (number of records processed) - (number of records inserted) - (created_at)
+                  </option>
+                  <option value="">All Attempts</option>
+                  {baobobAttempts.map((attempt) => (
+                    <option key={attempt.baobab_attempt_id} value={attempt.baobab_attempt_id}>
+                      ({attempt.baobab_attempt_id}) - ({attempt.rows_processed?.toLocaleString() || '0'}) - ({attempt.rows_inserted?.toLocaleString() || '0'}) - ({new Date(attempt.created_at).toLocaleDateString()})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
+                  city_name + state_code
+                </div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    value={cityStateFilterInput}
+                    onChange={(e) => setCityStateFilterInput(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        const parts = cityStateFilterInput.split(',').map(p => p.trim());
+                        if (parts.length === 2 && parts[0] && parts[1]) {
+                          const filter = { city: parts[0], state: parts[1] };
+                          setCityStateFilter(filter);
+                          localStorage.setItem('leadsmartMorph_cityStateFilter', JSON.stringify(filter));
+                        } else if (cityStateFilterInput === '') {
+                          setCityStateFilter(null);
+                          localStorage.removeItem('leadsmartMorph_cityStateFilter');
+                        }
+                      }
+                    }}
+                    placeholder="e.g., yorba linda, ca"
+                    className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    style={{ width: '200px' }}
+                  />
+                  <button
+                    onClick={() => {
+                      const parts = cityStateFilterInput.split(',').map(p => p.trim());
+                      if (parts.length === 2 && parts[0] && parts[1]) {
+                        const filter = { city: parts[0], state: parts[1] };
+                        setCityStateFilter(filter);
+                        localStorage.setItem('leadsmartMorph_cityStateFilter', JSON.stringify(filter));
+                      } else if (cityStateFilterInput === '') {
+                        setCityStateFilter(null);
+                        localStorage.removeItem('leadsmartMorph_cityStateFilter');
+                      } else {
+                        alert('Please enter in format: city name, state code');
+                      }
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Filter
+                  </button>
+                  {cityStateFilter && (
+                    <button
+                      onClick={() => {
+                        setCityStateFilter(null);
+                        setCityStateFilterInput('');
+                        localStorage.removeItem('leadsmartMorph_cityStateFilter');
+                      }}
+                      className="px-3 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
+                      title="Clear city/state filter"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-            
-            <select
-              value={baobobFilter || ''}
-              onChange={(e) => setBaobobFilter(e.target.value ? parseInt(e.target.value) : null)}
-              className="px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
-              style={{ marginBottom: '20px', minWidth: '400px' }}
-            >
-              <option value="" disabled>
-                (id) - (number of records processed) - (number of records inserted) - (created_at)
-              </option>
-              <option value="">All Attempts</option>
-              {baobobAttempts.map((attempt) => (
-                <option key={attempt.baobab_attempt_id} value={attempt.baobab_attempt_id}>
-                  ({attempt.baobab_attempt_id}) - ({attempt.rows_processed?.toLocaleString() || '0'}) - ({attempt.rows_inserted?.toLocaleString() || '0'}) - ({new Date(attempt.created_at).toLocaleDateString()})
-                </option>
-              ))}
-            </select>
             
             {/* Skylab Tile Tables */}
             <LeadSmartSkylabTileTables
               pageType="morph"
-              onFilterApply={(type, id) => setSkylabFilter({ type, id })}
+              onFilterApply={(type, id) => {
+                const newFilter = { type, id };
+                setSkylabFilter(newFilter);
+                localStorage.setItem('leadsmartMorph_skylabFilter', JSON.stringify(newFilter));
+              }}
               currentFilter={skylabFilter}
               onRegisterRebuild={(fn) => setRebuildCacheFn(() => fn)}
               onRebuildStatusChange={(rebuilding, progress) => {
@@ -1420,9 +1638,11 @@ export default function LeadsmartMorphClient() {
             </div>
           )}
           <table 
+            className="leadsmart-morph-main-table"
             style={{ 
               borderCollapse: 'collapse', 
               width: 'auto',
+              tableLayout: 'auto',
               border: '1px solid gray',
               opacity: loading ? 0.6 : 1,
               transition: 'opacity 0.2s ease-in-out'
@@ -1445,22 +1665,41 @@ export default function LeadsmartMorphClient() {
                     <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>leadsmart_transformed</span>
                   </div>
                 </th>
-                {paginatedColumns.map(col => (
-                  <th 
-                    key={`table-${col}`}
-                    className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : `for_db_table_leadsmart_transformed for_db_column_${col}`}
-                    style={{ 
-                      padding: '0px',
-                      border: '1px solid gray'
-                    }}
-                  >
-                    <div className="cell_inner_wrapper_div">
-                      <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>
-                        {col === 'city_population' ? 'cities' : 'leadsmart_transformed'}
-                      </span>
-                    </div>
-                  </th>
-                ))}
+                {paginatedColumns.map(col => {
+                  const targetColumns = ['mundial_id', 'baobab_attempt_id', 'jrel_release_id', 'jrel_subsheet_id', 'jrel_subpart_id', 'city_name', 'state_code', 'payout', 'fk_city_id', 'city_population'];
+                  const isTargetColumn = targetColumns.includes(col);
+                  const tableName = col === 'city_population' ? 'cities' : 'leadsmart_transformed';
+                  
+                  return (
+                    <th 
+                      key={`table-${col}`}
+                      className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : `for_db_table_leadsmart_transformed for_db_column_${col}`}
+                      style={{ 
+                        padding: '0px',
+                        border: '1px solid gray'
+                      }}
+                      onClick={(e) => {
+                        if (isTargetColumn) {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setColumnTooltip({
+                            visible: true,
+                            x: rect.left + rect.width / 2,
+                            y: rect.bottom + 5,
+                            content: `${tableName}\n${col}`
+                          });
+                          // Hide tooltip after 2 seconds
+                          setTimeout(() => setColumnTooltip(prev => ({ ...prev, visible: false })), 2000);
+                        }
+                      }}
+                    >
+                      <div className="cell_inner_wrapper_div">
+                        <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>
+                          {tableName}
+                        </span>
+                      </div>
+                    </th>
+                  );
+                })}
               </tr>
               
               {/* Database column name row */}
@@ -1535,7 +1774,36 @@ export default function LeadsmartMorphClient() {
             </thead>
             
             <tbody>
-              {paginatedData.map(row => (
+              {paginatedData.length === 0 ? (
+                <tr>
+                  <td 
+                    colSpan={paginatedColumns.length + 1} 
+                    style={{ 
+                      padding: '40px',
+                      textAlign: 'center',
+                      border: '1px solid gray',
+                      color: '#666'
+                    }}
+                  >
+                    <div style={{ fontSize: '16px' }}>
+                      {cityStateFilter ? (
+                        <>
+                          <strong>No results found for:</strong><br/>
+                          City: "{cityStateFilter.city}", State: "{cityStateFilter.state}"<br/>
+                          <span style={{ fontSize: '14px', marginTop: '10px', display: 'inline-block' }}>
+                            Please check the spelling and ensure you're using the 2-letter state code (e.g., CA, NY, TX)
+                          </span>
+                        </>
+                      ) : searchTerm ? (
+                        <>No results found for search term: "{searchTerm}"</>
+                      ) : (
+                        <>No data available</>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                paginatedData.map(row => (
                 <tr key={row.mundial_id}>
                   <td 
                     className="for_db_table_leadsmart_transformed for_db_column__abstract_checkbox"
@@ -1560,7 +1828,7 @@ export default function LeadsmartMorphClient() {
                   {paginatedColumns.map(col => {
                     const isEditing = editingCell?.id === row.mundial_id && editingCell?.field === col;
                     const value = row[col as keyof LeadsmartTransformed];
-                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'created_at' || col === 'updated_at' || col === 'city_population';
+                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'created_at' || col === 'updated_at' || col === 'city_population' || col === 'multiplied_payout_by_population';
                     
                     return (
                       <td 
@@ -1677,6 +1945,25 @@ export default function LeadsmartMorphClient() {
                             >
                               {value ? Number(value).toLocaleString() : ''}
                             </span>
+                          ) : col === 'payout' ? (
+                            <span 
+                              style={{ 
+                                cursor: isReadOnly ? 'default' : 'pointer',
+                                color: isReadOnly ? '#888' : 'inherit'
+                              }}
+                            >
+                              {value ? `$${Number(value).toFixed(2)}` : ''}
+                            </span>
+                          ) : col === 'multiplied_payout_by_population' ? (
+                            <span 
+                              style={{ 
+                                cursor: 'default',
+                                color: '#888',
+                                fontWeight: value ? 'normal' : 'normal'
+                              }}
+                            >
+                              {value ? `$${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : ''}
+                            </span>
                           ) : (
                             <span 
                               style={{ 
@@ -1692,7 +1979,7 @@ export default function LeadsmartMorphClient() {
                     );
                   })}
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>
@@ -2004,8 +2291,179 @@ export default function LeadsmartMorphClient() {
         </div>
       )}
       
+      {/* Payout Multiplier Confirmation Popup */}
+      {multiplierConfirmStep > 0 && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1001
+          }}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              padding: '32px',
+              borderRadius: '12px',
+              maxWidth: '500px',
+              width: '90%',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              border: '3px solid #dc2626'
+            }}
+          >
+            {multiplierConfirmStep === 1 ? (
+              <>
+                <h2 style={{ 
+                  fontSize: '24px', 
+                  fontWeight: 'bold', 
+                  color: '#dc2626',
+                  marginBottom: '20px',
+                  textAlign: 'center'
+                }}>
+                  ⚠️ FIRST CONFIRMATION ⚠️
+                </h2>
+                <p style={{ fontSize: '16px', marginBottom: '20px', lineHeight: '1.6' }}>
+                  This operation will:
+                </p>
+                <ul style={{ marginBottom: '20px', paddingLeft: '20px', lineHeight: '1.8' }}>
+                  <li>Process the <strong>ENTIRE leadsmart_transformed table</strong></li>
+                  <li>Multiply each row's <strong>payout</strong> value by its <strong>city_population</strong></li>
+                  <li>Store results in the <strong>multiplied_payout_by_population</strong> column</li>
+                  <li>This operation <strong>CANNOT be undone automatically</strong></li>
+                </ul>
+                <p style={{ 
+                  fontSize: '18px', 
+                  fontWeight: 'bold', 
+                  color: '#dc2626',
+                  textAlign: 'center',
+                  marginBottom: '24px'
+                }}>
+                  Are you sure you want to proceed?
+                </p>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                  <button
+                    onClick={() => setMultiplierConfirmStep(0)}
+                    className="px-6 py-3 bg-gray-500 text-white rounded-md font-medium hover:bg-gray-600 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => setMultiplierConfirmStep(2)}
+                    className="px-6 py-3 bg-orange-600 text-white rounded-md font-medium hover:bg-orange-700 transition-colors"
+                  >
+                    Yes, Continue
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 style={{ 
+                  fontSize: '24px', 
+                  fontWeight: 'bold', 
+                  color: '#dc2626',
+                  marginBottom: '20px',
+                  textAlign: 'center'
+                }}>
+                  🚨 FINAL CONFIRMATION 🚨
+                </h2>
+                <div style={{ 
+                  backgroundColor: '#fee2e2', 
+                  padding: '16px', 
+                  borderRadius: '8px',
+                  border: '2px solid #dc2626',
+                  marginBottom: '20px'
+                }}>
+                  <p style={{ 
+                    fontSize: '18px', 
+                    fontWeight: 'bold',
+                    color: '#991b1b',
+                    textAlign: 'center',
+                    marginBottom: '12px'
+                  }}>
+                    THIS IS YOUR LAST CHANCE TO CANCEL
+                  </p>
+                  <p style={{ fontSize: '16px', color: '#991b1b', textAlign: 'center' }}>
+                    The multiplication operation will begin immediately after you confirm.
+                  </p>
+                </div>
+                <p style={{ 
+                  fontSize: '16px', 
+                  marginBottom: '24px',
+                  textAlign: 'center'
+                }}>
+                  Type <strong>"MULTIPLY"</strong> to confirm:
+                </p>
+                <input
+                  type="text"
+                  placeholder="Type MULTIPLY to confirm"
+                  onChange={(e) => {
+                    if (e.target.value === 'MULTIPLY') {
+                      e.target.style.borderColor = '#10b981';
+                    } else {
+                      e.target.style.borderColor = '#d1d5db';
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    fontSize: '16px',
+                    border: '2px solid #d1d5db',
+                    borderRadius: '6px',
+                    marginBottom: '24px'
+                  }}
+                  id="multiply-confirm-input"
+                />
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                  <button
+                    onClick={() => setMultiplierConfirmStep(0)}
+                    className="px-6 py-3 bg-gray-500 text-white rounded-md font-medium hover:bg-gray-600 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      const input = document.getElementById('multiply-confirm-input') as HTMLInputElement;
+                      if (input?.value === 'MULTIPLY') {
+                        runPayoutMultiplier();
+                      } else {
+                        alert('Please type MULTIPLY to confirm');
+                      }
+                    }}
+                    className="px-6 py-3 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors"
+                  >
+                    Execute Multiplication
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Bezel Button */}
       <BezelButton />
+      
+      {/* Column Tooltip */}
+      {columnTooltip.visible && (
+        <div 
+          className="morph-column-tooltip visible"
+          style={{
+            position: 'fixed',
+            left: `${columnTooltip.x}px`,
+            top: `${columnTooltip.y}px`,
+            transform: 'translateX(-50%)'
+          }}
+        >
+          {columnTooltip.content}
+        </div>
+      )}
     </>
   );
 }
