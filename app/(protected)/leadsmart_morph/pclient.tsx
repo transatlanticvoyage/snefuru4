@@ -86,6 +86,17 @@ export default function LeadsmartMorphClient() {
   // Payout multiplier state
   const [multiplierConfirmStep, setMultiplierConfirmStep] = useState(0);
   const [multiplierProcessing, setMultiplierProcessing] = useState(false);
+  const [multiplierProgress, setMultiplierProgress] = useState({ current: 0, total: 0 });
+  const [multiplierOnlyBlank, setMultiplierOnlyBlank] = useState(true);
+  const [multiplierOnlyFiltered, setMultiplierOnlyFiltered] = useState(false);
+  const [multiplierResults, setMultiplierResults] = useState<{
+    success: number;
+    errors: number;
+    skipped: number;
+    missingCity: number;
+    missingPayout: number;
+    alreadyProcessed: number;
+  } | null>(null);
 
   // Chamber visibility state (integrated with bezel system)
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
@@ -550,60 +561,133 @@ export default function LeadsmartMorphClient() {
   const runPayoutMultiplier = async () => {
     try {
       setMultiplierProcessing(true);
+      setMultiplierConfirmStep(0); // Close confirmation dialog immediately
+      setMultiplierResults(null); // Clear previous results
       
-      // Run the update query directly using SQL
-      // This joins leadsmart_transformed with cities table and multiplies payout by city_population
-      const { data, error } = await supabase
-        .from('leadsmart_transformed')
-        .select('mundial_id, payout, fk_city_id')
-        .not('payout', 'is', null);
+      let data;
+      let error;
+      
+      // Check if we're processing only filtered rows
+      if (multiplierOnlyFiltered) {
+        // Use the filtered data from the current view
+        data = filteredAndSortedData.map(row => ({
+          mundial_id: row.mundial_id,
+          payout: row.payout,
+          fk_city_id: row.fk_city_id,
+          multiplied_payout_by_population: row.multiplied_payout_by_population
+        }));
+        
+        // Further filter for blank records if needed
+        if (multiplierOnlyBlank) {
+          data = data.filter(row => row.multiplied_payout_by_population == null);
+        }
+      } else {
+        // Query the entire database
+        let query = supabase
+          .from('leadsmart_transformed')
+          .select('mundial_id, payout, fk_city_id, multiplied_payout_by_population');
+        
+        if (multiplierOnlyBlank) {
+          query = query.is('multiplied_payout_by_population', null);
+        }
+        
+        const result = await query;
+        data = result.data;
+        error = result.error;
+      }
       
       if (error) {
         console.error('Error fetching data:', error);
         alert('Error fetching data: ' + error.message);
+        setMultiplierProcessing(false);
         return;
       }
       
+      // Set total count for progress tracking
+      setMultiplierProgress({ current: 0, total: data.length });
+      
+      // Initialize result counters
+      let results = {
+        success: 0,
+        errors: 0,
+        skipped: 0,
+        missingCity: 0,
+        missingPayout: 0,
+        alreadyProcessed: 0
+      };
+      
       // Process in batches to avoid timeout
       const batchSize = 100;
-      let successCount = 0;
-      let errorCount = 0;
+      let processedCount = 0;
       
       for (let i = 0; i < data.length; i += batchSize) {
         const batch = data.slice(i, i + batchSize);
         
         // For each record in batch, fetch city population and calculate
         for (const record of batch) {
-          if (record.fk_city_id) {
-            // Get city population
-            const { data: cityData, error: cityError } = await supabase
-              .from('cities')
-              .select('city_population')
-              .eq('id', record.fk_city_id)
-              .single();
-            
-            if (!cityError && cityData && cityData.city_population != null) {
-              // Calculate multiplied value
-              const multipliedValue = record.payout * cityData.city_population;
-              
-              // Update the record
-              const { error: updateError } = await supabase
-                .from('leadsmart_transformed')
-                .update({ multiplied_payout_by_population: multipliedValue })
-                .eq('mundial_id', record.mundial_id);
-              
-              if (updateError) {
-                console.error('Error updating record:', record.mundial_id, updateError);
-                errorCount++;
-              } else {
-                successCount++;
-              }
-            }
+          processedCount++;
+          setMultiplierProgress({ current: processedCount, total: data.length });
+          
+          // Check if already processed (shouldn't happen if filtering for blanks only)
+          if (!multiplierOnlyBlank && record.multiplied_payout_by_population != null) {
+            results.alreadyProcessed++;
+            continue;
+          }
+          
+          // Check for missing payout
+          if (record.payout == null) {
+            results.missingPayout++;
+            continue;
+          }
+          
+          // Check for missing city
+          if (!record.fk_city_id) {
+            results.missingCity++;
+            continue;
+          }
+          
+          // Get city population
+          const { data: cityData, error: cityError } = await supabase
+            .from('cities')
+            .select('city_population')
+            .eq('id', record.fk_city_id)
+            .single();
+          
+          if (cityError) {
+            console.error('Error fetching city:', record.fk_city_id, cityError);
+            results.errors++;
+            continue;
+          }
+          
+          if (!cityData || cityData.city_population == null) {
+            results.skipped++;
+            continue;
+          }
+          
+          // Calculate multiplied value
+          const multipliedValue = record.payout * cityData.city_population;
+          
+          // Update the record
+          const { error: updateError } = await supabase
+            .from('leadsmart_transformed')
+            .update({ multiplied_payout_by_population: multipliedValue })
+            .eq('mundial_id', record.mundial_id);
+          
+          if (updateError) {
+            console.error('Error updating record:', record.mundial_id, updateError);
+            results.errors++;
+          } else {
+            results.success++;
           }
         }
       }
       
-      alert(`Multiplication complete!\n\nSuccessfully updated: ${successCount} records\nErrors: ${errorCount} records`);
+      // Set results for display
+      setMultiplierResults(results);
+      
+      // Show completion report
+      setMultiplierConfirmStep(3);
+      
       // Refresh the data to show the new values
       fetchData();
       
@@ -612,7 +696,7 @@ export default function LeadsmartMorphClient() {
       alert('An error occurred: ' + err.message);
     } finally {
       setMultiplierProcessing(false);
-      setMultiplierConfirmStep(0);
+      setMultiplierProgress({ current: 0, total: 0 });
     }
   };
 
@@ -2292,7 +2376,7 @@ export default function LeadsmartMorphClient() {
       )}
       
       {/* Payout Multiplier Confirmation Popup */}
-      {multiplierConfirmStep > 0 && (
+      {(multiplierConfirmStep > 0 || multiplierProcessing) && (
         <div 
           style={{
             position: 'fixed',
@@ -2315,10 +2399,93 @@ export default function LeadsmartMorphClient() {
               maxWidth: '500px',
               width: '90%',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-              border: '3px solid #dc2626'
+              border: multiplierProcessing ? '3px solid #10b981' : '3px solid #dc2626'
             }}
           >
-            {multiplierConfirmStep === 1 ? (
+            {multiplierProcessing ? (
+              <>
+                <h2 style={{ 
+                  fontSize: '24px', 
+                  fontWeight: 'bold', 
+                  color: '#10b981',
+                  marginBottom: '20px',
+                  textAlign: 'center'
+                }}>
+                  ⚙️ PROCESSING MULTIPLICATION ⚙️
+                </h2>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ marginBottom: '20px' }}>
+                    <div style={{
+                      width: '60px',
+                      height: '60px',
+                      margin: '0 auto 20px',
+                      border: '5px solid #e5e7eb',
+                      borderTop: '5px solid #10b981',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }} />
+                    <style jsx>{`
+                      @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                      }
+                    `}</style>
+                  </div>
+                  <p style={{ fontSize: '18px', marginBottom: '12px', fontWeight: '600' }}>
+                    Multiplication in progress...
+                  </p>
+                  <p style={{ fontSize: '16px', color: '#666', marginBottom: '8px' }}>
+                    Processing all records with payout values
+                  </p>
+                  {multiplierProgress.total > 0 && (
+                    <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+                      <p style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>
+                        Progress: {multiplierProgress.current} / {multiplierProgress.total}
+                      </p>
+                      <div style={{
+                        width: '100%',
+                        height: '24px',
+                        backgroundColor: '#e5e7eb',
+                        borderRadius: '12px',
+                        overflow: 'hidden'
+                      }}>
+                        <div style={{
+                          width: `${(multiplierProgress.current / multiplierProgress.total) * 100}%`,
+                          height: '100%',
+                          backgroundColor: '#10b981',
+                          transition: 'width 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <span style={{
+                            fontSize: '12px',
+                            color: 'white',
+                            fontWeight: 'bold'
+                          }}>
+                            {Math.round((multiplierProgress.current / multiplierProgress.total) * 100)}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <p style={{ fontSize: '14px', color: '#888' }}>
+                    This may take a few moments. Please do not close this window.
+                  </p>
+                </div>
+                <div style={{
+                  backgroundColor: '#d1fae5',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  marginTop: '20px',
+                  border: '1px solid #10b981'
+                }}>
+                  <p style={{ fontSize: '14px', color: '#065f46', textAlign: 'center', margin: 0 }}>
+                    ✓ Process started successfully
+                  </p>
+                </div>
+              </>
+            ) : multiplierConfirmStep === 1 ? (
               <>
                 <h2 style={{ 
                   fontSize: '24px', 
@@ -2338,6 +2505,17 @@ export default function LeadsmartMorphClient() {
                   <li>Store results in the <strong>multiplied_payout_by_population</strong> column</li>
                   <li>This operation <strong>CANNOT be undone automatically</strong></li>
                 </ul>
+                <div style={{
+                  padding: '12px',
+                  backgroundColor: '#dbeafe',
+                  border: '1px solid #3b82f6',
+                  borderRadius: '6px',
+                  marginBottom: '20px'
+                }}>
+                  <p style={{ fontSize: '14px', color: '#1e40af', margin: 0 }}>
+                    <strong>Note:</strong> You can choose to process only filtered rows or blank records in the next step.
+                  </p>
+                </div>
                 <p style={{ 
                   fontSize: '18px', 
                   fontWeight: 'bold', 
@@ -2393,6 +2571,70 @@ export default function LeadsmartMorphClient() {
                     The multiplication operation will begin immediately after you confirm.
                   </p>
                 </div>
+                <div style={{
+                  marginBottom: '20px',
+                  padding: '16px',
+                  backgroundColor: '#fef3c7',
+                  border: '1px solid #fbbf24',
+                  borderRadius: '6px'
+                }}>
+                  <label style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    fontSize: '15px',
+                    cursor: 'pointer',
+                    marginBottom: '12px'
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={multiplierOnlyBlank}
+                      onChange={(e) => setMultiplierOnlyBlank(e.target.checked)}
+                      style={{ 
+                        width: '18px', 
+                        height: '18px',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <span>
+                      <strong>Only process blank records</strong>
+                      <br />
+                      <span style={{ fontSize: '13px', color: '#92400e' }}>
+                        {multiplierOnlyBlank ? 'Will skip records that already have multiplied values' : 'Will process ALL records (overwrites existing values)'}
+                      </span>
+                    </span>
+                  </label>
+                  
+                  <label style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    fontSize: '15px',
+                    cursor: 'pointer',
+                    paddingTop: '12px',
+                    borderTop: '1px solid #fbbf24'
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={multiplierOnlyFiltered}
+                      onChange={(e) => setMultiplierOnlyFiltered(e.target.checked)}
+                      style={{ 
+                        width: '18px', 
+                        height: '18px',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <span>
+                      <strong>Only process currently filtered rows</strong>
+                      <br />
+                      <span style={{ fontSize: '13px', color: '#92400e' }}>
+                        {multiplierOnlyFiltered 
+                          ? `Will process only the ${filteredAndSortedData.length.toLocaleString()} rows shown in the table` 
+                          : 'Will process all rows in the database'}
+                      </span>
+                    </span>
+                  </label>
+                </div>
                 <p style={{ 
                   fontSize: '16px', 
                   marginBottom: '24px',
@@ -2439,6 +2681,106 @@ export default function LeadsmartMorphClient() {
                     className="px-6 py-3 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors"
                   >
                     Execute Multiplication
+                  </button>
+                </div>
+              </>
+            )}
+            
+            {/* Completion Report */}
+            {multiplierConfirmStep === 3 && multiplierResults && (
+              <>
+                <div style={{
+                  fontSize: '22px',
+                  fontWeight: 'bold',
+                  marginBottom: '24px',
+                  textAlign: 'center',
+                  color: '#059669'
+                }}>
+                  ✅ Processing Complete
+                </div>
+                
+                <div style={{
+                  backgroundColor: '#f3f4f6',
+                  padding: '20px',
+                  borderRadius: '8px',
+                  marginBottom: '24px'
+                }}>
+                  <h3 style={{ 
+                    fontSize: '18px', 
+                    fontWeight: 'bold', 
+                    marginBottom: '16px',
+                    color: '#1f2937'
+                  }}>
+                    Results Summary:
+                  </h3>
+                  
+                  <div style={{ display: 'grid', gap: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#d1fae5', borderRadius: '4px' }}>
+                      <span style={{ fontWeight: '600', color: '#065f46' }}>✓ Successfully processed:</span>
+                      <span style={{ fontWeight: 'bold', color: '#065f46' }}>{multiplierResults.success.toLocaleString()}</span>
+                    </div>
+                    
+                    {multiplierResults.alreadyProcessed > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#e0e7ff', borderRadius: '4px' }}>
+                        <span style={{ fontWeight: '600', color: '#3730a3' }}>↻ Already processed (skipped):</span>
+                        <span style={{ fontWeight: 'bold', color: '#3730a3' }}>{multiplierResults.alreadyProcessed.toLocaleString()}</span>
+                      </div>
+                    )}
+                    
+                    {multiplierResults.missingPayout > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#fed7aa', borderRadius: '4px' }}>
+                        <span style={{ fontWeight: '600', color: '#92400e' }}>⊘ Missing payout value:</span>
+                        <span style={{ fontWeight: 'bold', color: '#92400e' }}>{multiplierResults.missingPayout.toLocaleString()}</span>
+                      </div>
+                    )}
+                    
+                    {multiplierResults.missingCity > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#fed7aa', borderRadius: '4px' }}>
+                        <span style={{ fontWeight: '600', color: '#92400e' }}>⊘ Missing city ID:</span>
+                        <span style={{ fontWeight: 'bold', color: '#92400e' }}>{multiplierResults.missingCity.toLocaleString()}</span>
+                      </div>
+                    )}
+                    
+                    {multiplierResults.skipped > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#fef3c7', borderRadius: '4px' }}>
+                        <span style={{ fontWeight: '600', color: '#78350f' }}>○ City missing population data:</span>
+                        <span style={{ fontWeight: 'bold', color: '#78350f' }}>{multiplierResults.skipped.toLocaleString()}</span>
+                      </div>
+                    )}
+                    
+                    {multiplierResults.errors > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#fee2e2', borderRadius: '4px' }}>
+                        <span style={{ fontWeight: '600', color: '#991b1b' }}>✕ Errors during processing:</span>
+                        <span style={{ fontWeight: 'bold', color: '#991b1b' }}>{multiplierResults.errors.toLocaleString()}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div style={{ 
+                    marginTop: '20px', 
+                    paddingTop: '16px', 
+                    borderTop: '2px solid #d1d5db' 
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: 'bold' }}>
+                      <span>Total Records Processed:</span>
+                      <span style={{ color: '#059669' }}>
+                        {(multiplierResults.success + multiplierResults.errors + multiplierResults.skipped + 
+                          multiplierResults.missingCity + multiplierResults.missingPayout + 
+                          (multiplierResults.alreadyProcessed || 0)).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <button
+                    onClick={() => {
+                      setMultiplierConfirmStep(0);
+                      setMultiplierResults(null);
+                    }}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Close Report
                   </button>
                 </div>
               </>
