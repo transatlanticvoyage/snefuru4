@@ -1,4 +1,5 @@
 <?php
+// Git test trigger comment: 2025-10-26
 
 /**
  * Ruplin WP Database Horse Class

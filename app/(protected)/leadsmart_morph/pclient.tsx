@@ -354,6 +354,14 @@ export default function LeadsmartMorphClient() {
       const population = row.city_population;
       
       switch (cityPopulationFilter) {
+        case '49k-67k':
+          return population != null && population >= 49000 && population <= 67000;
+        case '67k-85k':
+          return population != null && population >= 67001 && population <= 85000;
+        case '85k-100k':
+          return population != null && population >= 85001 && population <= 100000;
+        case '100k-125k':
+          return population != null && population >= 100001 && population <= 125000;
         case '50k-400k':
           return population != null && population >= 50000 && population <= 400000;
         case '75k-325k':
@@ -1140,6 +1148,11 @@ export default function LeadsmartMorphClient() {
                   }}
                 >
                   <option value="all">all (no filter)</option>
+                  <option value="49k-67k">49k-67k only</option>
+                  <option value="67k-85k">67,001-85,000</option>
+                  <option value="85k-100k">85,001-100,000</option>
+                  <option value="100k-125k">100,001-125,000</option>
+                  <option disabled>────────────────</option>
                   <option value="50k-400k">50k-400k only</option>
                   <option value="75k-325k">75k-325k only</option>
                   <option value="no-null-zero">do not show null or 0 population cities ("1" population or more only)</option>

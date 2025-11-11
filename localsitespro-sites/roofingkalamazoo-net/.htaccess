@@ -1,0 +1,64 @@
+# -------------------------------------
+# Performance, SEO, and Canonical Rules
+# -------------------------------------
+
+# Enable rewrite engine
+RewriteEngine On
+RewriteBase /
+
+# Force HTTPS (if available)
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Remove trailing slash
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [R=301,L]
+
+# Gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Browser caching
+<IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+</IfModule>
+
+
+# ==========================================================
+# Additional HTML Canonicalization and Rewrite Enhancements
+# (from section 2)
+# ==========================================================
+
+# Disable MultiViews (can conflict with these rules)
+Options -MultiViews
+
+# 1) Canonical redirect: if user requests /page.html -> redirect to /page (301)
+#    This avoids duplicate-content (both /page and /page.html accessible).
+RewriteCond %{THE_REQUEST} \s/([^\s]+?)\.html[?\s] [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# 2) Internal rewrite: if request is for /page and /page is not a file/dir,
+#    but /page.html exists -> serve /page.html silently (no URL change)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*?)/?$ $1.html [L]
+
+# 3) Optional: make index.html the directory index (if needed)
+DirectoryIndex index.html index.php

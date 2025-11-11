@@ -1,0 +1,75 @@
+# -------------------------------------
+# Performance, SEO, and Canonical Rules
+# -------------------------------------
+
+# Enable rewrite engine
+RewriteEngine On
+# IMPORTANT: For subfolder installation at /zubner-bin-2/
+RewriteBase /zubner-bin-2/
+
+# Force HTTPS (if available)
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Remove trailing slash
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /zubner-bin-2/$1 [R=301,L]
+
+# Gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Browser caching
+<IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+</IfModule>
+
+
+# ==========================================================
+# Additional HTML Canonicalization and Rewrite Enhancements
+# (from section 2)
+# ==========================================================
+
+# Disable MultiViews (can conflict with these rules)
+Options -MultiViews
+
+# PHP Configuration
+# Set PHP as default handler
+AddHandler application/x-httpd-php .php
+
+# 1) Canonical redirect: if user requests /page.html OR /page.php -> redirect to /page (301)
+#    This avoids duplicate-content (both /page and /page.html/php accessible).
+RewriteCond %{THE_REQUEST} \s/([^\s]+?)\.(html|php)[?\s] [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# 2) Internal rewrite: if request is for /page and /page is not a file/dir,
+#    but /page.php exists -> serve /page.php silently (no URL change)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*?)/?$ $1.php [L]
+
+# 3) Fallback to HTML if PHP doesn't exist
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*?)/?$ $1.html [L]
+
+# 4) Set directory index priority (PHP first, then HTML)
+DirectoryIndex index.php index.html
