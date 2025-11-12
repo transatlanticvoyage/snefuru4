@@ -34,6 +34,7 @@ interface LeadsmartTransformed {
   created_at: string | null;
   updated_at: string | null;
   city_population?: number | null;
+  subsheet_kw_stub_1?: string | null;
 }
 
 export default function LeadsmartMorphClient() {
@@ -156,7 +157,8 @@ export default function LeadsmartMorphClient() {
     'multiplied_payout_by_population',
     'fk_city_id',
     'created_at',
-    'updated_at'
+    'updated_at',
+    'custom_kw_stub_city_state'
   ];
 
   // Initialize chamber visibility and filters from localStorage
@@ -303,6 +305,9 @@ export default function LeadsmartMorphClient() {
           *,
           cities!fk_city_id (
             city_population
+          ),
+          leadsmart_subsheets!jrel_subsheet_id (
+            kw_stub_1
           )
         `);
       
@@ -367,14 +372,32 @@ export default function LeadsmartMorphClient() {
       
       console.log('Fetched data count:', fetchedData?.length);
       console.log('Total database count:', count);
+      
+      // Debug: Check the first row to see what's being returned
+      if (fetchedData && fetchedData.length > 0) {
+        console.log('Sample row structure:', {
+          jrel_subsheet_id: fetchedData[0].jrel_subsheet_id,
+          leadsmart_subsheets: fetchedData[0].leadsmart_subsheets,
+          cities: fetchedData[0].cities
+        });
+        // Additional debug for first 3 rows
+        console.log('First 3 rows with subsheet data:', fetchedData.slice(0, 3).map(row => ({
+          mundial_id: row.mundial_id,
+          jrel_subsheet_id: row.jrel_subsheet_id,
+          leadsmart_subsheets: row.leadsmart_subsheets,
+          city_name: row.city_name,
+          state_code: row.state_code
+        })));
+      }
 
       if (fetchError) throw fetchError;
       if (countError) throw countError;
 
-      // Process the data to flatten city population from the joined cities table
+      // Process the data to flatten city population and kw_stub_1 from the joined tables
       const processedData = (fetchedData || []).map(row => ({
         ...row,
-        city_population: row.cities?.city_population || null
+        city_population: row.cities?.city_population || null,
+        subsheet_kw_stub_1: row.leadsmart_subsheets?.kw_stub_1 || null
       }));
 
 
@@ -464,8 +487,8 @@ export default function LeadsmartMorphClient() {
       // Handle null/undefined values
       if (aValue == null && bValue == null) return 0;
       
-      // Special handling for city_population - treat nulls as lowest values
-      if (sortColumn === 'city_population') {
+      // Special handling for numeric columns - treat nulls as lowest values
+      if (sortColumn === 'city_population' || sortColumn === 'multiplied_payout_by_population') {
         if (aValue == null) return sortDirection === 'asc' ? -1 : 1;
         if (bValue == null) return sortDirection === 'asc' ? 1 : -1;
       } else {
@@ -474,8 +497,8 @@ export default function LeadsmartMorphClient() {
         if (bValue == null) return sortDirection === 'asc' ? -1 : 1;
       }
       
-      // Handle number sorting (for payout and city_population)
-      if (sortColumn === 'payout' || sortColumn === 'city_population') {
+      // Handle number sorting (for payout, city_population, and multiplied_payout_by_population)
+      if (sortColumn === 'payout' || sortColumn === 'city_population' || sortColumn === 'multiplied_payout_by_population') {
         const aNum = Number(aValue);
         const bNum = Number(bValue);
         return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
@@ -650,7 +673,7 @@ export default function LeadsmartMorphClient() {
           const { data: cityData, error: cityError } = await supabase
             .from('cities')
             .select('city_population')
-            .eq('id', record.fk_city_id)
+            .eq('city_id', record.fk_city_id)
             .single();
           
           if (cityError) {
@@ -1312,7 +1335,7 @@ export default function LeadsmartMorphClient() {
                 onClick={() => setIsSelectorPopupOpen(true)}
                 className="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700 transition-colors"
               >
-                selector popup
+                frosty selector popup
               </button>
               <button
                 onClick={() => setCitiesAssignmentPopupOpen(true)}
@@ -1750,14 +1773,14 @@ export default function LeadsmartMorphClient() {
                   </div>
                 </th>
                 {paginatedColumns.map(col => {
-                  const targetColumns = ['mundial_id', 'baobab_attempt_id', 'jrel_release_id', 'jrel_subsheet_id', 'jrel_subpart_id', 'city_name', 'state_code', 'payout', 'fk_city_id', 'city_population'];
+                  const targetColumns = ['mundial_id', 'baobab_attempt_id', 'jrel_release_id', 'jrel_subsheet_id', 'jrel_subpart_id', 'city_name', 'state_code', 'payout', 'fk_city_id', 'city_population', 'custom_kw_stub_city_state'];
                   const isTargetColumn = targetColumns.includes(col);
-                  const tableName = col === 'city_population' ? 'cities' : 'leadsmart_transformed';
+                  const tableName = col === 'city_population' ? 'cities' : col === 'custom_kw_stub_city_state' ? 'custom' : 'leadsmart_transformed';
                   
                   return (
                     <th 
                       key={`table-${col}`}
-                      className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : `for_db_table_leadsmart_transformed for_db_column_${col}`}
+                      className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : col === 'custom_kw_stub_city_state' ? 'for_db_table_abstract for_db_column_abstract' : `for_db_table_leadsmart_transformed for_db_column_${col}`}
                       style={{ 
                         padding: '0px',
                         border: '1px solid gray'
@@ -1769,7 +1792,7 @@ export default function LeadsmartMorphClient() {
                             visible: true,
                             x: rect.left + rect.width / 2,
                             y: rect.bottom + 5,
-                            content: `${tableName}\n${col}`
+                            content: col === 'custom_kw_stub_city_state' ? 'formulated from leadsmart_subsheets.kw_stub_1 plus other info' : `${tableName}\n${col}`
                           });
                           // Hide tooltip after 2 seconds
                           setTimeout(() => setColumnTooltip(prev => ({ ...prev, visible: false })), 2000);
@@ -1778,7 +1801,7 @@ export default function LeadsmartMorphClient() {
                     >
                       <div className="cell_inner_wrapper_div">
                         <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>
-                          {tableName}
+                          {col === 'custom_kw_stub_city_state' ? 'custom' : tableName}
                         </span>
                       </div>
                     </th>
@@ -1824,13 +1847,13 @@ export default function LeadsmartMorphClient() {
                     ))
                   );
                   
-                  const isSortable = col === 'payout' || col === 'city_population';
+                  const isSortable = col === 'payout' || col === 'city_population' || col === 'multiplied_payout_by_population';
                   const isCurrentlySorted = sortColumn === col;
                   
                   return (
                     <th 
                       key={`col-${col}`}
-                      className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : `for_db_table_leadsmart_transformed for_db_column_${col}`}
+                      className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : col === 'custom_kw_stub_city_state' ? 'for_db_table_abstract for_db_column_abstract' : `for_db_table_leadsmart_transformed for_db_column_${col}`}
                       style={{ 
                         padding: '0px',
                         border: '1px solid gray',
@@ -1841,8 +1864,19 @@ export default function LeadsmartMorphClient() {
                       title={isSortable ? `Click to sort by ${col}` : undefined}
                     >
                       <div className="cell_inner_wrapper_div" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                        {isCurrentlySorted && (
+                          <span style={{
+                            width: '10px',
+                            height: '10px',
+                            backgroundColor: '#ff6b35',
+                            borderRadius: '50%',
+                            display: 'inline-block',
+                            flexShrink: 0,
+                            marginRight: '4px'
+                          }} />
+                        )}
                         <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>
-                          {col === 'city_population' ? 'city_population' : col}
+                          {col === 'city_population' ? 'city_population' : col === 'custom_kw_stub_city_state' ? 'kw_stub_1 + city_name + state_code' : col}
                         </span>
                         {isSortable && (
                           <span style={{ fontSize: '10px', opacity: isCurrentlySorted ? 1 : 0.3 }}>
@@ -1912,19 +1946,19 @@ export default function LeadsmartMorphClient() {
                   {paginatedColumns.map(col => {
                     const isEditing = editingCell?.id === row.mundial_id && editingCell?.field === col;
                     const value = row[col as keyof LeadsmartTransformed];
-                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'created_at' || col === 'updated_at' || col === 'city_population' || col === 'multiplied_payout_by_population';
+                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'created_at' || col === 'updated_at' || col === 'city_population' || col === 'multiplied_payout_by_population' || col === 'custom_kw_stub_city_state';
                     
                     return (
                       <td 
                         key={`${row.mundial_id}-${col}`}
-                        className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : `for_db_table_leadsmart_transformed for_db_column_${col}`}
+                        className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : col === 'custom_kw_stub_city_state' ? 'for_db_table_abstract for_db_column_abstract' : `for_db_table_leadsmart_transformed for_db_column_${col}`}
                         style={{ 
                           padding: '0px',
                           border: '1px solid gray'
                         }}
                         onClick={() => !isReadOnly && !isEditing && startEditing(row.mundial_id, col, value)}
                       >
-                        <div className="cell_inner_wrapper_div" style={{ minHeight: '40px', display: 'flex', alignItems: 'center', gap: '8px', padding: '4px' }}>
+                        <div className="cell_inner_wrapper_div" style={{ minHeight: '40px', display: 'flex', alignItems: 'center', gap: '8px', padding: '4px', position: col === 'custom_kw_stub_city_state' ? 'relative' : undefined }}>
                           {isEditing ? (
                             <textarea
                               value={editValue}
@@ -2023,7 +2057,7 @@ export default function LeadsmartMorphClient() {
                             <span 
                               style={{ 
                                 cursor: 'default',
-                                color: '#888',
+                                color: '#000000',
                                 fontWeight: value ? 'normal' : 'normal'
                               }}
                             >
@@ -2046,8 +2080,102 @@ export default function LeadsmartMorphClient() {
                                 fontWeight: value ? 'normal' : 'normal'
                               }}
                             >
-                              {value ? `$${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : ''}
+                              {value ? Math.floor(Number(value)).toLocaleString('en-US') : ''}
                             </span>
+                          ) : col === 'custom_kw_stub_city_state' ? (
+                            <>
+                              <span 
+                                style={{ 
+                                  cursor: 'default',
+                                  color: '#333',
+                                  paddingRight: '46px' // Add padding to prevent text overlap with buttons (26px + 16px + 4px buffer)
+                                }}
+                              >
+                                {`${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''} ${row.state_code || ''}`.trim()}
+                              </span>
+                              <a
+                                href={`https://www.google.com/search?q=${`${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''} ${row.state_code || ''}`.trim().replace(/\s+/g, '+')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // For left click, prevent default and use window.open for consistency
+                                  if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
+                                    e.preventDefault();
+                                    const searchQuery = `${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''} ${row.state_code || ''}`.trim().replace(/\s+/g, '+');
+                                    window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
+                                  }
+                                  // Middle click and right click will use default browser behavior
+                                }}
+                                onAuxClick={(e) => {
+                                  e.stopPropagation();
+                                  // Middle click (button 1) - browser handles opening in background tab
+                                }}
+                                style={{
+                                  width: '26px',
+                                  height: '100%',
+                                  border: '1px solid black',
+                                  backgroundColor: '#ffffff',
+                                  fontSize: '14px',
+                                  padding: 0,
+                                  margin: 0,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                  position: 'absolute',
+                                  right: '16px',
+                                  top: 0,
+                                  bottom: 0,
+                                  color: 'black',
+                                  textDecoration: 'none'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#f0f0f0';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#ffffff';
+                                }}
+                                title="Search in Google"
+                              >
+                                ↗
+                              </a>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const textToCopy = `${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''} ${row.state_code || ''}`.trim();
+                                  navigator.clipboard.writeText(textToCopy);
+                                }}
+                                style={{
+                                  width: '16px',
+                                  height: '100%',
+                                  border: '1px solid gray',
+                                  backgroundColor: '#d3d3d3',
+                                  fontSize: '8px',
+                                  padding: 0,
+                                  margin: 0,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                  position: 'absolute',
+                                  right: 0,
+                                  top: 0,
+                                  bottom: 0
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'yellow';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#d3d3d3';
+                                }}
+                                title="Copy to clipboard"
+                              >
+                                c
+                              </button>
+                            </>
                           ) : (
                             <span 
                               style={{ 
@@ -2635,34 +2763,7 @@ export default function LeadsmartMorphClient() {
                     </span>
                   </label>
                 </div>
-                <p style={{ 
-                  fontSize: '16px', 
-                  marginBottom: '24px',
-                  textAlign: 'center'
-                }}>
-                  Type <strong>"MULTIPLY"</strong> to confirm:
-                </p>
-                <input
-                  type="text"
-                  placeholder="Type MULTIPLY to confirm"
-                  onChange={(e) => {
-                    if (e.target.value === 'MULTIPLY') {
-                      e.target.style.borderColor = '#10b981';
-                    } else {
-                      e.target.style.borderColor = '#d1d5db';
-                    }
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontSize: '16px',
-                    border: '2px solid #d1d5db',
-                    borderRadius: '6px',
-                    marginBottom: '24px'
-                  }}
-                  id="multiply-confirm-input"
-                />
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '32px' }}>
                   <button
                     onClick={() => setMultiplierConfirmStep(0)}
                     className="px-6 py-3 bg-gray-500 text-white rounded-md font-medium hover:bg-gray-600 transition-colors"
@@ -2670,14 +2771,7 @@ export default function LeadsmartMorphClient() {
                     Cancel
                   </button>
                   <button
-                    onClick={() => {
-                      const input = document.getElementById('multiply-confirm-input') as HTMLInputElement;
-                      if (input?.value === 'MULTIPLY') {
-                        runPayoutMultiplier();
-                      } else {
-                        alert('Please type MULTIPLY to confirm');
-                      }
-                    }}
+                    onClick={() => runPayoutMultiplier()}
                     className="px-6 py-3 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors"
                   >
                     Execute Multiplication

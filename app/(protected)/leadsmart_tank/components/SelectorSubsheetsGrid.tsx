@@ -8,6 +8,7 @@ interface Subsheet {
   subsheet_id: number;
   rel_release_id: number | null;
   subsheet_name: string | null;
+  kw_stub_1: string | null;
   created_at: string;
   updated_at: string;
   created_by: string | null;
@@ -29,6 +30,8 @@ export default function SelectorSubsheetsGrid({ selectedReleaseId, onSubsheetSel
   const [subsheets, setSubsheets] = useState<Subsheet[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedSubsheetId, setSelectedSubsheetId] = useState<number | null>(null);
+  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
+  const [editValue, setEditValue] = useState<string>('');
 
   const fetchSubsheets = useCallback(async () => {
     if (!selectedReleaseId) {
@@ -78,6 +81,36 @@ export default function SelectorSubsheetsGrid({ selectedReleaseId, onSubsheetSel
     onSubsheetSelect(subsheetId);
   };
 
+  const handleEditStart = (id: number, field: string, value: string) => {
+    setEditingCell({ id, field });
+    setEditValue(value);
+  };
+
+  const handleEditSave = async (subsheetId: number) => {
+    if (!editingCell) return;
+    
+    try {
+      const { error } = await supabase
+        .from('leadsmart_subsheets')
+        .update({ [editingCell.field]: editValue || null })
+        .eq('subsheet_id', subsheetId);
+      
+      if (error) throw error;
+      
+      // Update local state
+      setSubsheets(prev => prev.map(s => 
+        s.subsheet_id === subsheetId 
+          ? { ...s, [editingCell.field]: editValue || null }
+          : s
+      ));
+    } catch (error) {
+      console.error('Error updating subsheet:', error);
+    } finally {
+      setEditingCell(null);
+      setEditValue('');
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <hr className="border-gray-300" />
@@ -113,6 +146,9 @@ export default function SelectorSubsheetsGrid({ selectedReleaseId, onSubsheetSel
                   </th>
                   <th className="border border-gray-300 px-2 py-2 text-left" style={{ fontWeight: 'bold', fontSize: '14px', textTransform: 'lowercase' }}>
                     subsheet_name
+                  </th>
+                  <th className="border border-gray-300 px-2 py-2 text-left" style={{ fontWeight: 'bold', fontSize: '14px', textTransform: 'lowercase' }}>
+                    kw_stub_1
                   </th>
                   <th className="border border-gray-300 px-2 py-2 text-left" style={{ fontWeight: 'bold', fontSize: '14px', textTransform: 'lowercase' }}>
                     created_at
@@ -192,6 +228,26 @@ export default function SelectorSubsheetsGrid({ selectedReleaseId, onSubsheetSel
                       <td className="border border-gray-300 px-2 py-1 font-mono">{subsheet.subsheet_id}</td>
                     <td className="border border-gray-300 px-2 py-1">{subsheet.rel_release_id || ''}</td>
                     <td className="border border-gray-300 px-2 py-1">{subsheet.subsheet_name || ''}</td>
+                    <td className="border border-gray-300 px-2 py-1" onClick={() => handleEditStart(subsheet.subsheet_id, 'kw_stub_1', subsheet.kw_stub_1 || '')}>
+                      {editingCell?.id === subsheet.subsheet_id && editingCell?.field === 'kw_stub_1' ? (
+                        <input
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onBlur={() => handleEditSave(subsheet.subsheet_id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleEditSave(subsheet.subsheet_id);
+                            if (e.key === 'Escape') setEditingCell(null);
+                          }}
+                          className="w-full px-1 py-0 border border-blue-500 rounded"
+                          autoFocus
+                        />
+                      ) : (
+                        <span className="cursor-pointer hover:bg-gray-100 block w-full">
+                          {subsheet.kw_stub_1 || ''}
+                        </span>
+                      )}
+                    </td>
                     <td className="border border-gray-300 px-2 py-1 text-gray-600 text-xs">
                       {subsheet.created_at ? new Date(subsheet.created_at).toLocaleString() : ''}
                     </td>

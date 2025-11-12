@@ -863,17 +863,28 @@ export default function LeadSmartSkylabTileTables({
 
   return (
     <div className="p-4 bg-white border border-gray-300 rounded">
-      {/* Single flex container for all labels and tiles */}
-      <div className="flex flex-wrap gap-2 items-start">
+      {/* Flex container with row-based layout */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+        {/* Releases Row */}
+        <div 
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px',
+            alignItems: 'start',
+            paddingBottom: '8px',
+            borderBottom: (selectedReleaseId && subsheets.length > 0) || (selectedSubsheetId && subparts.length > 0) ? '1px solid black' : 'none'
+          }}
+        >
         
         {/* ========== RELEASES SECTION ========== */}
         {/* Release Label */}
         <div 
           className="border-2 border-gray-600 bg-gray-100 font-bold text-gray-800 flex items-center"
           style={{ 
-            padding: '8px 12px',
+            padding: '0px 12px',
             fontSize: '14px',
-            minHeight: '40px',
+            minHeight: '24px',
             whiteSpace: 'nowrap'
           }}
         >
@@ -882,16 +893,16 @@ export default function LeadSmartSkylabTileTables({
             <>
               <div className="flex items-center ml-2">
                 <button
-                  className="px-2 py-2.5 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
-                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', cursor: 'default' }}
+                  className="px-1 py-1 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
+                  style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', cursor: 'default' }}
                   title="Select X navigation"
                 >
                   sx
                 </button>
                 <button
                   onClick={() => handleNavigateRelease('prev')}
-                  className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
-                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                  className="px-1 py-1 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                  style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px' }}
                   title="Previous release"
                 >
                   <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -901,8 +912,8 @@ export default function LeadSmartSkylabTileTables({
                 </button>
                 <button
                   onClick={() => handleNavigateRelease('next')}
-                  className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
-                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                  className="px-1 py-1 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                  style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px' }}
                   title="Next release"
                 >
                   <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -914,16 +925,16 @@ export default function LeadSmartSkylabTileTables({
               
               <div className="flex items-center ml-2">
                 <button
-                  className="px-2 py-2.5 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
-                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', cursor: 'default' }}
+                  className="px-1 py-1 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
+                  style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', cursor: 'default' }}
                   title="View Children navigation"
                 >
                   vc
                 </button>
                 <button
                   onClick={() => handleNavigateReleaseVC('prev')}
-                  className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
-                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                  className="px-1 py-1 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                  style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px' }}
                   title="Previous release (view children)"
                 >
                   <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -933,8 +944,8 @@ export default function LeadSmartSkylabTileTables({
                 </button>
                 <button
                   onClick={() => handleNavigateReleaseVC('next')}
-                  className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
-                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                  className="px-1 py-1 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                  style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px' }}
                   title="Next release (view children)"
                 >
                   <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -1016,17 +1027,28 @@ export default function LeadSmartSkylabTileTables({
             </table>
           );
         })}
+        </div>
         
         {/* ========== SUBSHEETS SECTION ========== */}
         {selectedReleaseId && (
-          <>
+          <div 
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '8px',
+              alignItems: 'start',
+              paddingTop: '8px',
+              paddingBottom: '8px',
+              borderBottom: selectedSubsheetId && subparts.length > 0 ? '1px solid black' : 'none'
+            }}
+          >
             {/* Subsheet Label */}
             <div 
               className="border-2 border-gray-600 bg-gray-100 font-bold text-gray-800 flex items-center"
               style={{ 
-                padding: '8px 12px',
+                padding: '0px 12px',
                 fontSize: '14px',
-                minHeight: '40px',
+                minHeight: '24px',
                 whiteSpace: 'nowrap'
               }}
             >
@@ -1035,16 +1057,16 @@ export default function LeadSmartSkylabTileTables({
                 <>
                   <div className="flex items-center ml-2">
                     <button
-                      className="px-2 py-2.5 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
-                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', cursor: 'default' }}
+                      className="px-1 py-1 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
+                      style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', cursor: 'default' }}
                       title="Select X navigation"
                     >
                       sx
                     </button>
                     <button
                       onClick={() => handleNavigateSubsheet('prev')}
-                      className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
-                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                      className="px-1 py-1 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                      style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px' }}
                       title="Previous subsheet"
                     >
                       <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -1054,8 +1076,8 @@ export default function LeadSmartSkylabTileTables({
                     </button>
                     <button
                       onClick={() => handleNavigateSubsheet('next')}
-                      className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
-                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                      className="px-1 py-1 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                      style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px' }}
                       title="Next subsheet"
                     >
                       <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -1067,16 +1089,16 @@ export default function LeadSmartSkylabTileTables({
                   
                   <div className="flex items-center ml-2">
                     <button
-                      className="px-2 py-2.5 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
-                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', cursor: 'default' }}
+                      className="px-1 py-1 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
+                      style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', cursor: 'default' }}
                       title="View Children navigation"
                     >
                       vc
                     </button>
                     <button
                       onClick={() => handleNavigateSubsheetVC('prev')}
-                      className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
-                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                      className="px-1 py-1 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                      style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px' }}
                       title="Previous subsheet (view children)"
                     >
                       <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -1086,8 +1108,8 @@ export default function LeadSmartSkylabTileTables({
                     </button>
                     <button
                       onClick={() => handleNavigateSubsheetVC('next')}
-                      className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
-                      style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                      className="px-1 py-1 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                      style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px' }}
                       title="Next subsheet (view children)"
                     >
                       <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -1169,19 +1191,27 @@ export default function LeadSmartSkylabTileTables({
                 </table>
               );
             })}
-          </>
+          </div>
         )}
         
         {/* ========== SUBPARTS SECTION ========== */}
         {selectedSubsheetId && (
-          <>
+          <div 
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '8px',
+              alignItems: 'start',
+              paddingTop: '8px'
+            }}
+          >
             {/* Subpart Label */}
             <div 
               className="border-2 border-gray-600 bg-gray-100 font-bold text-gray-800 flex items-center"
               style={{ 
-                padding: '8px 12px',
+                padding: '0px 12px',
                 fontSize: '14px',
-                minHeight: '40px',
+                minHeight: '24px',
                 whiteSpace: 'nowrap'
               }}
             >
@@ -1189,16 +1219,16 @@ export default function LeadSmartSkylabTileTables({
               {subparts.length > 0 && (
                 <div className="flex items-center ml-2">
                   <button
-                    className="px-2 py-2.5 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
-                    style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', cursor: 'default' }}
+                    className="px-1 py-1 text-sm border rounded-l -mr-px bg-white font-bold text-gray-700"
+                    style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', cursor: 'default' }}
                     title="Select X navigation"
                   >
                     sx
                   </button>
                   <button
                     onClick={() => handleNavigateSubpart('prev')}
-                    className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
-                    style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                    className="px-1 py-1 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                    style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px' }}
                     title="Previous subpart"
                   >
                     <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -1208,8 +1238,8 @@ export default function LeadSmartSkylabTileTables({
                   </button>
                   <button
                     onClick={() => handleNavigateSubpart('next')}
-                    className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
-                    style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                    className="px-1 py-1 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                    style={{ fontSize: '12px', paddingTop: '4px', paddingBottom: '4px' }}
                     title="Next subpart"
                   >
                     <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -1276,7 +1306,7 @@ export default function LeadSmartSkylabTileTables({
                 </table>
               );
             })}
-          </>
+          </div>
         )}
         
       </div>
