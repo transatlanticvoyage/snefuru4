@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -35,6 +35,12 @@ interface LeadsmartTransformed {
   updated_at: string | null;
   city_population?: number | null;
   subsheet_kw_stub_1?: string | null;
+  volume_kwtuber1?: number | null;
+  cpc_kwtuber1?: number | null;
+  yelp_kwtuber1?: number | null;
+  volume_kwtuber2?: number | null;
+  cpc_kwtuber2?: number | null;
+  yelp_kwtuber2?: number | null;
 }
 
 export default function LeadsmartMorphClient() {
@@ -156,9 +162,16 @@ export default function LeadsmartMorphClient() {
     'aggregated_zip_codes',
     'multiplied_payout_by_population',
     'fk_city_id',
+    'custom_kw_stub_city_state',
+    'volume_kwtuber1',
+    'cpc_kwtuber1',
+    'yelp_kwtuber1',
+    'custom_kw_stub_city',
+    'volume_kwtuber2',
+    'cpc_kwtuber2',
+    'yelp_kwtuber2',
     'created_at',
-    'updated_at',
-    'custom_kw_stub_city_state'
+    'updated_at'
   ];
 
   // Initialize chamber visibility and filters from localStorage
@@ -264,7 +277,9 @@ export default function LeadsmartMorphClient() {
       router.push('/login');
       return;
     }
-    fetchData();
+    if (!isFetchingRef.current) {
+      fetchData();
+    }
   }, [user, router]);
   
   // Load baobab attempts on mount
@@ -274,9 +289,15 @@ export default function LeadsmartMorphClient() {
     }
   }, [user]);
 
-  // Refetch when filters change
+  // Add refs to track fetching state and last fetch time
+  const isFetchingRef = useRef(false);
+  const lastFetchTimeRef = useRef(0);
+  
+  // Refetch when filters change (with debounce)
   useEffect(() => {
-    if (user) {
+    const timeSinceLastFetch = Date.now() - lastFetchTimeRef.current;
+    // Only fetch if not currently fetching and at least 500ms since last fetch
+    if (user && !isFetchingRef.current && timeSinceLastFetch > 500) {
       fetchData();
     }
   }, [jettisonFilter, skylabFilter, baobobFilter]);
@@ -296,7 +317,14 @@ export default function LeadsmartMorphClient() {
   };
 
   const fetchData = async () => {
+    // Prevent concurrent fetches
+    if (isFetchingRef.current) {
+      return;
+    }
+    
     try {
+      isFetchingRef.current = true;
+      lastFetchTimeRef.current = Date.now();
       setLoading(true);
       
       let query = supabase
@@ -409,6 +437,7 @@ export default function LeadsmartMorphClient() {
       setError(err.message);
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
   };
   
@@ -463,6 +492,14 @@ export default function LeadsmartMorphClient() {
           return population != null && population >= 85001 && population <= 100000;
         case '100k-125k':
           return population != null && population >= 100001 && population <= 125000;
+        case '125k-175k':
+          return population != null && population >= 125001 && population <= 175000;
+        case '175k-300k':
+          return population != null && population >= 175001 && population <= 300000;
+        case '300k-600k':
+          return population != null && population >= 300001 && population <= 600000;
+        case '600k-up':
+          return population != null && population >= 600001;
         case '50k-400k':
           return population != null && population >= 50000 && population <= 400000;
         case '75k-325k':
@@ -1399,6 +1436,10 @@ export default function LeadsmartMorphClient() {
                   <option value="67k-85k">67,001-85,000</option>
                   <option value="85k-100k">85,001-100,000</option>
                   <option value="100k-125k">100,001-125,000</option>
+                  <option value="125k-175k">125,001-175,000</option>
+                  <option value="175k-300k">175,001-300,000</option>
+                  <option value="300k-600k">300,001-600,000</option>
+                  <option value="600k-up">600,001-(and up)</option>
                   <option disabled>────────────────</option>
                   <option value="50k-400k">50k-400k only</option>
                   <option value="75k-325k">75k-325k only</option>
@@ -1773,14 +1814,14 @@ export default function LeadsmartMorphClient() {
                   </div>
                 </th>
                 {paginatedColumns.map(col => {
-                  const targetColumns = ['mundial_id', 'baobab_attempt_id', 'jrel_release_id', 'jrel_subsheet_id', 'jrel_subpart_id', 'city_name', 'state_code', 'payout', 'fk_city_id', 'city_population', 'custom_kw_stub_city_state'];
+                  const targetColumns = ['mundial_id', 'baobab_attempt_id', 'jrel_release_id', 'jrel_subsheet_id', 'jrel_subpart_id', 'city_name', 'state_code', 'payout', 'fk_city_id', 'city_population', 'custom_kw_stub_city_state', 'custom_kw_stub_city'];
                   const isTargetColumn = targetColumns.includes(col);
-                  const tableName = col === 'city_population' ? 'cities' : col === 'custom_kw_stub_city_state' ? 'custom' : 'leadsmart_transformed';
+                  const tableName = col === 'city_population' ? 'cities' : (col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city') ? 'custom' : 'leadsmart_transformed';
                   
                   return (
                     <th 
                       key={`table-${col}`}
-                      className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : col === 'custom_kw_stub_city_state' ? 'for_db_table_abstract for_db_column_abstract' : `for_db_table_leadsmart_transformed for_db_column_${col}`}
+                      className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : (col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city') ? 'for_db_table_abstract for_db_column_abstract' : `for_db_table_leadsmart_transformed for_db_column_${col}`}
                       style={{ 
                         padding: '0px',
                         border: '1px solid gray'
@@ -1792,7 +1833,7 @@ export default function LeadsmartMorphClient() {
                             visible: true,
                             x: rect.left + rect.width / 2,
                             y: rect.bottom + 5,
-                            content: col === 'custom_kw_stub_city_state' ? 'formulated from leadsmart_subsheets.kw_stub_1 plus other info' : `${tableName}\n${col}`
+                            content: col === 'custom_kw_stub_city_state' ? 'formulated from leadsmart_subsheets.kw_stub_1 plus city and state' : col === 'custom_kw_stub_city' ? 'formulated from leadsmart_subsheets.kw_stub_1 plus city only' : `${tableName}\n${col}`
                           });
                           // Hide tooltip after 2 seconds
                           setTimeout(() => setColumnTooltip(prev => ({ ...prev, visible: false })), 2000);
@@ -1853,7 +1894,7 @@ export default function LeadsmartMorphClient() {
                   return (
                     <th 
                       key={`col-${col}`}
-                      className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : col === 'custom_kw_stub_city_state' ? 'for_db_table_abstract for_db_column_abstract' : `for_db_table_leadsmart_transformed for_db_column_${col}`}
+                      className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : (col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city') ? 'for_db_table_abstract for_db_column_abstract' : `for_db_table_leadsmart_transformed for_db_column_${col}`}
                       style={{ 
                         padding: '0px',
                         border: '1px solid gray',
@@ -1876,7 +1917,10 @@ export default function LeadsmartMorphClient() {
                           }} />
                         )}
                         <span style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'lowercase' }}>
-                          {col === 'city_population' ? 'city_population' : col === 'custom_kw_stub_city_state' ? 'kw_stub_1 + city_name + state_code' : col}
+                          {col === 'city_population' ? 'city_population' : 
+                           col === 'custom_kw_stub_city_state' ? 'kw-tuber-1' : 
+                           col === 'custom_kw_stub_city' ? 'kw-tuber-2' : 
+                           col}
                         </span>
                         {isSortable && (
                           <span style={{ fontSize: '10px', opacity: isCurrentlySorted ? 1 : 0.3 }}>
@@ -1946,35 +1990,60 @@ export default function LeadsmartMorphClient() {
                   {paginatedColumns.map(col => {
                     const isEditing = editingCell?.id === row.mundial_id && editingCell?.field === col;
                     const value = row[col as keyof LeadsmartTransformed];
-                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'created_at' || col === 'updated_at' || col === 'city_population' || col === 'multiplied_payout_by_population' || col === 'custom_kw_stub_city_state';
+                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'created_at' || col === 'updated_at' || col === 'city_population' || col === 'multiplied_payout_by_population' || col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city';
                     
                     return (
                       <td 
                         key={`${row.mundial_id}-${col}`}
-                        className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : col === 'custom_kw_stub_city_state' ? 'for_db_table_abstract for_db_column_abstract' : `for_db_table_leadsmart_transformed for_db_column_${col}`}
+                        className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : (col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city') ? 'for_db_table_abstract for_db_column_abstract' : `for_db_table_leadsmart_transformed for_db_column_${col}`}
                         style={{ 
                           padding: '0px',
                           border: '1px solid gray'
                         }}
                         onClick={() => !isReadOnly && !isEditing && startEditing(row.mundial_id, col, value)}
                       >
-                        <div className="cell_inner_wrapper_div" style={{ minHeight: '40px', display: 'flex', alignItems: 'center', gap: '8px', padding: '4px', position: col === 'custom_kw_stub_city_state' ? 'relative' : undefined }}>
+                        <div className="cell_inner_wrapper_div" style={{ minHeight: '40px', display: 'flex', alignItems: 'center', gap: '8px', padding: '4px', position: (col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city') ? 'relative' : undefined }}>
                           {isEditing ? (
-                            <textarea
-                              value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
-                              onBlur={saveEdit}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter' && e.ctrlKey) saveEdit();
-                                if (e.key === 'Escape') {
-                                  setEditingCell(null);
-                                  setEditValue('');
-                                }
-                              }}
-                              autoFocus
-                              className="w-full px-2 py-1 border border-blue-500 focus:outline-none"
-                              rows={3}
-                            />
+                            // Use compact input for kwtuber columns, textarea for others
+                            (col === 'volume_kwtuber1' || col === 'cpc_kwtuber1' || col === 'yelp_kwtuber1' || 
+                             col === 'volume_kwtuber2' || col === 'cpc_kwtuber2' || col === 'yelp_kwtuber2') ? (
+                              <input
+                                type="text"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onBlur={saveEdit}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveEdit();
+                                  if (e.key === 'Escape') {
+                                    setEditingCell(null);
+                                    setEditValue('');
+                                  }
+                                }}
+                                autoFocus
+                                className="w-full px-1 py-0 border border-blue-500 focus:outline-none"
+                                style={{ 
+                                  height: '24px',
+                                  fontSize: '12px',
+                                  lineHeight: '1.2'
+                                }}
+                              />
+                            ) : (
+                              <textarea
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onBlur={saveEdit}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && e.ctrlKey) saveEdit();
+                                  if (e.key === 'Escape') {
+                                    setEditingCell(null);
+                                    setEditValue('');
+                                  }
+                                }}
+                                autoFocus
+                                className="w-full px-2 py-1 border border-blue-500 focus:outline-none"
+                                rows={3}
+                              />
+                            )
                           ) : col === 'aggregated_zip_codes' && (Array.isArray(value) || (typeof value === 'string' && value.trim())) ? (
                             (() => {
                               // Parse zip codes from either array or string format
@@ -2088,7 +2157,7 @@ export default function LeadsmartMorphClient() {
                                 style={{ 
                                   cursor: 'default',
                                   color: '#333',
-                                  paddingRight: '46px' // Add padding to prevent text overlap with buttons (26px + 16px + 4px buffer)
+                                  paddingRight: '72px' // Add padding to prevent text overlap with buttons (26px + 26px + 16px + 4px buffer)
                                 }}
                               >
                                 {`${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''} ${row.state_code || ''}`.trim()}
@@ -2125,7 +2194,7 @@ export default function LeadsmartMorphClient() {
                                   justifyContent: 'center',
                                   flexShrink: 0,
                                   position: 'absolute',
-                                  right: '16px',
+                                  right: '42px',
                                   top: 0,
                                   bottom: 0,
                                   color: 'black',
@@ -2138,6 +2207,54 @@ export default function LeadsmartMorphClient() {
                                   e.currentTarget.style.backgroundColor = '#ffffff';
                                 }}
                                 title="Search in Google"
+                              >
+                                ↗
+                              </a>
+                              <a
+                                href={`https://www.semrush.com/analytics/keywordoverview/?q=${`${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''} ${row.state_code || ''}`.trim().replace(/\s+/g, '+')}&db=us`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // For left click, prevent default and use window.open for consistency
+                                  if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
+                                    e.preventDefault();
+                                    const searchQuery = `${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''} ${row.state_code || ''}`.trim().replace(/\s+/g, '+');
+                                    window.open(`https://www.semrush.com/analytics/keywordoverview/?q=${searchQuery}&db=us`, '_blank');
+                                  }
+                                  // Middle click and right click will use default browser behavior
+                                }}
+                                onAuxClick={(e) => {
+                                  e.stopPropagation();
+                                  // Middle click (button 1) - browser handles opening in background tab
+                                }}
+                                style={{
+                                  width: '26px',
+                                  height: '100%',
+                                  border: '1px solid black',
+                                  backgroundColor: '#ffffff',
+                                  fontSize: '14px',
+                                  padding: 0,
+                                  margin: 0,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                  position: 'absolute',
+                                  right: '16px',
+                                  top: 0,
+                                  bottom: 0,
+                                  color: 'black',
+                                  textDecoration: 'none'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#f0f0f0';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#ffffff';
+                                }}
+                                title="Search in Semrush"
                               >
                                 ↗
                               </a>
@@ -2176,6 +2293,166 @@ export default function LeadsmartMorphClient() {
                                 c
                               </button>
                             </>
+                          ) : col === 'custom_kw_stub_city' ? (
+                            <>
+                              <span 
+                                style={{ 
+                                  cursor: 'default',
+                                  color: '#333',
+                                  paddingRight: '72px' // Add padding to prevent text overlap with buttons
+                                }}
+                              >
+                                {`${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''}`.trim()}
+                              </span>
+                              <a
+                                href={`https://www.google.com/search?q=${`${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''}`.trim().replace(/\s+/g, '+')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // For left click, prevent default and use window.open for consistency
+                                  if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
+                                    e.preventDefault();
+                                    const searchQuery = `${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''}`.trim().replace(/\s+/g, '+');
+                                    window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
+                                  }
+                                  // Middle click and right click will use default browser behavior
+                                }}
+                                onAuxClick={(e) => {
+                                  e.stopPropagation();
+                                  // Middle click (button 1) - browser handles opening in background tab
+                                }}
+                                style={{
+                                  width: '26px',
+                                  height: '100%',
+                                  border: '1px solid black',
+                                  backgroundColor: '#ffffff',
+                                  fontSize: '14px',
+                                  padding: 0,
+                                  margin: 0,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                  position: 'absolute',
+                                  right: '42px',
+                                  top: 0,
+                                  bottom: 0,
+                                  color: 'black',
+                                  textDecoration: 'none'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#f0f0f0';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#ffffff';
+                                }}
+                                title="Search in Google"
+                              >
+                                ↗
+                              </a>
+                              <a
+                                href={`https://www.semrush.com/analytics/keywordoverview/?q=${`${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''}`.trim().replace(/\s+/g, '+')}&db=us`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // For left click, prevent default and use window.open for consistency
+                                  if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
+                                    e.preventDefault();
+                                    const searchQuery = `${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''}`.trim().replace(/\s+/g, '+');
+                                    window.open(`https://www.semrush.com/analytics/keywordoverview/?q=${searchQuery}&db=us`, '_blank');
+                                  }
+                                  // Middle click and right click will use default browser behavior
+                                }}
+                                onAuxClick={(e) => {
+                                  e.stopPropagation();
+                                  // Middle click (button 1) - browser handles opening in background tab
+                                }}
+                                style={{
+                                  width: '26px',
+                                  height: '100%',
+                                  border: '1px solid black',
+                                  backgroundColor: '#ffffff',
+                                  fontSize: '14px',
+                                  padding: 0,
+                                  margin: 0,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                  position: 'absolute',
+                                  right: '16px',
+                                  top: 0,
+                                  bottom: 0,
+                                  color: 'black',
+                                  textDecoration: 'none'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#f0f0f0';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#ffffff';
+                                }}
+                                title="Search in Semrush"
+                              >
+                                ↗
+                              </a>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const textToCopy = `${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''}`.trim();
+                                  navigator.clipboard.writeText(textToCopy);
+                                }}
+                                style={{
+                                  width: '16px',
+                                  height: '100%',
+                                  border: '1px solid gray',
+                                  backgroundColor: '#d3d3d3',
+                                  fontSize: '8px',
+                                  padding: 0,
+                                  margin: 0,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                  position: 'absolute',
+                                  right: 0,
+                                  top: 0,
+                                  bottom: 0
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'yellow';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#d3d3d3';
+                                }}
+                                title="Copy to clipboard"
+                              >
+                                c
+                              </button>
+                            </>
+                          ) : (col === 'cpc_kwtuber1' || col === 'cpc_kwtuber2') ? (
+                            <span 
+                              style={{ 
+                                cursor: 'pointer',
+                                color: 'inherit'
+                              }}
+                            >
+                              {value != null ? Number(value).toFixed(2) : ''}
+                            </span>
+                          ) : (col === 'volume_kwtuber1' || col === 'volume_kwtuber2' || col === 'yelp_kwtuber1' || col === 'yelp_kwtuber2') ? (
+                            <span 
+                              style={{ 
+                                cursor: 'pointer',
+                                color: 'inherit'
+                              }}
+                            >
+                              {value != null ? Number(value).toString() : ''}
+                            </span>
                           ) : (
                             <span 
                               style={{ 

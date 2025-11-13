@@ -225,9 +225,25 @@ table.utg_addressjar th .cell_inner_wrapper_div {
 .leadsmart-morph-main-table .for_db_column_payout,
 .leadsmart-morph-main-table .for_db_column_fk_city_id,
 .leadsmart-morph-main-table .for_db_column_city_population,
-.leadsmart-morph-main-table .for_db_column_multiplied_payout_by_population {
+.leadsmart-morph-main-table .for_db_column_multiplied_payout_by_population,
+.leadsmart-morph-main-table .for_db_column_volume_kwtuber1,
+.leadsmart-morph-main-table .for_db_column_cpc_kwtuber1,
+.leadsmart-morph-main-table .for_db_column_yelp_kwtuber1,
+.leadsmart-morph-main-table .for_db_column_volume_kwtuber2,
+.leadsmart-morph-main-table .for_db_column_cpc_kwtuber2,
+.leadsmart-morph-main-table .for_db_column_yelp_kwtuber2 {
   width: 1px !important; /* Forces column to shrink to minimum needed */
   white-space: nowrap !important;
+}
+
+/* Minimum width for kwtuber columns when empty */
+.leadsmart-morph-main-table .for_db_column_volume_kwtuber1,
+.leadsmart-morph-main-table .for_db_column_cpc_kwtuber1,
+.leadsmart-morph-main-table .for_db_column_yelp_kwtuber1,
+.leadsmart-morph-main-table .for_db_column_volume_kwtuber2,
+.leadsmart-morph-main-table .for_db_column_cpc_kwtuber2,
+.leadsmart-morph-main-table .for_db_column_yelp_kwtuber2 {
+  min-width: 16px !important; /* Minimum width when no data */
 }
 
 /* Special handling for checkbox column - even narrower */
@@ -247,7 +263,13 @@ table.utg_addressjar th .cell_inner_wrapper_div {
 .leadsmart-morph-main-table .for_db_column_payout .cell_inner_wrapper_div,
 .leadsmart-morph-main-table .for_db_column_fk_city_id .cell_inner_wrapper_div,
 .leadsmart-morph-main-table .for_db_column_city_population .cell_inner_wrapper_div,
-.leadsmart-morph-main-table .for_db_column_multiplied_payout_by_population .cell_inner_wrapper_div {
+.leadsmart-morph-main-table .for_db_column_multiplied_payout_by_population .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_volume_kwtuber1 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_cpc_kwtuber1 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_yelp_kwtuber1 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_volume_kwtuber2 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_cpc_kwtuber2 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table .for_db_column_yelp_kwtuber2 .cell_inner_wrapper_div {
   text-align: left !important;
   justify-content: flex-start !important;
   display: block !important;
@@ -271,10 +293,26 @@ table.utg_addressjar th .cell_inner_wrapper_div {
 .leadsmart-morph-main-table td.for_db_column_payout .cell_inner_wrapper_div,
 .leadsmart-morph-main-table td.for_db_column_fk_city_id .cell_inner_wrapper_div,
 .leadsmart-morph-main-table td.for_db_column_city_population .cell_inner_wrapper_div,
-.leadsmart-morph-main-table td.for_db_column_multiplied_payout_by_population .cell_inner_wrapper_div {
+.leadsmart-morph-main-table td.for_db_column_multiplied_payout_by_population .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_volume_kwtuber1 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_cpc_kwtuber1 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_yelp_kwtuber1 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_volume_kwtuber2 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_cpc_kwtuber2 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table td.for_db_column_yelp_kwtuber2 .cell_inner_wrapper_div {
   white-space: nowrap !important; /* Prevent wrapping to show full content */
   padding: 4px 8px !important; /* Consistent padding */
   min-width: fit-content !important;
+}
+
+/* Ensure minimum width for empty kwtuber TD cells */
+.leadsmart-morph-main-table td.for_db_column_volume_kwtuber1 .cell_inner_wrapper_div:empty,
+.leadsmart-morph-main-table td.for_db_column_cpc_kwtuber1 .cell_inner_wrapper_div:empty,
+.leadsmart-morph-main-table td.for_db_column_yelp_kwtuber1 .cell_inner_wrapper_div:empty,
+.leadsmart-morph-main-table td.for_db_column_volume_kwtuber2 .cell_inner_wrapper_div:empty,
+.leadsmart-morph-main-table td.for_db_column_cpc_kwtuber2 .cell_inner_wrapper_div:empty,
+.leadsmart-morph-main-table td.for_db_column_yelp_kwtuber2 .cell_inner_wrapper_div:empty {
+  min-width: 16px !important;
 }
 
 /* TH cells - overflow handling with hard cutoff */
@@ -289,11 +327,27 @@ table.utg_addressjar th .cell_inner_wrapper_div {
 .leadsmart-morph-main-table th.for_db_column_payout,
 .leadsmart-morph-main-table th.for_db_column_fk_city_id,
 .leadsmart-morph-main-table th.for_db_column_city_population,
-.leadsmart-morph-main-table th.for_db_column_multiplied_payout_by_population {
+.leadsmart-morph-main-table th.for_db_column_multiplied_payout_by_population,
+.leadsmart-morph-main-table th.for_db_column_volume_kwtuber1,
+.leadsmart-morph-main-table th.for_db_column_cpc_kwtuber1,
+.leadsmart-morph-main-table th.for_db_column_yelp_kwtuber1,
+.leadsmart-morph-main-table th.for_db_column_volume_kwtuber2,
+.leadsmart-morph-main-table th.for_db_column_cpc_kwtuber2,
+.leadsmart-morph-main-table th.for_db_column_yelp_kwtuber2 {
   position: relative !important;
   overflow: hidden !important; /* Cut off overflowing content */
   max-width: 0 !important; /* Force to minimum width */
   width: 1px !important;
+}
+
+/* Ensure minimum width for kwtuber TH columns */
+.leadsmart-morph-main-table th.for_db_column_volume_kwtuber1,
+.leadsmart-morph-main-table th.for_db_column_cpc_kwtuber1,
+.leadsmart-morph-main-table th.for_db_column_yelp_kwtuber1,
+.leadsmart-morph-main-table th.for_db_column_volume_kwtuber2,
+.leadsmart-morph-main-table th.for_db_column_cpc_kwtuber2,
+.leadsmart-morph-main-table th.for_db_column_yelp_kwtuber2 {
+  min-width: 16px !important;
 }
 
 /* Checkbox column special handling for TH */
@@ -319,7 +373,13 @@ table.utg_addressjar th .cell_inner_wrapper_div {
 .leadsmart-morph-main-table th.for_db_column_payout .cell_inner_wrapper_div,
 .leadsmart-morph-main-table th.for_db_column_fk_city_id .cell_inner_wrapper_div,
 .leadsmart-morph-main-table th.for_db_column_city_population .cell_inner_wrapper_div,
-.leadsmart-morph-main-table th.for_db_column_multiplied_payout_by_population .cell_inner_wrapper_div {
+.leadsmart-morph-main-table th.for_db_column_multiplied_payout_by_population .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_volume_kwtuber1 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_cpc_kwtuber1 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_yelp_kwtuber1 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_volume_kwtuber2 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_cpc_kwtuber2 .cell_inner_wrapper_div,
+.leadsmart-morph-main-table th.for_db_column_yelp_kwtuber2 .cell_inner_wrapper_div {
   white-space: nowrap !important; /* Single line only */
   overflow: hidden !important; /* Hide overflow */
   text-overflow: clip !important; /* Hard cutoff, not ellipsis */
@@ -340,6 +400,12 @@ th.for_db_column_city_name, td.for_db_column_city_name { z-index: 7; }
 th.for_db_column_state_code, td.for_db_column_state_code { z-index: 8; }
 th.for_db_column_payout, td.for_db_column_payout { z-index: 9; }
 th.for_db_column_fk_city_id, td.for_db_column_fk_city_id { z-index: 10; }
+th.for_db_column_volume_kwtuber1, td.for_db_column_volume_kwtuber1 { z-index: 11; }
+th.for_db_column_cpc_kwtuber1, td.for_db_column_cpc_kwtuber1 { z-index: 12; }
+th.for_db_column_yelp_kwtuber1, td.for_db_column_yelp_kwtuber1 { z-index: 13; }
+th.for_db_column_volume_kwtuber2, td.for_db_column_volume_kwtuber2 { z-index: 14; }
+th.for_db_column_cpc_kwtuber2, td.for_db_column_cpc_kwtuber2 { z-index: 15; }
+th.for_db_column_yelp_kwtuber2, td.for_db_column_yelp_kwtuber2 { z-index: 16; }
 
 /* Ensure cells have relative positioning for z-index to work */
 .for_db_column_mundial_id,
@@ -351,7 +417,13 @@ th.for_db_column_fk_city_id, td.for_db_column_fk_city_id { z-index: 10; }
 .for_db_column_state_code,
 .for_db_column_payout,
 .for_db_column_fk_city_id,
-.for_db_column_city_population {
+.for_db_column_city_population,
+.for_db_column_volume_kwtuber1,
+.for_db_column_cpc_kwtuber1,
+.for_db_column_yelp_kwtuber1,
+.for_db_column_volume_kwtuber2,
+.for_db_column_cpc_kwtuber2,
+.for_db_column_yelp_kwtuber2 {
   position: relative;
 }
 
