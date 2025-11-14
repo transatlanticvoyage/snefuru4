@@ -9,6 +9,7 @@ interface StateManagerProps {
 
 export default function StateManager({ currentState, onLoadState }: StateManagerProps) {
   const [copied, setCopied] = useState(false);
+  const [copiedNew, setCopiedNew] = useState(false);
   const [hasUrlState, setHasUrlState] = useState(false);
 
   useEffect(() => {
@@ -21,8 +22,22 @@ export default function StateManager({ currentState, onLoadState }: StateManager
       const stateParam = urlParams.get('state');
       if (stateParam) {
         try {
-          const decodedState = JSON.parse(decodeURIComponent(atob(stateParam)));
-          onLoadState(decodedState);
+          const decodedString = decodeURIComponent(atob(stateParam));
+          
+          // Check if it has our prefix format (PREFIX|STATE)
+          if (decodedString.includes('|')) {
+            const [prefix, stateJson] = decodedString.split('|', 2);
+            const decodedState = JSON.parse(stateJson);
+            onLoadState(decodedState);
+          } else {
+            // Handle old format without prefix (backward compatibility)
+            const decodedState = JSON.parse(decodedString);
+            // Remove _id field if it exists from old format
+            if (decodedState._id) {
+              delete decodedState._id;
+            }
+            onLoadState(decodedState);
+          }
         } catch (error) {
           console.error('Failed to load state from URL:', error);
         }
@@ -55,6 +70,39 @@ export default function StateManager({ currentState, onLoadState }: StateManager
     });
   }, [saveState]);
 
+  const generateNewUrlAndSave = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      // Generate a random prefix to make URLs visually distinct
+      const randomPrefix = Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      // Create a modified state string with the prefix
+      // Format: PREFIX|STATE to make decoding easier
+      const stateString = `${randomPrefix}|${JSON.stringify(currentState)}`;
+      
+      // Encode the prefixed state
+      const encoded = btoa(encodeURIComponent(stateString));
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('state', encoded);
+      
+      // Copy to clipboard first
+      navigator.clipboard.writeText(newUrl.toString()).then(() => {
+        setCopiedNew(true);
+        
+        // Force navigation even if URL seems the same
+        // Using replace to ensure the page reloads with the new state
+        window.location.replace(newUrl.toString());
+      }).catch((err) => {
+        console.error('Failed to copy to clipboard:', err);
+        // Still navigate even if clipboard fails
+        window.location.replace(newUrl.toString());
+      });
+    } catch (error) {
+      console.error('Failed to generate new URL:', error);
+    }
+  }, [currentState]);
+
   const clearState = useCallback(() => {
     if (typeof window === 'undefined') return;
     
@@ -86,6 +134,17 @@ export default function StateManager({ currentState, onLoadState }: StateManager
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
         </svg>
         <span>{copied ? 'Copied!' : 'Copy URL'}</span>
+      </button>
+      
+      <button
+        onClick={generateNewUrlAndSave}
+        className="px-3 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition-colors flex items-center space-x-2"
+        title="Generate a new unique URL with current state and copy to clipboard"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>{copiedNew ? 'Copied New URL!' : 'Generate New URL & Save State'}</span>
       </button>
       
       {hasUrlState && (
