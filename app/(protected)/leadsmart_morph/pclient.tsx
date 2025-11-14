@@ -19,6 +19,11 @@ const BezelButton = dynamic(
   { ssr: false }
 );
 
+const StateManager = dynamic(
+  () => import('./StateManager'),
+  { ssr: false }
+);
+
 interface LeadsmartTransformed {
   mundial_id: number;
   baobab_attempt_id: number | null;
@@ -169,9 +174,7 @@ export default function LeadsmartMorphClient() {
     'custom_kw_stub_city',
     'volume_kwtuber2',
     'cpc_kwtuber2',
-    'yelp_kwtuber2',
-    'created_at',
-    'updated_at'
+    'yelp_kwtuber2'
   ];
 
   // Initialize chamber visibility and filters from localStorage
@@ -271,13 +274,15 @@ export default function LeadsmartMorphClient() {
     };
   }, []);
 
-  // Fetch data from database
+  // Fetch data from database (only on initial load)
   useEffect(() => {
     if (!user) {
       router.push('/login');
       return;
     }
-    if (!isFetchingRef.current) {
+    // Only fetch if we haven't initially loaded data yet
+    if (!hasInitiallyLoadedRef.current && !isFetchingRef.current) {
+      hasInitiallyLoadedRef.current = true;
       fetchData();
     }
   }, [user, router]);
@@ -292,9 +297,13 @@ export default function LeadsmartMorphClient() {
   // Add refs to track fetching state and last fetch time
   const isFetchingRef = useRef(false);
   const lastFetchTimeRef = useRef(0);
+  const hasInitiallyLoadedRef = useRef(false);
   
   // Refetch when filters change (with debounce)
   useEffect(() => {
+    // Only fetch if we have initially loaded data (to prevent fetching on mount)
+    if (!hasInitiallyLoadedRef.current) return;
+    
     const timeSinceLastFetch = Date.now() - lastFetchTimeRef.current;
     // Only fetch if not currently fetching and at least 500ms since last fetch
     if (user && !isFetchingRef.current && timeSinceLastFetch > 500) {
@@ -616,6 +625,57 @@ export default function LeadsmartMorphClient() {
       setSortDirection('asc');
     }
   };
+  
+  // Handle loading state from URL
+  const handleLoadState = (state: any) => {
+    if (!state) return;
+    
+    // Apply all state values
+    if (state.rowsPerPage !== undefined) setRowsPerPage(state.rowsPerPage);
+    if (state.currentRowPage !== undefined) setCurrentRowPage(state.currentRowPage);
+    if (state.colsPerPage !== undefined) setColsPerPage(state.colsPerPage);
+    if (state.currentColPage !== undefined) setCurrentColPage(state.currentColPage);
+    if (state.sortColumn !== undefined) setSortColumn(state.sortColumn);
+    if (state.sortDirection !== undefined) setSortDirection(state.sortDirection);
+    if (state.searchTerm !== undefined) setSearchTerm(state.searchTerm);
+    if (state.jettisonFilter !== undefined) setJettisonFilter(state.jettisonFilter);
+    if (state.skylabFilter !== undefined) setSkylabFilter(state.skylabFilter);
+    if (state.baobobFilter !== undefined) setBaobobFilter(state.baobobFilter);
+    if (state.cityPopulationFilter !== undefined) setCityPopulationFilter(state.cityPopulationFilter);
+    if (state.cityStateFilter !== undefined) setCityStateFilter(state.cityStateFilter);
+    if (state.cityStateFilterInput !== undefined) setCityStateFilterInput(state.cityStateFilterInput);
+    if (state.multiplierOnlyBlank !== undefined) setMultiplierOnlyBlank(state.multiplierOnlyBlank);
+    if (state.multiplierOnlyFiltered !== undefined) setMultiplierOnlyFiltered(state.multiplierOnlyFiltered);
+    if (state.mandibleChamberVisible !== undefined) setMandibleChamberVisible(state.mandibleChamberVisible);
+    if (state.sinusChamberVisible !== undefined) setSinusChamberVisible(state.sinusChamberVisible);
+    if (state.cardioChamberVisible !== undefined) setCardioChamberVisible(state.cardioChamberVisible);
+    if (state.pecChamberVisible !== undefined) setPecChamberVisible(state.pecChamberVisible);
+    if (state.rocketChamberVisible !== undefined) setRocketChamberVisible(state.rocketChamberVisible);
+  };
+  
+  // Get current state for saving
+  const getCurrentState = () => ({
+    rowsPerPage,
+    currentRowPage,
+    colsPerPage,
+    currentColPage,
+    sortColumn,
+    sortDirection,
+    searchTerm,
+    jettisonFilter,
+    skylabFilter,
+    baobobFilter,
+    cityPopulationFilter,
+    cityStateFilter,
+    cityStateFilterInput,
+    multiplierOnlyBlank,
+    multiplierOnlyFiltered,
+    mandibleChamberVisible,
+    sinusChamberVisible,
+    cardioChamberVisible,
+    pecChamberVisible,
+    rocketChamberVisible
+  });
 
   // Handle payout multiplication by population
   const runPayoutMultiplier = async () => {
@@ -1380,6 +1440,12 @@ export default function LeadsmartMorphClient() {
               >
                 assign cities
               </button>
+              
+              {/* State Management Controls */}
+              <StateManager 
+                currentState={getCurrentState()}
+                onLoadState={handleLoadState}
+              />
             </div>
           </div>
         )}
@@ -1899,7 +1965,8 @@ export default function LeadsmartMorphClient() {
                         padding: '0px',
                         border: '1px solid gray',
                         backgroundColor: isActiveFilterColumn ? '#ffff99' : undefined,
-                        cursor: isSortable ? 'pointer' : 'default'
+                        cursor: isSortable ? 'pointer' : 'default',
+                        ...(col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city' ? { whiteSpace: 'nowrap' } : {})
                       }}
                       onClick={isSortable ? () => handleSort(col) : undefined}
                       title={isSortable ? `Click to sort by ${col}` : undefined}
@@ -1990,7 +2057,7 @@ export default function LeadsmartMorphClient() {
                   {paginatedColumns.map(col => {
                     const isEditing = editingCell?.id === row.mundial_id && editingCell?.field === col;
                     const value = row[col as keyof LeadsmartTransformed];
-                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'created_at' || col === 'updated_at' || col === 'city_population' || col === 'multiplied_payout_by_population' || col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city';
+                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'city_population' || col === 'multiplied_payout_by_population' || col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city';
                     
                     return (
                       <td 
@@ -1998,11 +2065,20 @@ export default function LeadsmartMorphClient() {
                         className={col === 'city_population' ? `for_db_table_cities for_db_column_${col}` : (col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city') ? 'for_db_table_abstract for_db_column_abstract' : `for_db_table_leadsmart_transformed for_db_column_${col}`}
                         style={{ 
                           padding: '0px',
-                          border: '1px solid gray'
+                          border: '1px solid gray',
+                          ...((col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city' || col === 'aggregated_zip_codes') ? { whiteSpace: 'nowrap' } : {})
                         }}
                         onClick={() => !isReadOnly && !isEditing && startEditing(row.mundial_id, col, value)}
                       >
-                        <div className="cell_inner_wrapper_div" style={{ minHeight: '40px', display: 'flex', alignItems: 'center', gap: '8px', padding: '4px', position: (col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city') ? 'relative' : undefined }}>
+                        <div className="cell_inner_wrapper_div" style={{ 
+                          minHeight: '40px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '8px', 
+                          padding: '4px', 
+                          position: (col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city') ? 'relative' : undefined, 
+                          ...(col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city' ? { whiteSpace: 'nowrap' } : {}) 
+                        }}>
                           {isEditing ? (
                             // Use compact input for kwtuber columns, textarea for others
                             (col === 'volume_kwtuber1' || col === 'cpc_kwtuber1' || col === 'yelp_kwtuber1' || 
@@ -2079,7 +2155,10 @@ export default function LeadsmartMorphClient() {
                                       cursor: 'default',
                                       color: 'inherit',
                                       flex: 1,
-                                      marginLeft: '8px'
+                                      marginLeft: '8px',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis'
                                     }}
                                   >
                                     {zipCodes.slice(0, 2).join(' / ')}
@@ -2157,7 +2236,9 @@ export default function LeadsmartMorphClient() {
                                 style={{ 
                                   cursor: 'default',
                                   color: '#333',
-                                  paddingRight: '72px' // Add padding to prevent text overlap with buttons (26px + 26px + 16px + 4px buffer)
+                                  paddingRight: '72px', // Add padding to prevent text overlap with buttons (26px + 26px + 16px + 4px buffer)
+                                  whiteSpace: 'nowrap',
+                                  display: 'inline-block'
                                 }}
                               >
                                 {`${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''} ${row.state_code || ''}`.trim()}
@@ -2299,7 +2380,9 @@ export default function LeadsmartMorphClient() {
                                 style={{ 
                                   cursor: 'default',
                                   color: '#333',
-                                  paddingRight: '72px' // Add padding to prevent text overlap with buttons
+                                  paddingRight: '72px', // Add padding to prevent text overlap with buttons
+                                  whiteSpace: 'nowrap',
+                                  display: 'inline-block'
                                 }}
                               >
                                 {`${row.subsheet_kw_stub_1 || ''} ${row.city_name || ''}`.trim()}

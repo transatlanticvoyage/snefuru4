@@ -880,12 +880,13 @@ export default function LeadSmartSkylabTileTables({
         {/* ========== RELEASES SECTION ========== */}
         {/* Release Label */}
         <div 
-          className="border-2 border-gray-600 bg-gray-100 font-bold text-gray-800 flex items-center"
+          className="border-2 border-gray-600 font-bold text-gray-800 flex items-center"
           style={{ 
             padding: '0px 12px',
             fontSize: '14px',
             minHeight: '24px',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            backgroundColor: '#f8eed1'
           }}
         >
           <span>leadsmart_file_releases</span>
@@ -1044,12 +1045,13 @@ export default function LeadSmartSkylabTileTables({
           >
             {/* Subsheet Label */}
             <div 
-              className="border-2 border-gray-600 bg-gray-100 font-bold text-gray-800 flex items-center"
+              className="border-2 border-gray-600 font-bold text-gray-800 flex items-center"
               style={{ 
                 padding: '0px 12px',
                 fontSize: '14px',
                 minHeight: '24px',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                backgroundColor: '#c1f8c5'
               }}
             >
               <span>leadsmart_subsheets</span>
@@ -1207,12 +1209,13 @@ export default function LeadSmartSkylabTileTables({
           >
             {/* Subpart Label */}
             <div 
-              className="border-2 border-gray-600 bg-gray-100 font-bold text-gray-800 flex items-center"
+              className="border-2 border-gray-600 font-bold text-gray-800 flex items-center"
               style={{ 
                 padding: '0px 12px',
                 fontSize: '14px',
                 minHeight: '24px',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                backgroundColor: '#cfd8f7'
               }}
             >
               <span>leadsmart_subparts</span>
