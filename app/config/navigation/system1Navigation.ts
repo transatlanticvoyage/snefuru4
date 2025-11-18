@@ -83,6 +83,14 @@ export const system1Navigation: NavItem[] = [
       {
         name: 'Atrium Services',
         path: '/atrium_services_jar'
+      },
+      {
+        name: 'Address Flipper',
+        path: '/address_flipper'
+      },
+      {
+        name: 'Citation Crane',
+        path: '/citation_crane'
       }
     ]
   }
