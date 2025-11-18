@@ -1,3 +1,0 @@
-<!-- TEST COMMENT - Testing git tracking in both repos -->
-# beacon-wp-plugin
-Beacon - WordPress plugin for data fallback and management
