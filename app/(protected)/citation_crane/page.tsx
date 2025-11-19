@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 export default function CitationCranePage() {
   // Initialize with 20 empty rows
   const [rows, setRows] = useState(() => 
-    Array.from({ length: 20 }, () => ({ A: '', B: '', C: '', D: '' }))
+    Array.from({ length: 20 }, () => ({ A: '', B: '', C: '' }))
   );
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [anchorFeedback, setAnchorFeedback] = useState('');
@@ -15,7 +15,10 @@ export default function CitationCranePage() {
   const [selectedGigId, setSelectedGigId] = useState<number>(1);
   const [atlasViewTab, setAtlasViewTab] = useState<number>(1);
   const [presetGigSelection, setPresetGigSelection] = useState<number>(1);
+  const [intendedGigPresetA, setIntendedGigPresetA] = useState<number>(1);
+  const [intendedGigPresetB, setIntendedGigPresetB] = useState<number>(2);
   const [detectedUrls, setDetectedUrls] = useState<string[]>([]);
+  const [unitLabelSource, setUnitLabelSource] = useState<'A' | 'B'>('A');
 
   // Hardcoded gig data
   const gigData = [
@@ -185,25 +188,56 @@ Major Social links
     }
   ];
 
-  // Load anchored column A data on component mount
+  // Load anchored column A and B data and gig presets on component mount
   useEffect(() => {
     const savedColumnA = localStorage.getItem('citationCrane_columnA');
+    const savedColumnB = localStorage.getItem('citationCrane_columnB');
+    const savedGigPresetA = localStorage.getItem('citationCrane_intendedGigPresetA');
+    const savedGigPresetB = localStorage.getItem('citationCrane_intendedGigPresetB');
+    
+    // Load gig presets
+    if (savedGigPresetA) {
+      setIntendedGigPresetA(Number(savedGigPresetA));
+    }
+    if (savedGigPresetB) {
+      setIntendedGigPresetB(Number(savedGigPresetB));
+    }
+    
+    let newRows = [...rows];
+    
     if (savedColumnA) {
       try {
         const parsedData = JSON.parse(savedColumnA);
-        const newRows = [...rows];
         parsedData.forEach((value: string, index: number) => {
           if (index < newRows.length) {
             newRows[index].A = value;
           } else {
-            newRows.push({ A: value, B: '', C: '', D: '' });
+            newRows.push({ A: value, B: '', C: '' });
           }
         });
-        setRows(newRows);
       } catch (e) {
         console.error('Failed to load saved column A data:', e);
       }
     }
+    
+    if (savedColumnB) {
+      try {
+        const parsedData = JSON.parse(savedColumnB);
+        // Ensure we have enough rows for column B data
+        while (newRows.length < parsedData.length) {
+          newRows.push({ A: '', B: '', C: '' });
+        }
+        parsedData.forEach((value: string, index: number) => {
+          if (index < newRows.length) {
+            newRows[index].B = value;
+          }
+        });
+      } catch (e) {
+        console.error('Failed to load saved column B data:', e);
+      }
+    }
+    
+    setRows(newRows);
   }, []);
 
   const handleCellChange = (rowIndex: number, column: string, value: string) => {
@@ -212,7 +246,7 @@ Major Social links
     
     // Auto-expand: if user is typing in the last few rows, add more rows
     if (rowIndex >= rows.length - 3) {
-      const additionalRows = Array.from({ length: 10 }, () => ({ A: '', B: '', C: '', D: '' }));
+      const additionalRows = Array.from({ length: 10 }, () => ({ A: '', B: '', C: '' }));
       newRows.push(...additionalRows);
     }
     
@@ -283,7 +317,7 @@ Major Social links
     // Ensure we have enough rows for the pasted data
     const requiredRows = rowIndex + cellValues.length;
     while (newRows.length < requiredRows + 10) {
-      newRows.push({ A: '', B: '', C: '', D: '' });
+      newRows.push({ A: '', B: '', C: '' });
     }
     
     cellValues.forEach((cellValue, cellIndex) => {
@@ -293,7 +327,7 @@ Major Social links
         if (hasTabSeparators && !cellValue.includes('"')) {
           // Handle tab-separated data (multi-column paste) - but only for non-quoted content
           const cells = cellValue.split('\t');
-          const columns = ['A', 'B', 'C', 'D'];
+          const columns = ['A', 'B', 'C'];
           const startColumnIndex = columns.indexOf(column);
           
           cells.forEach((cell, colIndex) => {
@@ -332,11 +366,27 @@ Major Social links
     setTimeout(() => setAnchorFeedback(''), 3000);
   };
 
+  const anchorColumnB = () => {
+    const columnBData = rows.map(row => row.B);
+    // Filter out trailing empty rows for storage
+    let lastNonEmptyIndex = columnBData.length - 1;
+    while (lastNonEmptyIndex >= 0 && columnBData[lastNonEmptyIndex] === '') {
+      lastNonEmptyIndex--;
+    }
+    const dataToSave = columnBData.slice(0, lastNonEmptyIndex + 1);
+    
+    localStorage.setItem('citationCrane_columnB', JSON.stringify(dataToSave));
+    
+    setAnchorFeedback('✅ Column B data anchored successfully!');
+    setTimeout(() => setAnchorFeedback(''), 3000);
+  };
+
   const clearAllData = () => {
     // Clear the spreadsheet
-    setRows(Array.from({ length: 20 }, () => ({ A: '', B: '', C: '', D: '' })));
+    setRows(Array.from({ length: 20 }, () => ({ A: '', B: '', C: '' })));
     // Clear localStorage
     localStorage.removeItem('citationCrane_columnA');
+    localStorage.removeItem('citationCrane_columnB');
     // Clear sharkintax output
     setSharkintaxOutput('');
     // Close dialog
@@ -350,21 +400,22 @@ Major Social links
     const sharkintaxParts: string[] = [];
     
     rows.forEach((row) => {
-      // Check if column A starts with "gigmark"
-      if (row.A.toLowerCase().startsWith('gigmark')) {
+      // Check if the selected column starts with "gigmark"
+      const sourceColumn = unitLabelSource === 'A' ? row.A : row.B;
+      if (sourceColumn.toLowerCase().startsWith('gigmark')) {
         // Find the "// " separator
-        const separatorIndex = row.A.indexOf('// ');
+        const separatorIndex = sourceColumn.indexOf('// ');
         if (separatorIndex !== -1) {
           // Extract text after "// "
-          const extractedText = row.A.substring(separatorIndex + 3).trim();
-          const columnBValue = row.B.trim();
+          const extractedText = sourceColumn.substring(separatorIndex + 3).trim();
+          const columnCValue = row.C.trim();
           
           if (extractedText) {
             // Format as sharkintax
             let sharkintaxBlock = '======================================\n';
             sharkintaxBlock += extractedText + '\n';
             sharkintaxBlock += '——————————————————————————————————————\n';
-            sharkintaxBlock += columnBValue || '';
+            sharkintaxBlock += columnCValue || '';
             
             sharkintaxParts.push(sharkintaxBlock);
           }
@@ -534,6 +585,11 @@ Major Social links
     return sharkintaxOutput.trim() !== '' && presetGigSelection !== '';
   };
 
+  // Count non-empty cells in each column
+  const getColumnDataCount = (column: 'A' | 'B' | 'C') => {
+    return rows.filter(row => row[column].trim() !== '').length;
+  };
+
   const renderMainScreen = () => (
     <>
       <div className="mb-6">
@@ -541,12 +597,44 @@ Major Social links
         <div className="flex gap-4">
           {/* Heaver Text Box Wrapper */}
           <div className="flex-1 border border-gray-600 p-4 rounded-md">
-            <button
-              onClick={createSharkintax}
-              className="mb-3 px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              1 - Create Sharkintax from Gigmark Rows
-            </button>
+            <div className="flex items-center gap-4 mb-3">
+              <button
+                onClick={createSharkintax}
+                className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                1 - Create Sharkintax from Gigmark Rows
+              </button>
+              <div className="flex items-center gap-3">
+                <span 
+                  className="text-black font-bold"
+                  style={{ fontSize: '16px' }}
+                >
+                  Derive Unit Labels From:
+                </span>
+                <div className="flex gap-3">
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      value="A"
+                      checked={unitLabelSource === 'A'}
+                      onChange={(e) => setUnitLabelSource(e.target.value as 'A' | 'B')}
+                      className="text-green-600 focus:ring-green-500"
+                    />
+                    <span className="text-sm font-medium">Use Column A</span>
+                  </label>
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      value="B"
+                      checked={unitLabelSource === 'B'}
+                      onChange={(e) => setUnitLabelSource(e.target.value as 'A' | 'B')}
+                      className="text-green-600 focus:ring-green-500"
+                    />
+                    <span className="text-sm font-medium">Use Column B</span>
+                  </label>
+                </div>
+              </div>
+            </div>
             <h4 
               className="text-black font-bold mb-2"
               style={{ fontSize: '16px' }}
@@ -742,6 +830,12 @@ Major Social links
               Anchor Column A
             </button>
             <button
+              onClick={anchorColumnB}
+              className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Anchor Column B
+            </button>
+            <button
               onClick={() => setShowConfirmDialog(true)}
               className="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
             >
@@ -749,24 +843,23 @@ Major Social links
             </button>
             <button
               onClick={() => {
-                // Clear spreadsheet columns B, C, D but keep column A
+                // Clear spreadsheet column C but keep columns A and B
                 const newRows = rows.map(row => ({
                   A: row.A, // Keep column A
-                  B: '',    // Clear column B
-                  C: '',    // Clear column C
-                  D: ''     // Clear column D
+                  B: row.B, // Keep column B
+                  C: ''     // Clear column C
                 }));
                 setRows(newRows);
                 // Clear text box outputs
                 setSharkintaxOutput('');
                 setRaiserOutput('');
                 
-                setAnchorFeedback('🗑️ All data cleared except Column A!');
+                setAnchorFeedback('🗑️ All data cleared except Columns A & B!');
                 setTimeout(() => setAnchorFeedback(''), 3000);
               }}
               className="px-4 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
             >
-              clear all data (except for column a)
+clear all data (but not col. A & B)
             </button>
             {anchorFeedback && (
               <span className={`text-sm font-medium ${
@@ -790,11 +883,73 @@ Major Social links
             <table className="border-collapse w-full">
               <thead className="sticky top-0 bg-gray-100 z-10">
                 <tr>
+                  <th className="border border-gray-400 bg-gray-100 p-2 w-16 font-medium">-</th>
+                  <th className="border border-gray-400 bg-gray-100 p-2 font-medium" style={{ width: '33.33%', borderRight: '3px solid black' }}>
+                    <div className="flex flex-col gap-1">
+                      <span 
+                        className="text-black font-bold text-center"
+                        style={{ fontSize: '12px' }}
+                      >
+                        intended_gig_preset
+                      </span>
+                      <select
+                        value={intendedGigPresetA}
+                        onChange={(e) => {
+                          const value = Number(e.target.value);
+                          setIntendedGigPresetA(value);
+                          localStorage.setItem('citationCrane_intendedGigPresetA', value.toString());
+                        }}
+                        className="px-1 py-1 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                      >
+                        <option value="">Select Gig</option>
+                        <option value={1}>1 - citationexpert - citations</option>
+                        <option value={2}>2 - se0linkbuilders - social profiles</option>
+                      </select>
+                    </div>
+                  </th>
+                  <th className="border border-gray-400 bg-gray-100 p-2 font-medium" style={{ width: '33.33%', borderRight: '3px solid black' }}>
+                    <div className="flex flex-col gap-1">
+                      <span 
+                        className="text-black font-bold text-center"
+                        style={{ fontSize: '12px' }}
+                      >
+                        intended_gig_preset
+                      </span>
+                      <select
+                        value={intendedGigPresetB}
+                        onChange={(e) => {
+                          const value = Number(e.target.value);
+                          setIntendedGigPresetB(value);
+                          localStorage.setItem('citationCrane_intendedGigPresetB', value.toString());
+                        }}
+                        className="px-1 py-1 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                      >
+                        <option value="">Select Gig</option>
+                        <option value={1}>1 - citationexpert - citations</option>
+                        <option value={2}>2 - se0linkbuilders - social profiles</option>
+                      </select>
+                    </div>
+                  </th>
+                  <th className="border border-gray-400 bg-gray-100 p-2 font-medium" style={{ width: '33.33%' }}>
+                    <span 
+                      className="text-black font-bold"
+                      style={{ fontSize: '12px' }}
+                    >
+                      live_data
+                    </span>
+                  </th>
+                </tr>
+                <tr>
                   <th className="border border-gray-400 bg-gray-100 p-2 w-16 font-medium">#</th>
-                  <th className="border border-gray-400 bg-gray-100 p-2 font-medium" style={{ minWidth: '200px', borderRight: '3px solid black' }}>A</th>
-                  <th className="border border-gray-400 bg-gray-100 p-2 font-medium" style={{ minWidth: '200px' }}>B</th>
-                  <th className="border border-gray-400 bg-gray-100 p-2 font-medium" style={{ minWidth: '200px' }}>C</th>
-                  <th className="border border-gray-400 bg-gray-100 p-2 font-medium" style={{ minWidth: '200px' }}>D</th>
+                  <th className="border border-gray-400 bg-gray-100 p-2 font-medium" style={{ width: '33.33%', borderRight: '3px solid black' }}>
+                    <span className="font-bold">Column A</span> - {getColumnDataCount('A')} <span className="text-gray-500">cells of data</span>
+                  </th>
+                  <th className="border border-gray-400 bg-gray-100 p-2 font-medium" style={{ width: '33.33%', borderRight: '3px solid black' }}>
+                    <span className="font-bold">Column B</span> - {getColumnDataCount('B')} <span className="text-gray-500">cells of data</span>
+                  </th>
+                  <th className="border border-gray-400 bg-gray-100 p-2 font-medium" style={{ width: '33.33%' }}>
+                    <span className="font-bold">Column C</span> - {getColumnDataCount('C')} <span className="text-gray-500">cells of data</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -803,18 +958,22 @@ Major Social links
                     <td className="border border-gray-400 bg-gray-50 p-1 text-center text-sm font-medium">
                       {rowIndex + 1}
                     </td>
-                    {['A', 'B', 'C', 'D'].map((column) => (
+                    {['A', 'B', 'C'].map((column) => (
                       <td 
                         key={`${rowIndex}-${column}`} 
                         className="border border-gray-400 p-0"
-                        style={column === 'A' ? { borderRight: '3px solid black' } : {}}
+                        style={column === 'A' || column === 'B' ? { borderRight: '3px solid black' } : {}}
                       >
                         <input
                           type="text"
                           value={row[column as keyof typeof row]}
                           onChange={(e) => handleCellChange(rowIndex, column, e.target.value)}
                           onPaste={(e) => handlePaste(e, rowIndex, column)}
-                          className="w-full h-full p-2 border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset bg-transparent"
+                          className={`w-full h-full p-2 border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset ${
+                            column === 'A' ? 'bg-green-50' : 
+                            column === 'B' ? 'bg-yellow-50' : 
+                            'bg-transparent'
+                          }`}
                           style={{ minHeight: '40px' }}
                         />
                       </td>
