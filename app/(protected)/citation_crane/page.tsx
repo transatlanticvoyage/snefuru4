@@ -15,6 +15,7 @@ export default function CitationCranePage() {
   const [selectedGigId, setSelectedGigId] = useState<number>(1);
   const [atlasViewTab, setAtlasViewTab] = useState<number>(1);
   const [presetGigSelection, setPresetGigSelection] = useState<number>(1);
+  const [detectedUrls, setDetectedUrls] = useState<string[]>([]);
 
   // Hardcoded gig data
   const gigData = [
@@ -225,28 +226,91 @@ Major Social links
     if (!pasteData) return;
     
     const lines = pasteData.split('\n');
+    const hasTabSeparators = pasteData.includes('\t');
+    
+    // If it's truly single line content (no newlines), just paste into one cell
+    if (lines.length === 1) {
+      const newRows = [...rows];
+      newRows[rowIndex][column as keyof typeof newRows[0]] = pasteData;
+      setRows(newRows);
+      return;
+    }
+    
     const newRows = [...rows];
     
+    // Parse lines and handle quoted multi-line content
+    const cellValues: string[] = [];
+    let currentCell = '';
+    let insideQuotes = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Check if this line starts a quoted section
+      if (!insideQuotes && line.startsWith('"')) {
+        insideQuotes = true;
+        currentCell = line;
+        
+        // Check if the quote also ends on this line
+        if (line.endsWith('"') && line.length > 1) {
+          insideQuotes = false;
+          cellValues.push(currentCell);
+          currentCell = '';
+        }
+      }
+      // If we're inside quotes, continue building the cell content
+      else if (insideQuotes) {
+        currentCell += '\n' + line;
+        
+        // Check if this line ends the quoted section
+        if (line.endsWith('"')) {
+          insideQuotes = false;
+          cellValues.push(currentCell);
+          currentCell = '';
+        }
+      }
+      // Regular line (not quoted)
+      else {
+        cellValues.push(line);
+      }
+    }
+    
+    // If there's remaining content (unclosed quote), add it
+    if (currentCell) {
+      cellValues.push(currentCell);
+    }
+    
     // Ensure we have enough rows for the pasted data
-    const requiredRows = rowIndex + lines.length;
+    const requiredRows = rowIndex + cellValues.length;
     while (newRows.length < requiredRows + 10) {
       newRows.push({ A: '', B: '', C: '', D: '' });
     }
     
-    lines.forEach((line, lineIndex) => {
-      const cells = line.split('\t'); // Handle tab-separated data
-      const currentRowIndex = rowIndex + lineIndex;
+    cellValues.forEach((cellValue, cellIndex) => {
+      const currentRowIndex = rowIndex + cellIndex;
       
       if (currentRowIndex < newRows.length) {
-        const columns = ['A', 'B', 'C', 'D'];
-        const startColumnIndex = columns.indexOf(column);
-        
-        cells.forEach((cellValue, cellIndex) => {
-          const targetColumnIndex = startColumnIndex + cellIndex;
-          if (targetColumnIndex < columns.length) {
-            newRows[currentRowIndex][columns[targetColumnIndex]] = cellValue.trim();
+        if (hasTabSeparators && !cellValue.includes('"')) {
+          // Handle tab-separated data (multi-column paste) - but only for non-quoted content
+          const cells = cellValue.split('\t');
+          const columns = ['A', 'B', 'C', 'D'];
+          const startColumnIndex = columns.indexOf(column);
+          
+          cells.forEach((cell, colIndex) => {
+            const targetColumnIndex = startColumnIndex + colIndex;
+            if (targetColumnIndex < columns.length) {
+              newRows[currentRowIndex][columns[targetColumnIndex]] = cell.trim();
+            }
+          });
+        } else {
+          // Handle single-column paste or quoted content
+          // Remove surrounding quotes if present
+          let finalValue = cellValue;
+          if (finalValue.startsWith('"') && finalValue.endsWith('"')) {
+            finalValue = finalValue.slice(1, -1);
           }
-        });
+          newRows[currentRowIndex][column as keyof typeof newRows[0]] = finalValue;
+        }
       }
     });
     
@@ -374,7 +438,12 @@ Major Social links
       );
       
       if (exactMatchKey) {
-        orderedBlocks.push(sharkintaxBlocks[exactMatchKey]);
+        // Ensure sharkintax blocks end with single newline for consistent spacing
+        let block = sharkintaxBlocks[exactMatchKey];
+        if (!block.endsWith('\n')) {
+          block += '\n';
+        }
+        orderedBlocks.push(block);
         usedSharkintaxUnits.add(exactMatchKey);
       } else {
         // Check for partial match
@@ -384,7 +453,12 @@ Major Social links
         );
         
         if (partialMatchKey && !usedSharkintaxUnits.has(partialMatchKey)) {
-          orderedBlocks.push(sharkintaxBlocks[partialMatchKey]);
+          // Ensure sharkintax blocks end with single newline for consistent spacing
+          let block = sharkintaxBlocks[partialMatchKey];
+          if (!block.endsWith('\n')) {
+            block += '\n';
+          }
+          orderedBlocks.push(block);
           usedSharkintaxUnits.add(partialMatchKey);
         } else {
           // No match found - create empty block for this atlas unit
@@ -398,29 +472,61 @@ Major Social links
     const unmatchedBlocks: string[] = [];
     Object.keys(sharkintaxBlocks).forEach(key => {
       if (!usedSharkintaxUnits.has(key)) {
-        // Include the full sharkintax block for unmatched units
-        unmatchedBlocks.push(sharkintaxBlocks[key]);
+        // Include the full sharkintax block for unmatched units with consistent spacing
+        let block = sharkintaxBlocks[key];
+        if (!block.endsWith('\n')) {
+          block += '\n';
+        }
+        unmatchedBlocks.push(block);
       }
     });
     
-    // Build the raiser output
-    let raiserContent = orderedBlocks.join('\n');
+    // Build the raiser output - ensure proper spacing between blocks
+    let raiserContent = orderedBlocks.join('');
     
     // Add unmatched section if there are unmatched units
     if (unmatchedBlocks.length > 0) {
-      raiserContent += '\n';
       raiserContent += '######################################\n';
       raiserContent += 'UNMATCHED UNITS PLACED BELOW (no exact match unit label found)\n';
       raiserContent += '######################################\n';
       unmatchedBlocks.forEach(block => {
-        raiserContent += block + '\n';
+        raiserContent += block;
       });
     }
     
     setRaiserOutput(raiserContent);
     
+    // Extract URLs and domains from the raiser output
+    const extractedUrls = extractUrlsAndDomains(raiserContent);
+    setDetectedUrls(extractedUrls);
+    
     setAnchorFeedback(`✅ Processed ${orderedBlocks.length} total units${unmatchedBlocks.length > 0 ? ` (${unmatchedBlocks.length} unmatched)` : ''}`);
     setTimeout(() => setAnchorFeedback(''), 3000);
+  };
+
+  // Function to extract URLs and domains from text
+  const extractUrlsAndDomains = (text: string): string[] => {
+    const urlRegex = /https?:\/\/[^\s]+/g;
+    const domainRegex = /(?:^|\s)([a-zA-Z0-9-]+\.(?:[a-zA-Z]{2,}|[a-zA-Z]{2,}\.[a-zA-Z]{2,}))(?=\s|$)/g;
+    
+    const urls: string[] = [];
+    const domains: string[] = [];
+    
+    // Extract full URLs
+    const urlMatches = text.match(urlRegex);
+    if (urlMatches) {
+      urls.push(...urlMatches);
+    }
+    
+    // Extract standalone domains
+    let domainMatch;
+    while ((domainMatch = domainRegex.exec(text)) !== null) {
+      domains.push(domainMatch[1]);
+    }
+    
+    // Combine and remove duplicates
+    const allUrls = [...new Set([...urls, ...domains])];
+    return allUrls;
   };
 
   // Check if order button should be enabled
@@ -430,11 +536,9 @@ Major Social links
 
   const renderMainScreen = () => (
     <>
-      <div className="flex items-start gap-6 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Citation Crane</h1>
-        
+      <div className="mb-6">
         {/* Text Boxes Container */}
-        <div className="flex-1 flex gap-4">
+        <div className="flex gap-4">
           {/* Heaver Text Box Wrapper */}
           <div className="flex-1 border border-gray-600 p-4 rounded-md">
             <button
@@ -455,64 +559,172 @@ Major Social links
               className="w-full h-32 p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-y"
               placeholder="Sharkintax output will appear here..."
             />
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(sharkintaxOutput || '');
-                setAnchorFeedback('📋 Sharkintax copied to clipboard!');
-                setTimeout(() => setAnchorFeedback(''), 3000);
-              }}
-              className="mt-2 px-3 py-1 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700"
-            >
-              Copy Sharkintax
-            </button>
-          </div>
-          
-          {/* Raiser Text Box Wrapper */}
-          <div className="flex-1 border border-gray-600 p-4 rounded-md">
-            <div className="flex items-center gap-3 border border-gray-600 p-2 rounded-md mb-3">
-              <select
-                value={presetGigSelection}
-                onChange={(e) => setPresetGigSelection(Number(e.target.value))}
-                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Gig</option>
-                <option value={1}>1 - citationexpert - citations</option>
-                <option value={2}>2 - se0linkbuilders - social profiles</option>
-              </select>
+            <div className="mt-2 flex gap-2 flex-wrap">
               <button
-                onClick={orderItemsAccordingToPreset}
-                disabled={!isOrderButtonEnabled()}
-                className={`px-4 py-2 font-medium rounded-md focus:outline-none focus:ring-2 ${
-                  isOrderButtonEnabled() 
-                    ? 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
+                onClick={() => {
+                  navigator.clipboard.writeText(sharkintaxOutput || '');
+                  setAnchorFeedback('📋 All content copied to clipboard!');
+                  setTimeout(() => setAnchorFeedback(''), 3000);
+                }}
+                className="px-3 py-1 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700"
               >
-                2 - Order Items According To Preset
+                copy all
+              </button>
+              <button
+                onClick={() => {
+                  // Split content at unmatched units section and copy only before it
+                  const beforeUnmatched = sharkintaxOutput.split('######################################')[0] || '';
+                  navigator.clipboard.writeText(beforeUnmatched);
+                  setAnchorFeedback('📋 Content before unmatched units copied to clipboard!');
+                  setTimeout(() => setAnchorFeedback(''), 3000);
+                }}
+                className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+              >
+                copy all before unmatched units
+              </button>
+              <button
+                onClick={() => {
+                  // Extract only unmatched units section
+                  const parts = sharkintaxOutput.split('######################################');
+                  const unmatchedSection = parts.length > 1 ? '######################################' + parts[1] : '';
+                  navigator.clipboard.writeText(unmatchedSection);
+                  setAnchorFeedback('📋 Unmatched units copied to clipboard!');
+                  setTimeout(() => setAnchorFeedback(''), 3000);
+                }}
+                className="px-3 py-1 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700"
+              >
+                copy unmatched units only
               </button>
             </div>
-            <h4 
-              className="text-black font-bold mb-2"
-              style={{ fontSize: '16px' }}
-            >
-              raiser_text_box
-            </h4>
-            <textarea
-              value={raiserOutput}
-              readOnly
-              className="w-full h-32 p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-y"
-              placeholder="Ordered units will appear here..."
-            />
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(raiserOutput || '');
-                setAnchorFeedback('📋 Ordered units copied to clipboard!');
-                setTimeout(() => setAnchorFeedback(''), 3000);
-              }}
-              className="mt-2 px-3 py-1 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700"
-            >
-              Copy Ordered Units
-            </button>
+          </div>
+          
+          {/* Raiser System Wrapper */}
+          <div className="flex-1 border border-gray-600 p-4 rounded-md">
+            <div className="flex gap-4">
+              {/* Raiser Text Box */}
+              <div className="flex-1">
+                <div className="flex items-center gap-3 border border-gray-600 p-2 rounded-md mb-3">
+                  <select
+                    value={presetGigSelection}
+                    onChange={(e) => setPresetGigSelection(Number(e.target.value))}
+                    className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Gig</option>
+                    <option value={1}>1 - citationexpert - citations</option>
+                    <option value={2}>2 - se0linkbuilders - social profiles</option>
+                  </select>
+                  <button
+                    onClick={orderItemsAccordingToPreset}
+                    disabled={!isOrderButtonEnabled()}
+                    className={`px-4 py-2 font-medium rounded-md focus:outline-none focus:ring-2 ${
+                      isOrderButtonEnabled() 
+                        ? 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500' 
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    2 - Order Items According To Preset
+                  </button>
+                </div>
+                <h4 
+                  className="text-black font-bold mb-2"
+                  style={{ fontSize: '16px' }}
+                >
+                  raiser_text_box
+                </h4>
+                <textarea
+                  value={raiserOutput}
+                  readOnly
+                  className="w-full h-32 p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-y"
+                  placeholder="Ordered units will appear here..."
+                />
+                <div className="mt-2 flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(raiserOutput || '');
+                      setAnchorFeedback('📋 All content copied to clipboard!');
+                      setTimeout(() => setAnchorFeedback(''), 3000);
+                    }}
+                    className="px-3 py-1 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700"
+                  >
+                    copy all
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Split content at unmatched units section and copy only before it
+                      const beforeUnmatched = raiserOutput.split('######################################')[0] || '';
+                      navigator.clipboard.writeText(beforeUnmatched);
+                      setAnchorFeedback('📋 Content before unmatched units copied to clipboard!');
+                      setTimeout(() => setAnchorFeedback(''), 3000);
+                    }}
+                    className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                  >
+                    copy all before unmatched units
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Extract only unmatched units section
+                      const parts = raiserOutput.split('######################################');
+                      const unmatchedSection = parts.length > 1 ? '######################################' + parts[1] : '';
+                      navigator.clipboard.writeText(unmatchedSection);
+                      setAnchorFeedback('📋 Unmatched units copied to clipboard!');
+                      setTimeout(() => setAnchorFeedback(''), 3000);
+                    }}
+                    className="px-3 py-1 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700"
+                  >
+                    copy unmatched units only
+                  </button>
+                </div>
+              </div>
+
+              {/* Detected URLs/Domains Section */}
+              <div className="w-64">
+                <h4 
+                  className="text-black font-bold mb-2"
+                  style={{ fontSize: '16px' }}
+                >
+                  detected urls/domains
+                </h4>
+                <div className="border border-gray-300 rounded-md">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border-b border-gray-300 p-2 text-left font-medium">(c)</th>
+                        <th className="border-b border-gray-300 p-2 text-left font-medium">url/domain</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detectedUrls.length > 0 ? (
+                        detectedUrls.map((url, index) => (
+                          <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                            <td className="border-b border-gray-200 p-2">
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(url);
+                                  setAnchorFeedback('📋 URL copied to clipboard!');
+                                  setTimeout(() => setAnchorFeedback(''), 3000);
+                                }}
+                                className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
+                              >
+                                copy
+                              </button>
+                            </td>
+                            <td className="border-b border-gray-200 p-2 break-all" style={{ maxWidth: '200px', wordWrap: 'break-word' }}>
+                              {url}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={2} className="p-4 text-center text-gray-500 italic">
+                            No URLs detected yet
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -534,6 +746,27 @@ Major Social links
               className="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
             >
               Clear All Data
+            </button>
+            <button
+              onClick={() => {
+                // Clear spreadsheet columns B, C, D but keep column A
+                const newRows = rows.map(row => ({
+                  A: row.A, // Keep column A
+                  B: '',    // Clear column B
+                  C: '',    // Clear column C
+                  D: ''     // Clear column D
+                }));
+                setRows(newRows);
+                // Clear text box outputs
+                setSharkintaxOutput('');
+                setRaiserOutput('');
+                
+                setAnchorFeedback('🗑️ All data cleared except Column A!');
+                setTimeout(() => setAnchorFeedback(''), 3000);
+              }}
+              className="px-4 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              clear all data (except for column a)
             </button>
             {anchorFeedback && (
               <span className={`text-sm font-medium ${
@@ -733,6 +966,9 @@ Major Social links
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="p-6">
+        {/* Page Title */}
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Citation Crane</h1>
+        
         {/* Tab Navigation */}
         <div className="mb-6">
           <div className="border-b border-gray-200">

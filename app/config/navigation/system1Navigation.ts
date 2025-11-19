@@ -91,6 +91,14 @@ export const system1Navigation: NavItem[] = [
       {
         name: 'Citation Crane',
         path: '/citation_crane'
+      },
+      {
+        name: 'LeadSmart Tank',
+        path: '/leadsmart_tank'
+      },
+      {
+        name: 'LeadSmart Morph',
+        path: '/leadsmart_morph'
       }
     ]
   }
