@@ -19,6 +19,8 @@ export default function CitationCraneClient() {
   const [intendedGigPresetB, setIntendedGigPresetB] = useState<number>(2);
   const [detectedUrls, setDetectedUrls] = useState<string[]>([]);
   const [unitLabelSource, setUnitLabelSource] = useState<'A' | 'B'>('A');
+  const [emptyUnits, setEmptyUnits] = useState<string[]>([]);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   // Hardcoded gig data
   const gigData = [
@@ -551,8 +553,44 @@ Major Social links
     const extractedUrls = extractUrlsAndDomains(raiserContent);
     setDetectedUrls(extractedUrls);
     
+    // Extract empty units from the raiser output
+    const extractedEmptyUnits = extractEmptyUnits(raiserContent);
+    setEmptyUnits(extractedEmptyUnits);
+    
     setAnchorFeedback(`✅ Processed ${orderedBlocks.length} total units${unmatchedBlocks.length > 0 ? ` (${unmatchedBlocks.length} unmatched)` : ''}`);
     setTimeout(() => setAnchorFeedback(''), 3000);
+  };
+
+  // Function to extract empty units from raiser output
+  const extractEmptyUnits = (text: string): string[] => {
+    const emptyUnitsList: string[] = [];
+    const blocks = text.split('======================================');
+    
+    blocks.forEach(block => {
+      if (block.trim()) {
+        const lines = block.trim().split('\n');
+        if (lines.length >= 3) {
+          const unitLabel = lines[0].trim();
+          // Find content after the dashed line (——————)
+          const dashLineIndex = lines.findIndex(line => line.includes('——————————————'));
+          if (dashLineIndex !== -1) {
+            // Get content after dash line
+            const contentAfterDash = lines.slice(dashLineIndex + 1).join('').trim();
+            // Check if content is empty or only whitespace
+            if (!contentAfterDash || contentAfterDash === '') {
+              // Don't include special headers
+              if (unitLabel && 
+                  !unitLabel.includes('UNMATCHED UNITS') && 
+                  unitLabel !== '') {
+                emptyUnitsList.push(unitLabel);
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    return emptyUnitsList;
   };
 
   // Function to extract URLs and domains from text
@@ -810,6 +848,50 @@ Major Social links
                       )}
                     </tbody>
                   </table>
+                </div>
+                
+                {/* Empty Units Section */}
+                <div className="mt-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowTooltip(!showTooltip)}
+                        className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+                      >
+                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+                      {showTooltip && (
+                        <div className="absolute left-0 bottom-full mb-2 w-48 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-10">
+                          unit labels for which there is no unit content
+                          <div className="absolute bottom-0 left-2 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800"></div>
+                        </div>
+                      )}
+                    </div>
+                    <span 
+                      className="text-black font-bold"
+                      style={{ fontSize: '16px' }}
+                    >
+                      empty units:
+                    </span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(emptyUnits.join('\n'));
+                        setAnchorFeedback('📋 Empty units copied to clipboard!');
+                        setTimeout(() => setAnchorFeedback(''), 3000);
+                      }}
+                      className="px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700"
+                    >
+                      copy
+                    </button>
+                  </div>
+                  <textarea
+                    value={emptyUnits.join('\n')}
+                    readOnly
+                    className="w-full h-24 p-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-xs resize-none"
+                    placeholder="Empty units will appear here..."
+                  />
                 </div>
               </div>
             </div>
