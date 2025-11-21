@@ -21,6 +21,7 @@ export default function CitationCraneClient() {
   const [unitLabelSource, setUnitLabelSource] = useState<'A' | 'B'>('A');
   const [emptyUnits, setEmptyUnits] = useState<string[]>([]);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [fileName, setFileName] = useState<string>('');
 
   // Hardcoded gig data
   const gigData = [
@@ -557,6 +558,12 @@ Major Social links
     const extractedEmptyUnits = extractEmptyUnits(raiserContent);
     setEmptyUnits(extractedEmptyUnits);
     
+    // Auto-generate filename when raiser content is updated
+    if (raiserContent.trim()) {
+      const autoFileName = generateFileName(raiserContent);
+      setFileName(autoFileName);
+    }
+    
     setAnchorFeedback(`✅ Processed ${orderedBlocks.length} total units${unmatchedBlocks.length > 0 ? ` (${unmatchedBlocks.length} unmatched)` : ''}`);
     setTimeout(() => setAnchorFeedback(''), 3000);
   };
@@ -569,19 +576,23 @@ Major Social links
     blocks.forEach(block => {
       if (block.trim()) {
         const lines = block.trim().split('\n');
-        if (lines.length >= 3) {
+        if (lines.length >= 2) {
           const unitLabel = lines[0].trim();
           // Find content after the dashed line (——————)
           const dashLineIndex = lines.findIndex(line => line.includes('——————————————'));
           if (dashLineIndex !== -1) {
-            // Get content after dash line
-            const contentAfterDash = lines.slice(dashLineIndex + 1).join('').trim();
-            // Check if content is empty or only whitespace
-            if (!contentAfterDash || contentAfterDash === '') {
+            // Get all lines after dash line and filter out empty/whitespace-only lines
+            const contentLines = lines.slice(dashLineIndex + 1)
+              .map(line => line.trim())
+              .filter(line => line.length > 0);
+            
+            // Check if there are any meaningful content lines
+            if (contentLines.length === 0) {
               // Don't include special headers
               if (unitLabel && 
                   !unitLabel.includes('UNMATCHED UNITS') && 
-                  unitLabel !== '') {
+                  unitLabel !== '' &&
+                  !unitLabel.includes('######')) {
                 emptyUnitsList.push(unitLabel);
               }
             }
@@ -626,6 +637,70 @@ Major Social links
   // Count non-empty cells in each column
   const getColumnDataCount = (column: 'A' | 'B' | 'C') => {
     return rows.filter(row => row[column].trim() !== '').length;
+  };
+
+  // Get gig type text from dropdown selection
+  const getGigTypeText = (gigId: number): string => {
+    switch (gigId) {
+      case 1:
+        return 'citations';
+      case 2:
+        return 'social profiles';
+      default:
+        return 'unknown';
+    }
+  };
+
+  // Extract and format first domain from text
+  const getFirstDomainFormatted = (text: string): string => {
+    const urlRegex = /https?:\/\/[^\s]+/g;
+    const domainRegex = /(?:^|\s)([a-zA-Z0-9-]+\.(?:[a-zA-Z]{2,}|[a-zA-Z]{2,}\.[a-zA-Z]{2,}))(?=\s|$)/g;
+    
+    // First try to find full URLs
+    const urlMatches = text.match(urlRegex);
+    if (urlMatches && urlMatches.length > 0) {
+      try {
+        const url = new URL(urlMatches[0]);
+        return url.hostname.replace(/\./g, '_');
+      } catch (e) {
+        // If URL parsing fails, fall through to domain regex
+      }
+    }
+    
+    // Then try to find standalone domains
+    const domainMatch = domainRegex.exec(text);
+    if (domainMatch) {
+      return domainMatch[1].replace(/\./g, '_');
+    }
+    
+    return 'unknown_domain';
+  };
+
+  // Auto-generate filename based on gig selection and first domain
+  const generateFileName = (content: string): string => {
+    const gigType = getGigTypeText(presetGigSelection);
+    const formattedDomain = getFirstDomainFormatted(content);
+    return `${gigType} - ${formattedDomain}`;
+  };
+
+  // Download raiser content as file
+  const downloadRaiserFile = () => {
+    if (!fileName.trim()) {
+      setAnchorFeedback('⚠️ Please enter a file name first!');
+      setTimeout(() => setAnchorFeedback(''), 3000);
+      return;
+    }
+    
+    const element = document.createElement('a');
+    const file = new Blob([raiserOutput], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = `${fileName.trim()}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    
+    setAnchorFeedback('📁 File downloaded successfully!');
+    setTimeout(() => setAnchorFeedback(''), 3000);
   };
 
   const renderMainScreen = () => (
@@ -798,6 +873,32 @@ Major Social links
                     className="px-3 py-1 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700"
                   >
                     copy unmatched units only
+                  </button>
+                </div>
+                
+                {/* File Download Section */}
+                <div className="mt-4">
+                  <label 
+                    className="text-black font-bold block mb-2"
+                    style={{ fontSize: '16px' }}
+                  >
+                    file name:
+                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={fileName}
+                      onChange={(e) => setFileName(e.target.value)}
+                      className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter filename..."
+                    />
+                    <span className="text-gray-600 font-medium">.txt</span>
+                  </div>
+                  <button
+                    onClick={downloadRaiserFile}
+                    className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    download file
                   </button>
                 </div>
               </div>
