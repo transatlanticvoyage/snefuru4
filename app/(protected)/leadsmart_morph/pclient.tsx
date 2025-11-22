@@ -116,6 +116,7 @@ export default function LeadsmartMorphClient() {
   const [cardioChamberVisible, setCardioChamberVisible] = useState(false);
   const [pecChamberVisible, setPecChamberVisible] = useState(true);
   const [collarChamberVisible, setCollarChamberVisible] = useState(true);
+  const [mosierChamberVisible, setMosierChamberVisible] = useState(true);
   const [rocketChamberVisible, setRocketChamberVisible] = useState(true);
   
   // Filter state for jettison table
@@ -213,6 +214,15 @@ export default function LeadsmartMorphClient() {
       localStorage.setItem('leadsmartMorph_collarChamberVisible', JSON.stringify(true));
     }
     
+    const savedMosier = localStorage.getItem('leadsmartMorph_mosierChamberVisible');
+    if (savedMosier !== null) {
+      setMosierChamberVisible(JSON.parse(savedMosier));
+    } else {
+      // Default to true (visible) and save it
+      setMosierChamberVisible(true);
+      localStorage.setItem('leadsmartMorph_mosierChamberVisible', JSON.stringify(true));
+    }
+    
     const savedRocket = localStorage.getItem('leadsmartMorph_rocketChamberVisible');
     if (savedRocket !== null) {
       setRocketChamberVisible(JSON.parse(savedRocket));
@@ -273,6 +283,9 @@ export default function LeadsmartMorphClient() {
           break;
         case 'collar_chamber':
           setCollarChamberVisible(visible);
+          break;
+        case 'mosier_chamber':
+          setMosierChamberVisible(visible);
           break;
         case 'rocket_chamber':
           setRocketChamberVisible(visible);
@@ -664,6 +677,7 @@ export default function LeadsmartMorphClient() {
     if (state.cardioChamberVisible !== undefined) setCardioChamberVisible(state.cardioChamberVisible);
     if (state.pecChamberVisible !== undefined) setPecChamberVisible(state.pecChamberVisible);
     if (state.collarChamberVisible !== undefined) setCollarChamberVisible(state.collarChamberVisible);
+    if (state.mosierChamberVisible !== undefined) setMosierChamberVisible(state.mosierChamberVisible);
     if (state.rocketChamberVisible !== undefined) setRocketChamberVisible(state.rocketChamberVisible);
   };
   
@@ -689,6 +703,7 @@ export default function LeadsmartMorphClient() {
     cardioChamberVisible,
     pecChamberVisible,
     collarChamberVisible,
+    mosierChamberVisible,
     rocketChamberVisible
   });
 
@@ -1721,6 +1736,23 @@ export default function LeadsmartMorphClient() {
           >
             <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
               collar_chamber
+            </div>
+            {/* Leave the rest of the area blank for now */}
+          </div>
+        )}
+
+        {/* Mosier Chamber */}
+        {mosierChamberVisible && (
+          <div 
+            className="mosier_chamber chamber_div" 
+            style={{ 
+              border: '1px solid black', 
+              padding: '16px',
+              marginBottom: '16px'
+            }}
+          >
+            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
+              mosier_chamber
             </div>
             {/* Leave the rest of the area blank for now */}
           </div>
@@ -3277,6 +3309,26 @@ export default function LeadsmartMorphClient() {
 
       {/* Bezel Button */}
       <BezelButton />
+      
+      {/* Vallance Button - Only on morph page */}
+      <button
+        className="fixed z-40 rounded-md shadow-lg border border-gray-600 hover:bg-gray-700 transition-colors"
+        style={{ 
+          top: '85px', // Position below bezel button (43px + 41px height + 1px gap)
+          left: '1px', 
+          backgroundColor: '#c5bf7a',
+          width: '41px',
+          height: '41px',
+          padding: '2px',
+          fontSize: '12px',
+          lineHeight: '1.2',
+          wordWrap: 'break-word',
+          minHeight: 'auto'
+        }}
+        title="Vallance"
+      >
+        <span className="text-gray-800 font-medium">vallance</span>
+      </button>
       
       {/* Column Tooltip */}
       {columnTooltip.visible && (

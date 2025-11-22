@@ -54,6 +54,7 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   const [leadsmartMorphCardioChamberVisible, setLeadsmartMorphCardioChamberVisible] = useState(false);
   const [leadsmartMorphPecChamberVisible, setLeadsmartMorphPecChamberVisible] = useState(true);
   const [leadsmartMorphCollarChamberVisible, setLeadsmartMorphCollarChamberVisible] = useState(true);
+  const [leadsmartMorphMosierChamberVisible, setLeadsmartMorphMosierChamberVisible] = useState(true);
   const [leadsmartMorphRocketChamberVisible, setLeadsmartMorphRocketChamberVisible] = useState(true);
 
   useEffect(() => {
@@ -595,6 +596,15 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
         localStorage.setItem('leadsmartMorph_collarChamberVisible', JSON.stringify(true));
       }
       
+      const savedMosier = localStorage.getItem('leadsmartMorph_mosierChamberVisible');
+      if (savedMosier !== null) {
+        setLeadsmartMorphMosierChamberVisible(JSON.parse(savedMosier));
+      } else {
+        // Default to true (visible) and save it
+        setLeadsmartMorphMosierChamberVisible(true);
+        localStorage.setItem('leadsmartMorph_mosierChamberVisible', JSON.stringify(true));
+      }
+      
       const savedRocket = localStorage.getItem('leadsmartMorph_rocketChamberVisible');
       if (savedRocket !== null) {
         setLeadsmartMorphRocketChamberVisible(JSON.parse(savedRocket));
@@ -653,6 +663,16 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     
     window.dispatchEvent(new CustomEvent('leadsmartMorph-chamber-toggle', { 
       detail: { chamber: 'collar_chamber', visible: checked } 
+    }));
+  };
+
+  // Handle leadsmart_morph mosier chamber toggle
+  const handleLeadsmartMorphMosierChamberToggle = (checked: boolean) => {
+    setLeadsmartMorphMosierChamberVisible(checked);
+    localStorage.setItem('leadsmartMorph_mosierChamberVisible', JSON.stringify(checked));
+    
+    window.dispatchEvent(new CustomEvent('leadsmartMorph-chamber-toggle', { 
+      detail: { chamber: 'mosier_chamber', visible: checked } 
     }));
   };
 
@@ -1341,6 +1361,29 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
                     <div className="mt-3 text-sm text-gray-600">
                       <p>Toggle visibility of the collar chamber on the Leadsmart Morph page.</p>
                       <p>Current state: <strong>{leadsmartMorphCollarChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Mosier Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={leadsmartMorphMosierChamberVisible}
+                          onChange={(e) => handleLeadsmartMorphMosierChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        mosier_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the mosier chamber on the Leadsmart Morph page.</p>
+                      <p>Current state: <strong>{leadsmartMorphMosierChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
                       <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
                     </div>
 
