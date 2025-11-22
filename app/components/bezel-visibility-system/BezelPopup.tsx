@@ -53,6 +53,7 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   const [leadsmartMorphSinusChamberVisible, setLeadsmartMorphSinusChamberVisible] = useState(true);
   const [leadsmartMorphCardioChamberVisible, setLeadsmartMorphCardioChamberVisible] = useState(false);
   const [leadsmartMorphPecChamberVisible, setLeadsmartMorphPecChamberVisible] = useState(true);
+  const [leadsmartMorphCollarChamberVisible, setLeadsmartMorphCollarChamberVisible] = useState(true);
   const [leadsmartMorphRocketChamberVisible, setLeadsmartMorphRocketChamberVisible] = useState(true);
 
   useEffect(() => {
@@ -585,6 +586,15 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
         setLeadsmartMorphPecChamberVisible(JSON.parse(savedPec));
       }
       
+      const savedCollar = localStorage.getItem('leadsmartMorph_collarChamberVisible');
+      if (savedCollar !== null) {
+        setLeadsmartMorphCollarChamberVisible(JSON.parse(savedCollar));
+      } else {
+        // Default to true (visible) and save it
+        setLeadsmartMorphCollarChamberVisible(true);
+        localStorage.setItem('leadsmartMorph_collarChamberVisible', JSON.stringify(true));
+      }
+      
       const savedRocket = localStorage.getItem('leadsmartMorph_rocketChamberVisible');
       if (savedRocket !== null) {
         setLeadsmartMorphRocketChamberVisible(JSON.parse(savedRocket));
@@ -633,6 +643,16 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     
     window.dispatchEvent(new CustomEvent('leadsmartMorph-chamber-toggle', { 
       detail: { chamber: 'pec_chamber', visible: checked } 
+    }));
+  };
+
+  // Handle leadsmart_morph collar chamber toggle
+  const handleLeadsmartMorphCollarChamberToggle = (checked: boolean) => {
+    setLeadsmartMorphCollarChamberVisible(checked);
+    localStorage.setItem('leadsmartMorph_collarChamberVisible', JSON.stringify(checked));
+    
+    window.dispatchEvent(new CustomEvent('leadsmartMorph-chamber-toggle', { 
+      detail: { chamber: 'collar_chamber', visible: checked } 
     }));
   };
 
@@ -1298,6 +1318,29 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
                     <div className="mt-3 text-sm text-gray-600">
                       <p>Toggle visibility of the pec chamber on the Leadsmart Morph page.</p>
                       <p>Current state: <strong>{leadsmartMorphPecChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+
+                    {/* Collar Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={leadsmartMorphCollarChamberVisible}
+                          onChange={(e) => handleLeadsmartMorphCollarChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        collar_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the collar chamber on the Leadsmart Morph page.</p>
+                      <p>Current state: <strong>{leadsmartMorphCollarChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
                       <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
                     </div>
 

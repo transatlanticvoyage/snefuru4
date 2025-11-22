@@ -65,7 +65,7 @@ export default function LeadsmartMorphClient() {
   // Pagination state
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentRowPage, setCurrentRowPage] = useState(1);
-  const [colsPerPage, setColsPerPage] = useState(12);
+  const [colsPerPage, setColsPerPage] = useState(999); // Default to "all" columns
   const [currentColPage, setCurrentColPage] = useState(1);
 
   // Selection state
@@ -115,6 +115,7 @@ export default function LeadsmartMorphClient() {
   const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
   const [cardioChamberVisible, setCardioChamberVisible] = useState(false);
   const [pecChamberVisible, setPecChamberVisible] = useState(true);
+  const [collarChamberVisible, setCollarChamberVisible] = useState(true);
   const [rocketChamberVisible, setRocketChamberVisible] = useState(true);
   
   // Filter state for jettison table
@@ -203,6 +204,15 @@ export default function LeadsmartMorphClient() {
       setPecChamberVisible(JSON.parse(savedPec));
     }
     
+    const savedCollar = localStorage.getItem('leadsmartMorph_collarChamberVisible');
+    if (savedCollar !== null) {
+      setCollarChamberVisible(JSON.parse(savedCollar));
+    } else {
+      // Default to true (visible) and save it
+      setCollarChamberVisible(true);
+      localStorage.setItem('leadsmartMorph_collarChamberVisible', JSON.stringify(true));
+    }
+    
     const savedRocket = localStorage.getItem('leadsmartMorph_rocketChamberVisible');
     if (savedRocket !== null) {
       setRocketChamberVisible(JSON.parse(savedRocket));
@@ -260,6 +270,9 @@ export default function LeadsmartMorphClient() {
           break;
         case 'pec_chamber':
           setPecChamberVisible(visible);
+          break;
+        case 'collar_chamber':
+          setCollarChamberVisible(visible);
           break;
         case 'rocket_chamber':
           setRocketChamberVisible(visible);
@@ -650,6 +663,7 @@ export default function LeadsmartMorphClient() {
     if (state.sinusChamberVisible !== undefined) setSinusChamberVisible(state.sinusChamberVisible);
     if (state.cardioChamberVisible !== undefined) setCardioChamberVisible(state.cardioChamberVisible);
     if (state.pecChamberVisible !== undefined) setPecChamberVisible(state.pecChamberVisible);
+    if (state.collarChamberVisible !== undefined) setCollarChamberVisible(state.collarChamberVisible);
     if (state.rocketChamberVisible !== undefined) setRocketChamberVisible(state.rocketChamberVisible);
   };
   
@@ -674,6 +688,7 @@ export default function LeadsmartMorphClient() {
     sinusChamberVisible,
     cardioChamberVisible,
     pecChamberVisible,
+    collarChamberVisible,
     rocketChamberVisible
   });
 
@@ -1691,6 +1706,23 @@ export default function LeadsmartMorphClient() {
                 setCacheRebuildProgress(progress);
               }}
             />
+          </div>
+        )}
+
+        {/* Collar Chamber */}
+        {collarChamberVisible && (
+          <div 
+            className="collar_chamber chamber_div" 
+            style={{ 
+              border: '1px solid black', 
+              padding: '16px',
+              marginBottom: '16px'
+            }}
+          >
+            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
+              collar_chamber
+            </div>
+            {/* Leave the rest of the area blank for now */}
           </div>
         )}
 
