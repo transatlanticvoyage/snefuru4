@@ -2952,8 +2952,8 @@ export default function LeadsmartMorphClient() {
                   <button
                     onClick={() => setSqlPopupOpen(true)}
                     style={{
-                      backgroundColor: '#90ee90',
-                      border: '1px solid #7dd87d',
+                      backgroundColor: '#add8e6',
+                      border: '1px solid #87ceeb',
                       borderRadius: '4px',
                       padding: '4px 8px',
                       fontSize: '12px',
@@ -2970,9 +2970,38 @@ export default function LeadsmartMorphClient() {
                   padding: '4px', 
                   borderRadius: '4px',
                   fontSize: '12px', 
-                  color: 'black' 
+                  color: 'black',
+                  display: 'flex',
+                  gap: '8px',
+                  alignItems: 'center'
                 }}>
-                  <span style={{ fontWeight: 'bold' }}>cities.city_name</span> {cityData?.city_name || ''} <span style={{ fontWeight: 'bold' }}>city_population</span> {cityData?.city_population ? cityData.city_population.toLocaleString() : ''}
+                  <div>
+                    <span style={{ fontWeight: 'bold' }}>cities.city_name</span> {cityData?.city_name || ''} <span style={{ fontWeight: 'bold' }}>city_population</span> {cityData?.city_population ? cityData.city_population.toLocaleString() : ''}
+                  </div>
+                  <div style={{
+                    border: '1px solid black',
+                    padding: '4px',
+                    fontSize: '12px',
+                    backgroundColor: 'white'
+                  }}>
+                    single cell zip codes from leadsmart_transformed (yellows) - percentage of cities.city_population: {(() => {
+                      // Calculate sum of populations from yellow cells (zip codes that match pane 1)
+                      const yellowPopSum = zipCodesListData.reduce((sum, zip) => {
+                        const isZipInPane1 = zipCodesPopupData.includes(zip.zip);
+                        if (isZipInPane1 && zip.population) {
+                          return sum + zip.population;
+                        }
+                        return sum;
+                      }, 0);
+                      
+                      // Calculate percentage of city population
+                      const cityPopulation = cityData?.city_population || 0;
+                      if (cityPopulation === 0) return '0.00%';
+                      
+                      const percentage = (yellowPopSum / cityPopulation) * 100;
+                      return `${percentage.toFixed(2)}%`;
+                    })()}
+                  </div>
                 </div>
               </div>
               <hr style={{ border: '1px solid #ccc', margin: '12px 0' }} />
@@ -2995,6 +3024,7 @@ export default function LeadsmartMorphClient() {
                       <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>state_id</th>
                       <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>population</th>
                       <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase', backgroundColor: '#e0f2f1' }}>~p~o~t</th>
+                      <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase', backgroundColor: '#90ee90' }}>lt.payout</th>
                       <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>state_name</th>
                       <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>county_name</th>
                       <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>lat</th>
@@ -3024,6 +3054,29 @@ export default function LeadsmartMorphClient() {
                               ? `${zip.pot_percentage}%` 
                               : ''}
                           </td>
+                          <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>
+                            {(() => {
+                              // Find matching payout from leadsmart_transformed
+                              const subpartId = zipCodesPopupRowData?.jrel_subpart_id;
+                              if (!subpartId || !zip.zip) return '';
+                              
+                              // Look through all data for matching subpart_id and zip in aggregated_zip_codes
+                              const matchingRow = data.find(row => {
+                                if (row.jrel_subpart_id !== subpartId) return false;
+                                
+                                // Check if zip exists in aggregated_zip_codes
+                                const zipCodes = Array.isArray(row.aggregated_zip_codes) 
+                                  ? row.aggregated_zip_codes 
+                                  : typeof row.aggregated_zip_codes === 'string' 
+                                    ? row.aggregated_zip_codes.split(',').map(z => z.trim())
+                                    : [];
+                                
+                                return zipCodes.includes(zip.zip);
+                              });
+                              
+                              return matchingRow?.payout || '';
+                            })()}
+                          </td>
                           <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>{zip.state_name}</td>
                           <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>{zip.county_name}</td>
                           <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>{zip.lat?.toFixed(5)}</td>
@@ -3031,6 +3084,27 @@ export default function LeadsmartMorphClient() {
                         </tr>
                       );
                     })}
+                    {/* Phantom row with totals */}
+                    <tr style={{ backgroundColor: '#f5f5f5' }}>
+                      <td style={{ border: '1px solid gray', padding: '2px 4px', backgroundColor: '#f5f5f5' }}></td>
+                      <td style={{ border: '1px solid gray', padding: '2px 4px', backgroundColor: '#f5f5f5' }}></td>
+                      <td style={{ border: '1px solid gray', padding: '2px 4px', backgroundColor: '#f5f5f5' }}></td>
+                      <td style={{ border: '1px solid gray', padding: '2px 4px', backgroundColor: '#f5f5f5' }}></td>
+                      <td style={{ border: '1px solid gray', padding: '2px 4px', backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>
+                        {(() => {
+                          const total = zipCodesListData.reduce((sum, zip) => {
+                            const percentage = zip.pot_percentage || 0;
+                            return sum + percentage;
+                          }, 0);
+                          return `${total.toFixed(2)}%`;
+                        })()}
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '2px 4px', backgroundColor: '#f5f5f5' }}></td>
+                      <td style={{ border: '1px solid gray', padding: '2px 4px', backgroundColor: '#f5f5f5' }}></td>
+                      <td style={{ border: '1px solid gray', padding: '2px 4px', backgroundColor: '#f5f5f5' }}></td>
+                      <td style={{ border: '1px solid gray', padding: '2px 4px', backgroundColor: '#f5f5f5' }}></td>
+                      <td style={{ border: '1px solid gray', padding: '2px 4px', backgroundColor: '#f5f5f5' }}></td>
+                    </tr>
                   </tbody>
                 </table>
               ) : (
