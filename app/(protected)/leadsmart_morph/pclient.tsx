@@ -24,6 +24,11 @@ const StateManager = dynamic(
   { ssr: false }
 );
 
+const LeadsmartMorphVallanceSystem = dynamic(
+  () => import('./LeadsmartMorphVallanceSystem'),
+  { ssr: false }
+);
+
 interface LeadsmartTransformed {
   mundial_id: number;
   baobab_attempt_id: number | null;
@@ -63,7 +68,7 @@ export default function LeadsmartMorphClient() {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Pagination state
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [currentRowPage, setCurrentRowPage] = useState(1);
   const [colsPerPage, setColsPerPage] = useState(999); // Default to "all" columns
   const [currentColPage, setCurrentColPage] = useState(1);
@@ -87,6 +92,10 @@ export default function LeadsmartMorphClient() {
   // Zip codes popup state
   const [zipCodesPopupOpen, setZipCodesPopupOpen] = useState(false);
   const [zipCodesPopupData, setZipCodesPopupData] = useState<string[]>([]);
+  const [zipCodesPopupRowData, setZipCodesPopupRowData] = useState<LeadsmartTransformed | null>(null);
+  const [zipCodesListData, setZipCodesListData] = useState<any[]>([]);
+  const [cityData, setCityData] = useState<any>(null);
+  const [sqlPopupOpen, setSqlPopupOpen] = useState(false);
   
   // Cities assignment popup state
   const [citiesAssignmentPopupOpen, setCitiesAssignmentPopupOpen] = useState(false);
@@ -350,6 +359,59 @@ export default function LeadsmartMorphClient() {
       console.error('Error loading baobab attempts:', err);
     }
   };
+
+  // Fetch zip codes from leadsmart_zip_codes_list when popup opens
+  useEffect(() => {
+    const fetchZipCodes = async () => {
+      if (zipCodesPopupOpen && zipCodesPopupRowData) {
+        const city = zipCodesPopupRowData.city_name;
+        const state = zipCodesPopupRowData.state_code;
+        
+        if (city && state) {
+          try {
+            // Fetch zip codes
+            const { data: zipData, error: zipError } = await supabase
+              .from('leadsmart_zip_codes_list')
+              .select('zip, city, state_id, state_name, population, county_name, lat, lng, pot_percentage')
+              .eq('city', city)
+              .eq('state_id', state)
+              .order('zip', { ascending: true });
+            
+            if (zipError) {
+              console.error('Error fetching zip codes:', zipError);
+              setZipCodesListData([]);
+            } else {
+              setZipCodesListData(zipData || []);
+            }
+            
+            // Fetch city data
+            const { data: cityInfo, error: cityError } = await supabase
+              .from('cities')
+              .select('city_name, city_population')
+              .eq('city_name', city)
+              .eq('state_code', state)
+              .single();
+            
+            if (cityError) {
+              console.error('Error fetching city data:', cityError);
+              setCityData(null);
+            } else {
+              setCityData(cityInfo);
+            }
+          } catch (err) {
+            console.error('Error fetching data:', err);
+            setZipCodesListData([]);
+            setCityData(null);
+          }
+        } else {
+          setZipCodesListData([]);
+          setCityData(null);
+        }
+      }
+    };
+    
+    fetchZipCodes();
+  }, [zipCodesPopupOpen, zipCodesPopupRowData]);
 
   const fetchData = async () => {
     // Prevent concurrent fetches
@@ -1508,47 +1570,6 @@ export default function LeadsmartMorphClient() {
               >
                 create new (popup)
               </button>
-              
-              {/* City Population Filter */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '16px' }}>
-                <span style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                  city_population
-                </span>
-                <select
-                  value={cityPopulationFilter}
-                  onChange={(e) => {
-                    setCityPopulationFilter(e.target.value);
-                    localStorage.setItem('leadsmartMorph_cityPopulationFilter', e.target.value);
-                  }}
-                  style={{
-                    padding: '4px 8px',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    fontSize: '14px'
-                  }}
-                >
-                  <option value="all">all (no filter)</option>
-                  <option value="49k-67k">49k-67k only</option>
-                  <option value="67k-85k">67,001-85,000</option>
-                  <option value="85k-100k">85,001-100,000</option>
-                  <option value="100k-125k">100,001-125,000</option>
-                  <option value="125k-175k">125,001-175,000</option>
-                  <option value="175k-300k">175,001-300,000</option>
-                  <option value="300k-600k">300,001-600,000</option>
-                  <option value="600k-up">600,001-(and up)</option>
-                  <option disabled>────────────────</option>
-                  <option value="50k-400k">50k-400k only</option>
-                  <option value="75k-325k">75k-325k only</option>
-                  <option value="no-null-zero">do not show null or 0 population cities ("1" population or more only)</option>
-                </select>
-                <button
-                  onClick={() => setMultiplierConfirmStep(1)}
-                  className="px-4 py-2 bg-orange-600 text-white rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
-                  disabled={multiplierProcessing}
-                >
-                  {multiplierProcessing ? 'Processing...' : 'Run Payout/Population Multiplier Function'}
-                </button>
-              </div>
             </div>
           </div>
         )}
@@ -1615,6 +1636,56 @@ export default function LeadsmartMorphClient() {
                   </div>
                 </div>
               )}
+            </div>
+            
+            
+            {/* Skylab Tile Tables */}
+            <LeadSmartSkylabTileTables
+              pageType="morph"
+              onFilterApply={(type, id) => {
+                const newFilter = { type, id };
+                setSkylabFilter(newFilter);
+                localStorage.setItem('leadsmartMorph_skylabFilter', JSON.stringify(newFilter));
+              }}
+              currentFilter={skylabFilter}
+              onRegisterRebuild={(fn) => setRebuildCacheFn(() => fn)}
+              onRebuildStatusChange={(rebuilding, progress) => {
+                setCacheRebuilding(rebuilding);
+                setCacheRebuildProgress(progress);
+              }}
+            />
+          </div>
+        )}
+
+        {/* Collar Chamber */}
+        {collarChamberVisible && (
+          <div 
+            className="collar_chamber chamber_div" 
+            style={{ 
+              border: '1px solid black', 
+              padding: '16px',
+              marginBottom: '16px'
+            }}
+          >
+            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
+              collar_chamber
+            </div>
+            {/* Leave the rest of the area blank for now */}
+          </div>
+        )}
+
+        {/* Mosier Chamber */}
+        {mosierChamberVisible && (
+          <div 
+            className="mosier_chamber chamber_div" 
+            style={{ 
+              border: '1px solid black', 
+              padding: '16px',
+              marginBottom: '16px'
+            }}
+          >
+            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
+              mosier_chamber
             </div>
             
             {/* Baobab Attempt Filter and City/State Filter */}
@@ -1704,57 +1775,46 @@ export default function LeadsmartMorphClient() {
                   )}
                 </div>
               </div>
+              
+              {/* City Population Filter */}
+              <div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
+                  city_population
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <select
+                    value={cityPopulationFilter}
+                    onChange={(e) => {
+                      setCityPopulationFilter(e.target.value);
+                      localStorage.setItem('leadsmartMorph_cityPopulationFilter', e.target.value);
+                    }}
+                    className="px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
+                    style={{ minWidth: '200px' }}
+                  >
+                    <option value="all">all (no filter)</option>
+                    <option value="49k-67k">49k-67k only</option>
+                    <option value="67k-85k">67,001-85,000</option>
+                    <option value="85k-100k">85,001-100,000</option>
+                    <option value="100k-125k">100,001-125,000</option>
+                    <option value="125k-175k">125,001-175,000</option>
+                    <option value="175k-300k">175,001-300,000</option>
+                    <option value="300k-600k">300,001-600,000</option>
+                    <option value="600k-up">600,001-(and up)</option>
+                    <option disabled>────────────────</option>
+                    <option value="50k-400k">50k-400k only</option>
+                    <option value="75k-325k">75k-325k only</option>
+                    <option value="no-null-zero">do not show null or 0 population cities ("1" population or more only)</option>
+                  </select>
+                  <button
+                    onClick={() => setMultiplierConfirmStep(1)}
+                    className="px-4 py-2 bg-orange-600 text-white rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
+                    disabled={multiplierProcessing}
+                  >
+                    {multiplierProcessing ? 'Processing...' : 'Run Payout/Population Multiplier Function'}
+                  </button>
+                </div>
+              </div>
             </div>
-            
-            {/* Skylab Tile Tables */}
-            <LeadSmartSkylabTileTables
-              pageType="morph"
-              onFilterApply={(type, id) => {
-                const newFilter = { type, id };
-                setSkylabFilter(newFilter);
-                localStorage.setItem('leadsmartMorph_skylabFilter', JSON.stringify(newFilter));
-              }}
-              currentFilter={skylabFilter}
-              onRegisterRebuild={(fn) => setRebuildCacheFn(() => fn)}
-              onRebuildStatusChange={(rebuilding, progress) => {
-                setCacheRebuilding(rebuilding);
-                setCacheRebuildProgress(progress);
-              }}
-            />
-          </div>
-        )}
-
-        {/* Collar Chamber */}
-        {collarChamberVisible && (
-          <div 
-            className="collar_chamber chamber_div" 
-            style={{ 
-              border: '1px solid black', 
-              padding: '16px',
-              marginBottom: '16px'
-            }}
-          >
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
-              collar_chamber
-            </div>
-            {/* Leave the rest of the area blank for now */}
-          </div>
-        )}
-
-        {/* Mosier Chamber */}
-        {mosierChamberVisible && (
-          <div 
-            className="mosier_chamber chamber_div" 
-            style={{ 
-              border: '1px solid black', 
-              padding: '16px',
-              marginBottom: '16px'
-            }}
-          >
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
-              mosier_chamber
-            </div>
-            {/* Leave the rest of the area blank for now */}
           </div>
         )}
 
@@ -2197,6 +2257,7 @@ export default function LeadsmartMorphClient() {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setZipCodesPopupData(zipCodes);
+                                      setZipCodesPopupRowData(row);
                                       setZipCodesPopupOpen(true);
                                     }}
                                     style={{
@@ -2237,6 +2298,7 @@ export default function LeadsmartMorphClient() {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setZipCodesPopupData([]);
+                                  setZipCodesPopupRowData(row);
                                   setZipCodesPopupOpen(true);
                                 }}
                                 style={{
@@ -2771,20 +2833,300 @@ export default function LeadsmartMorphClient() {
               backgroundColor: 'white',
               padding: '24px',
               borderRadius: '8px',
-              maxWidth: '500px',
+              maxWidth: '1600px',
+              width: '90%',
+              height: '95vh',
+              display: 'flex',
+              gap: '24px'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Pane 1 - Left Side */}
+            <div style={{ flex: '0 0 500px', overflow: 'auto', paddingRight: '12px', borderRight: '2px solid black' }}>
+              <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
+                Pane 1
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>
+                  All Zip Codes From The Cell<br />
+                  leadsmart_transformed.aggregated_zip_codes<br />
+                  ({zipCodesPopupData.length})
+                </h3>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(zipCodesPopupData.join('\n'));
+                    // Show temporary success feedback
+                    const btn = document.activeElement as HTMLButtonElement;
+                    const originalText = btn.textContent;
+                    btn.textContent = '✓ Copied!';
+                    btn.style.backgroundColor = '#10b981';
+                    setTimeout(() => {
+                      btn.textContent = originalText;
+                      btn.style.backgroundColor = '#3b82f6';
+                    }, 1500);
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition-colors text-sm"
+                >
+                  📋 Copy All
+                </button>
+              </div>
+              
+              {/* Database fields table */}
+              <table style={{
+                width: '100%',
+                marginBottom: '16px',
+                borderCollapse: 'collapse'
+              }}>
+                <tbody>
+                  <tr>
+                    <td style={{ fontWeight: 'bold', fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0', width: '40%' }}>mundial_id</td>
+                    <td style={{ fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0' }}>{zipCodesPopupRowData?.mundial_id || ''}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: 'bold', fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0', width: '40%' }}>jrel_release_id</td>
+                    <td style={{ fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0' }}>{zipCodesPopupRowData?.jrel_release_id || ''}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: 'bold', fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0', width: '40%' }}>jrel_subsheet_id</td>
+                    <td style={{ fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0' }}>{zipCodesPopupRowData?.jrel_subsheet_id || ''}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: 'bold', fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0', width: '40%' }}>jrel_subpart_id</td>
+                    <td style={{ fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0' }}>{zipCodesPopupRowData?.jrel_subpart_id || ''}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: 'bold', fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0', width: '40%' }}>city_name</td>
+                    <td style={{ fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0' }}>{zipCodesPopupRowData?.city_name || ''}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: 'bold', fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0', width: '40%' }}>state_code</td>
+                    <td style={{ fontSize: '12px', color: 'black', padding: '4px 8px', borderBottom: '1px solid #e0e0e0' }}>{zipCodesPopupRowData?.state_code || ''}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: 'bold', fontSize: '12px', color: 'black', padding: '4px 8px', width: '40%' }}>payout</td>
+                    <td style={{ fontSize: '12px', color: 'black', padding: '4px 8px' }}>{zipCodesPopupRowData?.payout || ''}</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              <textarea
+                value={zipCodesPopupData.join('\n')}
+                readOnly
+                style={{
+                  width: '100%',
+                  minHeight: '300px',
+                  padding: '12px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontFamily: 'monospace',
+                  fontSize: '14px',
+                  resize: 'vertical'
+                }}
+                onClick={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.select();
+                }}
+              />
+              
+              <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => setZipCodesPopupOpen(false)}
+                  className="bg-gray-300 hover:bg-gray-400 text-black font-medium px-4 py-2 rounded transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+            
+            {/* Pane 2 - Right Side */}
+            <div style={{ flex: '1', overflow: 'auto', paddingLeft: '12px' }}>
+              <div style={{ marginBottom: '12px' }}>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '8px' }}>
+                  Pane 2
+                </div>
+                <hr style={{ border: '1px solid #ccc', margin: '8px 0 12px 0' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '12px', color: 'black' }}>
+                    city from db table "cities" that matches the city from "leadsmart_transformed" row in pane 1
+                  </div>
+                  <button
+                    onClick={() => setSqlPopupOpen(true)}
+                    style={{
+                      backgroundColor: '#90ee90',
+                      border: '1px solid #7dd87d',
+                      borderRadius: '4px',
+                      padding: '4px 8px',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      color: 'black',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    run p.o.t function
+                  </button>
+                </div>
+                <div style={{ 
+                  backgroundColor: '#e0f2f1', 
+                  padding: '4px', 
+                  borderRadius: '4px',
+                  fontSize: '12px', 
+                  color: 'black' 
+                }}>
+                  <span style={{ fontWeight: 'bold' }}>cities.city_name</span> {cityData?.city_name || ''} <span style={{ fontWeight: 'bold' }}>city_population</span> {cityData?.city_population ? cityData.city_population.toLocaleString() : ''}
+                </div>
+              </div>
+              <hr style={{ border: '1px solid #ccc', margin: '12px 0' }} />
+              <div style={{ fontSize: '12px', color: 'black', marginBottom: '12px' }}>
+                all zips from leadsmart_zip_codes_list that have a "city" and "state_id" matching the "leadsmart_transformed" row's "city_name" and "state_code" here:
+              </div>
+              <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#555', marginBottom: '8px' }}>
+                from db table: leadsmart_zip_codes_list
+              </div>
+              {zipCodesListData.length > 0 ? (
+                <table style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  fontSize: '12px'
+                }}>
+                  <thead>
+                    <tr>
+                      <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>zip</th>
+                      <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>city</th>
+                      <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>state_id</th>
+                      <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>population</th>
+                      <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase', backgroundColor: '#e0f2f1' }}>~p~o~t</th>
+                      <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>state_name</th>
+                      <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>county_name</th>
+                      <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>lat</th>
+                      <th style={{ border: '1px solid gray', padding: '2px 4px', fontWeight: 'bold', textTransform: 'lowercase' }}>lng</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {zipCodesListData
+                      .sort((a, b) => (b.population || 0) - (a.population || 0))
+                      .map((zip, index) => {
+                      const isZipInPane1 = zipCodesPopupData.includes(zip.zip);
+                      return (
+                        <tr key={index}>
+                          <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>{zip.zip}</td>
+                          <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>{zip.city}</td>
+                          <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>{zip.state_id}</td>
+                          <td style={{ 
+                            border: '1px solid gray', 
+                            padding: '2px 4px', 
+                            textTransform: 'lowercase',
+                            backgroundColor: isZipInPane1 ? 'yellow' : 'transparent'
+                          }}>
+                            {zip.population ? zip.population.toLocaleString() : ''}
+                          </td>
+                          <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>
+                            {zip.pot_percentage 
+                              ? `${zip.pot_percentage}%` 
+                              : ''}
+                          </td>
+                          <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>{zip.state_name}</td>
+                          <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>{zip.county_name}</td>
+                          <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>{zip.lat?.toFixed(5)}</td>
+                          <td style={{ border: '1px solid gray', padding: '2px 4px', textTransform: 'lowercase' }}>{zip.lng?.toFixed(5)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                <div style={{ fontSize: '12px', color: '#666' }}>No matching zip codes found</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* SQL Popup for P.O.T Function */}
+      {sqlPopupOpen && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000
+          }}
+          onClick={() => setSqlPopupOpen(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              padding: '24px',
+              borderRadius: '8px',
+              maxWidth: '800px',
               width: '90%',
               maxHeight: '80vh',
               overflow: 'auto'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>
-                All Zip Codes ({zipCodesPopupData.length})
-              </h3>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
+              P.O.T (Percentage of Total) Function SQL
+            </div>
+            
+            <div style={{ fontSize: '14px', marginBottom: '16px', lineHeight: '1.5' }}>
+              <strong>What this SQL does:</strong>
+              <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                <li>Calculates what percentage each zip code's population represents of its city's total population</li>
+                <li>Matches zip codes to cities based on city name and state code</li>
+                <li>Updates all rows with the calculated percentages (rounded to 4 decimal places)</li>
+              </ul>
+            </div>
+            
+            <textarea
+              value={`-- Update the column with calculated percentages
+UPDATE leadsmart_zip_codes_list z
+SET pot_percentage = (
+    CASE 
+        WHEN z.population IS NULL OR z.population = 0 OR c.city_population IS NULL OR c.city_population = 0 THEN NULL
+        ELSE ROUND((z.population::DECIMAL / c.city_population::DECIMAL) * 100, 4)
+    END
+)
+FROM cities c
+WHERE LOWER(TRIM(z.city)) = LOWER(TRIM(c.city_name))
+AND UPPER(TRIM(z.state_id)) = UPPER(TRIM(c.state_code));`}
+              readOnly
+              style={{
+                width: '100%',
+                minHeight: '400px',
+                padding: '12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontFamily: 'monospace',
+                fontSize: '12px',
+                resize: 'vertical'
+              }}
+              onClick={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.select();
+              }}
+            />
+            
+            <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(zipCodesPopupData.join('\n'));
+                  const sql = `-- Update the column with calculated percentages
+UPDATE leadsmart_zip_codes_list z
+SET pot_percentage = (
+    CASE 
+        WHEN z.population IS NULL OR z.population = 0 OR c.city_population IS NULL OR c.city_population = 0 THEN NULL
+        ELSE ROUND((z.population::DECIMAL / c.city_population::DECIMAL) * 100, 4)
+    END
+)
+FROM cities c
+WHERE LOWER(TRIM(z.city)) = LOWER(TRIM(c.city_name))
+AND UPPER(TRIM(z.state_id)) = UPPER(TRIM(c.state_code));`;
+                  navigator.clipboard.writeText(sql);
                   // Show temporary success feedback
                   const btn = document.activeElement as HTMLButtonElement;
                   const originalText = btn.textContent;
@@ -2797,32 +3139,10 @@ export default function LeadsmartMorphClient() {
                 }}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition-colors text-sm"
               >
-                📋 Copy All
+                📋 Copy SQL
               </button>
-            </div>
-            
-            <textarea
-              value={zipCodesPopupData.join('\n')}
-              readOnly
-              style={{
-                width: '100%',
-                minHeight: '300px',
-                padding: '12px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontFamily: 'monospace',
-                fontSize: '14px',
-                resize: 'vertical'
-              }}
-              onClick={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                target.select();
-              }}
-            />
-            
-            <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
               <button
-                onClick={() => setZipCodesPopupOpen(false)}
+                onClick={() => setSqlPopupOpen(false)}
                 className="bg-gray-300 hover:bg-gray-400 text-black font-medium px-4 py-2 rounded transition-colors"
               >
                 Close
@@ -3310,25 +3630,8 @@ export default function LeadsmartMorphClient() {
       {/* Bezel Button */}
       <BezelButton />
       
-      {/* Vallance Button - Only on morph page */}
-      <button
-        className="fixed z-40 rounded-md shadow-lg border border-gray-600 hover:bg-gray-700 transition-colors"
-        style={{ 
-          top: '85px', // Position below bezel button (43px + 41px height + 1px gap)
-          left: '1px', 
-          backgroundColor: '#c5bf7a',
-          width: '41px',
-          height: '41px',
-          padding: '2px',
-          fontSize: '12px',
-          lineHeight: '1.2',
-          wordWrap: 'break-word',
-          minHeight: 'auto'
-        }}
-        title="Vallance"
-      >
-        <span className="text-gray-800 font-medium">vallance</span>
-      </button>
+      {/* Vallance System - Only on morph page */}
+      <LeadsmartMorphVallanceSystem />
       
       {/* Column Tooltip */}
       {columnTooltip.visible && (

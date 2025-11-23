@@ -24,6 +24,7 @@ interface City {
   longitude: number | null;
   rel_metro_id: number | null;
   fk_dfs_location_code: number | null;
+  qty_of_zips_found_in_leadsmart_zip_codes_list: number | null;
   population_last_updated: string | null;
   created_at: string;
   updated_at: string | null;
@@ -82,6 +83,7 @@ export default function CityjarTable() {
     { key: 'longitude' as keyof City, label: 'longitude', type: 'number' },
     { key: 'rel_metro_id' as keyof City, label: 'rel_metro_id', type: 'number' },
     { key: 'fk_dfs_location_code' as keyof City, label: 'fk_dfs_location_code', type: 'number' },
+    { key: 'qty_of_zips_found_in_leadsmart_zip_codes_list' as keyof City, label: '~zips~qty~ls', type: 'number' },
     { key: 'population_last_updated' as keyof City, label: 'population_last_updated', type: 'datetime' },
     { key: 'created_at' as keyof City, label: 'created_at', type: 'datetime', readOnly: true },
     { key: 'updated_at' as keyof City, label: 'updated_at', type: 'datetime', readOnly: true }
