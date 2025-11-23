@@ -41,6 +41,7 @@ interface LeadsmartTransformed {
   aggregated_zip_codes: string[] | null;
   multiplied_payout_by_population: number | null;
   fk_city_id: number | null;
+  is_starred: boolean | null;
   created_at: string | null;
   updated_at: string | null;
   city_population?: number | null;
@@ -80,9 +81,9 @@ export default function LeadsmartMorphClient() {
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
   
-  // Sorting state
-  const [sortColumn, setSortColumn] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  // Sorting state - default to payout column, descending
+  const [sortColumn, setSortColumn] = useState<string | null>('payout');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   // Popup state
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -171,6 +172,7 @@ export default function LeadsmartMorphClient() {
     'jrel_release_id',
     'jrel_subsheet_id',
     'jrel_subpart_id',
+    'is_starred',
     'city_population',
     'city_name',
     'state_code',
@@ -333,6 +335,37 @@ export default function LeadsmartMorphClient() {
   const isFetchingRef = useRef(false);
   const lastFetchTimeRef = useRef(0);
   const hasInitiallyLoadedRef = useRef(false);
+  
+  // Toggle star function
+  const toggleStar = async (id: number, currentValue: boolean | null) => {
+    const newValue = !currentValue;
+    
+    // Optimistically update UI immediately
+    setData(prev => prev.map(row => 
+      row.mundial_id === id ? { ...row, is_starred: newValue } : row
+    ));
+    
+    // Update database
+    try {
+      const { error } = await supabase
+        .from('leadsmart_transformed')
+        .update({ is_starred: newValue })
+        .eq('mundial_id', id);
+      if (error) {
+        console.error('Error updating star:', error);
+        // Revert optimistic update
+        setData(prev => prev.map(row => 
+          row.mundial_id === id ? { ...row, is_starred: currentValue } : row
+        ));
+      }
+    } catch (err) {
+      console.error('Error updating star:', err);
+      // Revert optimistic update
+      setData(prev => prev.map(row => 
+        row.mundial_id === id ? { ...row, is_starred: currentValue } : row
+      ));
+    }
+  };
   
   // Refetch when filters change (with debounce)
   useEffect(() => {
@@ -2181,7 +2214,7 @@ export default function LeadsmartMorphClient() {
                   {paginatedColumns.map(col => {
                     const isEditing = editingCell?.id === row.mundial_id && editingCell?.field === col;
                     const value = row[col as keyof LeadsmartTransformed];
-                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'city_population' || col === 'multiplied_payout_by_population' || col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city';
+                    const isReadOnly = col === 'mundial_id' || col === 'baobab_attempt_id' || col === 'fk_city_id' || col === 'city_population' || col === 'multiplied_payout_by_population' || col === 'custom_kw_stub_city_state' || col === 'custom_kw_stub_city' || col === 'is_starred';
                     
                     return (
                       <td 
@@ -2662,6 +2695,31 @@ export default function LeadsmartMorphClient() {
                             >
                               {value != null ? Number(value).toString() : ''}
                             </span>
+                          ) : col === 'is_starred' ? (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleStar(row.mundial_id, value as boolean | null);
+                                }}
+                                style={{ cursor: 'pointer', padding: '4px' }}
+                                title={value ? "Click to unstar" : "Click to star"}
+                              >
+                                <svg
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  style={{ color: value ? '#dc2626' : '#9ca3af' }}
+                                >
+                                  <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    fill={value ? 'currentColor' : 'none'}
+                                    stroke="currentColor"
+                                    strokeWidth="1"
+                                  />
+                                </svg>
+                              </div>
+                            </div>
                           ) : (
                             <span 
                               style={{ 
