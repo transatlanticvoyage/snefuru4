@@ -2,13 +2,14 @@ import { Metadata } from 'next';
 import WepfolClient from './pclient';
 
 type Props = {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata(
   { searchParams }: Props
 ): Promise<Metadata> {
-  const site = searchParams.site;
+  const params = await searchParams;
+  const site = params.site;
   const siteDisplay = typeof site === 'string' ? site : 'Unknown Site';
   
   return {
