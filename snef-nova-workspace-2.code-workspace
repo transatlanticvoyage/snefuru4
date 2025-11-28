@@ -47,6 +47,10 @@
 		{
 			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/lumora",
 			"name": "💡 Lumora (saltwater)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/230landers",
+			"name": "📍 230landers (standalone)"
 		}
 	],
 	"settings": {
@@ -58,7 +62,8 @@
 			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/grove",
 			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/klyra",
 			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/ruplin",
-			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/veyra"
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/veyra",
+			"./shiplavich-wp-sites/saltwater/app/public/230landers"
 		]
 	}
 }

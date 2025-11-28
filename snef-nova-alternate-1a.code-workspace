@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/230landers",
+			"name": "📍 230landers (standalone repo)"
+		},
+		{
+			"path": "./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/veyra",
+			"name": "🎯 Veyra (saltwater plugin)"
+		}
+	],
+	"settings": {
+		"git.detectSubmodules": false,
+		"git.autoRepositoryDetection": false,
+		"git.repositoryScanMaxDepth": 1,
+		"git.repositories": [
+			"./shiplavich-wp-sites/saltwater/app/public/230landers",
+			"./shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/veyra"
+		],
+		"scm.repositories.visible": 2,
+		"scm.repositories.sortOrder": "path"
+	}
+}

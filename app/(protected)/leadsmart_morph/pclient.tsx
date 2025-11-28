@@ -145,6 +145,22 @@ export default function LeadsmartMorphClient() {
   const [baobobFilter, setBaobobFilter] = useState<number | null>(null);
   const [baobobAttempts, setBaobobAttempts] = useState<any[]>([]);
   
+  // Turtleneck table state (collar chamber)
+  const [turtleneckReleaseId, setTurtleneckReleaseId] = useState<number | null>(null);
+  const [turtleneckSubsheetId, setTurtleneckSubsheetId] = useState<number | null>(null);
+  const [turtleneckSubpartId, setTurtleneckSubpartId] = useState<number | null>(null);
+  const [turtleneckReleases, setTurtleneckReleases] = useState<any[]>([]);
+  const [turtleneckSubsheets, setTurtleneckSubsheets] = useState<any[]>([]);
+  const [turtleneckSubparts, setTurtleneckSubparts] = useState<any[]>([]);
+  const [turtleneckFilterType, setTurtleneckFilterType] = useState<'release' | 'subsheet' | 'subpart' | null>(null);
+  
+  // Navigation states for turtleneck table button bars
+  const [turtleneckCurrentReleaseIndex, setTurtleneckCurrentReleaseIndex] = useState<number>(0);
+  const [turtleneckCurrentSubsheetIndex, setTurtleneckCurrentSubsheetIndex] = useState<number>(0);
+  const [turtleneckCurrentSubpartIndex, setTurtleneckCurrentSubpartIndex] = useState<number>(0);
+  const [turtleneckCurrentReleaseVCIndex, setTurtleneckCurrentReleaseVCIndex] = useState<number>(0);
+  const [turtleneckCurrentSubsheetVCIndex, setTurtleneckCurrentSubsheetVCIndex] = useState<number>(0);
+  
   // City population filter state
   const [cityPopulationFilter, setCityPopulationFilter] = useState<string>('all');
   
@@ -331,6 +347,81 @@ export default function LeadsmartMorphClient() {
     }
   }, [user]);
 
+  // Load turtleneck releases on mount and load all subsheets/subparts for sync
+  useEffect(() => {
+    if (user) {
+      loadTurtleneckReleases();
+      // Also load all subsheets and subparts for skylab sync
+      loadAllTurtleneckSubsheets();
+      loadAllTurtleneckSubparts();
+    }
+  }, [user]);
+
+  // Load turtleneck subsheets when release changes
+  useEffect(() => {
+    if (turtleneckReleaseId) {
+      loadTurtleneckSubsheets(turtleneckReleaseId);
+    } else {
+      setTurtleneckSubsheets([]);
+      setTurtleneckSubsheetId(null);
+    }
+  }, [turtleneckReleaseId]);
+
+  // Load turtleneck subparts when subsheet changes
+  useEffect(() => {
+    if (turtleneckSubsheetId) {
+      loadTurtleneckSubparts(turtleneckSubsheetId);
+    } else {
+      setTurtleneckSubparts([]);
+      setTurtleneckSubpartId(null);
+    }
+  }, [turtleneckSubsheetId]);
+
+  // Sync skylab filter changes to turtleneck table
+  useEffect(() => {
+    if (skylabFilter && skylabFilter.type && skylabFilter.id) {
+      // Update turtleneck selections based on skylab filter
+      if (skylabFilter.type === 'release') {
+        setTurtleneckReleaseId(skylabFilter.id);
+        setTurtleneckFilterType('release');
+      } else if (skylabFilter.type === 'subsheet') {
+        // Need to also set the parent release using global data
+        const allSubsheets = (window as any).allTurtleneckSubsheets || [];
+        const subsheet = allSubsheets.find((s: any) => s.subsheet_id === skylabFilter.id);
+        if (subsheet) {
+          setTurtleneckReleaseId(subsheet.rel_release_id);
+          setTurtleneckSubsheetId(skylabFilter.id);
+          setTurtleneckFilterType('subsheet');
+          // Load subsheets for this release if needed
+          if (subsheet.rel_release_id) {
+            loadTurtleneckSubsheets(subsheet.rel_release_id);
+          }
+        }
+      } else if (skylabFilter.type === 'subpart') {
+        // Need to also set the parent subsheet and release using global data
+        const allSubparts = (window as any).allTurtleneckSubparts || [];
+        const allSubsheets = (window as any).allTurtleneckSubsheets || [];
+        const subpart = allSubparts.find((s: any) => s.subpart_id === skylabFilter.id);
+        if (subpart) {
+          const subsheet = allSubsheets.find((s: any) => s.subsheet_id === subpart.rel_subsheet_id);
+          if (subsheet) {
+            setTurtleneckReleaseId(subsheet.rel_release_id);
+            setTurtleneckSubsheetId(subpart.rel_subsheet_id);
+            setTurtleneckSubpartId(skylabFilter.id);
+            setTurtleneckFilterType('subpart');
+            // Load subsheets and subparts if needed
+            if (subsheet.rel_release_id) {
+              loadTurtleneckSubsheets(subsheet.rel_release_id);
+            }
+            if (subpart.rel_subsheet_id) {
+              loadTurtleneckSubparts(subpart.rel_subsheet_id);
+            }
+          }
+        }
+      }
+    }
+  }, [skylabFilter]);
+
   // Add refs to track fetching state and last fetch time
   const isFetchingRef = useRef(false);
   const lastFetchTimeRef = useRef(0);
@@ -391,6 +482,164 @@ export default function LeadsmartMorphClient() {
     } catch (err) {
       console.error('Error loading baobab attempts:', err);
     }
+  };
+
+  // Load turtleneck releases
+  const loadTurtleneckReleases = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('leadsmart_file_releases')
+        .select('release_id, release_date')
+        .order('release_id', { ascending: false });
+      
+      if (error) throw error;
+      setTurtleneckReleases(data || []);
+    } catch (error) {
+      console.error('Error loading turtleneck releases:', error);
+    }
+  };
+
+  // Load turtleneck subsheets based on selected release
+  const loadTurtleneckSubsheets = async (releaseId: number) => {
+    try {
+      const { data, error } = await supabase
+        .from('leadsmart_subsheets')
+        .select('subsheet_id, subsheet_name, rel_release_id')
+        .eq('rel_release_id', releaseId)
+        .order('subsheet_id', { ascending: false });
+      
+      if (error) throw error;
+      setTurtleneckSubsheets(data || []);
+    } catch (error) {
+      console.error('Error loading turtleneck subsheets:', error);
+      setTurtleneckSubsheets([]);
+    }
+  };
+
+  // Load turtleneck subparts based on selected subsheet
+  const loadTurtleneckSubparts = async (subsheetId: number) => {
+    try {
+      const { data, error } = await supabase
+        .from('leadsmart_subparts')
+        .select('subpart_id, payout_note, rel_subsheet_id')
+        .eq('rel_subsheet_id', subsheetId)
+        .order('subpart_id', { ascending: false });
+      
+      if (error) throw error;
+      setTurtleneckSubparts(data || []);
+    } catch (error) {
+      console.error('Error loading turtleneck subparts:', error);
+      setTurtleneckSubparts([]);
+    }
+  };
+
+  // Load all subsheets for skylab sync
+  const loadAllTurtleneckSubsheets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('leadsmart_subsheets')
+        .select('subsheet_id, subsheet_name, rel_release_id')
+        .order('subsheet_id', { ascending: false });
+      
+      if (error) throw error;
+      // Store in a separate state for sync purposes
+      window.allTurtleneckSubsheets = data || [];
+    } catch (error) {
+      console.error('Error loading all turtleneck subsheets:', error);
+    }
+  };
+
+  // Load all subparts for skylab sync
+  const loadAllTurtleneckSubparts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('leadsmart_subparts')
+        .select('subpart_id, payout_note, rel_subsheet_id')
+        .order('subpart_id', { ascending: false });
+      
+      if (error) throw error;
+      // Store in a separate state for sync purposes
+      window.allTurtleneckSubparts = data || [];
+    } catch (error) {
+      console.error('Error loading all turtleneck subparts:', error);
+    }
+  };
+
+  // Navigation functions for turtleneck table button bars
+  const handleTurtleneckNavigateRelease = (direction: 'prev' | 'next') => {
+    if (turtleneckReleases.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = turtleneckCurrentReleaseIndex === 0 ? turtleneckReleases.length - 1 : turtleneckCurrentReleaseIndex - 1;
+    } else {
+      newIndex = turtleneckCurrentReleaseIndex === turtleneckReleases.length - 1 ? 0 : turtleneckCurrentReleaseIndex + 1;
+    }
+    
+    setTurtleneckCurrentReleaseIndex(newIndex);
+    setTurtleneckReleaseId(turtleneckReleases[newIndex].release_id);
+  };
+
+  const handleTurtleneckNavigateSubsheet = (direction: 'prev' | 'next') => {
+    if (turtleneckSubsheets.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = turtleneckCurrentSubsheetIndex === 0 ? turtleneckSubsheets.length - 1 : turtleneckCurrentSubsheetIndex - 1;
+    } else {
+      newIndex = turtleneckCurrentSubsheetIndex === turtleneckSubsheets.length - 1 ? 0 : turtleneckCurrentSubsheetIndex + 1;
+    }
+    
+    setTurtleneckCurrentSubsheetIndex(newIndex);
+    setTurtleneckSubsheetId(turtleneckSubsheets[newIndex].subsheet_id);
+  };
+
+  const handleTurtleneckNavigateSubpart = (direction: 'prev' | 'next') => {
+    if (turtleneckSubparts.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = turtleneckCurrentSubpartIndex === 0 ? turtleneckSubparts.length - 1 : turtleneckCurrentSubpartIndex - 1;
+    } else {
+      newIndex = turtleneckCurrentSubpartIndex === turtleneckSubparts.length - 1 ? 0 : turtleneckCurrentSubpartIndex + 1;
+    }
+    
+    setTurtleneckCurrentSubpartIndex(newIndex);
+    setTurtleneckSubpartId(turtleneckSubparts[newIndex].subpart_id);
+  };
+
+  const handleTurtleneckNavigateReleaseVC = (direction: 'prev' | 'next') => {
+    if (turtleneckReleases.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = turtleneckCurrentReleaseVCIndex === 0 ? turtleneckReleases.length - 1 : turtleneckCurrentReleaseVCIndex - 1;
+    } else {
+      newIndex = turtleneckCurrentReleaseVCIndex === turtleneckReleases.length - 1 ? 0 : turtleneckCurrentReleaseVCIndex + 1;
+    }
+    
+    setTurtleneckCurrentReleaseVCIndex(newIndex);
+    // Set release for view children mode
+    const releaseId = turtleneckReleases[newIndex].release_id;
+    setTurtleneckReleaseId(releaseId);
+    loadTurtleneckSubsheets(releaseId);
+  };
+
+  const handleTurtleneckNavigateSubsheetVC = (direction: 'prev' | 'next') => {
+    if (turtleneckSubsheets.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = turtleneckCurrentSubsheetVCIndex === 0 ? turtleneckSubsheets.length - 1 : turtleneckCurrentSubsheetVCIndex - 1;
+    } else {
+      newIndex = turtleneckCurrentSubsheetVCIndex === turtleneckSubsheets.length - 1 ? 0 : turtleneckCurrentSubsheetVCIndex + 1;
+    }
+    
+    setTurtleneckCurrentSubsheetVCIndex(newIndex);
+    // Set subsheet for view children mode
+    const subsheetId = turtleneckSubsheets[newIndex].subsheet_id;
+    setTurtleneckSubsheetId(subsheetId);
+    loadTurtleneckSubparts(subsheetId);
   };
 
   // Fetch zip codes from leadsmart_zip_codes_list when popup opens
@@ -1703,7 +1952,586 @@ export default function LeadsmartMorphClient() {
             <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'black', marginBottom: '12px' }}>
               collar_chamber
             </div>
-            {/* Leave the rest of the area blank for now */}
+            <table style={{ 
+              borderCollapse: 'collapse',
+              border: '1px solid black',
+              width: 'auto'
+            }}>
+              <thead>
+                <tr>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">-</div>
+                  </th>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">
+                      {turtleneckReleases.length > 0 && (
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <button
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', borderRadius: '3px 0 0 3px', 
+                                backgroundColor: 'white', fontWeight: 'bold', color: '#374151',
+                                marginRight: '-1px', cursor: 'default'
+                              }}
+                              title="Select X navigation"
+                            >
+                              sx
+                            </button>
+                            <button
+                              onClick={() => handleTurtleneckNavigateRelease('prev')}
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', backgroundColor: 'white',
+                                marginRight: '-1px', cursor: 'pointer'
+                              }}
+                              title="Previous release"
+                            >
+                              <svg style={{ width: '16px', height: '16px', color: '#4b5563' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <path d="M1 4v6h6" />
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleTurtleneckNavigateRelease('next')}
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', borderRadius: '0 3px 3px 0',
+                                backgroundColor: 'white', cursor: 'pointer'
+                              }}
+                              title="Next release"
+                            >
+                              <svg style={{ width: '16px', height: '16px', color: '#4b5563' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <path d="M23 4v6h-6" />
+                                <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                              </svg>
+                            </button>
+                          </div>
+                          
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <button
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', borderRadius: '3px 0 0 3px', 
+                                backgroundColor: 'white', fontWeight: 'bold', color: '#374151',
+                                marginRight: '-1px', cursor: 'default'
+                              }}
+                              title="View Children navigation"
+                            >
+                              vc
+                            </button>
+                            <button
+                              onClick={() => handleTurtleneckNavigateReleaseVC('prev')}
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', backgroundColor: 'white',
+                                marginRight: '-1px', cursor: 'pointer'
+                              }}
+                              title="Previous release (view children)"
+                            >
+                              <svg style={{ width: '16px', height: '16px', color: '#4b5563' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <path d="M1 4v6h6" />
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleTurtleneckNavigateReleaseVC('next')}
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', borderRadius: '0 3px 3px 0',
+                                backgroundColor: 'white', cursor: 'pointer'
+                              }}
+                              title="Next release (view children)"
+                            >
+                              <svg style={{ width: '16px', height: '16px', color: '#4b5563' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <path d="M23 4v6h-6" />
+                                <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </th>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">
+                      {turtleneckSubsheets.length > 0 && (
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <button
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', borderRadius: '3px 0 0 3px', 
+                                backgroundColor: 'white', fontWeight: 'bold', color: '#374151',
+                                marginRight: '-1px', cursor: 'default'
+                              }}
+                              title="Select X navigation"
+                            >
+                              sx
+                            </button>
+                            <button
+                              onClick={() => handleTurtleneckNavigateSubsheet('prev')}
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', backgroundColor: 'white',
+                                marginRight: '-1px', cursor: 'pointer'
+                              }}
+                              title="Previous subsheet"
+                            >
+                              <svg style={{ width: '16px', height: '16px', color: '#4b5563' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <path d="M1 4v6h6" />
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleTurtleneckNavigateSubsheet('next')}
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', borderRadius: '0 3px 3px 0',
+                                backgroundColor: 'white', cursor: 'pointer'
+                              }}
+                              title="Next subsheet"
+                            >
+                              <svg style={{ width: '16px', height: '16px', color: '#4b5563' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <path d="M23 4v6h-6" />
+                                <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                              </svg>
+                            </button>
+                          </div>
+                          
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <button
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', borderRadius: '3px 0 0 3px', 
+                                backgroundColor: 'white', fontWeight: 'bold', color: '#374151',
+                                marginRight: '-1px', cursor: 'default'
+                              }}
+                              title="View Children navigation"
+                            >
+                              vc
+                            </button>
+                            <button
+                              onClick={() => handleTurtleneckNavigateSubsheetVC('prev')}
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', backgroundColor: 'white',
+                                marginRight: '-1px', cursor: 'pointer'
+                              }}
+                              title="Previous subsheet (view children)"
+                            >
+                              <svg style={{ width: '16px', height: '16px', color: '#4b5563' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <path d="M1 4v6h6" />
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleTurtleneckNavigateSubsheetVC('next')}
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', borderRadius: '0 3px 3px 0',
+                                backgroundColor: 'white', cursor: 'pointer'
+                              }}
+                              title="Next subsheet (view children)"
+                            >
+                              <svg style={{ width: '16px', height: '16px', color: '#4b5563' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <path d="M23 4v6h-6" />
+                                <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </th>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">
+                      {turtleneckSubparts.length > 0 && (
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <button
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', borderRadius: '3px 0 0 3px', 
+                                backgroundColor: 'white', fontWeight: 'bold', color: '#374151',
+                                marginRight: '-1px', cursor: 'default'
+                              }}
+                              title="Select X navigation"
+                            >
+                              sx
+                            </button>
+                            <button
+                              onClick={() => handleTurtleneckNavigateSubpart('prev')}
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', backgroundColor: 'white',
+                                marginRight: '-1px', cursor: 'pointer'
+                              }}
+                              title="Previous subpart"
+                            >
+                              <svg style={{ width: '16px', height: '16px', color: '#4b5563' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <path d="M1 4v6h6" />
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleTurtleneckNavigateSubpart('next')}
+                              style={{ 
+                                fontSize: '12px', paddingTop: '4px', paddingBottom: '4px', 
+                                paddingLeft: '4px', paddingRight: '4px',
+                                border: '1px solid #ccc', borderRadius: '0 3px 3px 0',
+                                backgroundColor: 'white', cursor: 'pointer'
+                              }}
+                              title="Next subpart"
+                            >
+                              <svg style={{ width: '16px', height: '16px', color: '#4b5563' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <path d="M23 4v6h-6" />
+                                <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                              </svg>
+                            </button>
+                          </div>
+                          
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <span style={{ fontSize: '12px', color: '#374151' }}>No VC</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </th>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">-</div>
+                  </th>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">-</div>
+                  </th>
+                </tr>
+                <tr>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">turtleneck table</div>
+                  </th>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">
+                      releases
+                      <input
+                        type="checkbox"
+                        checked={turtleneckFilterType === 'release'}
+                        onChange={() => setTurtleneckFilterType(turtleneckFilterType === 'release' ? null : 'release')}
+                        style={{
+                          marginLeft: '8px',
+                          cursor: 'pointer',
+                          verticalAlign: 'middle'
+                        }}
+                      />
+                    </div>
+                  </th>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">
+                      subsheets
+                      <input
+                        type="checkbox"
+                        checked={turtleneckFilterType === 'subsheet'}
+                        onChange={() => setTurtleneckFilterType(turtleneckFilterType === 'subsheet' ? null : 'subsheet')}
+                        style={{
+                          marginLeft: '8px',
+                          cursor: 'pointer',
+                          verticalAlign: 'middle'
+                        }}
+                      />
+                    </div>
+                  </th>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">
+                      subparts
+                      <input
+                        type="checkbox"
+                        checked={turtleneckFilterType === 'subpart'}
+                        onChange={() => setTurtleneckFilterType(turtleneckFilterType === 'subpart' ? null : 'subpart')}
+                        style={{
+                          marginLeft: '8px',
+                          cursor: 'pointer',
+                          verticalAlign: 'middle'
+                        }}
+                      />
+                    </div>
+                  </th>
+                  <th style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div"></div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">-</div>
+                  </td>
+                  <td style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">
+                      <select
+                        value={turtleneckReleaseId || ''}
+                        onChange={(e) => {
+                          const value = e.target.value ? parseInt(e.target.value) : null;
+                          setTurtleneckReleaseId(value);
+                        }}
+                        style={{
+                          width: '100%',
+                          fontSize: '15px',
+                          color: 'black',
+                          border: 'none',
+                          background: 'transparent',
+                          outline: 'none',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <option value="">Select Release</option>
+                        {turtleneckReleases.map(release => (
+                          <option key={release.release_id} value={release.release_id}>
+                            {release.release_id} - {release.release_date || 'No date'}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </td>
+                  <td style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">
+                      <select
+                        value={turtleneckSubsheetId || ''}
+                        onChange={(e) => {
+                          const value = e.target.value ? parseInt(e.target.value) : null;
+                          setTurtleneckSubsheetId(value);
+                        }}
+                        disabled={!turtleneckReleaseId}
+                        style={{
+                          width: '100%',
+                          fontSize: '15px',
+                          color: !turtleneckReleaseId ? '#999' : 'black',
+                          border: 'none',
+                          background: 'transparent',
+                          outline: 'none',
+                          cursor: turtleneckReleaseId ? 'pointer' : 'not-allowed'
+                        }}
+                      >
+                        <option value="">
+                          {!turtleneckReleaseId ? 'Select release first' : 'Select Subsheet'}
+                        </option>
+                        {turtleneckSubsheets.map(subsheet => (
+                          <option key={subsheet.subsheet_id} value={subsheet.subsheet_id}>
+                            {subsheet.subsheet_id} - {subsheet.subsheet_name || 'Unnamed'}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </td>
+                  <td style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">
+                      <select
+                        value={turtleneckSubpartId || ''}
+                        onChange={(e) => {
+                          const value = e.target.value ? parseInt(e.target.value) : null;
+                          setTurtleneckSubpartId(value);
+                        }}
+                        disabled={!turtleneckSubsheetId}
+                        style={{
+                          width: '100%',
+                          fontSize: '15px',
+                          color: !turtleneckSubsheetId ? '#999' : 'black',
+                          border: 'none',
+                          background: 'transparent',
+                          outline: 'none',
+                          cursor: turtleneckSubsheetId ? 'pointer' : 'not-allowed'
+                        }}
+                      >
+                        <option value="">
+                          {!turtleneckSubsheetId ? 'Select subsheet first' : 'Select Subpart'}
+                        </option>
+                        {turtleneckSubparts.map(subpart => (
+                          <option key={subpart.subpart_id} value={subpart.subpart_id}>
+                            {subpart.subpart_id} - {subpart.payout_note || 'No note'}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </td>
+                  <td style={{
+                    border: '1px solid black',
+                    padding: '0px',
+                    fontSize: '15px',
+                    color: 'black',
+                    textAlign: 'left'
+                  }}>
+                    <div className="cell_inner_wrapper_div">
+                      <button
+                        onClick={() => {
+                          // Determine which filter to apply based on turtleneckFilterType
+                          let filterType = null;
+                          let filterId = null;
+                          
+                          if (turtleneckFilterType === 'release' && turtleneckReleaseId) {
+                            filterType = 'release';
+                            filterId = turtleneckReleaseId;
+                          } else if (turtleneckFilterType === 'subsheet' && turtleneckSubsheetId) {
+                            filterType = 'subsheet';
+                            filterId = turtleneckSubsheetId;
+                          } else if (turtleneckFilterType === 'subpart' && turtleneckSubpartId) {
+                            filterType = 'subpart';
+                            filterId = turtleneckSubpartId;
+                          }
+                          
+                          if (filterType && filterId) {
+                            const newFilter = { type: filterType as 'release' | 'subsheet' | 'subpart', id: filterId };
+                            setSkylabFilter(newFilter);
+                            localStorage.setItem('leadsmartMorph_skylabFilter', JSON.stringify(newFilter));
+                          }
+                        }}
+                        disabled={
+                          !turtleneckFilterType || 
+                          (turtleneckFilterType === 'release' && !turtleneckReleaseId) ||
+                          (turtleneckFilterType === 'subsheet' && !turtleneckSubsheetId) ||
+                          (turtleneckFilterType === 'subpart' && !turtleneckSubpartId)
+                        }
+                        style={{
+                          fontSize: '14px',
+                          padding: '2px 6px',
+                          cursor: (!turtleneckFilterType || 
+                            (turtleneckFilterType === 'release' && !turtleneckReleaseId) ||
+                            (turtleneckFilterType === 'subsheet' && !turtleneckSubsheetId) ||
+                            (turtleneckFilterType === 'subpart' && !turtleneckSubpartId)) 
+                            ? 'not-allowed' : 'pointer',
+                          backgroundColor: (!turtleneckFilterType || 
+                            (turtleneckFilterType === 'release' && !turtleneckReleaseId) ||
+                            (turtleneckFilterType === 'subsheet' && !turtleneckSubsheetId) ||
+                            (turtleneckFilterType === 'subpart' && !turtleneckSubpartId)) 
+                            ? '#e0e0e0' : '#4CAF50',
+                          color: (!turtleneckFilterType || 
+                            (turtleneckFilterType === 'release' && !turtleneckReleaseId) ||
+                            (turtleneckFilterType === 'subsheet' && !turtleneckSubsheetId) ||
+                            (turtleneckFilterType === 'subpart' && !turtleneckSubpartId)) 
+                            ? '#999' : 'white',
+                          border: 'none',
+                          borderRadius: '3px'
+                        }}
+                      >
+                        activate selections as filter
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         )}
 

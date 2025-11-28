@@ -83,4 +83,35 @@ shiplavich-wp-sites/
 
 # But allow the specific grove plugin repository
 !shiplavich-wp-sites/saltwater/app/public/wp-content/plugins/grove/
+
+# Allow 230landers standalone module
+!shiplavich-wp-sites/saltwater/app/public/230landers/
+
+# Exclude sensitive data from 230landers
+shiplavich-wp-sites/saltwater/app/public/230landers/*/customers/
+shiplavich-wp-sites/saltwater/app/public/230landers/*/orders/
+shiplavich-wp-sites/saltwater/app/public/230landers/*/emails/
+shiplavich-wp-sites/saltwater/app/public/230landers/*/logs/
+shiplavich-wp-sites/saltwater/app/public/230landers/admin-config.json
+
 *.xcuserstate
+purehtmlplayground/social profiles - main guy - bulk deliveries/1ac154b0adef0fd4a1f4a165cb44d8ac.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/02ce5a162c99a593a99d45f2e2316454.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/16a4590347b689f0151c26bf19186313.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/71ac3878fa09927e28b1f915329247e0.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/256b6b28322ecd5c7e781c1f748aeb8e.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/99a7fd8fef99e9949d1cdcfbe36a57d8.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/87f1706414af53d5e1c320a13721fa34.xlsx
+purehtmlplayground/social profiles - main guy - normal deliveries/17637925661163907671_HQ_Profile_Backlinks_Report_For___ShellBeam_Roofing_Of_Alpharetta.xlsx
+purehtmlplayground/social profiles - main guy - normal deliveries/17636378451604830689_HQ_Profile_Backlinks_Report_For___Decatur_Electrician_Group.xlsx
+purehtmlplayground/social profiles - main guy - normal deliveries/1763661807505001525_HQ_Profile_Backlinks_Report_For___Naperville_Pest_Control_Guys.xlsx
+purehtmlplayground/social profiles - main guy - normal deliveries/1763638149700445655_HQ_Profile_Backlinks_Report_For___Lexington_Water_Damage_Restoration_Force.xlsx
+purehtmlplayground/social profiles - main guy - normal deliveries/1763575697984002450_HQ_Profile_Backlinks_Report_For___Richardson_Pest_Control_Pros.xlsx
+purehtmlplayground/social profiles - main guy - normal deliveries/176374851218058061_HQ_Profile_Backlinks_Report_For__ForgePinnacle_Roofing_Of_Kirkland.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/f810a4e722f7fdfc922c5ccddc8644cb.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/f71b629896fc5a48da8cc111af89b0a1.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/c27e196a568c4c0d872b050b949c132d.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/b280f4d4e9316f6c08a3527c4ee9c021.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/99903d17f812fad7c3802f8c4cc11364.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/a33fac1f9944d3767e1d058223f8e611.xlsx
+purehtmlplayground/social profiles - main guy - bulk deliveries/af2be09cf684c3fc6efe4885a8edd899.xlsx
