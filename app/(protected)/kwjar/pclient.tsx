@@ -44,6 +44,9 @@ export default function KwjarClient() {
   const [loadingFailedKeywords, setLoadingFailedKeywords] = useState(false);
   const [failedKeywordCount, setFailedKeywordCount] = useState<number>(0);
   
+  // Delete keywords state
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  
   // Debug selected tag changes
   useEffect(() => {
     console.log('🏷️ [PCLIENT] selectedTag changed:', selectedTag);
@@ -112,10 +115,20 @@ export default function KwjarClient() {
   // Chamber visibility states
   const [mandibleChamberVisible, setMandibleChamberVisible] = useState(true);
   const [sinusChamberVisible, setSinusChamberVisible] = useState(true);
+  const [venlarChamberVisible, setVenlarChamberVisible] = useState(true);
   const [protozoicChamberVisible, setProtozoicChamberVisible] = useState(true);
   const [mesozoicChamberVisible, setMesozoicChamberVisible] = useState(true);
   const [showHoistColumns, setShowHoistColumns] = useState(true);
   const [showJoistColumns, setShowJoistColumns] = useState(true);
+  
+  // Venlar chamber filter states
+  const [searchVolumeFilter, setSearchVolumeFilter] = useState('all');
+  const [cpcFilter, setCpcFilter] = useState('all');
+  const [competitionFilter, setCompetitionFilter] = useState('all');
+  const [competitionIndexFilter, setCompetitionIndexFilter] = useState('all');
+  const [exactCityPopulationFilter, setExactCityPopulationFilter] = useState('all');
+  const [largestCityPopulationFilter, setLargestCityPopulationFilter] = useState('all');
+  const [cityClassificationFilter, setCityClassificationFilter] = useState('all');
 
   useEffect(() => {
     if (!user) {
@@ -134,6 +147,11 @@ export default function KwjarClient() {
     const savedSinus = localStorage.getItem('kwjar_sinusChamberVisible');
     if (savedSinus !== null) {
       setSinusChamberVisible(JSON.parse(savedSinus));
+    }
+    
+    const savedVenlar = localStorage.getItem('kwjar_venlarChamberVisible');
+    if (savedVenlar !== null) {
+      setVenlarChamberVisible(JSON.parse(savedVenlar));
     }
     
     const savedProtozoic = localStorage.getItem('kwjar_protozoicChamberVisible');
@@ -167,6 +185,11 @@ export default function KwjarClient() {
       setSinusChamberVisible(event.detail.visible);
     };
     
+    const handleVenlarChange = (event: CustomEvent) => {
+      setVenlarChamberVisible(event.detail.visible);
+      localStorage.setItem('kwjar_venlarChamberVisible', JSON.stringify(event.detail.visible));
+    };
+    
     const handleProtozoicChange = (event: CustomEvent) => {
       setProtozoicChamberVisible(event.detail.visible);
     };
@@ -177,12 +200,14 @@ export default function KwjarClient() {
 
     window.addEventListener('kwjarMandibleChamberVisibilityChange', handleMandibleChange as EventListener);
     window.addEventListener('kwjarSinusChamberVisibilityChange', handleSinusChange as EventListener);
+    window.addEventListener('kwjarVenlarChamberVisibilityChange', handleVenlarChange as EventListener);
     window.addEventListener('kwjarProtozoicChamberVisibilityChange', handleProtozoicChange as EventListener);
     window.addEventListener('kwjarMesozoicChamberVisibilityChange', handleMesozoicChange as EventListener);
     
     return () => {
       window.removeEventListener('kwjarMandibleChamberVisibilityChange', handleMandibleChange as EventListener);
       window.removeEventListener('kwjarSinusChamberVisibilityChange', handleSinusChange as EventListener);
+      window.removeEventListener('kwjarVenlarChamberVisibilityChange', handleVenlarChange as EventListener);
       window.removeEventListener('kwjarProtozoicChamberVisibilityChange', handleProtozoicChange as EventListener);
       window.removeEventListener('kwjarMesozoicChamberVisibilityChange', handleMesozoicChange as EventListener);
     };
@@ -712,6 +737,160 @@ export default function KwjarClient() {
     }
   };
 
+  // Delete keywords function
+  const deleteSelectedKeywords = async () => {
+    if (selectedKeywordIds.length === 0) {
+      alert('Please select keywords to delete');
+      return;
+    }
+
+    setDeleteLoading(true);
+
+    try {
+      console.log('🗑️ Fetching associated tags for selected keywords...');
+
+      // First, get all associated tags for the selected keywords
+      const { data: tagRelations, error: tagError } = await supabase
+        .from('keywordshub_tag_relations')
+        .select(`
+          fk_keyword_id,
+          keywordshub_tags (
+            tag_id,
+            tag_name
+          ),
+          keywordshub!keywordshub_tag_relations_fk_keyword_id_fkey (
+            keyword_datum
+          )
+        `)
+        .in('fk_keyword_id', selectedKeywordIds);
+
+      if (tagError) {
+        console.error('Error fetching tag relations:', tagError);
+        throw new Error(`Failed to fetch associated tags: ${tagError.message}`);
+      }
+
+      // Process the tag data
+      const associatedTags = new Set();
+      const keywordTagMap = new Map();
+
+      tagRelations?.forEach(relation => {
+        const tag = relation.keywordshub_tags;
+        const keyword = relation.keywordshub;
+        if (tag) {
+          associatedTags.add(`${tag.tag_name} (ID: ${tag.tag_id})`);
+          if (!keywordTagMap.has(relation.fk_keyword_id)) {
+            keywordTagMap.set(relation.fk_keyword_id, {
+              keyword_datum: keyword?.keyword_datum || `ID: ${relation.fk_keyword_id}`,
+              tags: []
+            });
+          }
+          keywordTagMap.get(relation.fk_keyword_id).tags.push(tag.tag_name);
+        }
+      });
+
+      const tagList = Array.from(associatedTags);
+      const taggedKeywordsList = Array.from(keywordTagMap.entries())
+        .map(([keywordId, data]) => `• ${data.keyword_datum}: ${data.tags.join(', ')}`)
+        .join('\n');
+
+      // Create detailed confirmation message
+      let confirmMessage = `Are you sure you want to delete ${selectedKeywordIds.length} keywords and clear them from any cncglub.kwslot* tables?\n\n`;
+      
+      if (tagList.length > 0) {
+        confirmMessage += `⚠️ DELETE ANY ASSOCIATED KEYWORD TAGS\n\n`;
+        confirmMessage += `The following tags will be removed from these keywords:\n`;
+        confirmMessage += `${tagList.join('\n')}\n\n`;
+        confirmMessage += `Keywords with tags:\n${taggedKeywordsList}\n\n`;
+      }
+      
+      confirmMessage += `This action cannot be undone.`;
+
+      const confirmed = window.confirm(confirmMessage);
+
+      if (!confirmed) {
+        setDeleteLoading(false);
+        return;
+      }
+
+      console.log('🗑️ Starting delete operation for keywords:', selectedKeywordIds);
+
+      // Delete tag relations first
+      if (tagRelations && tagRelations.length > 0) {
+        console.log('🗑️ Deleting keyword tag relations...');
+        const { error: tagDeleteError } = await supabase
+          .from('keywordshub_tag_relations')
+          .delete()
+          .in('fk_keyword_id', selectedKeywordIds);
+
+        if (tagDeleteError) {
+          throw new Error(`Failed to delete keyword tag relations: ${tagDeleteError.message}`);
+        }
+        console.log(`✅ Deleted ${tagRelations.length} tag relations`);
+      }
+
+      // Delete from cncglub kwslot tables
+      const response = await fetch('/api/delete-keywords-cncglub', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          keyword_ids: selectedKeywordIds,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to clear cncglub data: ${response.statusText}`);
+      }
+
+      // Then delete from keywordshub table
+      const { error: deleteError } = await supabase
+        .from('keywordshub')
+        .delete()
+        .in('keyword_id', selectedKeywordIds);
+
+      if (deleteError) {
+        throw new Error(`Failed to delete keywords: ${deleteError.message}`);
+      }
+
+      console.log('✅ Successfully deleted keywords and cleared cncglub data');
+      
+      let successMessage = `Successfully deleted ${selectedKeywordIds.length} keywords and cleared them from cncglub tables`;
+      if (tagRelations && tagRelations.length > 0) {
+        successMessage += `\n\nAlso removed ${tagRelations.length} keyword tag associations`;
+      }
+      
+      alert(successMessage);
+
+      // Clear selection and refresh data
+      setSelectedKeywordIds([]);
+      window.dispatchEvent(new Event('kwjar-refresh-needed'));
+
+    } catch (error) {
+      console.error('❌ Error deleting keywords:', error);
+      alert(`Error deleting keywords: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  // Force select all keywords in current filters function
+  const forceSelectAllInFilters = async () => {
+    try {
+      // We need to get all keywords matching current filters from the table component
+      // For now, we'll trigger a custom event that the table can listen to
+      const event = new CustomEvent('force-select-all-in-filters', {
+        detail: { 
+          selectedKeywordIds,
+          setSelectedKeywordIds: (ids: number[]) => setSelectedKeywordIds(ids)
+        }
+      });
+      window.dispatchEvent(event);
+    } catch (error) {
+      console.error('Error in force select all:', error);
+    }
+  };
+
   // Retry failed keywords - auto-run Gazelle
   const retryFailedKeywords = async (keywordsToRetry: number[]) => {
     if (keywordsToRetry.length === 0) return;
@@ -911,24 +1090,24 @@ export default function KwjarClient() {
           </div>
           
           {/* Moved header content */}
-          <div className="flex items-center space-x-6">
+          <div className="flex flex-wrap items-center gap-4">
             <h1 className="text-2xl font-bold text-gray-800">🔍 Keywords Hub</h1>
             <ZhedoriButtonBar />
             
             {/* Column Pagination Button Bars */}
             {columnPaginationControls && (
-              <>
+              <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center">
                   {columnPaginationControls.ColumnPaginationBar1()}
                 </div>
                 <div className="flex items-center">
                   {columnPaginationControls.ColumnPaginationBar2()}
                 </div>
-              </>
+              </div>
             )}
             
             {/* Joist Columns Toggle */}
-            <div className="flex items-center space-x-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
+            <div className="flex flex-wrap items-center gap-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
               <span className="text-sm font-medium text-gray-700">Show joist columns</span>
               <button
                 onClick={() => {
@@ -949,7 +1128,7 @@ export default function KwjarClient() {
             </div>
 
             {/* Hoist Columns Toggle */}
-            <div className="flex items-center space-x-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
+            <div className="flex flex-wrap items-center gap-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
               <span className="text-sm font-medium text-gray-700">Show hoist columns</span>
               <button
                 onClick={() => {
@@ -981,12 +1160,12 @@ export default function KwjarClient() {
           
           {/* Main pagination and search controls with industry controls */}
           {mainPaginationControls && (
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-4">
               {mainPaginationControls.PaginationControls()}
               {mainPaginationControls.SearchField()}
               
               {/* Industry Selection Controls - Wrapped in bordered div */}
-              <div className="flex items-center space-x-3 border border-black p-2 rounded-md">
+              <div className="flex flex-wrap items-center gap-3 border border-black p-2 rounded-md">
                 <button
                   onClick={() => setIsIndustryPopupOpen(true)}
                   className="px-3 py-1.5 bg-purple-600 text-white rounded text-xs font-medium hover:bg-purple-700 transition-colors"
@@ -1181,7 +1360,171 @@ export default function KwjarClient() {
         </div>
       )}
 
-      {/* Protozoic Chamber */}
+      {/* Venlar Chamber */}
+      {venlarChamberVisible && (
+        <div className="border border-black border-b-0 p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            venlar_chamber
+          </div>
+          
+          {/* Filter Dropdowns */}
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Search Volume Filter */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Search Volume:</label>
+              <select
+                value={searchVolumeFilter}
+                onChange={(e) => setSearchVolumeFilter(e.target.value)}
+                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  searchVolumeFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                }`}
+                style={searchVolumeFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+              >
+                <option value="all">all</option>
+                <option value="> 1000">&gt; 1,000</option>
+                <option value="> 750">&gt; 750</option>
+                <option value="> 500">&gt; 500</option>
+                <option value="> 250">&gt; 250</option>
+                <option value="> 100">&gt; 100</option>
+                <option value="> 50">&gt; 50</option>
+                <option value="> 20">&gt; 20</option>
+                <option value="> 10">&gt; 10</option>
+                <option value="> 5">&gt; 5</option>
+              </select>
+            </div>
+
+            {/* CPC Filter */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">CPC:</label>
+              <select
+                value={cpcFilter}
+                onChange={(e) => setCpcFilter(e.target.value)}
+                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  cpcFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                }`}
+                style={cpcFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+              >
+                <option value="all">all</option>
+                <option value="< 5">&lt; $5</option>
+                <option value="< 10">&lt; $10</option>
+                <option value="< 20">&lt; $20</option>
+                <option value="< 30">&lt; $30</option>
+              </select>
+            </div>
+
+            {/* Competition Filter */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Competition:</label>
+              <select
+                value={competitionFilter}
+                onChange={(e) => setCompetitionFilter(e.target.value)}
+                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  competitionFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                }`}
+                style={competitionFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+              >
+                <option value="all">all</option>
+                <option value="HIGH">HIGH</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="LOW">LOW</option>
+                <option value="MEDIUM + LOW">MEDIUM + LOW</option>
+              </select>
+            </div>
+
+            {/* Competition Index Filter */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Competition Index:</label>
+              <select
+                value={competitionIndexFilter}
+                onChange={(e) => setCompetitionIndexFilter(e.target.value)}
+                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  competitionIndexFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                }`}
+                style={competitionIndexFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+              >
+                <option value="all">all</option>
+                <option value="0-20">0-20</option>
+                <option value="21-50">21-50</option>
+                <option value="51-100">51-100</option>
+              </select>
+            </div>
+
+            {/* City Classification Filter */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">City Classification:</label>
+              <select
+                value={cityClassificationFilter}
+                onChange={(e) => setCityClassificationFilter(e.target.value)}
+                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  cityClassificationFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                }`}
+                style={cityClassificationFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+              >
+                <option value="all">all</option>
+                <option value="principal_city">principal_city</option>
+                <option value="formidable_suburb">formidable_suburb</option>
+                <option value="smaller_suburb">smaller_suburb</option>
+              </select>
+            </div>
+
+            {/* Exact City Population Filter */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Exact City Pop:</label>
+              <select
+                value={exactCityPopulationFilter}
+                onChange={(e) => setExactCityPopulationFilter(e.target.value)}
+                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  exactCityPopulationFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                }`}
+                style={exactCityPopulationFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+              >
+                <option value="all">all</option>
+                <option value="0-20k">0-20k</option>
+                <option value="20-30k">20-30k</option>
+                <option value="30-40k">30-40k</option>
+                <option value="40-50k">40-50k</option>
+                <option value="50-60k">50-60k</option>
+                <option value="60-80k">60-80k</option>
+                <option value="80-100k">80-100k</option>
+                <option value="100-150k">100-150k</option>
+                <option value="150-200k">150-200k</option>
+                <option value="200-300k">200-300k</option>
+                <option value="300-450k">300-450k</option>
+                <option value="450-600k">450-600k</option>
+                <option value="600k-infinity">600k-infinity</option>
+              </select>
+            </div>
+
+            {/* Largest City Population Filter */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Largest City Pop:</label>
+              <select
+                value={largestCityPopulationFilter}
+                onChange={(e) => setLargestCityPopulationFilter(e.target.value)}
+                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  largestCityPopulationFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                }`}
+                style={largestCityPopulationFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+              >
+                <option value="all">all</option>
+                <option value="0-20k">0-20k</option>
+                <option value="20-30k">20-30k</option>
+                <option value="30-40k">30-40k</option>
+                <option value="40-50k">40-50k</option>
+                <option value="50-60k">50-60k</option>
+                <option value="60-80k">60-80k</option>
+                <option value="80-100k">80-100k</option>
+                <option value="100-150k">100-150k</option>
+                <option value="150-200k">150-200k</option>
+                <option value="200-300k">200-300k</option>
+                <option value="300-450k">300-450k</option>
+                <option value="450-600k">450-600k</option>
+                <option value="600k-infinity">600k-infinity</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Protozoic Chamber */}
       {protozoicChamberVisible && (
@@ -1191,8 +1534,8 @@ export default function KwjarClient() {
           </div>
           
           {/* Moved buttons and controls */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2">
               {/* Functions Popup Button (styled like nwjar1) */}
               <button
                 onClick={() => setIsPopupOpen(true)}
@@ -1202,7 +1545,7 @@ export default function KwjarClient() {
               </button>
               
               {/* Tags section with border */}
-              <div className="flex items-center space-x-2 border border-black px-3 py-2 rounded">
+              <div className="flex flex-wrap items-center gap-2 border border-black px-3 py-2 rounded">
                 <button
                   onClick={() => setIsTagsPopupOpen(true)}
                   className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
@@ -1225,7 +1568,7 @@ export default function KwjarClient() {
                 )}
                 
                 {selectedTag && (
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <div className="text-sm font-medium bg-navy text-white border border-black px-3 py-1 rounded" style={{ backgroundColor: 'navy' }}>
                       {selectedTag.tag_name}
                     </div>
@@ -1241,15 +1584,39 @@ export default function KwjarClient() {
               </div>
               
               <button
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                onClick={deleteSelectedKeywords}
+                disabled={deleteLoading || selectedKeywordIds.length === 0}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  deleteLoading || selectedKeywordIds.length === 0
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                    : 'bg-red-600 hover:bg-red-700 text-white'
+                }`}
               >
-                delete kws and clear from any cncglub.kwslot*
+                {deleteLoading 
+                  ? 'Deleting...' 
+                  : `delete kws and clear from any cncglub.kwslot* (${selectedKeywordIds.length} selected)`
+                }
               </button>
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-500">DataForSEO Integration</div>
               <div className="text-xs text-gray-400">Project: Keywords Research</div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Selected Keywords Box */}
+      {protozoicChamberVisible && (
+        <div className="border border-black p-1" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="flex items-center gap-2 text-sm">
+            <span>Selected KW Rows: ({selectedKeywordIds.length})</span>
+            <button
+              onClick={forceSelectAllInFilters}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+            >
+              Force Select All In Current Filters Regardless Of Pagination
+            </button>
           </div>
         </div>
       )}
@@ -1275,7 +1642,7 @@ export default function KwjarClient() {
       </div>
 
       {/* Main Content - Full Width KeywordsHubTable */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden w-full min-w-0">
         <KeywordsHubTable 
           selectedTagId={selectedTag?.tag_id}
           tagFilterRefreshKey={tagFilterRefreshKey}
@@ -1288,6 +1655,13 @@ export default function KwjarClient() {
           initialColumnPage={currentColumnPage}
           onColumnPaginationChange={handleColumnPaginationChange}
           onSelectedRowsChange={setSelectedKeywordIds}
+          searchVolumeFilter={searchVolumeFilter}
+          cpcFilter={cpcFilter}
+          competitionFilter={competitionFilter}
+          competitionIndexFilter={competitionIndexFilter}
+          exactCityPopulationFilter={exactCityPopulationFilter}
+          largestCityPopulationFilter={largestCityPopulationFilter}
+          cityClassificationFilter={cityClassificationFilter}
         />
       </div>
 

@@ -7,6 +7,7 @@ import { useAuth } from '@/app/context/AuthContext';
 interface KeywordRecord {
   keyword_id: number;
   keyword_datum: string;
+  is_starred: boolean | null;
   search_volume: number | null;
   cpc: number | null;
   semrush_volume: number | null;
@@ -44,6 +45,8 @@ interface KeywordRecord {
   } | null;
   // Joined exact city data
   exact_city?: {
+    classification: string | null;
+    city_name: string | null;
     city_population: number | null;
   } | null;
   // Cache staleness tracking
@@ -95,6 +98,26 @@ const columns: ColumnDefinition[] = [
     readOnly: true,
     isJoistColumn: true
   },
+  {
+    key: 'exact_city.classification',
+    label: 'classification',
+    type: 'text',
+    headerRow1Text: 'joist',
+    headerRow2Text: 'classification',
+    readOnly: true,
+    isJoistColumn: true,
+    isJoined: true
+  },
+  {
+    key: 'exact_city.city_name',
+    label: 'city_name',
+    type: 'text',
+    headerRow1Text: 'joist',
+    headerRow2Text: 'city_name',
+    readOnly: true,
+    isJoistColumn: true,
+    isJoined: true
+  },
   { 
     key: 'joist_metro_pop_placeholder', 
     label: 'metro pop', 
@@ -142,7 +165,16 @@ const columns: ColumnDefinition[] = [
     isHoistColumn: true,
     isJoined: true
   },
+  { 
+    key: 'is_starred', 
+    label: 'is_starred', 
+    type: 'boolean',
+    headerRow1Text: 'keywordshub',
+    headerRow2Text: 'str.'
+  },
   { key: 'keyword_datum', label: 'keyword_datum', type: 'text' },
+  { key: 'competition', label: 'competition', type: 'text' },
+  { key: 'competition_index', label: 'competition_index', type: 'number' },
   { 
     key: 'serp_status', 
     label: 'serp_status', 
@@ -166,8 +198,6 @@ const columns: ColumnDefinition[] = [
   { key: 'location_coordinate', label: 'location_coordinate', type: 'text' },
   { key: 'language_code', label: 'language_code', type: 'text', leftSeparator: 'black-4px' },
   { key: 'language_name', label: 'language_name', type: 'text' },
-  { key: 'competition', label: 'competition', type: 'text', leftSeparator: 'black-4px' },
-  { key: 'competition_index', label: 'competition_index', type: 'number' },
   { key: 'low_top_of_page_bid', label: 'low_top_of_page_bid', type: 'number' },
   { key: 'high_top_of_page_bid', label: 'high_top_of_page_bid', type: 'number' },
   { key: 'api_fetched_at', label: 'api_fetched_at', type: 'datetime' },
@@ -354,6 +384,13 @@ interface KeywordsHubTableProps {
     DataForSEOActions: () => JSX.Element;
   }) => void;
   onSelectedRowsChange?: (selectedIds: number[]) => void;
+  searchVolumeFilter?: string;
+  cpcFilter?: string;
+  competitionFilter?: string;
+  competitionIndexFilter?: string;
+  exactCityPopulationFilter?: string;
+  largestCityPopulationFilter?: string;
+  cityClassificationFilter?: string;
 }
 
 // Helper function to format relative time
@@ -374,6 +411,40 @@ function formatDistanceToNow(date: Date): string {
   return `${Math.floor(diffDays / 365)}y ago`;
 }
 
+// Helper function to check if population falls within specified range
+function checkPopulationRange(population: number, rangeFilter: string): boolean {
+  switch (rangeFilter) {
+    case '0-20k':
+      return population >= 0 && population <= 20000;
+    case '20-30k':
+      return population > 20000 && population <= 30000;
+    case '30-40k':
+      return population > 30000 && population <= 40000;
+    case '40-50k':
+      return population > 40000 && population <= 50000;
+    case '50-60k':
+      return population > 50000 && population <= 60000;
+    case '60-80k':
+      return population > 60000 && population <= 80000;
+    case '80-100k':
+      return population > 80000 && population <= 100000;
+    case '100-150k':
+      return population > 100000 && population <= 150000;
+    case '150-200k':
+      return population > 150000 && population <= 200000;
+    case '200-300k':
+      return population > 200000 && population <= 300000;
+    case '300-450k':
+      return population > 300000 && population <= 450000;
+    case '450-600k':
+      return population > 450000 && population <= 600000;
+    case '600k-infinity':
+      return population > 600000;
+    default:
+      return true;
+  }
+}
+
 export default function KeywordsHubTable({ 
   selectedTagId,
   tagFilterRefreshKey = 0,
@@ -385,7 +456,14 @@ export default function KeywordsHubTable({
   onColumnPaginationChange,
   onMainPaginationRender,
   onTableActionsRender,
-  onSelectedRowsChange
+  onSelectedRowsChange,
+  searchVolumeFilter = 'all',
+  cpcFilter = 'all',
+  competitionFilter = 'all',
+  competitionIndexFilter = 'all',
+  exactCityPopulationFilter = 'all',
+  largestCityPopulationFilter = 'all',
+  cityClassificationFilter = 'all'
 }: KeywordsHubTableProps) {
   const { user } = useAuth();
   const [data, setData] = useState<KeywordRecord[]>([]);
@@ -468,6 +546,8 @@ export default function KeywordsHubTable({
             industry_name
           ),
           exact_city:cities!rel_exact_city_id (
+            classification,
+            city_name,
             city_population
           ),
           largest_city:cities!rel_largest_city_id (
@@ -498,7 +578,7 @@ export default function KeywordsHubTable({
         }
       }
 
-      const { data: keywords, error } = await query.order('created_at', { ascending: false });
+      const { data: keywords, error } = await query.order('search_volume', { ascending: false });
 
       if (error) throw error;
       
@@ -506,63 +586,89 @@ export default function KeywordsHubTable({
       if (keywords && keywords.length > 0) {
         const keywordIds = keywords.map(k => k.keyword_id);
         
-        // Get all tag relations for these keywords
-        const { data: tagRelations, error: tagRelError } = await supabase
-          .from('keywordshub_tag_relations')
-          .select(`
-            fk_keyword_id,
-            keywordshub_tags (
-              tag_id,
-              tag_name
-            )
-          `)
-          .in('fk_keyword_id', keywordIds);
+        // Batch the keyword IDs to avoid URL length issues
+        const BATCH_SIZE = 100; // Supabase can handle about 100 IDs safely in URL
+        const batches: number[][] = [];
         
-        if (tagRelError) {
-          console.error('Error fetching tag relations:', tagRelError);
+        for (let i = 0; i < keywordIds.length; i += BATCH_SIZE) {
+          batches.push(keywordIds.slice(i, i + BATCH_SIZE));
         }
         
-        // Get Universal SERP zone cache data for method-1
-        const { data: cacheData, error: cacheError } = await supabase
-          .from('keywordshub_serp_zone_cache')
-          .select(`
-            keyword_id,
-            total_emd_count,
-            zone_1_emd_count,
-            zone_2_emd_count,
-            zone_3_emd_count,
-            zone_4_10_emd_count,
-            zone_11_25_emd_count,
-            zone_26_50_emd_count,
-            zone_51_100_emd_count,
-            zone_1_domains,
-            zone_2_domains,
-            zone_3_domains,
-            zone_4_10_domains,
-            zone_11_25_domains,
-            zone_26_50_domains,
-            zone_51_100_domains,
-            cached_at,
-            latest_fetch_id,
-            source_fetch_id
-          `)
-          .eq('emd_stamp_method', 'method-1')
-          .eq('is_current', true)  // Only fetch current cache, not historical
-          .in('keyword_id', keywordIds);
+        // Get all tag relations for these keywords (in batches)
+        let tagRelations: any[] = [];
         
-        if (cacheError) {
-          console.error('Error fetching EMD zone cache:', cacheError);
+        for (const batch of batches) {
+          const { data, error: tagRelError } = await supabase
+            .from('keywordshub_tag_relations')
+            .select(`
+              fk_keyword_id,
+              keywordshub_tags (
+                tag_id,
+                tag_name
+              )
+            `)
+            .in('fk_keyword_id', batch);
+          
+          if (tagRelError) {
+            console.error('Error fetching tag relations:', tagRelError);
+          } else if (data) {
+            tagRelations = [...tagRelations, ...data];
+          }
+        }
+        
+        // Get Universal SERP zone cache data for method-1 (in batches)
+        let cacheData: any[] = [];
+        
+        for (const batch of batches) {
+          const { data, error: cacheError } = await supabase
+            .from('keywordshub_serp_zone_cache')
+            .select(`
+              keyword_id,
+              total_emd_count,
+              zone_1_emd_count,
+              zone_2_emd_count,
+              zone_3_emd_count,
+              zone_4_10_emd_count,
+              zone_11_25_emd_count,
+              zone_26_50_emd_count,
+              zone_51_100_emd_count,
+              zone_1_domains,
+              zone_2_domains,
+              zone_3_domains,
+              zone_4_10_domains,
+              zone_11_25_domains,
+              zone_26_50_domains,
+              zone_51_100_domains,
+              cached_at,
+              latest_fetch_id,
+              source_fetch_id
+            `)
+            .eq('emd_stamp_method', 'method-1')
+            .eq('is_current', true)  // Only fetch current cache, not historical
+            .in('keyword_id', batch);
+          
+          if (cacheError) {
+            console.error('Error fetching EMD zone cache:', cacheError);
+          } else if (data) {
+            cacheData = [...cacheData, ...data];
+          }
         }
 
-        // Get latest fetch_id for each keyword to detect staleness
-        const { data: latestFetches, error: fetchError } = await supabase
-          .from('zhe_serp_fetches')
-          .select('rel_keyword_id, fetch_id')
-          .eq('is_latest', true)
-          .in('rel_keyword_id', keywordIds);
+        // Get latest fetch_id for each keyword to detect staleness (in batches)
+        let latestFetches: any[] = [];
+        
+        for (const batch of batches) {
+          const { data, error: fetchError } = await supabase
+            .from('zhe_serp_fetches')
+            .select('rel_keyword_id, fetch_id')
+            .eq('is_latest', true)
+            .in('rel_keyword_id', batch);
 
-        if (fetchError) {
-          console.error('Error fetching latest fetches:', fetchError);
+          if (fetchError) {
+            console.error('Error fetching latest fetches:', fetchError);
+          } else if (data) {
+            latestFetches = [...latestFetches, ...data];
+          }
         }
         
         // Group tags by keyword_id
@@ -654,6 +760,7 @@ export default function KeywordsHubTable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
   // Notify parent when selected rows change
   useEffect(() => {
     if (onSelectedRowsChange) {
@@ -664,10 +771,72 @@ export default function KeywordsHubTable({
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
     let filtered = data.filter(item => {
-      if (!searchTerm) return true;
-      return Object.values(item).some(value => 
+      // Search term filter
+      if (searchTerm && !Object.values(item).some(value => 
         value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      )) {
+        return false;
+      }
+
+      // Search Volume filter
+      if (searchVolumeFilter !== 'all') {
+        const searchVolume = item.search_volume || 0;
+        const threshold = parseInt(searchVolumeFilter.replace('> ', ''));
+        if (searchVolume <= threshold) return false;
+      }
+
+      // CPC filter
+      if (cpcFilter !== 'all') {
+        const cpc = item.cpc || 0;
+        const threshold = parseFloat(cpcFilter.replace('< ', ''));
+        if (cpc >= threshold) return false;
+      }
+
+      // Competition filter
+      if (competitionFilter !== 'all') {
+        const competition = item.competition?.toUpperCase() || '';
+        if (competitionFilter === 'MEDIUM + LOW') {
+          if (competition !== 'MEDIUM' && competition !== 'LOW') return false;
+        } else {
+          if (competition !== competitionFilter) return false;
+        }
+      }
+
+      // Competition Index filter
+      if (competitionIndexFilter !== 'all') {
+        const competitionIndex = item.competition_index || 0;
+        switch (competitionIndexFilter) {
+          case '0-20':
+            if (competitionIndex < 0 || competitionIndex > 20) return false;
+            break;
+          case '21-50':
+            if (competitionIndex < 21 || competitionIndex > 50) return false;
+            break;
+          case '51-100':
+            if (competitionIndex < 51 || competitionIndex > 100) return false;
+            break;
+        }
+      }
+
+      // City Classification filter
+      if (cityClassificationFilter !== 'all') {
+        const cityClassification = item.exact_city?.classification || '';
+        if (cityClassification !== cityClassificationFilter) return false;
+      }
+
+      // Exact City Population filter
+      if (exactCityPopulationFilter !== 'all') {
+        const exactCityPop = item.exact_city?.city_population || 0;
+        if (!checkPopulationRange(exactCityPop, exactCityPopulationFilter)) return false;
+      }
+
+      // Largest City Population filter
+      if (largestCityPopulationFilter !== 'all') {
+        const largestCityPop = item.largest_city?.city_population || 0;
+        if (!checkPopulationRange(largestCityPop, largestCityPopulationFilter)) return false;
+      }
+
+      return true;
     });
 
     // Sort data - handle both regular fields and joined fields (with dots)
@@ -696,7 +865,7 @@ export default function KeywordsHubTable({
     });
 
     return filtered;
-  }, [data, searchTerm, sortField, sortOrder]);
+  }, [data, searchTerm, sortField, sortOrder, searchVolumeFilter, cpcFilter, competitionFilter, competitionIndexFilter, cityClassificationFilter, exactCityPopulationFilter, largestCityPopulationFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === 0 ? filteredAndSortedData.length : itemsPerPage));
@@ -704,8 +873,8 @@ export default function KeywordsHubTable({
   const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
   // Column pagination logic with sticky columns
-  const baseStickyKeys = ['serp_tool', 'keyword_id', 'keyword_datum', 'search_volume', 'cpc'];
-  const joistColumnKeys = ['rel_exact_city_id', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
+  const baseStickyKeys = ['serp_tool', 'keyword_id', 'is_starred', 'keyword_datum', 'search_volume', 'cpc'];
+  const joistColumnKeys = ['rel_exact_city_id', 'exact_city.classification', 'exact_city.city_name', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
   const hoistColumnKeys = ['rel_largest_city_id', 'hoist_metro_pop_placeholder', 'largest_city.city_population'];
   
   // Filter columns based on joist and hoist toggles
@@ -717,7 +886,7 @@ export default function KeywordsHubTable({
     activeColumns = activeColumns.filter(col => !hoistColumnKeys.includes(col.key));
   }
   
-  // Build sticky column keys with joist and hoist columns inserted between keyword_id and keyword_datum
+  // Build sticky column keys with joist and hoist columns inserted between keyword_id and is_starred/keyword_datum
   let stickyColumnKeys = [...baseStickyKeys.slice(0, 2)];
   if (showJoistColumns) {
     stickyColumnKeys = [...stickyColumnKeys, ...joistColumnKeys];
@@ -766,6 +935,32 @@ export default function KeywordsHubTable({
       setSelectedRows(new Set(paginatedData.map(item => item.keyword_id)));
     }
   };
+
+  // Listen for force select all events from parent
+  useEffect(() => {
+    const handleForceSelectAll = (event: any) => {
+      const { selectedKeywordIds, setSelectedKeywordIds } = event.detail;
+      
+      // Get all filtered keyword IDs (not just paginated)
+      const allFilteredIds = filteredAndSortedData.map(item => item.keyword_id);
+      
+      // Check if all filtered keywords are already selected
+      const allSelected = allFilteredIds.every(id => selectedKeywordIds.includes(id));
+      
+      if (allSelected) {
+        // If all are selected, deselect all
+        setSelectedKeywordIds([]);
+        setSelectedRows(new Set()); // Also update table's internal state
+      } else {
+        // Otherwise, select all filtered keywords
+        setSelectedKeywordIds(allFilteredIds);
+        setSelectedRows(new Set(allFilteredIds)); // Also update table's internal state
+      }
+    };
+    
+    window.addEventListener('force-select-all-in-filters', handleForceSelectAll);
+    return () => window.removeEventListener('force-select-all-in-filters', handleForceSelectAll);
+  }, [filteredAndSortedData]);
 
   // Column Pagination Components - Define before use
   // Bar 1: Columns per page quantity selector
@@ -1035,6 +1230,39 @@ export default function KeywordsHubTable({
   const cancelEdit = () => {
     setEditingCell(null);
     setEditingValue('');
+  };
+
+  // Toggle star function
+  const toggleStar = async (keywordId: number, currentValue: boolean | null) => {
+    if (!userInternalId) return;
+    
+    const newValue = !currentValue;
+    
+    // Optimistically update UI immediately
+    setData(prev => prev.map(row => 
+      row.keyword_id === keywordId ? { ...row, is_starred: newValue } : row
+    ));
+    
+    try {
+      const { error } = await supabase
+        .from('keywordshub')
+        .update({ is_starred: newValue, last_updated_by: userInternalId })
+        .eq('keyword_id', keywordId);
+        
+      if (error) {
+        console.error('Error updating star:', error);
+        // Revert optimistic update
+        setData(prev => prev.map(row => 
+          row.keyword_id === keywordId ? { ...row, is_starred: currentValue } : row
+        ));
+      }
+    } catch (err) {
+      console.error('Error updating star:', err);
+      // Revert optimistic update
+      setData(prev => prev.map(row => 
+        row.keyword_id === keywordId ? { ...row, is_starred: currentValue } : row
+      ));
+    }
   };
 
   // DataForSEO refresh function (Live endpoint)
@@ -1497,7 +1725,7 @@ export default function KeywordsHubTable({
               className={cellClass}
               onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
             >
-              {typeof value === 'number' ? value.toLocaleString() : value}
+              {typeof value === 'number' ? (column.key === 'keyword_id' ? value.toString() : value.toLocaleString()) : value}
             </div>
             <button
               onClick={(e) => {
@@ -1536,7 +1764,7 @@ export default function KeywordsHubTable({
           onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
         >
           <div className="flex items-center gap-1">
-            <span>{typeof value === 'number' ? (column.key === 'rel_dfs_location_code' ? value.toString() : value.toLocaleString()) : value}</span>
+            <span>{typeof value === 'number' ? (column.key === 'rel_dfs_location_code' || column.key === 'keyword_id' ? value.toString() : value.toLocaleString()) : value}</span>
             {isZoneCountColumn && item.cache_status && item.cache_status !== 'CURRENT' && (
               <span className="ml-1">
                 {item.cache_status === 'STALE' && <span className="text-orange-500" title="Cache is outdated - run F410+F420">⚠️</span>}
@@ -1616,7 +1844,7 @@ export default function KeywordsHubTable({
     // Special handling for SERP tool column
     if (column.key === 'serp_tool') {
       return (
-        <div className="px-2 py-1 flex items-center justify-center">
+        <div className="px-2 py-1 flex items-center justify-center gap-1">
           <a
             href={`/serpjar?keyword_id=${item.keyword_id}`}
             target="_blank"
@@ -1627,6 +1855,60 @@ export default function KeywordsHubTable({
           >
             s
           </a>
+          <a
+            href={`https://www.google.com/search?q=${encodeURIComponent(item.keyword_datum || '').replace(/%20/g, '+')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-4 h-4 bg-black text-white font-bold text-xs flex items-center justify-center hover:bg-gray-800 transition-colors no-underline inline-block"
+            title={`Search Google for: ${item.keyword_datum}`}
+            style={{ textDecoration: 'none', lineHeight: '16px' }}
+          >
+            g
+          </a>
+          <a
+            href={`https://www.semrush.com/analytics/keywordoverview/?q=${encodeURIComponent(item.keyword_datum || '').replace(/%20/g, '+')}&db=us`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-4 h-4 bg-black flex items-center justify-center hover:bg-gray-800 transition-colors no-underline inline-block"
+            title={`View in SEMrush: ${item.keyword_datum}`}
+            style={{ textDecoration: 'none', lineHeight: '16px' }}
+          >
+            <img 
+              src="/semrush_icon_1.png" 
+              alt="SEMrush" 
+              className="w-4 h-4"
+            />
+          </a>
+        </div>
+      );
+    }
+
+    // Special handling for star column
+    if (column.key === 'is_starred') {
+      return (
+        <div className="px-2 py-1 flex items-center justify-center">
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleStar(item.keyword_id, value as boolean | null);
+            }}
+            style={{ cursor: 'pointer', padding: '4px' }}
+            title={value ? "Click to unstar" : "Click to star"}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              style={{ color: value ? '#dc2626' : '#9ca3af' }}
+            >
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                fill={value ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+            </svg>
+          </div>
         </div>
       );
     }
@@ -1844,6 +2126,32 @@ export default function KeywordsHubTable({
                 {item.cache_status === 'NO_CACHE' && <span className="text-red-500" title="No cache - run Gazelle">✗</span>}
               </span>
             )}
+          </div>
+        </div>
+      );
+    }
+
+    // Special handling for keyword_datum column to add copy button
+    if (column.key === 'keyword_datum') {
+      return (
+        <div className="flex items-center space-x-1">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigator.clipboard.writeText(value?.toString() || '');
+            }}
+            className="flex-shrink-0 w-3 h-3 bg-gray-200 border border-gray-400 text-gray-600 text-[8px] flex items-center justify-center hover:bg-gray-300 transition-colors"
+            style={{ width: '12px', height: '12px', fontSize: '8px' }}
+            title={`Copy: ${value?.toString() || ''}`}
+          >
+            c
+          </button>
+          <div
+            className={cellClass}
+            onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
+            style={{ flex: 1 }}
+          >
+            {value?.toString() || ''}
           </div>
         </div>
       );
@@ -2123,9 +2431,9 @@ export default function KeywordsHubTable({
       
       <div className="h-full flex flex-col">
         {/* Table */}
-        <div className="flex-1 bg-white overflow-hidden">
-        <div className="h-full overflow-auto">
-          <table className="border-collapse border border-gray-200">
+        <div className="flex-1 bg-white overflow-hidden w-full min-w-0">
+        <div className="h-full overflow-auto w-full">
+          <table className="border-collapse border border-gray-200 w-full max-w-full">
             <thead className="bg-gray-50 sticky top-0">
               {/* First header row */}
               <tr>

@@ -17,6 +17,7 @@ interface City {
   country: string | null;
   rank_in_pop: number | null;
   gmaps_link: string | null;
+  classification: string | null;
   is_suburb: boolean | null;
   city_and_state_code: string | null;
   city_population: number | null;
@@ -30,7 +31,11 @@ interface City {
   updated_at: string | null;
 }
 
-export default function CityjarTable() {
+interface CityjarTableProps {
+  classificationFilter?: string;
+}
+
+export default function CityjarTable({ classificationFilter = 'all' }: CityjarTableProps) {
   const [data, setData] = useState<City[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,6 +81,7 @@ export default function CityjarTable() {
     { key: 'country' as keyof City, label: 'country', type: 'text' },
     { key: 'rank_in_pop' as keyof City, label: 'rank_in_pop', type: 'number' },
     { key: 'gmaps_link' as keyof City, label: 'gmaps_link', type: 'text', width: '100px' },
+    { key: 'classification' as keyof City, label: 'classification', type: 'text' },
     { key: 'is_suburb' as keyof City, label: 'is_suburb', type: 'boolean' },
     { key: 'city_and_state_code' as keyof City, label: 'city_and_state_code', type: 'text' },
     { key: 'city_population' as keyof City, label: 'city_population', type: 'number' },
@@ -116,8 +122,16 @@ export default function CityjarTable() {
   const filteredAndSortedData = useMemo(() => {
     let filtered = data;
     
+    // Apply classification filter
+    if (classificationFilter && classificationFilter !== 'all') {
+      filtered = filtered.filter(item => 
+        item.classification === classificationFilter
+      );
+    }
+    
+    // Apply search term filter
     if (searchTerm) {
-      filtered = data.filter(item => 
+      filtered = filtered.filter(item => 
         Object.values(item).some(value => 
           value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
         )
@@ -136,7 +150,7 @@ export default function CityjarTable() {
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [data, searchTerm, sortField, sortOrder]);
+  }, [data, searchTerm, sortField, sortOrder, classificationFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage));

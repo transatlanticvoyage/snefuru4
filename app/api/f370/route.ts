@@ -101,6 +101,15 @@ export async function POST(request: NextRequest) {
         case '500k-plus':
           cncglubQuery = cncglubQuery.not('cities.city_population', 'is', null).gte('cities.city_population', 500000);
           break;
+        case '35k-325k':
+          cncglubQuery = cncglubQuery.not('cities.city_population', 'is', null).gte('cities.city_population', 35000).lt('cities.city_population', 325000);
+          break;
+        case '40k-325k':
+          cncglubQuery = cncglubQuery.not('cities.city_population', 'is', null).gte('cities.city_population', 40000).lt('cities.city_population', 325000);
+          break;
+        case '50k-325k':
+          cncglubQuery = cncglubQuery.not('cities.city_population', 'is', null).gte('cities.city_population', 50000).lt('cities.city_population', 325000);
+          break;
       }
     }
 

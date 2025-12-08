@@ -115,3 +115,9 @@ purehtmlplayground/social profiles - main guy - bulk deliveries/b280f4d4e9316f6c
 purehtmlplayground/social profiles - main guy - bulk deliveries/99903d17f812fad7c3802f8c4cc11364.xlsx
 purehtmlplayground/social profiles - main guy - bulk deliveries/a33fac1f9944d3767e1d058223f8e611.xlsx
 purehtmlplayground/social profiles - main guy - bulk deliveries/af2be09cf684c3fc6efe4885a8edd899.xlsx
+
+# Ignore all contents under 130localsparkdomains folder
+purehtmlplayground/130localsparkdomains/
+
+# Ignore all contents under 140nextbacklinks folder
+purehtmlplayground/140nextbacklinks/

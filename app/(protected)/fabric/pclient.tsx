@@ -265,6 +265,15 @@ export default function FabricClient() {
           case '500k-plus':
             cncglubQuery = cncglubQuery.gte('cities.city_population', 500000);
             break;
+          case '35k-325k':
+            cncglubQuery = cncglubQuery.gte('cities.city_population', 35000).lt('cities.city_population', 325000);
+            break;
+          case '40k-325k':
+            cncglubQuery = cncglubQuery.gte('cities.city_population', 40000).lt('cities.city_population', 325000);
+            break;
+          case '50k-325k':
+            cncglubQuery = cncglubQuery.gte('cities.city_population', 50000).lt('cities.city_population', 325000);
+            break;
         }
       }
 
@@ -465,6 +474,10 @@ export default function FabricClient() {
                         <option value="50k-100k">50k - 100k</option>
                         <option value="100k-500k">100k - 500k</option>
                         <option value="500k-plus">500k+</option>
+                        <option disabled>---------</option>
+                        <option value="35k-325k">35k-325k</option>
+                        <option value="40k-325k">40k-325k</option>
+                        <option value="50k-325k">50k-325k</option>
                       </select>
                     </td>
                     <td className="border border-gray-300 p-3"></td>

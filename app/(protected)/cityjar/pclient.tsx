@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import CityjarTable from './components/CityjarTable';
+import ExportButton from './components/ExportButton';
+import ClassificationFilter from './components/ClassificationFilter';
 
 const DrenjariButtonBarDriggsmanLinks = dynamic(
   () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
@@ -14,6 +16,7 @@ const DrenjariButtonBarDriggsmanLinks = dynamic(
 export default function CityjarClient() {
   const { user } = useAuth();
   const router = useRouter();
+  const [classificationFilter, setClassificationFilter] = useState('all');
 
   useEffect(() => {
     if (!user) {
@@ -35,10 +38,15 @@ export default function CityjarClient() {
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-gray-800">
               City Manager
             </h1>
+            <ExportButton />
+            <ClassificationFilter 
+              value={classificationFilter}
+              onChange={setClassificationFilter}
+            />
           </div>
           <div className="flex items-center space-x-4">
             <DrenjariButtonBarDriggsmanLinks />
@@ -52,7 +60,7 @@ export default function CityjarClient() {
 
       {/* Main Content - Full Width CityjarTable */}
       <div className="flex-1 overflow-hidden">
-        <CityjarTable />
+        <CityjarTable classificationFilter={classificationFilter} />
       </div>
     </div>
   );
