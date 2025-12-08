@@ -241,7 +241,11 @@ export default function FabricClient() {
 
       // Apply industry filter
       if (data.industry_id && data.industry_id !== '') {
-        cncglubQuery = cncglubQuery.eq('rel_industry_id', parseInt(data.industry_id));
+        if (data.industry_id === 'none') {
+          cncglubQuery = cncglubQuery.is('rel_industry_id', null);
+        } else {
+          cncglubQuery = cncglubQuery.eq('rel_industry_id', parseInt(data.industry_id));
+        }
       }
 
       // Apply city population filter
@@ -435,6 +439,7 @@ export default function FabricClient() {
                         onChange={(e) => handleInputChange('industry_id', e.target.value)}
                       >
                         <option value="">Select industry...</option>
+                        <option value="none">(none / other)</option>
                         {industries.map((industry) => (
                           <option key={industry.industry_id} value={industry.industry_id}>
                             {industry.industry_name}

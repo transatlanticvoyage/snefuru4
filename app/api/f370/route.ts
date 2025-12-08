@@ -76,7 +76,11 @@ export async function POST(request: NextRequest) {
     // Apply industry filter
     if (industry_id && industry_id !== '') {
       console.log(`Applying industry filter: ${industry_id}`);
-      cncglubQuery = cncglubQuery.eq('rel_industry_id', parseInt(industry_id));
+      if (industry_id === 'none') {
+        cncglubQuery = cncglubQuery.is('rel_industry_id', null);
+      } else {
+        cncglubQuery = cncglubQuery.eq('rel_industry_id', parseInt(industry_id));
+      }
     }
 
     // Apply city population filter
@@ -247,7 +251,7 @@ export async function POST(request: NextRequest) {
         await supabase
           .from('keywordshub')
           .update({ 
-            rel_industry_id: row.rel_industry_id,
+            rel_industry_id: (industry_id === 'none') ? null : row.rel_industry_id,
             cached_city_name: city.city_name,
             rel_exact_city_id,
             rel_largest_city_id
@@ -262,7 +266,7 @@ export async function POST(request: NextRequest) {
             rel_dfs_location_code: parseInt(rel_dfs_location_code),
             language_code: language_code,
             language_name: 'English',
-            rel_industry_id: row.rel_industry_id,
+            rel_industry_id: (industry_id === 'none') ? null : row.rel_industry_id,
             cached_city_name: city.city_name,
             rel_exact_city_id,
             rel_largest_city_id
@@ -343,7 +347,7 @@ export async function POST(request: NextRequest) {
         rel_keywordshub_tag_id: tagId,
         user_id: user_internal_id,
         opt_country: country,
-        opt_industry_id: industry_id ? parseInt(industry_id) : null,
+        opt_industry_id: (industry_id && industry_id !== '' && industry_id !== 'none') ? parseInt(industry_id) : null,
         opt_city_population_filter: city_population_filter,
         opt_kw_style: kw_rubric,
         opt_kw_slot: kwslot,

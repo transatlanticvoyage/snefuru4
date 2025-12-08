@@ -8,6 +8,7 @@ import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
 import KeywordsHubTable from './components/KeywordsHubTable';
 import TagsPlenchPopup from './components/TagsPlenchPopup';
 import IndustrySelectorPopup from './components/IndustrySelectorPopup';
+import ExportButton from './components/ExportButton';
 
 export default function KwjarClient() {
   const { user } = useAuth();
@@ -29,6 +30,27 @@ export default function KwjarClient() {
   const [gazelleLoading, setGazelleLoading] = useState(false);
   const [showGazelleFirstConfirm, setShowGazelleFirstConfirm] = useState(false);
   const [showGazelleSecondConfirm, setShowGazelleSecondConfirm] = useState(false);
+  
+  // Export data state
+  const [exportData, setExportData] = useState<{
+    allFilteredData: any[];
+    selectedData: any[];
+    starredData: any[];
+    chosenData: any[];
+    columns: any[];
+    paginatedData: any[];
+    currentPage: number;
+    itemsPerPage: number;
+  }>({
+    allFilteredData: [],
+    selectedData: [],
+    starredData: [],
+    chosenData: [],
+    columns: [],
+    paginatedData: [],
+    currentPage: 1,
+    itemsPerPage: 25
+  });
   const [gazelleProgress, setGazelleProgress] = useState({ current: 0, total: 0 });
   const [f400Mode, setF400Mode] = useState<'live' | 'queued' | null>(null); // User must choose before proceeding
   
@@ -1617,6 +1639,128 @@ export default function KwjarClient() {
             >
               Force Select All In Current Filters Regardless Of Pagination
             </button>
+            <ExportButton 
+              allFilteredData={exportData.allFilteredData}
+              selectedData={exportData.selectedData}
+              starredData={exportData.starredData}
+              chosenData={exportData.chosenData}
+              columns={exportData.columns}
+            />
+            
+            {/* Vertical Separator */}
+            <div className="border-l border-black h-6" style={{ borderLeftWidth: '5px' }}></div>
+            
+            <button
+              onClick={() => {
+                // Select all starred on current page only
+                const currentPageStarredIds = exportData.paginatedData
+                  .filter(item => item.is_starred === true)
+                  .map(item => item.keyword_id);
+                
+                setSelectedKeywordIds(currentPageStarredIds);
+                
+                // Also dispatch custom event to update table internal selection
+                window.dispatchEvent(new CustomEvent('forceSelectKeywords', {
+                  detail: { keywordIds: currentPageStarredIds }
+                }));
+              }}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+            >
+              Select All Starred On This Page
+            </button>
+            
+            <button
+              onClick={() => {
+                // Select all starred in all current filtered data
+                const allStarredIds = exportData.starredData.map(item => item.keyword_id);
+                
+                setSelectedKeywordIds(allStarredIds);
+                
+                // Also dispatch custom event to update table internal selection
+                window.dispatchEvent(new CustomEvent('forceSelectKeywords', {
+                  detail: { keywordIds: allStarredIds }
+                }));
+              }}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+            >
+              Select All Starred In All Current Filtered
+            </button>
+            
+            {/* Vertical Separator */}
+            <div className="border-l border-black h-6" style={{ borderLeftWidth: '5px' }}></div>
+            
+            <button
+              onClick={() => {
+                // Select all chosen on current page only
+                const currentPageChosenIds = exportData.paginatedData
+                  .filter(item => item.is_chosen === true)
+                  .map(item => item.keyword_id);
+                
+                setSelectedKeywordIds(currentPageChosenIds);
+                
+                // Also dispatch custom event to update table internal selection
+                window.dispatchEvent(new CustomEvent('forceSelectKeywords', {
+                  detail: { keywordIds: currentPageChosenIds }
+                }));
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+            >
+              Select All is_chosen On This Page
+            </button>
+            
+            <button
+              onClick={() => {
+                // Select all chosen in all current filtered data
+                const allChosenIds = exportData.allFilteredData
+                  .filter(item => item.is_chosen === true)
+                  .map(item => item.keyword_id);
+                
+                setSelectedKeywordIds(allChosenIds);
+                
+                // Also dispatch custom event to update table internal selection
+                window.dispatchEvent(new CustomEvent('forceSelectKeywords', {
+                  detail: { keywordIds: allChosenIds }
+                }));
+              }}
+              className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+            >
+              Select All is_chosen In All Current Filtered
+            </button>
+            
+            <button
+              onClick={() => {
+                // Select all chosen in all filtered data (mirroring starred functionality)
+                const allChosenIds = exportData.chosenData.map(item => item.keyword_id);
+                
+                setSelectedKeywordIds(allChosenIds);
+                
+                // Also dispatch custom event to update table internal selection
+                window.dispatchEvent(new CustomEvent('forceSelectKeywords', {
+                  detail: { keywordIds: allChosenIds }
+                }));
+              }}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+            >
+              Select All is_chosen In All Filtered
+            </button>
+            
+            {/* Vertical Separator */}
+            <div className="border-l border-black h-6" style={{ borderLeftWidth: '5px' }}></div>
+            
+            <button
+              onClick={() => {
+                // Clear all selections
+                setSelectedKeywordIds([]);
+                
+                // Also dispatch custom event to clear table internal selection
+                window.dispatchEvent(new CustomEvent('forceSelectKeywords', {
+                  detail: { keywordIds: [] }
+                }));
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+            >
+              Clear Selection
+            </button>
           </div>
         </div>
       )}
@@ -1641,8 +1785,8 @@ export default function KwjarClient() {
       <div className="bg-white border-b px-6 py-4" style={{ display: 'none' }}>
       </div>
 
-      {/* Main Content - Full Width KeywordsHubTable */}
-      <div className="flex-1 overflow-hidden w-full min-w-0">
+      {/* Main Content - KeywordsHubTable */}
+      <div className="flex-1 overflow-hidden min-w-0">
         <KeywordsHubTable 
           selectedTagId={selectedTag?.tag_id}
           tagFilterRefreshKey={tagFilterRefreshKey}
@@ -1662,6 +1806,7 @@ export default function KwjarClient() {
           exactCityPopulationFilter={exactCityPopulationFilter}
           largestCityPopulationFilter={largestCityPopulationFilter}
           cityClassificationFilter={cityClassificationFilter}
+          onExportDataChange={setExportData}
         />
       </div>
 

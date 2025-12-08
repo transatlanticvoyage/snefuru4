@@ -8,6 +8,7 @@ interface KeywordRecord {
   keyword_id: number;
   keyword_datum: string;
   is_starred: boolean | null;
+  is_chosen: boolean | null;
   search_volume: number | null;
   cpc: number | null;
   semrush_volume: number | null;
@@ -47,6 +48,7 @@ interface KeywordRecord {
   exact_city?: {
     classification: string | null;
     city_name: string | null;
+    state_code: string | null;
     city_population: number | null;
   } | null;
   // Cache staleness tracking
@@ -118,6 +120,16 @@ const columns: ColumnDefinition[] = [
     isJoistColumn: true,
     isJoined: true
   },
+  {
+    key: 'exact_city.state_code',
+    label: 'state_code',
+    type: 'text',
+    headerRow1Text: 'joist',
+    headerRow2Text: 'state_code',
+    readOnly: true,
+    isJoistColumn: true,
+    isJoined: true
+  },
   { 
     key: 'joist_metro_pop_placeholder', 
     label: 'metro pop', 
@@ -171,6 +183,13 @@ const columns: ColumnDefinition[] = [
     type: 'boolean',
     headerRow1Text: 'keywordshub',
     headerRow2Text: 'str.'
+  },
+  { 
+    key: 'is_chosen', 
+    label: 'is_chosen', 
+    type: 'boolean',
+    headerRow1Text: 'keywordshub',
+    headerRow2Text: 'cho.'
   },
   { key: 'keyword_datum', label: 'keyword_datum', type: 'text' },
   { key: 'competition', label: 'competition', type: 'text' },
@@ -384,6 +403,7 @@ interface KeywordsHubTableProps {
     DataForSEOActions: () => JSX.Element;
   }) => void;
   onSelectedRowsChange?: (selectedIds: number[]) => void;
+  onExportDataChange?: (data: { allFilteredData: any[]; selectedData: any[]; starredData: any[]; chosenData: any[]; columns: any[]; paginatedData: any[]; currentPage: number; itemsPerPage: number }) => void;
   searchVolumeFilter?: string;
   cpcFilter?: string;
   competitionFilter?: string;
@@ -457,6 +477,7 @@ export default function KeywordsHubTable({
   onMainPaginationRender,
   onTableActionsRender,
   onSelectedRowsChange,
+  onExportDataChange,
   searchVolumeFilter = 'all',
   cpcFilter = 'all',
   competitionFilter = 'all',
@@ -548,6 +569,7 @@ export default function KeywordsHubTable({
           exact_city:cities!rel_exact_city_id (
             classification,
             city_name,
+            state_code,
             city_population
           ),
           largest_city:cities!rel_largest_city_id (
@@ -873,8 +895,8 @@ export default function KeywordsHubTable({
   const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
   // Column pagination logic with sticky columns
-  const baseStickyKeys = ['serp_tool', 'keyword_id', 'is_starred', 'keyword_datum', 'search_volume', 'cpc'];
-  const joistColumnKeys = ['rel_exact_city_id', 'exact_city.classification', 'exact_city.city_name', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
+  const baseStickyKeys = ['serp_tool', 'keyword_id', 'is_starred', 'is_chosen', 'keyword_datum', 'search_volume', 'cpc'];
+  const joistColumnKeys = ['rel_exact_city_id', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
   const hoistColumnKeys = ['rel_largest_city_id', 'hoist_metro_pop_placeholder', 'largest_city.city_population'];
   
   // Filter columns based on joist and hoist toggles
@@ -886,7 +908,7 @@ export default function KeywordsHubTable({
     activeColumns = activeColumns.filter(col => !hoistColumnKeys.includes(col.key));
   }
   
-  // Build sticky column keys with joist and hoist columns inserted between keyword_id and is_starred/keyword_datum
+  // Build sticky column keys with joist and hoist columns inserted between keyword_id and is_starred/is_chosen/keyword_datum
   let stickyColumnKeys = [...baseStickyKeys.slice(0, 2)];
   if (showJoistColumns) {
     stickyColumnKeys = [...stickyColumnKeys, ...joistColumnKeys];
@@ -961,6 +983,19 @@ export default function KeywordsHubTable({
     window.addEventListener('force-select-all-in-filters', handleForceSelectAll);
     return () => window.removeEventListener('force-select-all-in-filters', handleForceSelectAll);
   }, [filteredAndSortedData]);
+
+  // Listen for force select specific keywords events from parent
+  useEffect(() => {
+    const handleForceSelectKeywords = (event: any) => {
+      const { keywordIds } = event.detail;
+      
+      // Clear existing selection and set new selection
+      setSelectedRows(new Set(keywordIds));
+    };
+
+    window.addEventListener('forceSelectKeywords', handleForceSelectKeywords);
+    return () => window.removeEventListener('forceSelectKeywords', handleForceSelectKeywords);
+  }, []);
 
   // Column Pagination Components - Define before use
   // Bar 1: Columns per page quantity selector
@@ -1261,6 +1296,38 @@ export default function KeywordsHubTable({
       // Revert optimistic update
       setData(prev => prev.map(row => 
         row.keyword_id === keywordId ? { ...row, is_starred: currentValue } : row
+      ));
+    }
+  };
+
+  const toggleChosen = async (keywordId: number, currentValue: boolean | null) => {
+    if (!userInternalId) return;
+    
+    const newValue = !currentValue;
+    
+    // Optimistically update UI immediately
+    setData(prev => prev.map(row => 
+      row.keyword_id === keywordId ? { ...row, is_chosen: newValue } : row
+    ));
+    
+    try {
+      const { error } = await supabase
+        .from('keywordshub')
+        .update({ is_chosen: newValue, last_updated_by: userInternalId })
+        .eq('keyword_id', keywordId);
+        
+      if (error) {
+        console.error('Error updating chosen:', error);
+        // Revert optimistic update
+        setData(prev => prev.map(row => 
+          row.keyword_id === keywordId ? { ...row, is_chosen: currentValue } : row
+        ));
+      }
+    } catch (err) {
+      console.error('Error updating chosen:', err);
+      // Revert optimistic update
+      setData(prev => prev.map(row => 
+        row.keyword_id === keywordId ? { ...row, is_chosen: currentValue } : row
       ));
     }
   };
@@ -1913,6 +1980,36 @@ export default function KeywordsHubTable({
       );
     }
 
+    // Special handling for chosen column
+    if (column.key === 'is_chosen') {
+      return (
+        <div className="px-2 py-1 flex items-center justify-center">
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleChosen(item.keyword_id, value as boolean | null);
+            }}
+            style={{ cursor: 'pointer', padding: '4px' }}
+            title={value ? "Click to unchoose" : "Click to choose"}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              style={{ color: value ? '#16a34a' : '#9ca3af' }}
+            >
+              <path
+                d="M12 2 L20 7 L16 19 L8 19 L4 7 Z"
+                fill={value ? 'currentColor' : 'white'}
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+            </svg>
+          </div>
+        </div>
+      );
+    }
+
     // Special handling for reverse lookup column
     if (column.key === 'reverse_lookup') {
       const cachedIds = item.cached_cncglub_ids;
@@ -1952,7 +2049,7 @@ export default function KeywordsHubTable({
       
       return (
         <div className="flex items-center justify-between space-x-2 px-2 py-1">
-          <div className="flex items-center space-x-2 flex-1">
+          <div className="flex items-center space-x-2">
             {status === 'completed' && (
               <>
                 <span className="text-green-600 text-base">✅</span>
@@ -2134,14 +2231,14 @@ export default function KeywordsHubTable({
     // Special handling for keyword_datum column to add copy button
     if (column.key === 'keyword_datum') {
       return (
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center space-x-1" style={{ whiteSpace: 'nowrap' }}>
           <button
             onClick={(e) => {
               e.stopPropagation();
               navigator.clipboard.writeText(value?.toString() || '');
             }}
-            className="flex-shrink-0 w-3 h-3 bg-gray-200 border border-gray-400 text-gray-600 text-[8px] flex items-center justify-center hover:bg-gray-300 transition-colors"
-            style={{ width: '12px', height: '12px', fontSize: '8px' }}
+            className="flex-shrink-0 bg-gray-200 border border-gray-400 text-gray-600 flex items-center justify-center hover:bg-gray-300 transition-colors"
+            style={{ width: '24px', height: '24px', fontSize: '14px' }}
             title={`Copy: ${value?.toString() || ''}`}
           >
             c
@@ -2149,10 +2246,47 @@ export default function KeywordsHubTable({
           <div
             className={cellClass}
             onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
-            style={{ flex: 1 }}
+            style={{ whiteSpace: 'nowrap' }}
           >
             {value?.toString() || ''}
           </div>
+        </div>
+      );
+    }
+
+    // Special handling for state_code column to add copy and maps buttons
+    if (column.key === 'exact_city.state_code') {
+      const cityName = item.exact_city?.city_name || '';
+      const stateCode = value?.toString() || '';
+      const fullLocation = `${cityName} ${stateCode}`.trim();
+      
+      return (
+        <div className="flex items-center space-x-1">
+          <div className="text-xs">
+            {stateCode}
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigator.clipboard.writeText(fullLocation.toLowerCase());
+            }}
+            className="flex-shrink-0 bg-gray-200 border border-gray-400 text-gray-600 flex items-center justify-center hover:bg-gray-300 transition-colors"
+            style={{ width: '26px', height: '26px', fontSize: '14px' }}
+            title={`Copy: ${fullLocation.toLowerCase()}`}
+          >
+            c
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullLocation)}`, '_blank');
+            }}
+            className="flex-shrink-0 bg-gray-200 border border-gray-400 text-gray-600 flex items-center justify-center hover:bg-gray-300 transition-colors"
+            style={{ width: '26px', height: '26px', fontSize: '14px' }}
+            title={`Open in Google Maps: ${fullLocation}`}
+          >
+            m
+          </button>
         </div>
       );
     }
@@ -2245,6 +2379,42 @@ export default function KeywordsHubTable({
       });
     }
   }, [onTableActionsRender, DataForSEOActions]);
+
+  // Pass export data to parent - recalculating dependencies internally to prevent infinite loops
+  useEffect(() => {
+    if (onExportDataChange && filteredAndSortedData.length >= 0) {
+      // Recalculate selectedData internally
+      const selectedData = filteredAndSortedData.filter(item => selectedRows.has(item.keyword_id));
+      const starredData = filteredAndSortedData.filter(item => item.is_starred === true);
+      const chosenData = filteredAndSortedData.filter(item => item.is_chosen === true);
+      
+      // Calculate current pagination data
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const currentPaginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+      
+      // Filter columns based on joist and hoist toggles
+      let currentActiveColumns = columns;
+      if (!showJoistColumns) {
+        const joistKeys = ['rel_exact_city_id', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
+        currentActiveColumns = currentActiveColumns.filter(col => !joistKeys.includes(col.key));
+      }
+      if (!showHoistColumns) {
+        const hoistKeys = ['rel_largest_city_id', 'hoist_metro_pop_placeholder', 'largest_city.city_population'];
+        currentActiveColumns = currentActiveColumns.filter(col => !hoistKeys.includes(col.key));
+      }
+      
+      onExportDataChange({
+        allFilteredData: filteredAndSortedData,
+        selectedData,
+        starredData,
+        chosenData,
+        columns: currentActiveColumns,
+        paginatedData: currentPaginatedData,
+        currentPage: currentPage,
+        itemsPerPage: itemsPerPage
+      });
+    }
+  }, [filteredAndSortedData, selectedRows, currentPage, itemsPerPage, showJoistColumns, showHoistColumns]);
 
   const SearchField = () => {
     return (
@@ -2431,9 +2601,9 @@ export default function KeywordsHubTable({
       
       <div className="h-full flex flex-col">
         {/* Table */}
-        <div className="flex-1 bg-white overflow-hidden w-full min-w-0">
-        <div className="h-full overflow-auto w-full">
-          <table className="border-collapse border border-gray-200 w-full max-w-full">
+        <div className="flex-1 bg-white overflow-hidden min-w-0">
+        <div className="h-full overflow-auto">
+          <table className="border-collapse border border-gray-200" style={{ width: 'auto', tableLayout: 'auto' }}>
             <thead className="bg-gray-50 sticky top-0">
               {/* First header row */}
               <tr>
@@ -2514,7 +2684,7 @@ export default function KeywordsHubTable({
             </thead>
             <tbody className="bg-white">
               {paginatedData.map((item) => (
-                <tr key={item.keyword_id} className="hover:bg-gray-50">
+                <tr key={item.keyword_id} className={`hover:bg-gray-50 ${selectedRows.has(item.keyword_id) ? '' : ''}`} style={selectedRows.has(item.keyword_id) ? { backgroundColor: '#cfdff8' } : {}}>
                   <td className="px-2 py-2 border border-gray-200">
                     <div 
                       className="w-full h-full flex items-center justify-center cursor-pointer"
