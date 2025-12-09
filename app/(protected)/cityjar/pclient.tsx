@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import CityjarTable from './components/CityjarTable';
 import ExportButton from './components/ExportButton';
 import ClassificationFilter from './components/ClassificationFilter';
+import CountryFilter from './components/CountryFilter';
 
 const DrenjariButtonBarDriggsmanLinks = dynamic(
   () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
@@ -17,6 +18,7 @@ export default function CityjarClient() {
   const { user } = useAuth();
   const router = useRouter();
   const [classificationFilter, setClassificationFilter] = useState('all');
+  const [countryFilter, setCountryFilter] = useState('us');
 
   useEffect(() => {
     if (!user) {
@@ -47,6 +49,10 @@ export default function CityjarClient() {
               value={classificationFilter}
               onChange={setClassificationFilter}
             />
+            <CountryFilter 
+              value={countryFilter}
+              onChange={setCountryFilter}
+            />
           </div>
           <div className="flex items-center space-x-4">
             <DrenjariButtonBarDriggsmanLinks />
@@ -60,7 +66,7 @@ export default function CityjarClient() {
 
       {/* Main Content - Full Width CityjarTable */}
       <div className="flex-1 overflow-hidden">
-        <CityjarTable classificationFilter={classificationFilter} />
+        <CityjarTable classificationFilter={classificationFilter} countryFilter={countryFilter} />
       </div>
     </div>
   );

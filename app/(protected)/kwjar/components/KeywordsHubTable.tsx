@@ -13,6 +13,7 @@ interface KeywordRecord {
   cpc: number | null;
   semrush_volume: number | null;
   rel_dfs_location_code: number | null;
+  country_code_internal: string | null;
   location_display_name: string | null;
   location_coordinate: string | null;
   language_code: string | null;
@@ -49,6 +50,7 @@ interface KeywordRecord {
     classification: string | null;
     city_name: string | null;
     state_code: string | null;
+    state_full: string | null;
     city_population: number | null;
   } | null;
   // Cache staleness tracking
@@ -103,10 +105,10 @@ const columns: ColumnDefinition[] = [
   {
     key: 'exact_city.classification',
     label: 'classification',
-    type: 'text',
+    type: 'classification_dropdown',
     headerRow1Text: 'joist',
     headerRow2Text: 'classification',
-    readOnly: true,
+    readOnly: false,
     isJoistColumn: true,
     isJoined: true
   },
@@ -129,6 +131,16 @@ const columns: ColumnDefinition[] = [
     readOnly: true,
     isJoistColumn: true,
     isJoined: true
+  },
+  {
+    key: 'map_actions',
+    label: 'map',
+    type: 'map',
+    headerRow1Text: 'joist',
+    headerRow2Text: 'map',
+    readOnly: true,
+    isJoistColumn: true,
+    width: '80px'
   },
   { 
     key: 'joist_metro_pop_placeholder', 
@@ -380,6 +392,13 @@ const columns: ColumnDefinition[] = [
     headerRow1Text: 'zone',
     headerRow2Text: '51-100',
     readOnly: true
+  },
+  { 
+    key: 'country_code_internal', 
+    label: 'country_code_internal', 
+    type: 'text',
+    headerRow1Text: 'keywordshub',
+    headerRow2Text: 'country_code_internal'
   }
 ];
 
@@ -411,6 +430,36 @@ interface KeywordsHubTableProps {
   exactCityPopulationFilter?: string;
   largestCityPopulationFilter?: string;
   cityClassificationFilter?: string;
+}
+
+// Helper function to get Google domain based on country code
+function getGoogleDomain(countryCode: string | null): string {
+  if (!countryCode) return 'google.com';
+  
+  const domainMap: { [key: string]: string } = {
+    'ca': 'google.ca',
+    'uk': 'google.co.uk',
+    'za': 'google.co.za',
+    'nz': 'google.co.nz',
+    'us': 'google.com'
+  };
+  
+  return domainMap[countryCode.toLowerCase()] || 'google.com';
+}
+
+// Helper function to get SEMrush database code based on country code
+function getSemrushDbCode(countryCode: string | null): string {
+  if (!countryCode) return 'us';
+  
+  const dbMap: { [key: string]: string } = {
+    'ca': 'ca',
+    'uk': 'uk', 
+    'za': 'za',
+    'nz': 'nz',
+    'us': 'us'
+  };
+  
+  return dbMap[countryCode.toLowerCase()] || 'us';
 }
 
 // Helper function to format relative time
@@ -570,6 +619,7 @@ export default function KeywordsHubTable({
             classification,
             city_name,
             state_code,
+            state_full,
             city_population
           ),
           largest_city:cities!rel_largest_city_id (
@@ -896,7 +946,7 @@ export default function KeywordsHubTable({
 
   // Column pagination logic with sticky columns
   const baseStickyKeys = ['serp_tool', 'keyword_id', 'is_starred', 'is_chosen', 'keyword_datum', 'search_volume', 'cpc'];
-  const joistColumnKeys = ['rel_exact_city_id', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
+  const joistColumnKeys = ['rel_exact_city_id', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'map_actions', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
   const hoistColumnKeys = ['rel_largest_city_id', 'hoist_metro_pop_placeholder', 'largest_city.city_population'];
   
   // Filter columns based on joist and hoist toggles
@@ -1225,6 +1275,11 @@ export default function KeywordsHubTable({
 
   const saveEdit = async () => {
     if (!editingCell || !userInternalId) return;
+    
+    // Skip saveEdit for classification field as it's handled by its own dropdown
+    if (editingCell.field === 'exact_city.classification') {
+      return;
+    }
     
     try {
       let value: any = editingValue;
@@ -1738,7 +1793,7 @@ export default function KeywordsHubTable({
     const isEditing = editingCell?.id === item.keyword_id && editingCell?.field === column.key;
     const isReadOnly = column.readOnly || column.key === 'keyword_id' || column.key === 'created_at' || column.key === 'updated_at';
 
-    if (isEditing && !isReadOnly) {
+    if (isEditing && !isReadOnly && column.key !== 'exact_city.classification') {
       return (
         <div className="flex items-center space-x-2">
           <input
@@ -1923,7 +1978,7 @@ export default function KeywordsHubTable({
             s
           </a>
           <a
-            href={`https://www.google.com/search?q=${encodeURIComponent(item.keyword_datum || '').replace(/%20/g, '+')}`}
+            href={`https://www.${getGoogleDomain(item.country_code_internal)}/search?q=${encodeURIComponent(item.keyword_datum || '').replace(/%20/g, '+')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-4 h-4 bg-black text-white font-bold text-xs flex items-center justify-center hover:bg-gray-800 transition-colors no-underline inline-block"
@@ -1933,7 +1988,7 @@ export default function KeywordsHubTable({
             g
           </a>
           <a
-            href={`https://www.semrush.com/analytics/keywordoverview/?q=${encodeURIComponent(item.keyword_datum || '').replace(/%20/g, '+')}&db=us`}
+            href={`https://www.semrush.com/analytics/keywordoverview/?q=${encodeURIComponent(item.keyword_datum || '').replace(/%20/g, '+')}&db=${getSemrushDbCode(item.country_code_internal)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-4 h-4 bg-black flex items-center justify-center hover:bg-gray-800 transition-colors no-underline inline-block"
@@ -2291,6 +2346,140 @@ export default function KeywordsHubTable({
       );
     }
 
+    // Special handling for classification column with custom dropdown
+    if (column.key === 'exact_city.classification') {
+      const classificationOptions = ['principal_city', 'formidable_suburb', 'smaller_suburb'];
+      const currentValue = value?.toString() || '';
+      const isEditingClassification = editingCell?.id === item.keyword_id && editingCell?.field === column.key;
+      
+      if (isEditingClassification) {
+        // Show horizontal dropdown when editing
+        return (
+          <div className="flex items-center space-x-1" style={{ minWidth: '300px' }}>
+            {classificationOptions.map((option) => (
+              <button
+                key={option}
+                onClick={async () => {
+                  // Update the cities table directly
+                  try {
+                    if (!item.rel_exact_city_id) return;
+                    
+                    const { error } = await supabase
+                      .from('cities')
+                      .update({ classification: option })
+                      .eq('city_id', item.rel_exact_city_id);
+
+                    if (error) throw error;
+
+                    // Update local data
+                    setData(prevData => 
+                      prevData.map(dataItem => 
+                        dataItem.keyword_id === item.keyword_id 
+                          ? { 
+                              ...dataItem, 
+                              exact_city: dataItem.exact_city ? 
+                                { ...dataItem.exact_city, classification: option } : 
+                                dataItem.exact_city,
+                              updated_at: new Date().toISOString() 
+                            }
+                          : dataItem
+                      )
+                    );
+
+                    setEditingCell(null);
+                  } catch (error) {
+                    console.error('Error updating classification:', error);
+                    alert('Failed to update classification');
+                  }
+                }}
+                className={`px-3 py-1 text-xs rounded font-medium transition-colors flex items-center ${
+                  option === 'principal_city' 
+                    ? 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                    : option === 'formidable_suburb'
+                    ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                    : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+                }`}
+              >
+                {currentValue === option && (
+                  <span className="mr-1 text-yellow-500">⭐</span>
+                )}
+                {option}
+              </button>
+            ))}
+            <button
+              onClick={() => setEditingCell(null)}
+              className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700"
+              title="Cancel"
+            >
+              ✕
+            </button>
+          </div>
+        );
+      }
+      
+      // Normal display mode
+      return (
+        <div
+          className={cellClass}
+          onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
+          style={{ cursor: isReadOnly ? 'default' : 'pointer' }}
+        >
+          {currentValue || ''}
+        </div>
+      );
+    }
+
+    // Special handling for map_actions column
+    if (column.key === 'map_actions') {
+      const cityName = item.exact_city?.city_name || '';
+      const stateFull = item.exact_city?.state_full || '';
+      
+      // Generate Google Maps URL using city_name and state_full (same as cityjar logic)
+      const generateGoogleMapsUrl = (city: string, state: string) => {
+        if (!city || !state) return '';
+        const searchQuery = `${city} ${state}`.replace(/\s+/g, ' ').trim();
+        return `https://www.google.com/maps/place/${encodeURIComponent(searchQuery)}`;
+      };
+      
+      const generatedUrl = generateGoogleMapsUrl(cityName, stateFull);
+      
+      return (
+        <div className="flex items-center space-x-1" style={{ width: '80px', maxWidth: '80px', minWidth: '80px' }}>
+          {/* Copy button (like cityjar) */}
+          <button
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (generatedUrl) {
+                try {
+                  await navigator.clipboard.writeText(generatedUrl);
+                } catch (err) {
+                  console.error('Failed to copy to clipboard:', err);
+                }
+              }
+            }}
+            className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-bold flex items-center justify-center"
+            title="Copy Google Maps link to clipboard"
+          >
+            📋
+          </button>
+          
+          {/* Open button (like cityjar) */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (generatedUrl) {
+                window.open(generatedUrl, '_blank');
+              }
+            }}
+            className="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-bold flex items-center justify-center"
+            title="Open in Google Maps"
+          >
+            OP
+          </button>
+        </div>
+      );
+    }
+
     return (
       <div
         className={cellClass}
@@ -2325,7 +2514,7 @@ export default function KeywordsHubTable({
             : 'bg-blue-600 text-white hover:bg-blue-700'
         }`}
       >
-        {bulkRefreshing ? 'Processing...' : 'Refresh Metrics'}
+        {bulkRefreshing ? 'Processing...' : 'f12 refresh dfs metrics'}
       </button>
 
       {/* Only Refresh Blanks Button */}
@@ -2395,7 +2584,7 @@ export default function KeywordsHubTable({
       // Filter columns based on joist and hoist toggles
       let currentActiveColumns = columns;
       if (!showJoistColumns) {
-        const joistKeys = ['rel_exact_city_id', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
+        const joistKeys = ['rel_exact_city_id', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'map_actions', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
         currentActiveColumns = currentActiveColumns.filter(col => !joistKeys.includes(col.key));
       }
       if (!showHoistColumns) {

@@ -17,6 +17,7 @@ interface KeywordTag {
   created_at: string;
   updated_at: string;
   user_id: string;
+  is_starred: boolean | null;
   keyword_count?: number;
 }
 
@@ -32,11 +33,12 @@ const columns = [
   { key: 'filter', label: 'Filter', type: 'action', width: '80px' },
   { key: 'tag_id', label: 'tag_id', type: 'number', width: '80px' },
   { key: 'tag_name', label: 'tag_name', type: 'text', width: '200px' },
+  { key: 'is_starred', label: 'str.', type: 'star', width: '60px', headerRow1Text: 'keywordshub_tags', headerRow2Text: 'str.' },
   { key: 'tag_order', label: 'tag_order', type: 'number', width: '100px' },
   { key: 'created_at', label: 'created_at', type: 'datetime', width: '180px' },
   { key: 'updated_at', label: 'updated_at', type: 'datetime', width: '180px' },
   { key: 'user_id', label: 'user_id', type: 'text', width: '200px' }
-];
+] as const;
 
 export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selectedTag }: TagsPlenchPopupProps) {
   const { user } = useAuth();
@@ -178,6 +180,46 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
     onSelectTag({ tag_id: tag.tag_id, tag_name: tag.tag_name });
   };
 
+  // Handle star toggle
+  const toggleStar = async (tagId: number, currentValue: boolean | null) => {
+    if (!userInternalId) return;
+    
+    const newValue = !currentValue;
+    
+    // Optimistically update the UI
+    setData(prev => 
+      prev.map(tag => 
+        tag.tag_id === tagId ? { ...tag, is_starred: newValue } : tag
+      )
+    );
+
+    try {
+      const { error } = await supabase
+        .from('keywordshub_tags')
+        .update({ is_starred: newValue })
+        .eq('tag_id', tagId)
+        .eq('user_id', userInternalId);
+
+      if (error) {
+        console.error('Error updating tag star status:', error);
+        // Revert on error
+        setData(prev => 
+          prev.map(tag => 
+            tag.tag_id === tagId ? { ...tag, is_starred: currentValue } : tag
+          )
+        );
+      }
+    } catch (err) {
+      console.error('Error toggling star:', err);
+      // Revert on error
+      setData(prev => 
+        prev.map(tag => 
+          tag.tag_id === tagId ? { ...tag, is_starred: currentValue } : tag
+        )
+      );
+    }
+  };
+
   // Render cell content
   const renderCell = (item: KeywordTag, column: typeof columns[0]) => {
     if (column.key === 'filter') {
@@ -188,6 +230,37 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
         >
           filter
         </button>
+      );
+    }
+
+    // Special handling for star column (same as KeywordsHubTable)
+    if (column.key === 'is_starred') {
+      const value = item.is_starred;
+      return (
+        <div className="px-2 py-1 flex items-center justify-center">
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleStar(item.tag_id, value);
+            }}
+            style={{ cursor: 'pointer', padding: '4px' }}
+            title={value ? "Click to unstar" : "Click to star"}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              style={{ color: value ? '#dc2626' : '#9ca3af' }}
+            >
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                fill={value ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+            </svg>
+          </div>
+        </div>
       );
     }
 
@@ -287,7 +360,9 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
                         className="px-2 py-3 text-left border border-gray-200 bg-[#bcc4f1]"
                         style={{ width: column.width }}
                       >
-                        <span className="font-bold text-xs">keywordshub_tags</span>
+                        <span className="font-bold text-xs">
+                          {column.headerRow1Text || 'keywordshub_tags'}
+                        </span>
                       </th>
                     ))}
                   </tr>
@@ -297,14 +372,16 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
                       <th
                         key={column.key}
                         className={`px-2 py-3 text-left border border-gray-200 ${
-                          column.key === 'filter' ? '' : 'cursor-pointer hover:bg-gray-100'
+                          column.key === 'filter' || column.key === 'is_starred' ? '' : 'cursor-pointer hover:bg-gray-100'
                         }`}
                         style={{ width: column.width }}
-                        onClick={() => column.key !== 'filter' && handleSort(column.key as keyof KeywordTag)}
+                        onClick={() => column.key !== 'filter' && column.key !== 'is_starred' && handleSort(column.key as keyof KeywordTag)}
                       >
                         <div className="flex items-center space-x-1">
-                          <span className="font-bold text-xs lowercase">{column.label}</span>
-                          {column.key !== 'filter' && sortField === column.key && (
+                          <span className="font-bold text-xs lowercase">
+                            {column.headerRow2Text || column.label}
+                          </span>
+                          {column.key !== 'filter' && column.key !== 'is_starred' && sortField === column.key && (
                             <span className="text-xs">
                               {sortOrder === 'asc' ? '↑' : '↓'}
                             </span>

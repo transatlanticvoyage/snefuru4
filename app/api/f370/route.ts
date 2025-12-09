@@ -6,6 +6,20 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+// Helper function to convert country name to internal country code
+function getCountryCodeInternal(countryName: string): string {
+  const countryMapping: { [key: string]: string } = {
+    'United States': 'us',
+    'Canada': 'ca',
+    'Australia': 'au',
+    'United Kingdom': 'uk',
+    'South Africa': 'za',
+    'New Zealand': 'nz'
+  };
+  
+  return countryMapping[countryName] || countryName.toLowerCase().substring(0, 2);
+}
+
 export async function POST(request: NextRequest) {
   // Add timeout protection - kill process after 10 minutes
   const timeoutId = setTimeout(() => {
@@ -32,8 +46,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User internal ID is required' }, { status: 400 });
     }
 
+    // Get country code for keywords
+    const countryCodeInternal = getCountryCodeInternal(country);
+
     console.log('F370 Filters applied:', {
       country,
+      countryCodeInternal,
       industry_id,
       city_population_filter,
       kwslot,
@@ -254,7 +272,8 @@ export async function POST(request: NextRequest) {
             rel_industry_id: (industry_id === 'none') ? null : row.rel_industry_id,
             cached_city_name: city.city_name,
             rel_exact_city_id,
-            rel_largest_city_id
+            rel_largest_city_id,
+            country_code_internal: countryCodeInternal
           })
           .eq('keyword_id', keywordId);
       } else {
@@ -269,7 +288,8 @@ export async function POST(request: NextRequest) {
             rel_industry_id: (industry_id === 'none') ? null : row.rel_industry_id,
             cached_city_name: city.city_name,
             rel_exact_city_id,
-            rel_largest_city_id
+            rel_largest_city_id,
+            country_code_internal: countryCodeInternal
           })
           .select('keyword_id')
           .single();

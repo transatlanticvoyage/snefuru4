@@ -33,9 +33,10 @@ interface City {
 
 interface CityjarTableProps {
   classificationFilter?: string;
+  countryFilter?: string;
 }
 
-export default function CityjarTable({ classificationFilter = 'all' }: CityjarTableProps) {
+export default function CityjarTable({ classificationFilter = 'all', countryFilter = 'us' }: CityjarTableProps) {
   const [data, setData] = useState<City[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +81,7 @@ export default function CityjarTable({ classificationFilter = 'all' }: CityjarTa
     { key: 'state_full' as keyof City, label: 'state_full', type: 'text' },
     { key: 'country' as keyof City, label: 'country', type: 'text' },
     { key: 'rank_in_pop' as keyof City, label: 'rank_in_pop', type: 'number' },
-    { key: 'gmaps_link' as keyof City, label: 'gmaps_link', type: 'text', width: '100px' },
+    { key: 'gmaps_link' as keyof City, label: 'gmaps_link', type: 'text', width: '100px', readOnly: true },
     { key: 'classification' as keyof City, label: 'classification', type: 'text' },
     { key: 'is_suburb' as keyof City, label: 'is_suburb', type: 'boolean' },
     { key: 'city_and_state_code' as keyof City, label: 'city_and_state_code', type: 'text' },
@@ -129,6 +130,26 @@ export default function CityjarTable({ classificationFilter = 'all' }: CityjarTa
       );
     }
     
+    // Apply country filter
+    if (countryFilter) {
+      // Map filter values to actual country names
+      const countryMapping: { [key: string]: string } = {
+        'us': 'united states',
+        'ca': 'canada', 
+        'uk': 'united kingdom',
+        'nz': 'new zealand',
+        'za': 'south africa',
+        'au': 'australia'
+      };
+      
+      const targetCountry = countryMapping[countryFilter.toLowerCase()];
+      if (targetCountry) {
+        filtered = filtered.filter(item => 
+          item.country?.toLowerCase() === targetCountry
+        );
+      }
+    }
+    
     // Apply search term filter
     if (searchTerm) {
       filtered = filtered.filter(item => 
@@ -150,7 +171,7 @@ export default function CityjarTable({ classificationFilter = 'all' }: CityjarTa
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [data, searchTerm, sortField, sortOrder, classificationFilter]);
+  }, [data, searchTerm, sortField, sortOrder, classificationFilter, countryFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage));
@@ -395,15 +416,24 @@ export default function CityjarTable({ classificationFilter = 'all' }: CityjarTa
 
     // Special handling for gmaps_link column
     if (column.key === 'gmaps_link') {
+      // Generate Google Maps URL dynamically
+      const generateGoogleMapsUrl = (cityName: string | null, stateFull: string | null) => {
+        if (!cityName || !stateFull) return '';
+        const searchQuery = `${cityName} ${stateFull}`.replace(/\s+/g, ' ').trim();
+        return `https://www.google.com/maps/place/${encodeURIComponent(searchQuery)}`;
+      };
+      
+      const generatedUrl = generateGoogleMapsUrl(item.city_name, item.state_full);
+      
       return (
         <div className="flex items-center space-x-1" style={{ width: '100px', maxWidth: '100px', minWidth: '100px' }}>
           {/* Copy button */}
           <button
             onClick={async (e) => {
               e.stopPropagation();
-              if (value) {
+              if (generatedUrl) {
                 try {
-                  await navigator.clipboard.writeText(value.toString());
+                  await navigator.clipboard.writeText(generatedUrl);
                   // You could add a toast notification here
                 } catch (err) {
                   console.error('Failed to copy to clipboard:', err);
@@ -411,7 +441,7 @@ export default function CityjarTable({ classificationFilter = 'all' }: CityjarTa
               }
             }}
             className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-bold flex items-center justify-center"
-            title="Copy to clipboard"
+            title="Copy Google Maps link to clipboard"
           >
             📋
           </button>
@@ -420,24 +450,22 @@ export default function CityjarTable({ classificationFilter = 'all' }: CityjarTa
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if (value) {
-                window.open(value.toString(), '_blank');
+              if (generatedUrl) {
+                window.open(generatedUrl, '_blank');
               }
             }}
             className="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-bold flex items-center justify-center"
-            title="Open in new tab"
+            title="Open in Google Maps"
           >
             OP
           </button>
           
-          {/* Editable text area */}
+          {/* Map icon instead of text */}
           <div
-            onClick={() => handleCellClick(item.city_id, column.key, value)}
-            className={`cursor-pointer hover:bg-gray-100 px-1 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'} truncate overflow-hidden whitespace-nowrap`}
-            style={{ width: '46px', maxWidth: '46px', minWidth: '46px' }}
-            title={value?.toString() || ''}
+            className="w-6 h-6 bg-gray-200 hover:bg-gray-300 rounded text-xs font-bold flex items-center justify-center cursor-pointer"
+            title={`Google Maps: ${item.city_name} ${item.state_full}`}
           >
-            {value?.toString() || ''}
+            🗺️
           </div>
         </div>
       );

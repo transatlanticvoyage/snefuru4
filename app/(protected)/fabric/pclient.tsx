@@ -27,7 +27,7 @@ export default function FabricClient() {
   const [formData, setFormData] = useState({
     country: 'United States',
     industry_id: '',
-    city_population_filter: 'all',
+    city_population_filter: '35k-325k',
     kwslot: 'kwslot1',
     kw_rubric: 'deck builder (city_name) (state_code)',
     rel_dfs_location_code: '2840',
@@ -83,6 +83,17 @@ export default function FabricClient() {
 
       if (!error && data) {
         setIndustries(data);
+        
+        // Set default industry to "air duct cleaning" if it exists
+        const airDuctIndustry = data.find(industry => 
+          industry.industry_name.toLowerCase() === 'air duct cleaning'
+        );
+        if (airDuctIndustry && formData.industry_id === '') {
+          setFormData(prev => ({
+            ...prev,
+            industry_id: airDuctIndustry.industry_id.toString()
+          }));
+        }
       }
     };
 
@@ -399,7 +410,7 @@ export default function FabricClient() {
                         <span className="font-bold">cncglub option - select country</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
+                    <td className="border border-gray-300 p-3 min-w-[480px] border-t-black border-t-[4px]">
                       <select 
                         className="w-full px-2 py-1 border border-gray-300 rounded" 
                         value={formData.country}
@@ -432,7 +443,7 @@ export default function FabricClient() {
                         <span className="font-bold">cncglub option - select industry</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3">
+                    <td className="border border-gray-300 p-3 min-w-[480px]">
                       <select 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
                         value={formData.industry_id}
@@ -451,9 +462,36 @@ export default function FabricClient() {
                     <td className="border border-gray-300 p-3"></td>
                     <td className="border border-gray-300 p-3"></td>
                   </tr>
-                  {/* Row 3 */}
+                  {/* Row 3 - New country selection row */}
                   <tr>
                     <td className="border border-gray-300 p-3 bg-gray-200">3</td>
+                    <td className="border border-gray-300 p-3">
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
+                          onClick={() => navigator.clipboard.writeText('new - country to select cities from')}
+                          title="Copy to clipboard"
+                        >
+                          ⧉
+                        </button>
+                        <span className="font-bold">new - country to select cities from</span>
+                      </div>
+                    </td>
+                    <td className="border border-gray-300 p-3 min-w-[480px]">
+                      <select 
+                        className="w-full px-2 py-1 border border-gray-300 rounded"
+                        disabled
+                      >
+                        <option value="">dropdown waiting to be implemented</option>
+                      </select>
+                    </td>
+                    <td className="border border-gray-300 p-3"></td>
+                    <td className="border border-gray-300 p-3"></td>
+                    <td className="border border-gray-300 p-3"></td>
+                  </tr>
+                  {/* Row 4 */}
+                  <tr>
+                    <td className="border border-gray-300 p-3 bg-gray-200">4</td>
                     <td className="border border-gray-300 p-3">
                       <div className="flex items-center space-x-2">
                         <button 
@@ -466,7 +504,7 @@ export default function FabricClient() {
                         <span className="font-bold">cncglub option - select cities</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3">
+                    <td className="border border-gray-300 p-3 min-w-[480px]">
                       <select 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
                         value={formData.city_population_filter}
@@ -489,9 +527,9 @@ export default function FabricClient() {
                     <td className="border border-gray-300 p-3"></td>
                     <td className="border border-gray-300 p-3"></td>
                   </tr>
-                  {/* Row 4 */}
+                  {/* Row 5 */}
                   <tr>
-                    <td className="border border-gray-300 p-3 bg-gray-200 border-t-black border-t-[4px]">4</td>
+                    <td className="border border-gray-300 p-3 bg-gray-200 border-t-black border-t-[4px]">5</td>
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
                       <div className="flex items-center space-x-2">
                         <button 
@@ -504,7 +542,7 @@ export default function FabricClient() {
                         <span className="font-bold">kwslot option - kwslot to populate</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
+                    <td className="border border-gray-300 p-3 min-w-[480px] border-t-black border-t-[4px]">
                       <select 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
                         value={formData.kwslot}
@@ -527,9 +565,9 @@ export default function FabricClient() {
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
                   </tr>
-                  {/* Row 5 */}
+                  {/* Row 6 */}
                   <tr>
-                    <td className="border border-gray-300 p-3 bg-gray-200 border-t-black border-t-[4px]">5</td>
+                    <td className="border border-gray-300 p-3 bg-gray-200 border-t-black border-t-[4px]">6</td>
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
                       <div className="flex items-center space-x-2">
                         <button 
@@ -542,11 +580,11 @@ export default function FabricClient() {
                         <span className="font-bold">kwhub option - kw rubric</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-80 border-t-black border-t-[4px]">
+                    <td className="border border-gray-300 p-3 min-w-[480px] border-t-black border-t-[4px]">
                       <input 
                         type="text" 
                         placeholder="deck builder (city_name) (state_code)"
-                        className="w-full px-2 py-1 border border-gray-300 rounded min-w-72"
+                        className="w-full px-2 py-1 border border-gray-300 rounded min-w-[440px]"
                         value={formData.kw_rubric}
                         onChange={(e) => handleInputChange('kw_rubric', e.target.value)}
                       />
@@ -555,9 +593,9 @@ export default function FabricClient() {
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
                   </tr>
-                  {/* Row 6 */}
+                  {/* Row 7 */}
                   <tr>
-                    <td className="border border-gray-300 p-3 bg-gray-200">6</td>
+                    <td className="border border-gray-300 p-3 bg-gray-200">7</td>
                     <td className="border border-gray-300 p-3">
                       <div className="flex items-center space-x-2">
                         <button 
@@ -570,7 +608,7 @@ export default function FabricClient() {
                         <span className="font-bold">kwhub option - rel_dfs_location_code</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3">
+                    <td className="border border-gray-300 p-3 min-w-[480px]">
                       <input 
                         type="text" 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
@@ -582,9 +620,9 @@ export default function FabricClient() {
                     <td className="border border-gray-300 p-3"></td>
                     <td className="border border-gray-300 p-3"></td>
                   </tr>
-                  {/* Row 7 */}
+                  {/* Row 8 */}
                   <tr>
-                    <td className="border border-gray-300 p-3 bg-gray-200 border-b-black border-b-[4px]">7</td>
+                    <td className="border border-gray-300 p-3 bg-gray-200 border-b-black border-b-[4px]">8</td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
                       <div className="flex items-center space-x-2">
                         <button 
@@ -597,7 +635,7 @@ export default function FabricClient() {
                         <span className="font-bold">kwhub option - language_code</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
+                    <td className="border border-gray-300 p-3 min-w-[480px] border-b-black border-b-[4px]">
                       <input 
                         type="text" 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
@@ -609,9 +647,9 @@ export default function FabricClient() {
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]"></td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]"></td>
                   </tr>
-                  {/* Row 8 */}
+                  {/* Row 9 */}
                   <tr>
-                    <td className="border border-gray-300 p-3 bg-gray-200 border-b-black border-b-[4px]">8</td>
+                    <td className="border border-gray-300 p-3 bg-gray-200 border-b-black border-b-[4px]">9</td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
                       <div className="flex items-center space-x-2">
                         <button 
@@ -624,7 +662,7 @@ export default function FabricClient() {
                         <span className="font-bold">tag option - keywordshub_tags.tag_name</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
+                    <td className="border border-gray-300 p-3 min-w-[480px] border-b-black border-b-[4px]">
                       <input 
                         type="text" 
                         placeholder="deck cncs 1"

@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     console.log(`🔄 [${new Date().toISOString()}] Starting bulk refresh API request...`);
     
-    const { keyword_ids, field } = await request.json();
+    const { keyword_ids, field, retry_report_id, tag_id, tag_name } = await request.json();
     const parseTime = Date.now() - startTime;
     console.log(`📋 Request parsed in ${parseTime}ms - ${keyword_ids?.length || 0} keyword IDs received`);
 
@@ -46,6 +46,51 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`🔄 Starting bulk DataForSEO refresh for ${keyword_ids.length} keywords (${field})`);
+
+    // Create DFS fetch report entry
+    let reportId = null;
+    if (!retry_report_id) {
+      try {
+        console.log('📝 Creating DFS fetch report entry...');
+        const { data: reportData, error: reportError } = await supabase
+          .from('dfs_fetch_reports')
+          .insert({
+            tag_id: tag_id || null,
+            tag_name: tag_name || null,
+            total_keywords: keyword_ids.length,
+            keywords_submitted: keyword_ids.map(String),
+            status: 'pending',
+            processing_started_at: new Date().toISOString()
+          })
+          .select('report_id')
+          .single();
+
+        if (reportError) {
+          console.error('❌ Error creating report entry:', reportError);
+        } else {
+          reportId = reportData?.report_id;
+          console.log(`✅ Created DFS fetch report with ID: ${reportId}`);
+        }
+      } catch (err) {
+        console.error('❌ Error creating report entry:', err);
+      }
+    } else {
+      reportId = retry_report_id;
+      console.log(`🔄 Using existing report ID for retry: ${reportId}`);
+      
+      // Update existing report for retry
+      await supabase
+        .from('dfs_fetch_reports')
+        .update({
+          status: 'processing',
+          processing_started_at: new Date().toISOString(),
+          keywords_processed: 0,
+          keywords_succeeded: 0,
+          keywords_failed: 0,
+          error_details: null
+        })
+        .eq('report_id', reportId);
+    }
 
     // Get the keyword records
     const dbStartTime = Date.now();
@@ -273,11 +318,32 @@ export async function POST(request: NextRequest) {
     console.log(`   - Processing time: ${processingTime}ms (${(processingTime / 1000).toFixed(1)}s)`);
     console.log(`   - Total API time: ${totalTime}ms (${(totalTime / 1000).toFixed(1)}s)`);
 
+    // Update report status based on initial results
+    if (reportId) {
+      const status = errors.length === 0 ? 'processing' : 
+                    taskIds.length === 0 ? 'failed' : 'partial';
+      
+      await supabase
+        .from('dfs_fetch_reports')
+        .update({
+          status: status,
+          keywords_processed: taskIds.length > 0 ? 0 : keyword_ids.length,
+          keywords_succeeded: 0,
+          keywords_failed: errors.length > 0 ? keyword_ids.length - taskIds.reduce((sum, t) => sum + t.keyword_ids.length, 0) : 0,
+          dfs_task_ids: taskIds.map(t => t.task_id),
+          dfs_credits_used: taskIds.length * 0.004, // Estimate: $0.004 per keyword
+          error_details: errors.length > 0 ? Object.fromEntries(
+            errors.map((err, index) => [`error_${index}`, err])
+          ) : null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('report_id', reportId);
+    }
+
     // Start a background process to check and update results
-    // For now, we'll just return the task IDs and let the user refresh manually
     setTimeout(async () => {
       console.log('🔄 Starting background task result retrieval...');
-      await retrieveAndUpdateResults(taskIds, supabase, username!, password!);
+      await retrieveAndUpdateResults(taskIds, supabase, username!, password!, reportId);
     }, 10000); // Check after 10 seconds
 
     return NextResponse.json({
@@ -301,11 +367,32 @@ export async function POST(request: NextRequest) {
           }
         }
       },
-      errors: errors.length > 0 ? errors : undefined
+      errors: errors.length > 0 ? errors : undefined,
+      report_id: reportId
     });
 
   } catch (error) {
     console.error('❌ DataForSEO bulk refresh failed:', error);
+    
+    // Update report status to failed if we created one
+    if (reportId) {
+      try {
+        await supabase
+          .from('dfs_fetch_reports')
+          .update({
+            status: 'failed',
+            error_details: {
+              error: 'Bulk refresh startup failed',
+              details: error instanceof Error ? error.message : 'Unknown error'
+            },
+            updated_at: new Date().toISOString()
+          })
+          .eq('report_id', reportId);
+      } catch (updateError) {
+        console.error('❌ Failed to update report status on error:', updateError);
+      }
+    }
+    
     return NextResponse.json(
       { 
         error: 'Failed to start bulk refresh', 
@@ -322,6 +409,7 @@ async function retrieveAndUpdateResults(
   supabase: any,
   username: string,
   password: string,
+  reportId?: number | null,
   maxRetries: number = 3
 ) {
   console.log(`🔍 [BULK BACKGROUND] Retrieving results for ${taskIds.length} tasks...`);
@@ -498,5 +586,59 @@ async function retrieveAndUpdateResults(
       task_id: t.task_id, 
       keywords: t.keywords 
     })));
+  }
+
+  // Update final report status
+  if (reportId) {
+    const totalKeywords = taskIds.reduce((sum, t) => sum + t.keyword_ids.length, 0);
+    const keywordsSucceeded = completedCount;
+    const keywordsFailed = totalKeywords - completedCount;
+    
+    let finalStatus: 'completed' | 'failed' | 'partial';
+    if (completedCount === taskIds.length) {
+      finalStatus = 'completed';
+    } else if (completedCount === 0) {
+      finalStatus = 'failed';
+    } else {
+      finalStatus = 'partial';
+    }
+
+    const processingEndTime = new Date().toISOString();
+    
+    try {
+      // Get the processing start time to calculate duration
+      const { data: reportData } = await supabase
+        .from('dfs_fetch_reports')
+        .select('processing_started_at')
+        .eq('report_id', reportId)
+        .single();
+      
+      let durationMs = null;
+      if (reportData?.processing_started_at) {
+        const startTime = new Date(reportData.processing_started_at).getTime();
+        durationMs = Date.now() - startTime;
+      }
+      
+      await supabase
+        .from('dfs_fetch_reports')
+        .update({
+          status: finalStatus,
+          keywords_processed: totalKeywords,
+          keywords_succeeded: keywordsSucceeded,
+          keywords_failed: keywordsFailed,
+          processing_completed_at: processingEndTime,
+          processing_duration_ms: durationMs,
+          updated_at: processingEndTime
+        })
+        .eq('report_id', reportId);
+      
+      console.log(`📊 [BULK BACKGROUND] Updated report ${reportId} with final status: ${finalStatus}`);
+      console.log(`📊 [BULK BACKGROUND] Final stats: ${keywordsSucceeded}/${totalKeywords} succeeded, ${keywordsFailed} failed`);
+      if (durationMs) {
+        console.log(`📊 [BULK BACKGROUND] Processing duration: ${(durationMs / 1000).toFixed(1)}s`);
+      }
+    } catch (error) {
+      console.error(`❌ [BULK BACKGROUND] Failed to update final report status:`, error);
+    }
   }
 }
