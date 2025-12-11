@@ -290,7 +290,8 @@ export async function POST(request: NextRequest) {
             cached_city_name: city.city_name,
             rel_exact_city_id,
             rel_largest_city_id,
-            country_code_internal: countryCodeInternal
+            country_code_internal: countryCodeInternal,
+            dfs_fetch_status: 'none'
           })
           .select('keyword_id')
           .single();
@@ -404,6 +405,7 @@ export async function POST(request: NextRequest) {
             total_keywords: allKeywordIds.length,
             keywords_submitted: allKeywordIds.map(String),
             status: 'pending',
+            submitted_at: new Date().toISOString(),
             processing_started_at: new Date().toISOString(),
             source_type: 'f370_auto',
             rel_fabrication_launch_id: launchData?.launch_id || null

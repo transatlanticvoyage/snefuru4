@@ -92,8 +92,15 @@ interface ColumnDefinition {
 }
 
 const columns: ColumnDefinition[] = [
-  { key: 'serp_tool', label: 'serp_tool', type: 'button' },
   { key: 'keyword_id', label: 'keyword_id', type: 'number' },
+  { 
+    key: 'dfs_fetch_status', 
+    label: 'dfs_fetch_status', 
+    type: 'text',
+    headerRow1Text: 'keywordshub',
+    headerRow2Text: 'dfs_fetch_status',
+    readOnly: true
+  },
   { 
     key: 'rel_exact_city_id', 
     label: 'rel_exact_city_id', 
@@ -162,6 +169,15 @@ const columns: ColumnDefinition[] = [
     readOnly: true,
     isJoistColumn: true,
     isJoined: true
+  },
+  { 
+    key: 'serp_tool', 
+    label: 'serp_tool', 
+    type: 'button',
+    headerRow1Text: 'joist',
+    headerRow2Text: 'buttons3',
+    readOnly: true,
+    isJoistColumn: true
   },
   { 
     key: 'rel_largest_city_id', 
@@ -409,6 +425,8 @@ interface KeywordsHubTableProps {
   tagFilterRefreshKey?: number;
   showJoistColumns?: boolean;
   showHoistColumns?: boolean;
+  showRelExactCityIdColumn?: boolean;
+  showAssociatedPrincipalCityColumn?: boolean;
   onColumnPaginationRender?: (controls: {
     ColumnPaginationBar1: () => JSX.Element | null;
     ColumnPaginationBar2: () => JSX.Element | null;
@@ -521,6 +539,8 @@ export default function KeywordsHubTable({
   tagFilterRefreshKey = 0,
   showJoistColumns = true,
   showHoistColumns = true,
+  showRelExactCityIdColumn = false,
+  showAssociatedPrincipalCityColumn = false,
   onColumnPaginationRender, 
   initialColumnsPerPage = 8,
   initialColumnPage = 1,
@@ -948,14 +968,22 @@ export default function KeywordsHubTable({
   const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
   // Column pagination logic with sticky columns
-  const baseStickyKeys = ['serp_tool', 'keyword_id', 'is_starred', 'is_chosen', 'keyword_datum', 'search_volume', 'cpc'];
-  const joistColumnKeys = ['rel_exact_city_id', 'exact_city.associated_principal_city', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
+  const baseStickyKeys = ['keyword_id', 'dfs_fetch_status', 'is_starred', 'is_chosen', 'keyword_datum', 'search_volume', 'cpc'];
+  const joistColumnKeys = ['rel_exact_city_id', 'exact_city.associated_principal_city', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'joist_metro_pop_placeholder', 'exact_city.city_population', 'serp_tool'];
   const hoistColumnKeys = ['rel_largest_city_id', 'hoist_metro_pop_placeholder', 'largest_city.city_population'];
   
   // Filter columns based on joist and hoist toggles
   let activeColumns = columns;
   if (!showJoistColumns) {
     activeColumns = activeColumns.filter(col => !joistColumnKeys.includes(col.key));
+  } else {
+    // Apply individual column toggles within joist columns
+    if (!showRelExactCityIdColumn) {
+      activeColumns = activeColumns.filter(col => col.key !== 'rel_exact_city_id');
+    }
+    if (!showAssociatedPrincipalCityColumn) {
+      activeColumns = activeColumns.filter(col => col.key !== 'exact_city.associated_principal_city');
+    }
   }
   if (!showHoistColumns) {
     activeColumns = activeColumns.filter(col => !hoistColumnKeys.includes(col.key));
@@ -964,7 +992,13 @@ export default function KeywordsHubTable({
   // Build sticky column keys with joist and hoist columns inserted between keyword_id and is_starred/is_chosen/keyword_datum
   let stickyColumnKeys = [...baseStickyKeys.slice(0, 2)];
   if (showJoistColumns) {
-    stickyColumnKeys = [...stickyColumnKeys, ...joistColumnKeys];
+    // Only add joist columns that are enabled
+    const activeJoistKeys = joistColumnKeys.filter(key => {
+      if (key === 'rel_exact_city_id' && !showRelExactCityIdColumn) return false;
+      if (key === 'exact_city.associated_principal_city' && !showAssociatedPrincipalCityColumn) return false;
+      return true;
+    });
+    stickyColumnKeys = [...stickyColumnKeys, ...activeJoistKeys];
   }
   if (showHoistColumns) {
     stickyColumnKeys = [...stickyColumnKeys, ...hoistColumnKeys];
@@ -2874,8 +2908,7 @@ export default function KeywordsHubTable({
                     }}
                   >
                     <span className="font-bold text-xs">
-                      {column.key === 'serp_tool' ? 'tool' : 
-                       column.headerRow1Text || (column.key === 'tags' ? 'multi db tables' : 'keywordshub')}
+                      {column.headerRow1Text || (column.key === 'tags' ? 'multi db tables' : 'keywordshub')}
                     </span>
                   </th>
                 ))}
@@ -2915,7 +2948,7 @@ export default function KeywordsHubTable({
                   >
                     <div className="flex items-center space-x-1">
                       <span className="font-bold text-xs lowercase">
-                        {column.key === 'serp_tool' ? 'serp' : (column.headerRow2Text || column.label)}
+                        {column.headerRow2Text || column.label}
                       </span>
                       {sortField === column.key && column.key !== 'serp_tool' && column.key !== 'joist_metro_pop_placeholder' && column.key !== 'hoist_metro_pop_placeholder' && (
                         <span className="text-xs">

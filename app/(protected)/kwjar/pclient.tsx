@@ -142,8 +142,11 @@ export default function KwjarClient() {
   const [mesozoicChamberVisible, setMesozoicChamberVisible] = useState(true);
   const [showHoistColumns, setShowHoistColumns] = useState(true);
   const [showJoistColumns, setShowJoistColumns] = useState(true);
+  const [showRelExactCityIdColumn, setShowRelExactCityIdColumn] = useState(false);
+  const [showAssociatedPrincipalCityColumn, setShowAssociatedPrincipalCityColumn] = useState(false);
   
   // Venlar chamber filter states
+  const [dfsFetchStatusFilter, setDfsFetchStatusFilter] = useState('all');
   const [searchVolumeFilter, setSearchVolumeFilter] = useState('all');
   const [cpcFilter, setCpcFilter] = useState('all');
   const [competitionFilter, setCompetitionFilter] = useState('all');
@@ -194,6 +197,16 @@ export default function KwjarClient() {
     const savedJoistColumns = localStorage.getItem('kwjar_showJoistColumns');
     if (savedJoistColumns !== null) {
       setShowJoistColumns(JSON.parse(savedJoistColumns));
+    }
+    
+    const savedRelExactCityId = localStorage.getItem('kwjar_showRelExactCityIdColumn');
+    if (savedRelExactCityId !== null) {
+      setShowRelExactCityIdColumn(JSON.parse(savedRelExactCityId));
+    }
+    
+    const savedAssociatedPrincipalCity = localStorage.getItem('kwjar_showAssociatedPrincipalCityColumn');
+    if (savedAssociatedPrincipalCity !== null) {
+      setShowAssociatedPrincipalCityColumn(JSON.parse(savedAssociatedPrincipalCity));
     }
   }, []);
 
@@ -1129,26 +1142,92 @@ export default function KwjarClient() {
             )}
             
             {/* Joist Columns Toggle */}
+            <div className="flex flex-col gap-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">Show joist columns</span>
+                <button
+                  onClick={() => {
+                    const newValue = !showJoistColumns;
+                    setShowJoistColumns(newValue);
+                    localStorage.setItem('kwjar_showJoistColumns', JSON.stringify(newValue));
+                  }}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    showJoistColumns ? 'bg-green-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      showJoistColumns ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+              
+              {/* Sub-options for joist columns */}
+              <div className="ml-4 flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-600">rel_exact_city_id</span>
+                  <button
+                    onClick={() => {
+                      const newValue = !showRelExactCityIdColumn;
+                      setShowRelExactCityIdColumn(newValue);
+                      localStorage.setItem('kwjar_showRelExactCityIdColumn', JSON.stringify(newValue));
+                    }}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                      showRelExactCityIdColumn ? 'bg-green-600' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                        showRelExactCityIdColumn ? 'translate-x-5' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-600">associated_principal_city</span>
+                  <button
+                    onClick={() => {
+                      const newValue = !showAssociatedPrincipalCityColumn;
+                      setShowAssociatedPrincipalCityColumn(newValue);
+                      localStorage.setItem('kwjar_showAssociatedPrincipalCityColumn', JSON.stringify(newValue));
+                    }}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                      showAssociatedPrincipalCityColumn ? 'bg-green-600' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                        showAssociatedPrincipalCityColumn ? 'translate-x-5' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Hoist Columns Toggle */}
             <div className="flex flex-wrap items-center gap-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
-              <span className="text-sm font-medium text-gray-700">Show joist columns</span>
+              <span className="text-sm font-medium text-gray-700">Show hoist columns</span>
               <button
                 onClick={() => {
-                  const newValue = !showJoistColumns;
-                  setShowJoistColumns(newValue);
-                  localStorage.setItem('kwjar_showJoistColumns', JSON.stringify(newValue));
+                  const newValue = !showHoistColumns;
+                  setShowHoistColumns(newValue);
+                  localStorage.setItem('kwjar_showHoistColumns', JSON.stringify(newValue));
                 }}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  showJoistColumns ? 'bg-green-600' : 'bg-gray-300'
+                  showHoistColumns ? 'bg-green-600' : 'bg-gray-300'
                 }`}
               >
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    showJoistColumns ? 'translate-x-6' : 'translate-x-1'
+                    showHoistColumns ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>
             </div>
-
+            
             {/* Hoist Columns Toggle */}
             <div className="flex flex-wrap items-center gap-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
               <span className="text-sm font-medium text-gray-700">Show hoist columns</span>
@@ -1389,162 +1468,205 @@ export default function KwjarClient() {
             venlar_chamber
           </div>
           
-          {/* Filter Dropdowns */}
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Search Volume Filter */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Search Volume:</label>
-              <select
-                value={searchVolumeFilter}
-                onChange={(e) => setSearchVolumeFilter(e.target.value)}
-                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  searchVolumeFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
-                }`}
-                style={searchVolumeFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
-              >
-                <option value="all">all</option>
-                <option value="> 1000">&gt; 1,000</option>
-                <option value="> 750">&gt; 750</option>
-                <option value="> 500">&gt; 500</option>
-                <option value="> 250">&gt; 250</option>
-                <option value="> 100">&gt; 100</option>
-                <option value="> 50">&gt; 50</option>
-                <option value="> 20">&gt; 20</option>
-                <option value="> 10">&gt; 10</option>
-                <option value="> 5">&gt; 5</option>
-              </select>
-            </div>
-
-            {/* CPC Filter */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">CPC:</label>
-              <select
-                value={cpcFilter}
-                onChange={(e) => setCpcFilter(e.target.value)}
-                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  cpcFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
-                }`}
-                style={cpcFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
-              >
-                <option value="all">all</option>
-                <option value="< 5">&lt; $5</option>
-                <option value="< 10">&lt; $10</option>
-                <option value="< 20">&lt; $20</option>
-                <option value="< 30">&lt; $30</option>
-              </select>
-            </div>
-
-            {/* Competition Filter */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Competition:</label>
-              <select
-                value={competitionFilter}
-                onChange={(e) => setCompetitionFilter(e.target.value)}
-                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  competitionFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
-                }`}
-                style={competitionFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
-              >
-                <option value="all">all</option>
-                <option value="HIGH">HIGH</option>
-                <option value="MEDIUM">MEDIUM</option>
-                <option value="LOW">LOW</option>
-                <option value="MEDIUM + LOW">MEDIUM + LOW</option>
-              </select>
-            </div>
-
-            {/* Competition Index Filter */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Competition Index:</label>
-              <select
-                value={competitionIndexFilter}
-                onChange={(e) => setCompetitionIndexFilter(e.target.value)}
-                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  competitionIndexFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
-                }`}
-                style={competitionIndexFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
-              >
-                <option value="all">all</option>
-                <option value="0-20">0-20</option>
-                <option value="21-50">21-50</option>
-                <option value="51-100">51-100</option>
-              </select>
-            </div>
-
-            {/* City Classification Filter */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">City Classification:</label>
-              <select
-                value={cityClassificationFilter}
-                onChange={(e) => setCityClassificationFilter(e.target.value)}
-                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  cityClassificationFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
-                }`}
-                style={cityClassificationFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
-              >
-                <option value="all">all</option>
-                <option value="principal_city">principal_city</option>
-                <option value="formidable_suburb">formidable_suburb</option>
-                <option value="smaller_suburb">smaller_suburb</option>
-              </select>
-            </div>
-
-            {/* Exact City Population Filter */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Exact City Pop:</label>
-              <select
-                value={exactCityPopulationFilter}
-                onChange={(e) => setExactCityPopulationFilter(e.target.value)}
-                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  exactCityPopulationFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
-                }`}
-                style={exactCityPopulationFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
-              >
-                <option value="all">all</option>
-                <option value="0-20k">0-20k</option>
-                <option value="20-30k">20-30k</option>
-                <option value="30-40k">30-40k</option>
-                <option value="40-50k">40-50k</option>
-                <option value="50-60k">50-60k</option>
-                <option value="60-80k">60-80k</option>
-                <option value="80-100k">80-100k</option>
-                <option value="100-150k">100-150k</option>
-                <option value="150-200k">150-200k</option>
-                <option value="200-300k">200-300k</option>
-                <option value="300-450k">300-450k</option>
-                <option value="450-600k">450-600k</option>
-                <option value="600k-infinity">600k-infinity</option>
-              </select>
-            </div>
-
-            {/* Largest City Population Filter */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Largest City Pop:</label>
-              <select
-                value={largestCityPopulationFilter}
-                onChange={(e) => setLargestCityPopulationFilter(e.target.value)}
-                className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  largestCityPopulationFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
-                }`}
-                style={largestCityPopulationFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
-              >
-                <option value="all">all</option>
-                <option value="0-20k">0-20k</option>
-                <option value="20-30k">20-30k</option>
-                <option value="30-40k">30-40k</option>
-                <option value="40-50k">40-50k</option>
-                <option value="50-60k">50-60k</option>
-                <option value="60-80k">60-80k</option>
-                <option value="80-100k">80-100k</option>
-                <option value="100-150k">100-150k</option>
-                <option value="150-200k">150-200k</option>
-                <option value="200-300k">200-300k</option>
-                <option value="300-450k">300-450k</option>
-                <option value="450-600k">450-600k</option>
-                <option value="600k-infinity">600k-infinity</option>
-              </select>
-            </div>
-          </div>
+          {/* Filter Dropdowns Table */}
+          <table style={{ border: '1px solid gray', borderCollapse: 'collapse', width: '100%' }}>
+            <thead>
+              <tr>
+                <th style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">DFS Fetch Status</div>
+                </th>
+                <th style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">Search Volume</div>
+                </th>
+                <th style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">CPC</div>
+                </th>
+                <th style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">Competition</div>
+                </th>
+                <th style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">Competition Index</div>
+                </th>
+                <th style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">City Classification</div>
+                </th>
+                <th style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">Exact City Pop</div>
+                </th>
+                <th style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">Largest City Pop</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">
+                    <select
+                      value={dfsFetchStatusFilter}
+                      onChange={(e) => setDfsFetchStatusFilter(e.target.value)}
+                      className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        dfsFetchStatusFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                      }`}
+                      style={dfsFetchStatusFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+                    >
+                      <option value="all">all</option>
+                      <option value="fetched">fetched</option>
+                      <option value="pending">pending</option>
+                      <option value="error">error</option>
+                    </select>
+                  </div>
+                </td>
+                <td style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">
+                    <select
+                      value={searchVolumeFilter}
+                      onChange={(e) => setSearchVolumeFilter(e.target.value)}
+                      className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        searchVolumeFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                      }`}
+                      style={searchVolumeFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+                    >
+                      <option value="all">all</option>
+                      <option value="> 1000">&gt; 1,000</option>
+                      <option value="> 750">&gt; 750</option>
+                      <option value="> 500">&gt; 500</option>
+                      <option value="> 250">&gt; 250</option>
+                      <option value="> 100">&gt; 100</option>
+                      <option value="> 50">&gt; 50</option>
+                      <option value="> 20">&gt; 20</option>
+                      <option value="> 10">&gt; 10</option>
+                      <option value="> 5">&gt; 5</option>
+                    </select>
+                  </div>
+                </td>
+                <td style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">
+                    <select
+                      value={cpcFilter}
+                      onChange={(e) => setCpcFilter(e.target.value)}
+                      className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        cpcFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                      }`}
+                      style={cpcFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+                    >
+                      <option value="all">all</option>
+                      <option value="< 5">&lt; $5</option>
+                      <option value="< 10">&lt; $10</option>
+                      <option value="< 20">&lt; $20</option>
+                      <option value="< 30">&lt; $30</option>
+                    </select>
+                  </div>
+                </td>
+                <td style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">
+                    <select
+                      value={competitionFilter}
+                      onChange={(e) => setCompetitionFilter(e.target.value)}
+                      className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        competitionFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                      }`}
+                      style={competitionFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+                    >
+                      <option value="all">all</option>
+                      <option value="HIGH">HIGH</option>
+                      <option value="MEDIUM">MEDIUM</option>
+                      <option value="LOW">LOW</option>
+                      <option value="MEDIUM + LOW">MEDIUM + LOW</option>
+                    </select>
+                  </div>
+                </td>
+                <td style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">
+                    <select
+                      value={competitionIndexFilter}
+                      onChange={(e) => setCompetitionIndexFilter(e.target.value)}
+                      className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        competitionIndexFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                      }`}
+                      style={competitionIndexFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+                    >
+                      <option value="all">all</option>
+                      <option value="0-20">0-20</option>
+                      <option value="21-50">21-50</option>
+                      <option value="51-100">51-100</option>
+                    </select>
+                  </div>
+                </td>
+                <td style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">
+                    <select
+                      value={cityClassificationFilter}
+                      onChange={(e) => setCityClassificationFilter(e.target.value)}
+                      className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        cityClassificationFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                      }`}
+                      style={cityClassificationFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+                    >
+                      <option value="all">all</option>
+                      <option value="principal_city">principal_city</option>
+                      <option value="formidable_suburb">formidable_suburb</option>
+                      <option value="smaller_suburb">smaller_suburb</option>
+                    </select>
+                  </div>
+                </td>
+                <td style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">
+                    <select
+                      value={exactCityPopulationFilter}
+                      onChange={(e) => setExactCityPopulationFilter(e.target.value)}
+                      className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        exactCityPopulationFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                      }`}
+                      style={exactCityPopulationFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+                    >
+                      <option value="all">all</option>
+                      <option value="0-20k">0-20k</option>
+                      <option value="20-30k">20-30k</option>
+                      <option value="30-40k">30-40k</option>
+                      <option value="40-50k">40-50k</option>
+                      <option value="50-60k">50-60k</option>
+                      <option value="60-80k">60-80k</option>
+                      <option value="80-100k">80-100k</option>
+                      <option value="100-150k">100-150k</option>
+                      <option value="150-200k">150-200k</option>
+                      <option value="200-300k">200-300k</option>
+                      <option value="300-450k">300-450k</option>
+                      <option value="450-600k">450-600k</option>
+                      <option value="600k-infinity">600k-infinity</option>
+                    </select>
+                  </div>
+                </td>
+                <td style={{ border: '1px solid gray', padding: '0' }}>
+                  <div className="cell_inner_wrapper_div">
+                    <select
+                      value={largestCityPopulationFilter}
+                      onChange={(e) => setLargestCityPopulationFilter(e.target.value)}
+                      className={`border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        largestCityPopulationFilter !== 'all' ? 'bg-navy text-white' : 'bg-white text-gray-700'
+                      }`}
+                      style={largestCityPopulationFilter !== 'all' ? { backgroundColor: 'navy', color: 'white' } : {}}
+                    >
+                      <option value="all">all</option>
+                      <option value="0-20k">0-20k</option>
+                      <option value="20-30k">20-30k</option>
+                      <option value="30-40k">30-40k</option>
+                      <option value="40-50k">40-50k</option>
+                      <option value="50-60k">50-60k</option>
+                      <option value="60-80k">60-80k</option>
+                      <option value="80-100k">80-100k</option>
+                      <option value="100-150k">100-150k</option>
+                      <option value="150-200k">150-200k</option>
+                      <option value="200-300k">200-300k</option>
+                      <option value="300-450k">300-450k</option>
+                      <option value="450-600k">450-600k</option>
+                      <option value="600k-infinity">600k-infinity</option>
+                    </select>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       )}
 
@@ -1575,25 +1697,24 @@ export default function KwjarClient() {
                   tags plench button
                 </button>
                 
-                {/* REFRESH button */}
-                {selectedTag && (
-                  <button
-                    onClick={handleRefreshTagFilter}
-                    className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2"
-                    title="Refresh tag filter"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span>REFRESH</span>
-                  </button>
-                )}
-                
                 {selectedTag && (
                   <div className="flex flex-wrap items-center gap-2">
                     <div className="text-sm font-medium bg-navy text-white border border-black px-3 py-1 rounded" style={{ backgroundColor: 'navy' }}>
                       {selectedTag.tag_name}
                     </div>
+                    
+                    {/* REFRESH button */}
+                    <button
+                      onClick={handleRefreshTagFilter}
+                      className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2"
+                      title="Refresh tag filter"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      <span>REFRESH</span>
+                    </button>
+                    
                     <button
                       onClick={() => setSelectedTag(null)}
                       className="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors"
@@ -1792,6 +1913,8 @@ export default function KwjarClient() {
           tagFilterRefreshKey={tagFilterRefreshKey}
           showJoistColumns={showJoistColumns}
           showHoistColumns={showHoistColumns}
+          showRelExactCityIdColumn={showRelExactCityIdColumn}
+          showAssociatedPrincipalCityColumn={showAssociatedPrincipalCityColumn}
           onColumnPaginationRender={setColumnPaginationControls}
           onMainPaginationRender={setMainPaginationControls}
           onTableActionsRender={setTableActions}
@@ -1806,6 +1929,7 @@ export default function KwjarClient() {
           exactCityPopulationFilter={exactCityPopulationFilter}
           largestCityPopulationFilter={largestCityPopulationFilter}
           cityClassificationFilter={cityClassificationFilter}
+          dfsFetchStatusFilter={dfsFetchStatusFilter}
           onExportDataChange={setExportData}
         />
       </div>

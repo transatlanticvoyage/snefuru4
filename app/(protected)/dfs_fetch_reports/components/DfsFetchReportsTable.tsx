@@ -109,6 +109,14 @@ export default function DfsFetchReportsTable({ reports, onRetryFailed, onRefresh
     return `${minutes}m ${remainingSeconds}s`;
   };
 
+  const getProcessingStatus = (report: DfsFetchReport) => {
+    if (report.status === 'pending' || report.status === 'processing') {
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">processing</span>;
+    } else {
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">finished</span>;
+    }
+  };
+
   const formatRelativeTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -179,6 +187,7 @@ export default function DfsFetchReportsTable({ reports, onRetryFailed, onRefresh
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tag</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Processing</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Success Rate</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Processing Time</th>
@@ -229,6 +238,9 @@ export default function DfsFetchReportsTable({ reports, onRetryFailed, onRefresh
                   {getStatusBadge(report.status)}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
+                  {getProcessingStatus(report)}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
                   <div className="w-20">
                     {getProgressBar(report)}
                   </div>
@@ -259,7 +271,7 @@ export default function DfsFetchReportsTable({ reports, onRetryFailed, onRefresh
                         onClick={() => onRetryFailed(report.report_id)}
                         className="text-orange-600 hover:text-orange-800"
                       >
-                        Retry
+                        retry failed kws
                       </button>
                     )}
                     <button

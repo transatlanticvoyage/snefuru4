@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     console.log(`🔄 Starting bulk DataForSEO refresh for ${keyword_ids.length} keywords (${field})`);
 
     // Create DFS fetch report entry
-    let reportId = null;
+    let reportId: number | null = null;
     if (!retry_report_id) {
       try {
         console.log('📝 Creating DFS fetch report entry...');
@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
             total_keywords: keyword_ids.length,
             keywords_submitted: keyword_ids.map(String),
             status: 'pending',
+            submitted_at: new Date().toISOString(),
             processing_started_at: new Date().toISOString()
           })
           .select('report_id')
@@ -91,6 +92,13 @@ export async function POST(request: NextRequest) {
         })
         .eq('report_id', reportId);
     }
+
+    // Set keyword status to pending before starting DFS fetch
+    console.log(`📝 Setting ${keyword_ids.length} keywords to pending status...`);
+    await supabase
+      .from('keywordshub')
+      .update({ dfs_fetch_status: 'pending' })
+      .in('keyword_id', keyword_ids);
 
     // Get the keyword records
     const dbStartTime = Date.now();
@@ -312,6 +320,30 @@ export async function POST(request: NextRequest) {
     const processingTime = Date.now() - processingStartTime;
     const totalTime = Date.now() - startTime;
     
+    // Mark keywords from failed chunks as failed
+    if (errors.length > 0) {
+      const failedKeywordIds = [];
+      errors.forEach((error) => {
+        // Find the chunk that failed
+        const failedChunk = chunkedGroups.find(chunk => chunk.key === error.group);
+        if (failedChunk) {
+          failedKeywordIds.push(...failedChunk.group.keyword_ids);
+        }
+      });
+      
+      if (failedKeywordIds.length > 0) {
+        try {
+          await supabase
+            .from('keywordshub')
+            .update({ dfs_fetch_status: 'failed' })
+            .in('keyword_id', failedKeywordIds);
+          console.log(`❌ Marked ${failedKeywordIds.length} keywords as failed due to task creation errors`);
+        } catch (dbError) {
+          console.error(`❌ Error updating failed status for failed chunks:`, dbError);
+        }
+      }
+    }
+
     // Store task information for later retrieval (optional - could be in a separate table)
     console.log(`📋 API Processing Summary:`);
     console.log(`   - Created ${taskIds.length} DataForSEO tasks, ${errors.length} errors`);
@@ -482,6 +514,10 @@ async function retrieveAndUpdateResults(
                   competition: keywordData.competition
                 });
                 
+                // Determine fetch status based on data availability
+                const hasValidData = keywordData.search_volume !== null || keywordData.cpc !== null;
+                const fetchStatus = hasValidData ? 'completed' : 'failed';
+                
                 const updateData = {
                   search_volume: keywordData.search_volume || null,
                   cpc: keywordData.cpc || null,
@@ -489,7 +525,8 @@ async function retrieveAndUpdateResults(
                   competition_index: keywordData.competition_index || null,
                   low_top_of_page_bid: keywordData.low_top_of_page_bid || null,
                   high_top_of_page_bid: keywordData.high_top_of_page_bid || null,
-                  api_fetched_at: new Date().toISOString()
+                  api_fetched_at: new Date().toISOString(),
+                  dfs_fetch_status: fetchStatus
                 };
                 
                 updates.push(
@@ -529,7 +566,20 @@ async function retrieveAndUpdateResults(
               console.log(`⏳ Task ${taskInfo.task_id} still processing (status: ${task.status_code})`);
               return { taskInfo, status: 'pending' };
             } else {
+              // Task failed - mark keywords as failed
               console.error(`Task ${taskInfo.task_id} failed with status: ${task.status_code}`);
+              
+              // Mark all keywords in this task as failed
+              try {
+                await supabase
+                  .from('keywordshub')
+                  .update({ dfs_fetch_status: 'failed' })
+                  .in('keyword_id', taskInfo.keyword_ids);
+                console.log(`❌ Marked ${taskInfo.keyword_ids.length} keywords as failed for task ${taskInfo.task_id}`);
+              } catch (error) {
+                console.error(`❌ Error updating failed status for task ${taskInfo.task_id}:`, error);
+              }
+              
               return { taskInfo, status: 'failed', error: `Task failed with status: ${task.status_code}` };
             }
           } else {
@@ -538,6 +588,18 @@ async function retrieveAndUpdateResults(
           }
         } catch (error) {
           console.error(`Exception retrieving results for task ${taskInfo.task_id}:`, error);
+          
+          // Mark keywords as failed due to exception
+          try {
+            await supabase
+              .from('keywordshub')
+              .update({ dfs_fetch_status: 'failed' })
+              .in('keyword_id', taskInfo.keyword_ids);
+            console.log(`❌ Marked ${taskInfo.keyword_ids.length} keywords as failed due to exception`);
+          } catch (dbError) {
+            console.error(`❌ Error updating failed status:`, dbError);
+          }
+          
           return { taskInfo, status: 'error', error: error instanceof Error ? error.message : 'Unknown error' };
         }
       });
