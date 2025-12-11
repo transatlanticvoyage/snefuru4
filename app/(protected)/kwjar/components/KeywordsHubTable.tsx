@@ -32,6 +32,8 @@ interface KeywordRecord {
   cached_city_name: string | null;
   rel_largest_city_id: number | null;
   rel_exact_city_id: number | null;
+  // DFS fetch tracking field
+  dfs_fetch_status: 'none' | 'pending' | 'completed' | 'failed' | 'partial';
   // SERP fetch tracking fields
   serp_results_count: number;
   serp_last_fetched_at: string | null;
@@ -443,6 +445,7 @@ interface KeywordsHubTableProps {
   }) => void;
   onSelectedRowsChange?: (selectedIds: number[]) => void;
   onExportDataChange?: (data: { allFilteredData: any[]; selectedData: any[]; starredData: any[]; chosenData: any[]; columns: any[]; paginatedData: any[]; currentPage: number; itemsPerPage: number }) => void;
+  dfsFetchStatusFilter?: string;
   searchVolumeFilter?: string;
   cpcFilter?: string;
   competitionFilter?: string;
@@ -549,6 +552,7 @@ export default function KeywordsHubTable({
   onTableActionsRender,
   onSelectedRowsChange,
   onExportDataChange,
+  dfsFetchStatusFilter = 'all',
   searchVolumeFilter = 'all',
   cpcFilter = 'all',
   competitionFilter = 'all',
@@ -630,24 +634,41 @@ export default function KeywordsHubTable({
     try {
       setLoading(true);
       
+      // Use simpler query to avoid timeout when no tag filter is applied
       let query = supabase
         .from('keywordshub')
         .select(`
-          *,
-          industries:rel_industry_id (
-            industry_name
-          ),
-          exact_city:cities!rel_exact_city_id (
-            classification,
-            city_name,
-            state_code,
-            state_full,
-            associated_principal_city,
-            city_population
-          ),
-          largest_city:cities!rel_largest_city_id (
-            city_population
-          )
+          keyword_id,
+          keyword_datum,
+          is_starred,
+          is_chosen,
+          search_volume,
+          cpc,
+          semrush_volume,
+          rel_dfs_location_code,
+          country_code_internal,
+          location_display_name,
+          location_coordinate,
+          language_code,
+          language_name,
+          competition,
+          competition_index,
+          low_top_of_page_bid,
+          high_top_of_page_bid,
+          api_fetched_at,
+          created_at,
+          updated_at,
+          created_by,
+          last_updated_by,
+          cached_cncglub_ids,
+          rel_industry_id,
+          cached_city_name,
+          rel_largest_city_id,
+          rel_exact_city_id,
+          dfs_fetch_status,
+          serp_results_count,
+          serp_last_fetched_at,
+          serp_fetch_status
         `);
 
       // If a tag is selected, filter by keywords that have this tag
@@ -673,9 +694,20 @@ export default function KeywordsHubTable({
         }
       }
 
-      const { data: keywords, error } = await query.order('search_volume', { ascending: false });
+      const { data: keywords, error } = await query
+        .order('search_volume', { ascending: false })
+        .limit(100);
 
-      if (error) throw error;
+      if (error) {
+        console.error('🏷️ [FETCH DATA] Database error:', error);
+        console.error('🏷️ [FETCH DATA] Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        throw error;
+      }
       
       // Fetch tag information and cache data for each keyword
       if (keywords && keywords.length > 0) {
@@ -873,6 +905,13 @@ export default function KeywordsHubTable({
         return false;
       }
 
+      // DFS Fetch Status filter
+      if (dfsFetchStatusFilter !== 'all') {
+        if (item.dfs_fetch_status !== dfsFetchStatusFilter) {
+          return false;
+        }
+      }
+
       // Search Volume filter
       if (searchVolumeFilter !== 'all') {
         const searchVolume = item.search_volume || 0;
@@ -960,7 +999,7 @@ export default function KeywordsHubTable({
     });
 
     return filtered;
-  }, [data, searchTerm, sortField, sortOrder, searchVolumeFilter, cpcFilter, competitionFilter, competitionIndexFilter, cityClassificationFilter, exactCityPopulationFilter, largestCityPopulationFilter]);
+  }, [data, searchTerm, sortField, sortOrder, dfsFetchStatusFilter, searchVolumeFilter, cpcFilter, competitionFilter, competitionIndexFilter, cityClassificationFilter, exactCityPopulationFilter, largestCityPopulationFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === 0 ? filteredAndSortedData.length : itemsPerPage));

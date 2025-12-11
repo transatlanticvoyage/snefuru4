@@ -420,13 +420,24 @@ export async function POST(request: NextRequest) {
           console.log(`✅ Created DFS fetch report with ID: ${dfsReportId}`);
 
           // Trigger the actual DataForSEO refresh in the background
-          // We'll use fetch but not await the response to avoid blocking
-          const baseUrl = request.headers.get('origin') || `https://${request.headers.get('host')}`;
+          // Use absolute URL for internal API calls to avoid header issues
+          const protocol = request.headers.get('x-forwarded-proto') || 'http';
+          const host = request.headers.get('host') || 'localhost:3000';
+          const baseUrl = `${protocol}://${host}`;
+          
+          console.log(`🔗 Triggering background F12 refresh at: ${baseUrl}/api/dataforseo-refresh-bulk`);
           
           fetch(`${baseUrl}/api/dataforseo-refresh-bulk`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              // Copy authorization headers if they exist
+              ...(request.headers.get('authorization') && {
+                'authorization': request.headers.get('authorization')
+              }),
+              ...(request.headers.get('user-auth-id') && {
+                'user-auth-id': request.headers.get('user-auth-id')
+              })
             },
             body: JSON.stringify({
               keyword_ids: allKeywordIds,
@@ -435,14 +446,54 @@ export async function POST(request: NextRequest) {
               tag_id: tagId,
               tag_name: tag_name
             }),
-          }).then(response => {
+          }).then(async (response) => {
+            const responseText = await response.text();
             if (response.ok) {
               console.log('✅ F12 refresh triggered successfully in background');
+              console.log(`📋 Background response: ${responseText}`);
+              
+              // Update the report to show the background request was sent
+              await supabase
+                .from('dfs_fetch_reports')
+                .update({
+                  status: 'processing',
+                  updated_at: new Date().toISOString()
+                })
+                .eq('report_id', dfsReportId);
             } else {
-              console.error('❌ F12 refresh trigger failed:', response.statusText);
+              console.error('❌ F12 refresh trigger failed:', response.status, response.statusText);
+              console.error('❌ Response body:', responseText);
+              
+              // Update the report to show the failure
+              await supabase
+                .from('dfs_fetch_reports')
+                .update({
+                  status: 'failed',
+                  error_details: {
+                    error: 'Background trigger failed',
+                    status: response.status,
+                    statusText: response.statusText,
+                    responseBody: responseText
+                  },
+                  updated_at: new Date().toISOString()
+                })
+                .eq('report_id', dfsReportId);
             }
-          }).catch(error => {
+          }).catch(async (error) => {
             console.error('❌ Error triggering F12 refresh:', error);
+            
+            // Update the report to show the error
+            await supabase
+              .from('dfs_fetch_reports')
+              .update({
+                status: 'failed',
+                error_details: {
+                  error: 'Background fetch error',
+                  details: error.message
+                },
+                updated_at: new Date().toISOString()
+              })
+              .eq('report_id', dfsReportId);
           });
 
           console.log('📤 F12 refresh request sent to background processing');

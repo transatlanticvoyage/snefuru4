@@ -33,8 +33,11 @@ export default function FabricClient() {
     kw_rubric: 'deck builder (city_name) (state_code)',
     rel_dfs_location_code: '2840',
     language_code: 'en',
-    tag_name: 'deck cncs 1'
+    tag_name: 'deck cncs 1',
+    tag_group_id: ''
   });
+
+  const [tagGroups, setTagGroups] = useState<{group_id: number, group_name: string}[]>([]);
 
   useEffect(() => {
     if (!user) {
@@ -99,6 +102,29 @@ export default function FabricClient() {
     };
 
     fetchIndustries();
+  }, [user]);
+
+  // Fetch tag groups
+  useEffect(() => {
+    const fetchTagGroups = async () => {
+      if (!user) return;
+      
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      const { data, error } = await supabase
+        .from('keywordshub_tag_groups')
+        .select('group_id, group_name')
+        .order('group_name', { ascending: true });
+
+      if (!error && data) {
+        setTagGroups(data);
+      }
+    };
+
+    fetchTagGroups();
   }, [user]);
 
   // Fetch fabrication launches for Tab 2
@@ -189,7 +215,14 @@ export default function FabricClient() {
           `• Created ${result.keywords_created} new keywords\n` +
           `• Found ${result.keywords_existing} keywords that already existed\n` +
           `• Created tag in keywordshub_tags db table: ${result.tag_name} (ID: ${result.tag_id})\n` +
-          `• Made sure all ${result.keywords_total} keywords were added to it\n` +
+          `• Made sure all ${result.keywords_total} keywords were added to it\n`;
+        
+        // Add group assignment message if a group was selected
+        if (formData.tag_group_id && result.group_assigned) {
+          successMessage += `• Assigned tag to group: ${result.group_name} (ID: ${result.group_id})\n`;
+        }
+        
+        successMessage += 
           `• Updated ${result.cncglub_rows_updated} cncglub rows at ${formData.kwslot} to reference all ${result.keywords_total} keywords in keywordshub db table\n` +
           `• Launch ID: ${result.launch_id}\n`;
         
@@ -662,8 +695,8 @@ export default function FabricClient() {
                   </tr>
                   {/* Row 9 */}
                   <tr>
-                    <td className="border border-gray-300 p-3 bg-gray-200 border-b-black border-b-[4px]">9</td>
-                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
+                    <td className="border border-gray-300 p-3 bg-gray-200">9</td>
+                    <td className="border border-gray-300 p-3">
                       <div className="flex items-center space-x-2">
                         <button 
                           className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
@@ -675,7 +708,7 @@ export default function FabricClient() {
                         <span className="font-bold">tag option - keywordshub_tags.tag_name</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-[700px] border-b-black border-b-[4px]" style={{ minWidth: '700px' }}>
+                    <td className="border border-gray-300 p-3 min-w-[700px]" style={{ minWidth: '700px' }}>
                       <input 
                         type="text" 
                         placeholder="deck cncs 1"
@@ -683,6 +716,39 @@ export default function FabricClient() {
                         value={formData.tag_name}
                         onChange={(e) => handleInputChange('tag_name', e.target.value)}
                       />
+                    </td>
+                    <td className="border border-gray-300 p-3"></td>
+                    <td className="border border-gray-300 p-3"></td>
+                    <td className="border border-gray-300 p-3"></td>
+                  </tr>
+                  {/* Row 10 */}
+                  <tr>
+                    <td className="border border-gray-300 p-3 bg-gray-200 border-b-black border-b-[4px]">10</td>
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
+                          onClick={() => navigator.clipboard.writeText('group for tag (keywordshub_tag_groups)')}
+                          title="Copy to clipboard"
+                        >
+                          ⧉
+                        </button>
+                        <span className="font-bold">group for tag (keywordshub_tag_groups)</span>
+                      </div>
+                    </td>
+                    <td className="border border-gray-300 p-3 min-w-[700px] border-b-black border-b-[4px]" style={{ minWidth: '700px' }}>
+                      <select 
+                        className="w-full px-2 py-1 border border-gray-300 rounded"
+                        value={formData.tag_group_id}
+                        onChange={(e) => handleInputChange('tag_group_id', e.target.value)}
+                      >
+                        <option value="">(none)</option>
+                        {tagGroups.map((group) => (
+                          <option key={group.group_id} value={group.group_id}>
+                            {group.group_name}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]"></td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]"></td>

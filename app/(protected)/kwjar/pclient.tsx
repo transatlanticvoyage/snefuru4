@@ -1692,9 +1692,13 @@ export default function KwjarClient() {
               <div className="flex flex-wrap items-center gap-2 border border-black px-3 py-2 rounded">
                 <button
                   onClick={() => setIsTagsPopupOpen(true)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2"
                 >
-                  tags plench button
+                  <div className="w-4 h-4 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full shadow-sm border border-yellow-400 relative">
+                    <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 bg-yellow-100 rounded-full opacity-60"></div>
+                    <div className="absolute bottom-0.5 right-0.5 w-0.5 h-0.5 bg-yellow-600 rounded-full"></div>
+                  </div>
+                  <span>tags plench button</span>
                 </button>
                 
                 {selectedTag && (
@@ -1922,6 +1926,7 @@ export default function KwjarClient() {
           initialColumnPage={currentColumnPage}
           onColumnPaginationChange={handleColumnPaginationChange}
           onSelectedRowsChange={setSelectedKeywordIds}
+          dfsFetchStatusFilter={dfsFetchStatusFilter}
           searchVolumeFilter={searchVolumeFilter}
           cpcFilter={cpcFilter}
           competitionFilter={competitionFilter}
