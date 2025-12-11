@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
       rel_dfs_location_code,
       language_code,
       tag_name,
-      user_internal_id
+      user_internal_id,
+      run_f12_refresh
     } = body;
 
     // Step 1: Filter cncglub rows based on criteria
@@ -384,6 +385,72 @@ export async function POST(request: NextRequest) {
 
     console.log(`Final results: Created ${keywordsCreatedCount} new keywords, found ${existingKeywordsCount} existing, processed ${createdKeywords.length} total`);
 
+    // Step 6: Trigger F12 refresh if enabled
+    let dfsReportId = null;
+    if (run_f12_refresh && createdKeywords.length > 0) {
+      console.log('🔄 F12 refresh enabled, triggering DataForSEO metrics refresh...');
+      
+      try {
+        // Get all keyword IDs (both created and existing)
+        const allKeywordIds = createdKeywords.map(k => k.keyword_id);
+        console.log(`📊 Triggering F12 refresh for ${allKeywordIds.length} keywords from F370 process`);
+
+        // Create DFS fetch report entry linked to this fabrication launch
+        const { data: reportData, error: reportError } = await supabase
+          .from('dfs_fetch_reports')
+          .insert({
+            tag_id: tagId,
+            tag_name: tag_name,
+            total_keywords: allKeywordIds.length,
+            keywords_submitted: allKeywordIds.map(String),
+            status: 'pending',
+            processing_started_at: new Date().toISOString(),
+            source_type: 'f370_auto',
+            rel_fabrication_launch_id: launchData?.launch_id || null
+          })
+          .select('report_id')
+          .single();
+
+        if (reportError) {
+          console.error('❌ Error creating DFS report entry:', reportError);
+        } else {
+          dfsReportId = reportData?.report_id;
+          console.log(`✅ Created DFS fetch report with ID: ${dfsReportId}`);
+
+          // Trigger the actual DataForSEO refresh in the background
+          // We'll use fetch but not await the response to avoid blocking
+          const baseUrl = request.headers.get('origin') || `https://${request.headers.get('host')}`;
+          
+          fetch(`${baseUrl}/api/dataforseo-refresh-bulk`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              keyword_ids: allKeywordIds,
+              field: 'cpc',
+              retry_report_id: dfsReportId,
+              tag_id: tagId,
+              tag_name: tag_name
+            }),
+          }).then(response => {
+            if (response.ok) {
+              console.log('✅ F12 refresh triggered successfully in background');
+            } else {
+              console.error('❌ F12 refresh trigger failed:', response.statusText);
+            }
+          }).catch(error => {
+            console.error('❌ Error triggering F12 refresh:', error);
+          });
+
+          console.log('📤 F12 refresh request sent to background processing');
+        }
+      } catch (error) {
+        console.error('❌ Error triggering F12 refresh:', error);
+        // Don't fail the F370 process if F12 refresh fails
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: `Processed ${cncglubRows.length} cncglub rows successfully`,
@@ -394,7 +461,10 @@ export async function POST(request: NextRequest) {
       keywords_existing: existingKeywordsCount,
       keywords_total: createdKeywords.length,
       cncglub_rows_updated: cncglubUpdates.length,
-      launch_id: launchData?.launch_id || 'N/A'
+      launch_id: launchData?.launch_id || 'N/A',
+      keyword_ids: createdKeywords.map(k => k.keyword_id),
+      dfs_report_id: dfsReportId,
+      f12_refresh_triggered: run_f12_refresh && createdKeywords.length > 0
     });
 
   } catch (error) {

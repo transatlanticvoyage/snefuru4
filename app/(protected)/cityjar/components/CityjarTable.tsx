@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
+import ExportButton from './ExportButton';
 
 const NubraTablefaceKite = dynamic(
   () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
@@ -19,6 +20,7 @@ interface City {
   gmaps_link: string | null;
   classification: string | null;
   is_suburb: boolean | null;
+  associated_principal_city: string | null;
   city_and_state_code: string | null;
   city_population: number | null;
   latitude: number | null;
@@ -63,6 +65,7 @@ export default function CityjarTable({ classificationFilter = 'all', countryFilt
     rank_in_pop: 0,
     gmaps_link: '',
     is_suburb: false,
+    associated_principal_city: '',
     city_and_state_code: '',
     city_population: 0,
     latitude: 0,
@@ -84,6 +87,7 @@ export default function CityjarTable({ classificationFilter = 'all', countryFilt
     { key: 'gmaps_link' as keyof City, label: 'gmaps_link', type: 'text', width: '100px', readOnly: true },
     { key: 'classification' as keyof City, label: 'classification', type: 'text' },
     { key: 'is_suburb' as keyof City, label: 'is_suburb', type: 'boolean' },
+    { key: 'associated_principal_city' as keyof City, label: 'associated_principal_city', type: 'text' },
     { key: 'city_and_state_code' as keyof City, label: 'city_and_state_code', type: 'text' },
     { key: 'city_population' as keyof City, label: 'city_population', type: 'number' },
     { key: 'latitude' as keyof City, label: 'latitude', type: 'number' },
@@ -273,6 +277,7 @@ export default function CityjarTable({ classificationFilter = 'all', countryFilt
         rank_in_pop: null,
         gmaps_link: '',
         is_suburb: false,
+        associated_principal_city: '',
         city_and_state_code: 'New City, ST',
         city_population: null,
         latitude: null,
@@ -312,6 +317,7 @@ export default function CityjarTable({ classificationFilter = 'all', countryFilt
         rank_in_pop: formData.rank_in_pop || null,
         gmaps_link: formData.gmaps_link?.trim() || null,
         is_suburb: formData.is_suburb,
+        associated_principal_city: formData.associated_principal_city?.trim() || null,
         city_and_state_code: formData.city_and_state_code?.trim() || null,
         city_population: formData.city_population || null,
         latitude: formData.latitude || null,
@@ -347,6 +353,7 @@ export default function CityjarTable({ classificationFilter = 'all', countryFilt
       rank_in_pop: 0,
       gmaps_link: '',
       is_suburb: false,
+      associated_principal_city: '',
       city_and_state_code: '',
       city_population: 0,
       latitude: 0,
@@ -598,6 +605,10 @@ export default function CityjarTable({ classificationFilter = 'all', countryFilt
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-6">
             <NubraTablefaceKite tableType="cities-grid" />
+            <ExportButton 
+              selectedRows={selectedRows}
+              filteredData={filteredAndSortedData}
+            />
             <div className="text-sm text-gray-600">
               {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
               {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
@@ -898,6 +909,17 @@ export default function CityjarTable({ classificationFilter = 'all', countryFilt
                 <label htmlFor="is_suburb" className="text-sm font-medium text-gray-700">
                   Is Suburb
                 </label>
+              </div>
+              
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Associated Principal City</label>
+                <input
+                  type="text"
+                  value={formData.associated_principal_city}
+                  onChange={(e) => setFormData({ ...formData, associated_principal_city: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="Enter associated principal city"
+                />
               </div>
             </div>
 

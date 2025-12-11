@@ -25,6 +25,8 @@ interface DfsFetchReport {
   dfs_task_ids: string[] | null;
   dfs_credits_used: number | null;
   updated_at: string;
+  source_type?: string | null;
+  rel_fabrication_launch_id?: number | null;
 }
 
 interface Statistics {

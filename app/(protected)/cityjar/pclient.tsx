@@ -44,7 +44,6 @@ export default function CityjarClient() {
             <h1 className="text-2xl font-bold text-gray-800">
               City Manager
             </h1>
-            <ExportButton />
             <ClassificationFilter 
               value={classificationFilter}
               onChange={setClassificationFilter}

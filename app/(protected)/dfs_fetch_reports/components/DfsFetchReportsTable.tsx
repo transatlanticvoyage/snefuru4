@@ -23,6 +23,8 @@ interface DfsFetchReport {
   dfs_task_ids: string[] | null;
   dfs_credits_used: number | null;
   updated_at: string;
+  source_type?: string | null;
+  rel_fabrication_launch_id?: number | null;
 }
 
 interface Props {
@@ -124,9 +126,11 @@ export default function DfsFetchReportsTable({ reports, onRetryFailed, onRefresh
 
   const exportReportCSV = (report: DfsFetchReport) => {
     const csvData = [
-      ['Submission ID', 'Tag Name', 'Status', 'Total Keywords', 'Processed', 'Succeeded', 'Failed', 'Success Rate', 'Processing Time', 'Credits Used', 'Submitted At'],
+      ['Submission ID', 'Source', 'F370 Launch ID', 'Tag Name', 'Status', 'Total Keywords', 'Processed', 'Succeeded', 'Failed', 'Success Rate', 'Processing Time', 'Credits Used', 'Submitted At'],
       [
         report.submission_id.toString(),
+        report.source_type || 'manual',
+        report.rel_fabrication_launch_id?.toString() || 'N/A',
         report.tag_name || 'N/A',
         report.status,
         report.total_keywords.toString(),
@@ -172,6 +176,7 @@ export default function DfsFetchReportsTable({ reports, onRetryFailed, onRefresh
         <thead className="bg-gray-50">
           <tr>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submission</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tag</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
@@ -189,6 +194,24 @@ export default function DfsFetchReportsTable({ reports, onRetryFailed, onRefresh
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">#{report.submission_id}</div>
                   <div className="text-xs text-gray-500">{report.total_keywords} keywords</div>
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  {report.source_type === 'f370_auto' ? (
+                    <div>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                        F370 Auto
+                      </span>
+                      {report.rel_fabrication_launch_id && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          Launch #{report.rel_fabrication_launch_id}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                      {report.source_type === 'retry' ? 'Retry' : 'Manual'}
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   {report.tag_name && report.tag_id ? (

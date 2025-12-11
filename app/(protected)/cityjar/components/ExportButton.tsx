@@ -24,17 +24,33 @@ interface City {
   updated_at: string | null;
 }
 
-export default function ExportButton() {
+interface ExportButtonProps {
+  selectedRows: Set<number>;
+  filteredData: City[];
+}
+
+export default function ExportButton({ selectedRows, filteredData }: ExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [exportScope, setExportScope] = useState('all_from_filters');
 
   const fetchCitiesData = async (): Promise<City[]> => {
-    const response = await fetch('/api/cities/export');
-    if (!response.ok) {
-      throw new Error('Failed to fetch cities data');
+    switch (exportScope) {
+      case 'entire_db':
+        const response = await fetch('/api/cities/export');
+        if (!response.ok) {
+          throw new Error('Failed to fetch cities data');
+        }
+        const data = await response.json();
+        return data.cities;
+      
+      case 'selected_items':
+        return filteredData.filter(city => selectedRows.has(city.city_id));
+      
+      case 'all_from_filters':
+      default:
+        return filteredData;
     }
-    const data = await response.json();
-    return data.cities;
   };
 
   const downloadFile = (content: string, filename: string, contentType: string) => {
@@ -239,34 +255,78 @@ export default function ExportButton() {
           />
           
           {/* Dropdown Menu */}
-          <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+          <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-20">
             <div className="py-1">
-              <button
-                onClick={exportToExcel}
-                disabled={isLoading}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 flex items-center space-x-2"
-              >
-                <span>📗</span>
-                <span>Export as Excel (.xlsx)</span>
-              </button>
+              {/* Export Scope Options */}
+              <div className="px-4 py-2 border-b border-gray-200">
+                <div className="text-xs font-medium text-gray-500 mb-2">Export Scope:</div>
+                <div className="space-y-1">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="exportScope"
+                      value="entire_db"
+                      checked={exportScope === 'entire_db'}
+                      onChange={(e) => setExportScope(e.target.value)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Export Entire DB Table</span>
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="exportScope"
+                      value="selected_items"
+                      checked={exportScope === 'selected_items'}
+                      onChange={(e) => setExportScope(e.target.value)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Export Only Selected Items ({selectedRows.size})</span>
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="exportScope"
+                      value="all_from_filters"
+                      checked={exportScope === 'all_from_filters'}
+                      onChange={(e) => setExportScope(e.target.value)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Export All From Current Filters ({filteredData.length})</span>
+                  </label>
+                </div>
+              </div>
               
-              <button
-                onClick={exportToCsv}
-                disabled={isLoading}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 flex items-center space-x-2"
-              >
-                <span>📄</span>
-                <span>Export as CSV (.csv)</span>
-              </button>
-              
-              <button
-                onClick={exportToSql}
-                disabled={isLoading}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 flex items-center space-x-2"
-              >
-                <span>🗃️</span>
-                <span>Export as SQL (.sql)</span>
-              </button>
+              {/* Export Format Options */}
+              <div className="px-4 py-2">
+                <div className="text-xs font-medium text-gray-500 mb-2">Export Format:</div>
+                <button
+                  onClick={exportToExcel}
+                  disabled={isLoading}
+                  className="w-full text-left px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 flex items-center space-x-2 rounded"
+                >
+                  <span>📗</span>
+                  <span>Export as Excel (.xlsx)</span>
+                </button>
+                
+                <button
+                  onClick={exportToCsv}
+                  disabled={isLoading}
+                  className="w-full text-left px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 flex items-center space-x-2 rounded"
+                >
+                  <span>📄</span>
+                  <span>Export as CSV (.csv)</span>
+                </button>
+                
+                <button
+                  onClick={exportToSql}
+                  disabled={isLoading}
+                  className="w-full text-left px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 flex items-center space-x-2 rounded"
+                >
+                  <span>🗃️</span>
+                  <span>Export as SQL (.sql)</span>
+                </button>
+              </div>
             </div>
           </div>
         </>

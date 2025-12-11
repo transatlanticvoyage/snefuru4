@@ -51,6 +51,7 @@ interface KeywordRecord {
     city_name: string | null;
     state_code: string | null;
     state_full: string | null;
+    associated_principal_city: string | null;
     city_population: number | null;
   } | null;
   // Cache staleness tracking
@@ -103,6 +104,16 @@ const columns: ColumnDefinition[] = [
     isJoistColumn: true
   },
   {
+    key: 'exact_city.associated_principal_city',
+    label: 'associated_principal_city',
+    type: 'text',
+    headerRow1Text: 'joist',
+    headerRow2Text: 'associated_principal_city',
+    readOnly: false,
+    isJoistColumn: true,
+    isJoined: true
+  },
+  {
     key: 'exact_city.classification',
     label: 'classification',
     type: 'classification_dropdown',
@@ -130,17 +141,8 @@ const columns: ColumnDefinition[] = [
     headerRow2Text: 'state_code',
     readOnly: true,
     isJoistColumn: true,
-    isJoined: true
-  },
-  {
-    key: 'map_actions',
-    label: 'map',
-    type: 'map',
-    headerRow1Text: 'joist',
-    headerRow2Text: 'map',
-    readOnly: true,
-    isJoistColumn: true,
-    width: '80px'
+    isJoined: true,
+    width: '130px'
   },
   { 
     key: 'joist_metro_pop_placeholder', 
@@ -620,6 +622,7 @@ export default function KeywordsHubTable({
             city_name,
             state_code,
             state_full,
+            associated_principal_city,
             city_population
           ),
           largest_city:cities!rel_largest_city_id (
@@ -946,7 +949,7 @@ export default function KeywordsHubTable({
 
   // Column pagination logic with sticky columns
   const baseStickyKeys = ['serp_tool', 'keyword_id', 'is_starred', 'is_chosen', 'keyword_datum', 'search_volume', 'cpc'];
-  const joistColumnKeys = ['rel_exact_city_id', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'map_actions', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
+  const joistColumnKeys = ['rel_exact_city_id', 'exact_city.associated_principal_city', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
   const hoistColumnKeys = ['rel_largest_city_id', 'hoist_metro_pop_placeholder', 'largest_city.city_population'];
   
   // Filter columns based on joist and hoist toggles
@@ -1279,6 +1282,48 @@ export default function KeywordsHubTable({
     // Skip saveEdit for classification field as it's handled by its own dropdown
     if (editingCell.field === 'exact_city.classification') {
       return;
+    }
+    
+    // Handle associated_principal_city field - update cities table
+    if (editingCell.field === 'exact_city.associated_principal_city') {
+      try {
+        // Find the record to get the city ID
+        const item = data.find(record => record.keyword_id === editingCell.id);
+        if (!item?.rel_exact_city_id) {
+          console.error('No city ID found for this record');
+          return;
+        }
+
+        const { error } = await supabase
+          .from('cities')
+          .update({ associated_principal_city: editingValue || null })
+          .eq('city_id', item.rel_exact_city_id);
+
+        if (error) throw error;
+
+        // Update local data
+        setData(prevData => 
+          prevData.map(dataItem => 
+            dataItem.keyword_id === editingCell.id 
+              ? { 
+                  ...dataItem, 
+                  exact_city: dataItem.exact_city ? 
+                    { ...dataItem.exact_city, associated_principal_city: editingValue || null } : 
+                    dataItem.exact_city,
+                  updated_at: new Date().toISOString() 
+                }
+              : dataItem
+          )
+        );
+
+        setEditingCell(null);
+        setEditingValue('');
+        return;
+      } catch (error) {
+        console.error('Error updating associated_principal_city:', error);
+        alert('Failed to update associated principal city');
+        return;
+      }
     }
     
     try {
@@ -2313,35 +2358,79 @@ export default function KeywordsHubTable({
     if (column.key === 'exact_city.state_code') {
       const cityName = item.exact_city?.city_name || '';
       const stateCode = value?.toString() || '';
+      const stateFull = item.exact_city?.state_full || '';
       const fullLocation = `${cityName} ${stateCode}`.trim();
       
+      // Generate Google Maps URL using city_name and state_full (from former map_actions)
+      const generateGoogleMapsUrl = (city: string, state: string) => {
+        if (!city || !state) return '';
+        const searchQuery = `${city} ${state}`.replace(/\s+/g, ' ').trim();
+        return `https://www.google.com/maps/place/${encodeURIComponent(searchQuery)}`;
+      };
+      
+      const generatedUrl = generateGoogleMapsUrl(cityName, stateFull);
+      
       return (
-        <div className="flex items-center space-x-1">
-          <div className="text-xs">
-            {stateCode}
+        <div className="flex items-center justify-between" style={{ width: '130px', minWidth: '130px' }}>
+          <div className="text-xs flex-shrink-0" style={{ width: '22px' }}>
+            <span className="font-bold">{stateCode}</span>
           </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              navigator.clipboard.writeText(fullLocation.toLowerCase());
-            }}
-            className="flex-shrink-0 bg-gray-200 border border-gray-400 text-gray-600 flex items-center justify-center hover:bg-gray-300 transition-colors"
-            style={{ width: '26px', height: '26px', fontSize: '14px' }}
-            title={`Copy: ${fullLocation.toLowerCase()}`}
-          >
-            c
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullLocation)}`, '_blank');
-            }}
-            className="flex-shrink-0 bg-gray-200 border border-gray-400 text-gray-600 flex items-center justify-center hover:bg-gray-300 transition-colors"
-            style={{ width: '26px', height: '26px', fontSize: '14px' }}
-            title={`Open in Google Maps: ${fullLocation}`}
-          >
-            m
-          </button>
+          <div className="flex items-center space-x-1">
+            {/* Original copy button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(fullLocation.toLowerCase());
+              }}
+              className="flex-shrink-0 bg-gray-200 border border-gray-400 text-gray-600 flex items-center justify-center hover:bg-gray-300 transition-colors"
+              style={{ width: '22px', height: '22px', fontSize: '12px' }}
+              title={`Copy: ${fullLocation.toLowerCase()}`}
+            >
+              c
+            </button>
+            {/* Original maps button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullLocation)}`, '_blank');
+              }}
+              className="flex-shrink-0 bg-gray-200 border border-gray-400 text-gray-600 flex items-center justify-center hover:bg-gray-300 transition-colors"
+              style={{ width: '22px', height: '22px', fontSize: '12px' }}
+              title={`Open in Google Maps: ${fullLocation}`}
+            >
+              m
+            </button>
+            {/* Former map_actions copy button */}
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (generatedUrl) {
+                  try {
+                    await navigator.clipboard.writeText(generatedUrl);
+                  } catch (err) {
+                    console.error('Failed to copy to clipboard:', err);
+                  }
+                }
+              }}
+              className="w-5 h-5 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-bold flex items-center justify-center"
+              title="Copy Google Maps link to clipboard"
+            >
+              📋
+            </button>
+            {/* Former map_actions open button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (generatedUrl) {
+                  window.open(generatedUrl, '_blank');
+                }
+              }}
+              className="w-5 h-5 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-bold flex items-center justify-center"
+              title="Open in Google Maps"
+            >
+              OP
+            </button>
+          </div>
         </div>
       );
     }
@@ -2429,53 +2518,20 @@ export default function KeywordsHubTable({
       );
     }
 
-    // Special handling for map_actions column
-    if (column.key === 'map_actions') {
-      const cityName = item.exact_city?.city_name || '';
-      const stateFull = item.exact_city?.state_full || '';
-      
-      // Generate Google Maps URL using city_name and state_full (same as cityjar logic)
-      const generateGoogleMapsUrl = (city: string, state: string) => {
-        if (!city || !state) return '';
-        const searchQuery = `${city} ${state}`.replace(/\s+/g, ' ').trim();
-        return `https://www.google.com/maps/place/${encodeURIComponent(searchQuery)}`;
-      };
-      
-      const generatedUrl = generateGoogleMapsUrl(cityName, stateFull);
+
+    // Special handling for bolding city_name and state_code in joist area
+    if (column.key === 'exact_city.city_name') {
+      const classification = item.exact_city?.classification || '';
+      const shouldBold = classification !== 'smaller_suburb';
       
       return (
-        <div className="flex items-center space-x-1" style={{ width: '80px', maxWidth: '80px', minWidth: '80px' }}>
-          {/* Copy button (like cityjar) */}
-          <button
-            onClick={async (e) => {
-              e.stopPropagation();
-              if (generatedUrl) {
-                try {
-                  await navigator.clipboard.writeText(generatedUrl);
-                } catch (err) {
-                  console.error('Failed to copy to clipboard:', err);
-                }
-              }
-            }}
-            className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-bold flex items-center justify-center"
-            title="Copy Google Maps link to clipboard"
-          >
-            📋
-          </button>
-          
-          {/* Open button (like cityjar) */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (generatedUrl) {
-                window.open(generatedUrl, '_blank');
-              }
-            }}
-            className="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-bold flex items-center justify-center"
-            title="Open in Google Maps"
-          >
-            OP
-          </button>
+        <div
+          className={cellClass}
+          onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
+        >
+          <span className={shouldBold ? 'font-bold' : ''}>
+            {value?.toString() || ''}
+          </span>
         </div>
       );
     }
@@ -2584,7 +2640,7 @@ export default function KeywordsHubTable({
       // Filter columns based on joist and hoist toggles
       let currentActiveColumns = columns;
       if (!showJoistColumns) {
-        const joistKeys = ['rel_exact_city_id', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'map_actions', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
+        const joistKeys = ['rel_exact_city_id', 'exact_city.associated_principal_city', 'exact_city.classification', 'exact_city.city_name', 'exact_city.state_code', 'joist_metro_pop_placeholder', 'exact_city.city_population'];
         currentActiveColumns = currentActiveColumns.filter(col => !joistKeys.includes(col.key));
       }
       if (!showHoistColumns) {

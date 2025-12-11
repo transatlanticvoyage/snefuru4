@@ -24,6 +24,7 @@ export default function FabricClient() {
   const [cncglubRowCount, setCncglubRowCount] = useState<number | null>(null);
   const [isLoadingCount, setIsLoadingCount] = useState(false);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
+  const [runF12Refresh, setRunF12Refresh] = useState(true);
   const [formData, setFormData] = useState({
     country: 'United States',
     industry_id: '',
@@ -173,7 +174,8 @@ export default function FabricClient() {
         },
         body: JSON.stringify({
           ...formData,
-          user_internal_id: userInternalId
+          user_internal_id: userInternalId,
+          run_f12_refresh: runF12Refresh
         }),
       });
 
@@ -181,7 +183,7 @@ export default function FabricClient() {
 
       if (response.ok) {
         setIsSuccess(true);
-        setResultMessage(
+        let successMessage = 
           `✅ F370 Process Completed Successfully!\n\n\n` +
           `• Identified ${result.cncglub_rows_identified} cncglub rows matching the criteria\n` +
           `• Created ${result.keywords_created} new keywords\n` +
@@ -189,9 +191,20 @@ export default function FabricClient() {
           `• Created tag in keywordshub_tags db table: ${result.tag_name} (ID: ${result.tag_id})\n` +
           `• Made sure all ${result.keywords_total} keywords were added to it\n` +
           `• Updated ${result.cncglub_rows_updated} cncglub rows at ${formData.kwslot} to reference all ${result.keywords_total} keywords in keywordshub db table\n` +
-          `• Launch ID: ${result.launch_id}\n\n` +
-          `Process completed at: ${new Date().toLocaleString()}`
-        );
+          `• Launch ID: ${result.launch_id}\n`;
+        
+        // Add F12 refresh status if triggered
+        if (result.f12_refresh_triggered) {
+          successMessage += 
+            `\n🔄 F12 DFS Metrics Refresh:\n` +
+            `• Automatically triggered for ${result.keywords_total} keywords\n` +
+            `• DFS Report ID: ${result.dfs_report_id || 'Processing'}\n` +
+            `• Metrics will be updated in background\n`;
+        }
+        
+        successMessage += `\nProcess completed at: ${new Date().toLocaleString()}`;
+        
+        setResultMessage(successMessage);
         // Refresh fabrication launches data
         await refreshFabricationLaunches();
       } else {
@@ -381,8 +394,8 @@ export default function FabricClient() {
                 <span className="font-bold text-lg">saskatoon ui table</span>
               </div>
               
-              {/* 4-column table */}
-              <table className="border-collapse table-auto">
+              {/* 6-column table */}
+              <table className="border-collapse table-auto" style={{ minWidth: '1200px' }}>
                 {/* Header row - numbered with light gray background */}
                 <thead>
                   <tr className="bg-gray-200">
@@ -410,7 +423,7 @@ export default function FabricClient() {
                         <span className="font-bold">cncglub option - select country</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-[480px] border-t-black border-t-[4px]">
+                    <td className="border border-gray-300 p-3 min-w-[700px] border-t-black border-t-[4px]" style={{ minWidth: '700px' }}>
                       <select 
                         className="w-full px-2 py-1 border border-gray-300 rounded" 
                         value={formData.country}
@@ -443,7 +456,7 @@ export default function FabricClient() {
                         <span className="font-bold">cncglub option - select industry</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-[480px]">
+                    <td className="border border-gray-300 p-3 min-w-[700px]" style={{ minWidth: '700px' }}>
                       <select 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
                         value={formData.industry_id}
@@ -477,7 +490,7 @@ export default function FabricClient() {
                         <span className="font-bold">new - country to select cities from</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-[480px]">
+                    <td className="border border-gray-300 p-3 min-w-[700px]" style={{ minWidth: '700px' }}>
                       <select 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
                         disabled
@@ -504,7 +517,7 @@ export default function FabricClient() {
                         <span className="font-bold">cncglub option - select cities</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-[480px]">
+                    <td className="border border-gray-300 p-3 min-w-[700px]" style={{ minWidth: '700px' }}>
                       <select 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
                         value={formData.city_population_filter}
@@ -542,7 +555,7 @@ export default function FabricClient() {
                         <span className="font-bold">kwslot option - kwslot to populate</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-[480px] border-t-black border-t-[4px]">
+                    <td className="border border-gray-300 p-3 min-w-[700px] border-t-black border-t-[4px]" style={{ minWidth: '700px' }}>
                       <select 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
                         value={formData.kwslot}
@@ -580,11 +593,11 @@ export default function FabricClient() {
                         <span className="font-bold">kwhub option - kw rubric</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-[480px] border-t-black border-t-[4px]">
+                    <td className="border border-gray-300 p-3 min-w-[700px] border-t-black border-t-[4px]" style={{ minWidth: '700px' }}>
                       <input 
                         type="text" 
                         placeholder="deck builder (city_name) (state_code)"
-                        className="w-full px-2 py-1 border border-gray-300 rounded min-w-[440px]"
+                        className="w-full px-2 py-1 border border-gray-300 rounded min-w-[660px]"
                         value={formData.kw_rubric}
                         onChange={(e) => handleInputChange('kw_rubric', e.target.value)}
                       />
@@ -608,7 +621,7 @@ export default function FabricClient() {
                         <span className="font-bold">kwhub option - rel_dfs_location_code</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-[480px]">
+                    <td className="border border-gray-300 p-3 min-w-[700px]" style={{ minWidth: '700px' }}>
                       <input 
                         type="text" 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
@@ -635,7 +648,7 @@ export default function FabricClient() {
                         <span className="font-bold">kwhub option - language_code</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-[480px] border-b-black border-b-[4px]">
+                    <td className="border border-gray-300 p-3 min-w-[700px] border-b-black border-b-[4px]" style={{ minWidth: '700px' }}>
                       <input 
                         type="text" 
                         className="w-full px-2 py-1 border border-gray-300 rounded"
@@ -662,7 +675,7 @@ export default function FabricClient() {
                         <span className="font-bold">tag option - keywordshub_tags.tag_name</span>
                       </div>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-[480px] border-b-black border-b-[4px]">
+                    <td className="border border-gray-300 p-3 min-w-[700px] border-b-black border-b-[4px]" style={{ minWidth: '700px' }}>
                       <input 
                         type="text" 
                         placeholder="deck cncs 1"
@@ -705,6 +718,21 @@ export default function FabricClient() {
                     This is how many cncglub rows will be processed when F370 runs
                   </div>
                 </div>
+              </div>
+
+              {/* F12 Refresh Checkbox */}
+              <div className="mt-4 mb-2">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={runF12Refresh}
+                    onChange={(e) => setRunF12Refresh(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    run f12 refresh dfs metrics immediately after all f370 functions have completed
+                  </span>
+                </label>
               </div>
 
               {/* Red button below table */}
