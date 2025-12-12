@@ -694,9 +694,14 @@ export default function KeywordsHubTable({
         }
       }
 
+      // Only apply limit when not filtering by tag to prevent timeouts
+      // When filtering by tag, we want ALL keywords for that tag
+      if (!selectedTagId) {
+        query = query.limit(100);
+      }
+      
       const { data: keywords, error } = await query
-        .order('search_volume', { ascending: false })
-        .limit(100);
+        .order('search_volume', { ascending: false });
 
       if (error) {
         console.error('🏷️ [FETCH DATA] Database error:', error);
@@ -1879,7 +1884,7 @@ export default function KeywordsHubTable({
   };
 
   // Render cell content
-  const renderCell = (item: KeywordRecord, column: typeof columns[0]) => {
+  const renderCell = (item: KeywordRecord, column: typeof columns[0], rowIndex?: number) => {
     // Handle placeholder columns for metro pop (no database column exists)
     if (column.key === 'joist_metro_pop_placeholder' || column.key === 'hoist_metro_pop_placeholder') {
       return (
@@ -2083,8 +2088,35 @@ export default function KeywordsHubTable({
 
     // Special handling for SERP tool column
     if (column.key === 'serp_tool') {
+      // Check if this row should show the "8" button (first row and every 8th row after)
+      const showBatchButton = rowIndex !== undefined && rowIndex % 8 === 0;
+      
+      const handleBatchSemrush = async () => {
+        if (rowIndex === undefined) return;
+        
+        // Get the next 8 rows starting from current index
+        const endIndex = Math.min(rowIndex + 8, paginatedData.length);
+        
+        // Open each link with a small delay to prevent popup blocking
+        for (let i = rowIndex; i < endIndex; i++) {
+          const keyword = paginatedData[i];
+          if (keyword && keyword.keyword_datum) {
+            const semrushUrl = `https://www.semrush.com/analytics/keywordoverview/?q=${encodeURIComponent(keyword.keyword_datum).replace(/%20/g, '+')}&db=${getSemrushDbCode(keyword.country_code_internal)}`;
+            
+            // Open in new tab
+            window.open(semrushUrl, '_blank', 'noopener,noreferrer');
+            
+            // Add a small delay between opening tabs to prevent browser blocking
+            if (i < endIndex - 1) {
+              await new Promise(resolve => setTimeout(resolve, 100));
+            }
+          }
+        }
+      };
+      
       return (
         <div className="px-2 py-1 flex items-center justify-center gap-1">
+          {/* Existing buttons */}
           <a
             href={`/serpjar?keyword_id=${item.keyword_id}`}
             target="_blank"
@@ -2119,6 +2151,18 @@ export default function KeywordsHubTable({
               className="w-4 h-4"
             />
           </a>
+          
+          {/* New batch button - appears last (right) */}
+          <button
+            onClick={showBatchButton ? handleBatchSemrush : undefined}
+            className={`w-4 h-4 bg-white border border-orange-500 flex items-center justify-center text-xs font-bold ${
+              showBatchButton ? 'cursor-pointer hover:bg-orange-50' : 'cursor-default'
+            }`}
+            title={showBatchButton ? `Open 8 SEMrush links starting from this row` : ''}
+            style={{ textDecoration: 'none', lineHeight: '16px' }}
+          >
+            {showBatchButton ? <span style={{ color: '#FF6600' }}>8</span> : ''}
+          </button>
         </div>
       );
     }
@@ -3000,7 +3044,7 @@ export default function KeywordsHubTable({
               </tr>
             </thead>
             <tbody className="bg-white">
-              {paginatedData.map((item) => (
+              {paginatedData.map((item, index) => (
                 <tr key={item.keyword_id} className={`hover:bg-gray-50 ${selectedRows.has(item.keyword_id) ? '' : ''}`} style={selectedRows.has(item.keyword_id) ? { backgroundColor: '#cfdff8' } : {}}>
                   <td className="px-2 py-2 border border-gray-200">
                     <div 
@@ -3031,7 +3075,7 @@ export default function KeywordsHubTable({
                         column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
                       }`}
                     >
-                      {renderCell(item, column)}
+                      {renderCell(item, column, index)}
                     </td>
                   ))}
                 </tr>

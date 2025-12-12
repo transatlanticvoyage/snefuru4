@@ -149,7 +149,36 @@ All content inside TH and TD cells is wrapped in a div with class `cell_inner_wr
 
 ## Important Notes
 1. The `!important` flag is used throughout to override any inline styles
-2. The `.leadsmart-morph-main-table` parent class ensures these rules only apply to the specific table
+2. The parent table class ensures these rules only apply to the specific table
 3. The system relies on the `for_db_column_` class naming convention
 4. Z-index layering prevents visual glitches when cells might overlap
+
+## Z-Index Requirements for Sticky Headers
+**CRITICAL**: When using sticky headers with shrinkage columns, follow this z-index hierarchy:
+
+### Base Z-Index Values
+- `thead`: z-index: 100 (base sticky layer)
+- `th` (general): z-index: 110 (header cells above everything)
+- `td` (shrinkage columns): z-index: 101-109 (data cells above base but below headers)
+- `th` (shrinkage columns in sticky headers): z-index: 111+ (sticky headers must be highest)
+
+### Example Implementation
+```css
+/* Sticky header base */
+.table-name thead { z-index: 100; }
+.table-name th { z-index: 110; }
+
+/* Shrinkage columns */
+.table-name th.for_db_column_col1,
+.table-name td.for_db_column_col1 { z-index: 101; }
+.table-name th.for_db_column_col2,
+.table-name td.for_db_column_col2 { z-index: 102; }
+
+/* Sticky headers override shrinkage */
+.table-name thead th.for_db_column_col1 { z-index: 111; }
+.table-name thead th.for_db_column_col2 { z-index: 112; }
+```
+
+### Why This Matters
+Without proper z-index hierarchy, data cells in shrinkage columns will show "behind" sticky headers when scrolling, causing visual corruption where cell content appears to bleed through header backgrounds.
 5. The hard clip (not ellipsis) creates a cleaner visual appearance for truncated headers

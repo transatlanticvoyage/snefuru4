@@ -3,12 +3,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
-import dynamic from 'next/dynamic';
-
-const NubraTablefaceKite = dynamic(
-  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
-  { ssr: false }
-);
 
 interface KeywordTag {
   tag_id: number;
@@ -16,7 +10,6 @@ interface KeywordTag {
   tag_order: number;
   created_at: string;
   updated_at: string;
-  user_id: string;
   is_starred: boolean | null;
   keyword_count?: number;
   rel_tag_group?: number | null;
@@ -32,7 +25,6 @@ interface KeywordTagGroup {
   display_order: number;
   created_at: string;
   updated_at: string;
-  user_id: string;
   is_starred: boolean | null;
   tag_count?: number;
 }
@@ -46,18 +38,17 @@ interface TagsPlenchPopupProps {
 
 const tagsColumns = [
   { key: 'checkbox', label: 'checkbox', type: 'checkbox', width: '60px' },
-  { key: 'keyword_count', label: 'count of keywords', type: 'number', width: '120px' },
+  { key: 'keyword_count', label: 'count of keywords', type: 'number', width: '1px', shrinkColumn: true },
   { key: 'group_name', label: 'group', type: 'text', width: '150px' },
   { key: 'filter', label: 'Filter', type: 'action', width: '80px' },
   { key: 'tag_id', label: 'tag_id', type: 'number', width: '80px' },
   { key: 'is_starred', label: 'str.', type: 'star', width: '60px', headerRow1Text: 'keywordshub_tags', headerRow2Text: 'str.' },
   { key: 'tag_name', label: 'tag_name', type: 'text', width: '200px' },
-  { key: 'qty_starred', label: 'qty_starred', type: 'number', width: '100px' },
-  { key: 'qty_chosen', label: 'qty_chosen', type: 'number', width: '100px' },
+  { key: 'qty_starred', label: 'qty_starred', type: 'number', width: '1px', shrinkColumn: true },
+  { key: 'qty_chosen', label: 'qty_chosen', type: 'number', width: '1px', shrinkColumn: true },
   { key: 'tag_order', label: 'tag_order', type: 'number', width: '100px' },
   { key: 'created_at', label: 'created_at', type: 'datetime', width: '180px' },
-  { key: 'updated_at', label: 'updated_at', type: 'datetime', width: '180px' },
-  { key: 'user_id', label: 'user_id', type: 'text', width: '200px' }
+  { key: 'updated_at', label: 'updated_at', type: 'datetime', width: '180px' }
 ] as const;
 
 const groupsColumns = [
@@ -71,12 +62,133 @@ const groupsColumns = [
   { key: 'is_starred', label: 'str.', type: 'star', width: '60px', headerRow1Text: 'keywordshub_tag_groups', headerRow2Text: 'str.' },
   { key: 'display_order', label: 'display_order', type: 'number', width: '100px' },
   { key: 'created_at', label: 'created_at', type: 'datetime', width: '180px' },
-  { key: 'updated_at', label: 'updated_at', type: 'datetime', width: '180px' },
-  { key: 'user_id', label: 'user_id', type: 'text', width: '200px' }
+  { key: 'updated_at', label: 'updated_at', type: 'datetime', width: '180px' }
 ] as const;
 
 export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selectedTag }: TagsPlenchPopupProps) {
   const { user } = useAuth();
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [selectedTagForDelete, setSelectedTagForDelete] = useState<KeywordTag | null>(null);
+  const [scanResults, setScanResults] = useState<{ total: number; shared: number } | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+
+  // Column shrinkage CSS styles
+  const shrinkageStyles = `
+    .tags-plench-table {
+      table-layout: auto !important;
+    }
+    
+    .tags-plench-table th,
+    .tags-plench-table td {
+      white-space: nowrap !important;
+      width: auto !important;
+    }
+    
+    .tags-plench-table .for_db_column_keyword_count,
+    .tags-plench-table .for_db_column_qty_starred,
+    .tags-plench-table .for_db_column_qty_chosen {
+      width: 1px !important;
+      white-space: nowrap !important;
+      position: relative;
+    }
+
+    .tags-plench-table td.for_db_column_keyword_count .cell_inner_wrapper_div,
+    .tags-plench-table td.for_db_column_qty_starred .cell_inner_wrapper_div,
+    .tags-plench-table td.for_db_column_qty_chosen .cell_inner_wrapper_div {
+      white-space: nowrap !important;
+      padding: 4px 8px !important;
+      min-width: fit-content !important;
+      text-align: left !important;
+      justify-content: flex-start !important;
+      display: block !important;
+    }
+
+    .tags-plench-table th.for_db_column_keyword_count,
+    .tags-plench-table th.for_db_column_qty_starred,
+    .tags-plench-table th.for_db_column_qty_chosen {
+      position: relative !important;
+      overflow: hidden !important;
+      max-width: 0 !important;
+      width: 1px !important;
+    }
+
+    .tags-plench-table th.for_db_column_keyword_count .cell_inner_wrapper_div,
+    .tags-plench-table th.for_db_column_qty_starred .cell_inner_wrapper_div,
+    .tags-plench-table th.for_db_column_qty_chosen .cell_inner_wrapper_div {
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: clip !important;
+      display: block !important;
+      padding: 4px 8px !important;
+      min-width: 0 !important;
+    }
+
+    /* Sticky header base z-index and opaque backgrounds */
+    .tags-plench-table thead {
+      z-index: 100;
+      position: relative;
+    }
+    
+    .tags-plench-table th {
+      z-index: 110;
+      background-color: #f9fafb !important; /* Completely opaque gray-50 equivalent */
+      position: relative;
+    }
+    
+    /* First header row - table name row */
+    .tags-plench-table thead tr:first-child th {
+      background-color: #bcc4f1 !important; /* Completely opaque blue background */
+      z-index: 115;
+    }
+    
+    /* Second header row - column name row */
+    .tags-plench-table thead tr:last-child th {
+      background-color: #f9fafb !important; /* Completely opaque gray background */
+      z-index: 114;
+    }
+    
+    /* Shrinkage column z-index (lower than headers) */
+    .tags-plench-table th.for_db_column_keyword_count,
+    .tags-plench-table td.for_db_column_keyword_count { z-index: 101; }
+    .tags-plench-table th.for_db_column_qty_starred,
+    .tags-plench-table td.for_db_column_qty_starred { z-index: 102; }
+    .tags-plench-table th.for_db_column_qty_chosen,
+    .tags-plench-table td.for_db_column_qty_chosen { z-index: 103; }
+    
+    /* Ensure sticky headers override shrinkage columns with opaque backgrounds */
+    .tags-plench-table thead tr:first-child th.for_db_column_keyword_count { 
+      z-index: 116; 
+      background-color: #bcc4f1 !important; 
+      position: relative;
+    }
+    .tags-plench-table thead tr:first-child th.for_db_column_qty_starred { 
+      z-index: 117; 
+      background-color: #bcc4f1 !important; 
+      position: relative;
+    }
+    .tags-plench-table thead tr:first-child th.for_db_column_qty_chosen { 
+      z-index: 118; 
+      background-color: #bcc4f1 !important; 
+      position: relative;
+    }
+    
+    .tags-plench-table thead tr:last-child th.for_db_column_keyword_count { 
+      z-index: 119; 
+      background-color: #f9fafb !important; 
+      position: relative;
+    }
+    .tags-plench-table thead tr:last-child th.for_db_column_qty_starred { 
+      z-index: 120; 
+      background-color: #f9fafb !important; 
+      position: relative;
+    }
+    .tags-plench-table thead tr:last-child th.for_db_column_qty_chosen { 
+      z-index: 121; 
+      background-color: #f9fafb !important; 
+      position: relative;
+    }
+  `;
   // Tags state
   const [data, setData] = useState<KeywordTag[]>([]);
   const [loading, setLoading] = useState(true);
@@ -651,16 +763,10 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
   // Handle add selected tags to group
   const handleAddSelectedTagsToGroup = async (group: KeywordTagGroup) => {
     if (selectedRows.size === 0) {
-      alert('No tags are selected. Please select some tags first.');
       return;
     }
 
     const selectedTagIds = Array.from(selectedRows);
-    const confirmAdd = window.confirm(
-      `Add ${selectedTagIds.length} selected tag(s) to the group "${group.group_name}"?`
-    );
-    
-    if (!confirmAdd) return;
 
     try {
       // Update the rel_tag_group field for selected tags
@@ -674,10 +780,14 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
 
       if (error) {
         console.error('Error adding tags to group:', error);
-        alert('Failed to add tags to group: ' + error.message);
       } else {
         console.log('Tags added to group successfully');
-        alert(`Successfully added ${selectedTagIds.length} tag(s) to "${group.group_name}"`);
+        
+        // Show success message
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+        }, 1750); // Total animation time: 500ms fade in + 500ms solid + 750ms fade out
         
         // Refresh the groups data to update tag counts
         fetchGroupsData();
@@ -688,7 +798,6 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
       }
     } catch (err) {
       console.error('Error adding tags to group:', err);
-      alert('Failed to add tags to group');
     }
   };
 
@@ -831,10 +940,318 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
     }
   };
 
+  // Handle scan keywords for shared tags
+  const handleScanKeywords = async () => {
+    if (!selectedTagForDelete || !userInternalId) return;
+    
+    setIsScanning(true);
+    try {
+      // Get all keywords for this tag
+      const { data: tagRelations, error: relationError } = await supabase
+        .from('keywordshub_tag_relations')
+        .select('fk_keyword_id')
+        .eq('fk_tag_id', selectedTagForDelete.tag_id);
+
+      if (relationError) {
+        console.error('Error fetching tag relations:', relationError);
+        setIsScanning(false);
+        return;
+      }
+
+      const totalKeywords = tagRelations?.length || 0;
+      
+      if (totalKeywords === 0) {
+        setScanResults({ total: 0, shared: 0 });
+        setIsScanning(false);
+        return;
+      }
+
+      const keywordIds = tagRelations.map(rel => rel.fk_keyword_id);
+      
+      // Check which keywords are shared with other tags
+      const { data: sharedRelations, error: sharedError } = await supabase
+        .from('keywordshub_tag_relations')
+        .select('fk_keyword_id, fk_tag_id')
+        .in('fk_keyword_id', keywordIds)
+        .neq('fk_tag_id', selectedTagForDelete.tag_id);
+
+      if (sharedError) {
+        console.error('Error checking shared keywords:', sharedError);
+        setIsScanning(false);
+        return;
+      }
+
+      // Count unique keywords that are shared
+      const uniqueSharedKeywords = new Set(sharedRelations?.map(rel => rel.fk_keyword_id) || []);
+      
+      setScanResults({
+        total: totalKeywords,
+        shared: uniqueSharedKeywords.size
+      });
+    } catch (err) {
+      console.error('Error scanning keywords:', err);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  // Handle special delete operations
+  const handleSpecialDelete = async (deleteType: 'tag-only' | 'tag-and-all' | 'tag-and-exclusive') => {
+    if (!selectedTagForDelete || !userInternalId) return;
+
+    try {
+      if (deleteType === 'tag-only') {
+        // First delete all tag relations
+        const { error: relationsError } = await supabase
+          .from('keywordshub_tag_relations')
+          .delete()
+          .eq('fk_tag_id', selectedTagForDelete.tag_id);
+
+        if (relationsError) {
+          console.error('Error deleting tag relations:', relationsError);
+        }
+
+        // Then delete the tag
+        const { error } = await supabase
+          .from('keywordshub_tags')
+          .delete()
+          .eq('tag_id', selectedTagForDelete.tag_id)
+          .eq('user_id', userInternalId);
+
+        if (error) {
+          console.error('Error deleting tag:', error);
+        } else {
+          // Show success and refresh
+          setShowSuccessMessage(true);
+          setTimeout(() => setShowSuccessMessage(false), 1750);
+          fetchData();
+          setSelectedRows(new Set());
+          setSelectAll(false);
+        }
+      } else if (deleteType === 'tag-and-all') {
+        // First get all keyword IDs for this tag
+        const { data: tagRelations } = await supabase
+          .from('keywordshub_tag_relations')
+          .select('fk_keyword_id')
+          .eq('fk_tag_id', selectedTagForDelete.tag_id);
+
+        const keywordIds = tagRelations?.map(rel => rel.fk_keyword_id) || [];
+
+        // Delete tag relations first (to avoid foreign key constraint)
+        const { error: relationsError } = await supabase
+          .from('keywordshub_tag_relations')
+          .delete()
+          .eq('fk_tag_id', selectedTagForDelete.tag_id);
+
+        if (relationsError) {
+          console.error('Error deleting tag relations:', relationsError);
+        }
+
+        // Delete keywords by first clearing all foreign key references
+        if (keywordIds.length > 0) {
+          console.log(`Starting deletion process for ${keywordIds.length} keywords`);
+          
+          const batchSize = 25; // Smaller batches to reduce URL length and potential conflicts
+          for (let i = 0; i < keywordIds.length; i += batchSize) {
+            const batch = keywordIds.slice(i, i + batchSize);
+            console.log(`Processing batch ${Math.floor(i/batchSize) + 1}: keywords ${batch[0]} to ${batch[batch.length-1]}`);
+            
+            // Step 1: Delete keyword-tag relations
+            const { error: kwRelationsError } = await supabase
+              .from('keywordshub_tag_relations')
+              .delete()
+              .in('fk_keyword_id', batch);
+
+            if (kwRelationsError) {
+              console.error('Error deleting keyword relations:', kwRelationsError);
+            }
+
+            // Step 2: Clear all references in cncglub table
+            for (const kwId of batch) {
+              for (let j = 1; j <= 10; j++) {
+                const columnName = `kwslot${j}`;
+                const { error: cncglubError } = await supabase
+                  .from('cncglub')
+                  .update({ [columnName]: null })
+                  .eq(columnName, kwId);
+                
+                if (cncglubError && cncglubError.code !== 'PGRST116') {
+                  console.error(`Error clearing cncglub ${columnName} for keyword ${kwId}:`, cncglubError);
+                }
+              }
+            }
+
+            // Step 3: Delete from zhe_serp_fetches (with smaller sub-batches)
+            const serpBatchSize = 10;
+            for (let k = 0; k < batch.length; k += serpBatchSize) {
+              const serpBatch = batch.slice(k, k + serpBatchSize);
+              const { error: serpError } = await supabase
+                .from('zhe_serp_fetches')
+                .delete()
+                .in('rel_keyword_id', serpBatch);
+
+              if (serpError && serpError.code !== 'PGRST116') {
+                console.error('Error deleting serp fetches:', serpError);
+              }
+            }
+
+            // Step 4: Delete from keywordshub_serp_zone_cache
+            const { error: cacheError } = await supabase
+              .from('keywordshub_serp_zone_cache')
+              .delete()
+              .in('keyword_id', batch);
+
+            if (cacheError && cacheError.code !== 'PGRST116') {
+              console.error('Error deleting serp cache:', cacheError);
+            }
+
+            // Step 5: Delete from keywordshub_tracking if it exists
+            const { error: trackingError } = await supabase
+              .from('keywordshub_tracking')
+              .delete()
+              .in('keyword_id', batch);
+
+            if (trackingError && trackingError.code !== 'PGRST116') {
+              console.error('Error deleting tracking records:', trackingError);
+            }
+
+            // Step 6: Finally delete the keywords themselves
+            const { error: keywordError } = await supabase
+              .from('keywordshub')
+              .delete()
+              .in('keyword_id', batch);
+
+            if (keywordError) {
+              console.error('Error deleting keywords batch:', keywordError);
+              console.error('Failed batch:', batch);
+            } else {
+              console.log(`Successfully deleted keyword batch: ${batch.join(', ')}`);
+            }
+
+            // Add delay between batches to prevent overwhelming the database
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        }
+
+        // Finally delete the tag
+        const { error: tagError } = await supabase
+          .from('keywordshub_tags')
+          .delete()
+          .eq('tag_id', selectedTagForDelete.tag_id)
+          .eq('user_id', userInternalId);
+
+        if (!tagError) {
+          setShowSuccessMessage(true);
+          setTimeout(() => setShowSuccessMessage(false), 1750);
+          fetchData();
+          setSelectedRows(new Set());
+          setSelectAll(false);
+        }
+      } else if (deleteType === 'tag-and-exclusive') {
+        // Get all keywords for this tag
+        const { data: tagRelations } = await supabase
+          .from('keywordshub_tag_relations')
+          .select('fk_keyword_id')
+          .eq('fk_tag_id', selectedTagForDelete.tag_id);
+
+        const keywordIds = tagRelations?.map(rel => rel.fk_keyword_id) || [];
+
+        if (keywordIds.length > 0) {
+          // Find keywords that are NOT shared with other tags
+          const { data: sharedRelations } = await supabase
+            .from('keywordshub_tag_relations')
+            .select('fk_keyword_id')
+            .in('fk_keyword_id', keywordIds)
+            .neq('fk_tag_id', selectedTagForDelete.tag_id);
+
+          const sharedKeywordIds = new Set(sharedRelations?.map(rel => rel.fk_keyword_id) || []);
+          const exclusiveKeywordIds = keywordIds.filter(id => !sharedKeywordIds.has(id));
+
+          // First delete relations for this tag
+          const { error: relationsError } = await supabase
+            .from('keywordshub_tag_relations')
+            .delete()
+            .eq('fk_tag_id', selectedTagForDelete.tag_id);
+
+          if (relationsError) {
+            console.error('Error deleting tag relations:', relationsError);
+          }
+
+          // Delete exclusive keywords in batches
+          if (exclusiveKeywordIds.length > 0) {
+            const batchSize = 50;
+            for (let i = 0; i < exclusiveKeywordIds.length; i += batchSize) {
+              const batch = exclusiveKeywordIds.slice(i, i + batchSize);
+              
+              // Delete all relations for these exclusive keywords
+              const { error: kwRelationsError } = await supabase
+                .from('keywordshub_tag_relations')
+                .delete()
+                .in('fk_keyword_id', batch);
+
+              if (kwRelationsError) {
+                console.error('Error deleting exclusive keyword relations:', kwRelationsError);
+              }
+
+              // Then delete the keywords
+              const { error: keywordError } = await supabase
+                .from('keywordshub')
+                .delete()
+                .in('keyword_id', batch);
+
+              if (keywordError) {
+                console.error('Error deleting exclusive keywords batch:', keywordError);
+              }
+            }
+          }
+        } else {
+          // Just delete the tag relations if no keywords
+          const { error: relationsError } = await supabase
+            .from('keywordshub_tag_relations')
+            .delete()
+            .eq('fk_tag_id', selectedTagForDelete.tag_id);
+
+          if (relationsError) {
+            console.error('Error deleting tag relations:', relationsError);
+          }
+        }
+
+        // Finally delete the tag
+        const { error: tagError } = await supabase
+          .from('keywordshub_tags')
+          .delete()
+          .eq('tag_id', selectedTagForDelete.tag_id)
+          .eq('user_id', userInternalId);
+
+        if (!tagError) {
+          setShowSuccessMessage(true);
+          setTimeout(() => setShowSuccessMessage(false), 1750);
+          fetchData();
+          setSelectedRows(new Set());
+          setSelectAll(false);
+        }
+      }
+
+      setShowDeletePopup(false);
+      setSelectedTagForDelete(null);
+      setScanResults(null);
+    } catch (err) {
+      console.error('Error in special delete operation:', err);
+    }
+  };
+
   // Render tags cell content
   const renderCell = (item: KeywordTag, column: typeof tagsColumns[0]) => {
+    // Wrapper function to conditionally wrap content with cell_inner_wrapper_div
+    const wrapContent = (content: React.ReactNode) => {
+      if (column.shrinkColumn) {
+        return <div className="cell_inner_wrapper_div">{content}</div>;
+      }
+      return content;
+    };
+
     if (column.key === 'checkbox') {
-      return (
+      return wrapContent(
         <div className="px-2 py-1 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
           <input
             type="checkbox"
@@ -847,7 +1264,7 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
     }
     
     if (column.key === 'filter') {
-      return (
+      return wrapContent(
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -863,7 +1280,7 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
     // Special handling for star column (same as KeywordsHubTable)
     if (column.key === 'is_starred') {
       const value = item.is_starred;
-      return (
+      return wrapContent(
         <div className="px-2 py-1 flex items-center justify-center">
           <div
             onClick={(e) => {
@@ -894,7 +1311,7 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
     const value = item[column.key as keyof KeywordTag];
     
     if (column.type === 'datetime' && value) {
-      return (
+      return wrapContent(
         <div className="px-2 py-1 text-xs">
           {new Date(value as string).toLocaleString()}
         </div>
@@ -902,14 +1319,14 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
     }
 
     if (column.type === 'number' && value !== null) {
-      return (
+      return wrapContent(
         <div className="px-2 py-1 text-xs">
           {typeof value === 'number' ? value.toLocaleString() : value}
         </div>
       );
     }
 
-    return (
+    return wrapContent(
       <div className="px-2 py-1 text-xs">
         {value?.toString() || ''}
       </div>
@@ -1068,6 +1485,135 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50" style={{ padding: '20px' }}>
+      {/* Inject shrinkage styles */}
+      <style dangerouslySetInnerHTML={{ __html: shrinkageStyles }} />
+      
+      {/* Success Message Overlay */}
+      {showSuccessMessage && (
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-[100] pointer-events-none"
+          style={{
+            animation: 'successFadeInOut 1.75s ease-in-out'
+          }}
+        >
+          <div className="flex items-center space-x-2" style={{ fontSize: '14px', color: '#16a34a' }}>
+            <svg 
+              width="20" 
+              height="20" 
+              viewBox="0 0 20 20" 
+              fill="currentColor"
+              style={{ color: '#16a34a' }}
+            >
+              <path 
+                fillRule="evenodd" 
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
+                clipRule="evenodd" 
+              />
+            </svg>
+            <span style={{ fontWeight: 500 }}>Success!</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Special Delete Popup */}
+      {showDeletePopup && selectedTagForDelete && (
+        <div className="fixed inset-0 flex items-center justify-center z-[110] bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4">Special Tag Delete Process</h2>
+            
+            {/* Tag Details */}
+            <div className="mb-4 p-4 bg-gray-50 rounded">
+              <h3 className="font-semibold mb-2">Tag Details:</h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div><span className="font-medium">Tag Name:</span> {selectedTagForDelete.tag_name}</div>
+                <div><span className="font-medium">Tag ID:</span> {selectedTagForDelete.tag_id}</div>
+                <div><span className="font-medium">Tag Order:</span> {selectedTagForDelete.tag_order}</div>
+                <div><span className="font-medium">Group:</span> {selectedTagForDelete.group_name || 'Unassigned'}</div>
+                <div><span className="font-medium">Keywords:</span> {selectedTagForDelete.keyword_count || 0}</div>
+                <div><span className="font-medium">Starred:</span> {selectedTagForDelete.is_starred ? 'Yes' : 'No'}</div>
+                <div><span className="font-medium">Qty Starred:</span> {selectedTagForDelete.qty_starred || 0}</div>
+                <div><span className="font-medium">Qty Chosen:</span> {selectedTagForDelete.qty_chosen || 0}</div>
+                <div className="col-span-2">
+                  <span className="font-medium">Created:</span> {new Date(selectedTagForDelete.created_at).toLocaleString()}
+                </div>
+                <div className="col-span-2">
+                  <span className="font-medium">Updated:</span> {new Date(selectedTagForDelete.updated_at).toLocaleString()}
+                </div>
+              </div>
+            </div>
+            
+            {/* Scan Section */}
+            <div className="mb-6 p-4 border-2 border-blue-300 rounded bg-blue-50">
+              <button
+                onClick={handleScanKeywords}
+                disabled={isScanning}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors disabled:bg-gray-400"
+              >
+                {isScanning ? 'Scanning...' : 'scan all keywords in this tag to see if they are part of another tag also'}
+              </button>
+              
+              {scanResults && (
+                <div className="mt-3 text-sm">
+                  <div>total keywords in tag: <span className="font-bold">{scanResults.total}</span></div>
+                  <div>total keywords that are part of another tag also: <span className="font-bold">{scanResults.shared}</span></div>
+                </div>
+              )}
+            </div>
+            
+            {/* Delete Options */}
+            <div className="space-y-3">
+              <h3 className="font-semibold mb-2">Delete Options:</h3>
+              
+              <button
+                onClick={() => handleSpecialDelete('tag-only')}
+                className="w-full bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded text-sm font-medium transition-colors text-left"
+              >
+                <div className="font-semibold">Delete tag only</div>
+                <div className="text-xs opacity-90 mt-1">Removes the tag but keeps all keywords</div>
+              </button>
+              
+              <button
+                onClick={() => handleSpecialDelete('tag-and-all')}
+                className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded text-sm font-medium transition-colors text-left"
+              >
+                <div className="font-semibold">Delete tag and all keywords</div>
+                <div className="text-xs opacity-90 mt-1">Removes the tag and ALL associated keywords</div>
+              </button>
+              
+              <button
+                onClick={() => handleSpecialDelete('tag-and-exclusive')}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded text-sm font-medium transition-colors text-left"
+              >
+                <div className="font-semibold">Delete tag and delete only the keywords that are not shared by other tags</div>
+                <div className="text-xs opacity-90 mt-1">Removes the tag and only keywords exclusive to this tag</div>
+              </button>
+            </div>
+            
+            {/* Cancel Button */}
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => {
+                  setShowDeletePopup(false);
+                  setSelectedTagForDelete(null);
+                  setScanResults(null);
+                }}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded text-sm font-medium transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <style>{`
+        @keyframes successFadeInOut {
+          0% { opacity: 0; }
+          28.5% { opacity: 1; } /* 500ms / 1750ms = 28.5% */
+          57% { opacity: 1; } /* (500ms + 500ms) / 1750ms = 57% */
+          100% { opacity: 0; }
+        }
+      `}</style>
       <div className="bg-white rounded-lg shadow-xl w-full h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
@@ -1123,7 +1669,18 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
         {/* Controls */}
         <div className="p-4 border-b">
           <div className="flex items-center space-x-4">
-            <NubraTablefaceKite text={activeTab === 'tags' ? "tags-table-kite" : "groups-table-kite"} />
+            <button
+              onClick={() => {
+                if (activeTab === 'tags') {
+                  fetchData();
+                } else {
+                  fetchGroupsData();
+                }
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+            >
+              refresh load
+            </button>
             {activeTab === 'groups' && (
               <button
                 onClick={() => {
@@ -1169,18 +1726,42 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
               </button>
             </div>
             {activeTab === 'tags' && (
-              <button
-                onClick={() => handleGenerateCachedQty()}
-                disabled={selectedRows.size === 0}
-                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                  selectedRows.size === 0
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-orange-600 hover:bg-orange-700 text-white'
-                }`}
-                title={selectedRows.size === 0 ? 'Select tags to generate quantities' : `Generate cached quantities for ${selectedRows.size} selected tag(s)`}
-              >
-                generate cached qty (star, etc.)
-              </button>
+              <>
+                <button
+                  onClick={() => handleGenerateCachedQty()}
+                  disabled={selectedRows.size === 0}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                    selectedRows.size === 0
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-orange-600 hover:bg-orange-700 text-white'
+                  }`}
+                  title={selectedRows.size === 0 ? 'Select tags to generate quantities' : `Generate cached quantities for ${selectedRows.size} selected tag(s)`}
+                >
+                  generate cached qty (star, etc.)
+                </button>
+                <button
+                  onClick={() => {
+                    if (selectedRows.size === 1) {
+                      const tagId = Array.from(selectedRows)[0];
+                      const tag = data.find(t => t.tag_id === tagId);
+                      if (tag) {
+                        setSelectedTagForDelete(tag);
+                        setShowDeletePopup(true);
+                        setScanResults(null);
+                      }
+                    }
+                  }}
+                  disabled={selectedRows.size !== 1}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                    selectedRows.size !== 1
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-red-600 hover:bg-red-700 text-white'
+                  }`}
+                  title={selectedRows.size !== 1 ? 'Select exactly one tag for special delete' : 'Special tag delete process'}
+                >
+                  special tag delete process f5102
+                </button>
+              </>
             )}
             {activeTab === 'tags' && selectedTag && (
               <div className="text-sm text-purple-600 font-medium">
@@ -1278,19 +1859,20 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
                   <div className="text-red-500">Error: {error}</div>
                 </div>
               ) : (
-                <table className="w-full border-collapse border border-gray-200">
-                  <thead className="bg-gray-50 sticky top-0">
+                <table className="tags-plench-table border-collapse border border-gray-200" style={{ width: 'auto' }}>
+                  <thead className="sticky top-0">
                     {/* Table name header */}
                     <tr>
                       {tagsColumns.map((column) => (
                         <th
                           key={`header-${column.key}`}
-                          className="px-2 py-3 text-left border border-gray-200 bg-[#bcc4f1]"
-                          style={{ width: column.width }}
+                          className={`px-2 py-3 text-left border border-gray-200 bg-[#bcc4f1] ${column.shrinkColumn ? `for_db_column_${column.key}` : ''}`}
                         >
-                          <span className="font-bold text-xs">
-                            {column.key === 'checkbox' ? '-' : (column.headerRow1Text || 'keywordshub_tags')}
-                          </span>
+                          <div className="cell_inner_wrapper_div">
+                            <span className="font-bold text-xs">
+                              {column.key === 'checkbox' ? '-' : (column.headerRow1Text || 'keywordshub_tags')}
+                            </span>
+                          </div>
                         </th>
                       ))}
                     </tr>
@@ -1301,31 +1883,32 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
                           key={column.key}
                           className={`px-2 py-3 text-left border border-gray-200 ${
                             column.key === 'filter' || column.key === 'is_starred' || column.key === 'checkbox' ? '' : 'cursor-pointer hover:bg-gray-100'
-                          }`}
-                          style={{ width: column.width }}
+                          } ${column.shrinkColumn ? `for_db_column_${column.key}` : ''}`}
                           onClick={() => column.key !== 'filter' && column.key !== 'is_starred' && column.key !== 'checkbox' && handleSort(column.key as keyof KeywordTag)}
                         >
-                          {column.key === 'checkbox' ? (
-                            <div className="flex items-center justify-center">
-                              <input
-                                type="checkbox"
-                                checked={selectAll}
-                                onChange={handleSelectAll}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                              />
-                            </div>
-                          ) : (
-                            <div className="flex items-center space-x-1">
-                              <span className="font-bold text-xs lowercase">
-                                {column.headerRow2Text || column.label}
-                              </span>
-                              {column.key !== 'filter' && column.key !== 'is_starred' && sortField === column.key && (
-                                <span className="text-xs">
-                                  {sortOrder === 'asc' ? '↑' : '↓'}
+                          <div className="cell_inner_wrapper_div">
+                            {column.key === 'checkbox' ? (
+                              <div className="flex items-center justify-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selectAll}
+                                  onChange={handleSelectAll}
+                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                              </div>
+                            ) : (
+                              <div className="flex items-center space-x-1">
+                                <span className="font-bold text-xs lowercase">
+                                  {column.headerRow2Text || column.label}
                                 </span>
-                              )}
-                            </div>
-                          )}
+                                {column.key !== 'filter' && column.key !== 'is_starred' && sortField === column.key && (
+                                  <span className="text-xs">
+                                    {sortOrder === 'asc' ? '↑' : '↓'}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </th>
                       ))}
                     </tr>
@@ -1340,9 +1923,8 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
                         {tagsColumns.map((column) => (
                           <td 
                             key={column.key} 
-                            className="border border-gray-200"
-                            style={{ width: column.width }}
-                          >
+                            className={`border border-gray-200 ${column.shrinkColumn ? `for_db_column_${column.key}` : ''}`}
+                            >
                             {renderCell(item, column)}
                           </td>
                         ))}
@@ -1371,14 +1953,13 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
                 </div>
               ) : (isCreatingNewGroup || paginatedGroupsData.length > 0) ? (
                 <table className="w-full border-collapse border border-gray-200">
-                  <thead className="bg-gray-50 sticky top-0">
+                  <thead className="sticky top-0">
                     {/* Table name header */}
                     <tr>
                       {groupsColumns.map((column) => (
                         <th
                           key={`header-${column.key}`}
                           className="px-2 py-3 text-left border border-gray-200 bg-[#c9f2d4]"
-                          style={{ width: column.width }}
                         >
                           <span className="font-bold text-xs">
                             {column.key === 'checkbox' ? '-' : (column.headerRow1Text || 'groups')}
@@ -1394,7 +1975,6 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
                           className={`px-2 py-3 text-left border border-gray-200 ${
                             column.key === 'edit' || column.key === 'delete' || column.key === 'is_starred' || column.key === 'checkbox' ? '' : 'cursor-pointer hover:bg-gray-100'
                           }`}
-                          style={{ width: column.width }}
                           onClick={() => column.key !== 'edit' && column.key !== 'delete' && column.key !== 'is_starred' && column.key !== 'checkbox' && handleGroupsSort(column.key as keyof KeywordTagGroup)}
                         >
                           {column.key === 'checkbox' ? (
@@ -1429,8 +2009,7 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
                           <td 
                             key={column.key} 
                             className="border border-gray-200 px-2 py-1"
-                            style={{ width: column.width }}
-                          >
+                            >
                             {column.key === 'checkbox' ? (
                               <div className="flex items-center justify-center">
                                 <input type="checkbox" disabled className="w-4 h-4 text-blue-600 border-gray-300 rounded" />
@@ -1504,8 +2083,7 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
                           <td 
                             key={column.key} 
                             className="border border-gray-200"
-                            style={{ width: column.width }}
-                          >
+                            >
                             {renderGroupsCell(item, column)}
                           </td>
                         ))}
