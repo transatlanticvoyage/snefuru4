@@ -28,7 +28,7 @@ export default function FabricClient() {
   const [formData, setFormData] = useState({
     country: 'United States',
     industry_id: '',
-    city_population_filter: '35k-325k',
+    city_population_filter: '35,000-infinity',
     kwslot: 'kwslot1',
     kw_rubric: 'deck builder (city_name) (state_code)',
     rel_dfs_location_code: '2840',
@@ -335,6 +335,12 @@ export default function FabricClient() {
           case '50k-325k':
             cncglubQuery = cncglubQuery.gte('cities.city_population', 50000).lt('cities.city_population', 325000);
             break;
+          case '35,000-1,000,000':
+            cncglubQuery = cncglubQuery.gte('cities.city_population', 35000).lt('cities.city_population', 1000000);
+            break;
+          case '35,000-infinity':
+            cncglubQuery = cncglubQuery.gte('cities.city_population', 35000);
+            break;
         }
       }
 
@@ -567,6 +573,9 @@ export default function FabricClient() {
                         <option value="35k-325k">35k-325k</option>
                         <option value="40k-325k">40k-325k</option>
                         <option value="50k-325k">50k-325k</option>
+                        <option disabled>---------</option>
+                        <option value="35,000-1,000,000">35,000-1,000,000</option>
+                        <option value="35,000-infinity">35,000-infinity</option>
                       </select>
                     </td>
                     <td className="border border-gray-300 p-3"></td>

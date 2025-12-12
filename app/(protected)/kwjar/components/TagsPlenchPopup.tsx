@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
+import ClavedoriButtonBar from '@/app/components/ClavedoriButtonBar';
 
 interface KeywordTag {
   tag_id: number;
@@ -940,6 +941,34 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
     }
   };
 
+  // Handle group star toggle
+  const handleGroupStarToggle = async (group: KeywordTagGroup) => {
+    try {
+      const newStarredValue = !group.is_starred;
+      
+      const { error } = await supabase
+        .from('keywordshub_tag_groups')
+        .update({ is_starred: newStarredValue })
+        .eq('group_id', group.group_id);
+
+      if (error) {
+        console.error('Error updating group star:', error);
+        alert('Failed to update star: ' + error.message);
+      } else {
+        console.log('Group star updated successfully:', group.group_id, newStarredValue);
+        // Update the group in local state
+        setGroupsData(prev => prev.map(g => 
+          g.group_id === group.group_id 
+            ? { ...g, is_starred: newStarredValue } 
+            : g
+        ));
+      }
+    } catch (err) {
+      console.error('Error toggling group star:', err);
+      alert('Failed to update star');
+    }
+  };
+
   // Handle scan keywords for shared tags
   const handleScanKeywords = async () => {
     if (!selectedTagForDelete || !userInternalId) return;
@@ -1294,7 +1323,7 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
               width="16"
               height="16"
               viewBox="0 0 24 24"
-              style={{ color: value ? '#dc2626' : '#9ca3af' }}
+              style={{ color: value ? '#b156e0' : '#9ca3af' }}
             >
               <path
                 d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
@@ -1432,8 +1461,7 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
           <div
             onClick={(e) => {
               e.stopPropagation();
-              // TODO: Implement group star toggle
-              console.log('Toggle star for group:', item.group_id);
+              handleGroupStarToggle(item);
             }}
             style={{ cursor: 'pointer', padding: '4px' }}
             title={value ? "Click to unstar" : "Click to star"}
@@ -1442,7 +1470,7 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
               width="16"
               height="16"
               viewBox="0 0 24 24"
-              style={{ color: value ? '#dc2626' : '#9ca3af' }}
+              style={{ color: value ? '#566ae0' : '#9ca3af' }}
             >
               <path
                 d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
@@ -1648,13 +1676,14 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
                   groups
                 </button>
               </div>
-              <div className="flex space-x-3">
+              <div className="flex items-center space-x-3">
                 <div className="px-3 py-1 bg-gray-100 rounded text-sm text-gray-700 font-medium">
                   Tags Selected: {selectedRows.size}
                 </div>
                 <div className="px-3 py-1 bg-gray-100 rounded text-sm text-gray-700 font-medium">
                   Groups Selected: {groupsSelectedRows.size}
                 </div>
+                <ClavedoriButtonBar />
               </div>
             </div>
           </div>

@@ -566,8 +566,9 @@ export default function KeywordsHubTable({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [keywordDatumSearch, setKeywordDatumSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(100);
+  const [itemsPerPage, setItemsPerPage] = useState(500); // Start with manageable 500 rows
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [sortField, setSortField] = useState<string>('created_at');
   const [fetchingSerpKeywords, setFetchingSerpKeywords] = useState<Set<number>>(new Set());
@@ -668,7 +669,21 @@ export default function KeywordsHubTable({
           dfs_fetch_status,
           serp_results_count,
           serp_last_fetched_at,
-          serp_fetch_status
+          serp_fetch_status,
+          industries (
+            industry_name
+          ),
+          exact_city:cities!rel_exact_city_id (
+            classification,
+            city_name,
+            state_code,
+            state_full,
+            associated_principal_city,
+            city_population
+          ),
+          largest_city:cities!rel_largest_city_id (
+            city_population
+          )
         `);
 
       // If a tag is selected, filter by keywords that have this tag
@@ -694,10 +709,13 @@ export default function KeywordsHubTable({
         }
       }
 
-      // Only apply limit when not filtering by tag to prevent timeouts
-      // When filtering by tag, we want ALL keywords for that tag
-      if (!selectedTagId) {
-        query = query.limit(100);
+      // Apply reasonable limits to prevent timeout
+      const hasNoTagFilter = !selectedTagId;
+      if (hasNoTagFilter) {
+        query = query.limit(5000); // Reasonable limit when NO tag filter applied
+        console.log('Applied 5k limit - no tag filter active');
+      } else {
+        console.log('No limit applied - tag filter active');
       }
       
       const { data: keywords, error } = await query
@@ -909,6 +927,10 @@ export default function KeywordsHubTable({
       )) {
         return false;
       }
+      // Keyword datum search filter
+      if (keywordDatumSearch && !item.keyword_datum?.toLowerCase().includes(keywordDatumSearch.toLowerCase())) {
+        return false;
+      }
 
       // DFS Fetch Status filter
       if (dfsFetchStatusFilter !== 'all') {
@@ -1004,7 +1026,7 @@ export default function KeywordsHubTable({
     });
 
     return filtered;
-  }, [data, searchTerm, sortField, sortOrder, dfsFetchStatusFilter, searchVolumeFilter, cpcFilter, competitionFilter, competitionIndexFilter, cityClassificationFilter, exactCityPopulationFilter, largestCityPopulationFilter]);
+  }, [data, searchTerm, keywordDatumSearch, sortField, sortOrder, dfsFetchStatusFilter, searchVolumeFilter, cpcFilter, competitionFilter, competitionIndexFilter, cityClassificationFilter, exactCityPopulationFilter, largestCityPopulationFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === 0 ? filteredAndSortedData.length : itemsPerPage));
@@ -2730,8 +2752,25 @@ export default function KeywordsHubTable({
       >
         Create New (Popup)
       </button>
+      
+      {/* Search keyword_datum section */}
+      <div className="flex items-center space-x-1 ml-4">
+        <input
+          type="text"
+          placeholder="search keyword_datum"
+          value={keywordDatumSearch}
+          onChange={(e) => setKeywordDatumSearch(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-md text-sm w-48"
+        />
+        <button
+          onClick={() => setKeywordDatumSearch('')}
+          className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-2 py-2 rounded-md text-sm transition-colors w-10 h-10 flex items-center justify-center"
+        >
+          CL
+        </button>
+      </div>
     </div>
-  ), [bulkRefreshing, blankRefreshing, reverseLookupRefreshing, selectedRows.size]);
+  ), [bulkRefreshing, blankRefreshing, reverseLookupRefreshing, selectedRows.size, keywordDatumSearch]);
 
   // Pass table actions to parent (must be after DataForSEOActions is defined)
   useEffect(() => {
@@ -2866,10 +2905,10 @@ export default function KeywordsHubTable({
           </button>
           <button
             onClick={() => {
-              setItemsPerPage(filteredAndSortedData.length);
+              setItemsPerPage(filteredAndSortedData.length || 2000);
               setCurrentPage(1);
             }}
-            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${itemsPerPage === filteredAndSortedData.length ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${itemsPerPage >= filteredAndSortedData.length ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
           >
             All
           </button>

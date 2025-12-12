@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
       rel_dfs_location_code,
       language_code,
       tag_name,
+      tag_group_id,
       user_internal_id,
       run_f12_refresh
     } = body;
@@ -169,7 +170,8 @@ export async function POST(request: NextRequest) {
       .from('keywordshub_tags')
       .insert({ 
         tag_name,
-        user_id: user_internal_id 
+        user_id: user_internal_id,
+        rel_tag_group: tag_group_id ? parseInt(tag_group_id) : null
       })
       .select('tag_id')
       .single();

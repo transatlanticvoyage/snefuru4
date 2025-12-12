@@ -140,6 +140,7 @@ export default function KwjarClient() {
   const [venlarChamberVisible, setVenlarChamberVisible] = useState(true);
   const [protozoicChamberVisible, setProtozoicChamberVisible] = useState(true);
   const [mesozoicChamberVisible, setMesozoicChamberVisible] = useState(true);
+  const [rocketChamberVisible, setRocketChamberVisible] = useState(true);
   const [showHoistColumns, setShowHoistColumns] = useState(true);
   const [showJoistColumns, setShowJoistColumns] = useState(true);
   const [showRelExactCityIdColumn, setShowRelExactCityIdColumn] = useState(false);
@@ -189,6 +190,11 @@ export default function KwjarClient() {
       setMesozoicChamberVisible(JSON.parse(savedMesozoic));
     }
     
+    const savedRocket = localStorage.getItem('kwjar_rocketChamberVisible');
+    if (savedRocket !== null) {
+      setRocketChamberVisible(JSON.parse(savedRocket));
+    }
+    
     const savedHoistColumns = localStorage.getItem('kwjar_showHoistColumns');
     if (savedHoistColumns !== null) {
       setShowHoistColumns(JSON.parse(savedHoistColumns));
@@ -232,12 +238,17 @@ export default function KwjarClient() {
     const handleMesozoicChange = (event: CustomEvent) => {
       setMesozoicChamberVisible(event.detail.visible);
     };
+    
+    const handleRocketChange = (event: CustomEvent) => {
+      setRocketChamberVisible(event.detail.visible);
+    };
 
     window.addEventListener('kwjarMandibleChamberVisibilityChange', handleMandibleChange as EventListener);
     window.addEventListener('kwjarSinusChamberVisibilityChange', handleSinusChange as EventListener);
     window.addEventListener('kwjarVenlarChamberVisibilityChange', handleVenlarChange as EventListener);
     window.addEventListener('kwjarProtozoicChamberVisibilityChange', handleProtozoicChange as EventListener);
     window.addEventListener('kwjarMesozoicChamberVisibilityChange', handleMesozoicChange as EventListener);
+    window.addEventListener('kwjarRocketChamberVisibilityChange', handleRocketChange as EventListener);
     
     return () => {
       window.removeEventListener('kwjarMandibleChamberVisibilityChange', handleMandibleChange as EventListener);
@@ -245,6 +256,7 @@ export default function KwjarClient() {
       window.removeEventListener('kwjarVenlarChamberVisibilityChange', handleVenlarChange as EventListener);
       window.removeEventListener('kwjarProtozoicChamberVisibilityChange', handleProtozoicChange as EventListener);
       window.removeEventListener('kwjarMesozoicChamberVisibilityChange', handleMesozoicChange as EventListener);
+      window.removeEventListener('kwjarRocketChamberVisibilityChange', handleRocketChange as EventListener);
     };
   }, []);
 
@@ -1227,27 +1239,6 @@ export default function KwjarClient() {
                 />
               </button>
             </div>
-            
-            {/* Hoist Columns Toggle */}
-            <div className="flex flex-wrap items-center gap-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
-              <span className="text-sm font-medium text-gray-700">Show hoist columns</span>
-              <button
-                onClick={() => {
-                  const newValue = !showHoistColumns;
-                  setShowHoistColumns(newValue);
-                  localStorage.setItem('kwjar_showHoistColumns', JSON.stringify(newValue));
-                }}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  showHoistColumns ? 'bg-green-600' : 'bg-gray-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    showHoistColumns ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -1488,13 +1479,13 @@ export default function KwjarClient() {
                   <div className="cell_inner_wrapper_div">Competition Index</div>
                 </th>
                 <th style={{ border: '1px solid gray', padding: '0' }}>
-                  <div className="cell_inner_wrapper_div">City Classification</div>
+                  <div className="cell_inner_wrapper_div">City Classification (joist)</div>
                 </th>
                 <th style={{ border: '1px solid gray', padding: '0' }}>
-                  <div className="cell_inner_wrapper_div">Exact City Pop</div>
+                  <div className="cell_inner_wrapper_div">Exact City Pop (joist)</div>
                 </th>
                 <th style={{ border: '1px solid gray', padding: '0' }}>
-                  <div className="cell_inner_wrapper_div">Largest City Pop</div>
+                  <div className="cell_inner_wrapper_div">Largest City Pop (hoist)</div>
                 </th>
               </tr>
             </thead>
@@ -1903,6 +1894,15 @@ export default function KwjarClient() {
               {tableActions.DataForSEOActions()}
             </div>
           )}
+        </div>
+      )}
+      
+      {/* Rocket Chamber */}
+      {rocketChamberVisible && (
+        <div className="border border-black p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
+          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+            rocket_chamber
+          </div>
         </div>
       )}
 
