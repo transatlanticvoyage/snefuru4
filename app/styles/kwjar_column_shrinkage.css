@@ -1,0 +1,173 @@
+/* Kwjar Table Column Shrinkage Conventions
+   Based on shenfur_column_shrinkage_conventions_1.md
+   Applied to: keyword_id, dfs_fetch_status, is_starred (str.), is_chosen (cho.), competition, competition_index
+*/
+
+/* ========================================
+   Column Width Control - Force to minimum needed width
+   ======================================== */
+
+/* keyword_id column */
+.kwjar-table .for_db_column_keyword_id {
+  width: 1px !important;
+  white-space: nowrap !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* dfs_fetch_status column */
+.kwjar-table .for_db_column_dfs_fetch_status {
+  width: 1px !important;
+  white-space: nowrap !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* is_starred column (str.) */
+.kwjar-table .for_db_column_is_starred {
+  width: 1px !important;
+  white-space: nowrap !important;
+  position: relative;
+  z-index: 3;
+  max-width: 40px !important; /* Extra constraint for star column */
+}
+
+/* is_chosen column (cho.) */
+.kwjar-table .for_db_column_is_chosen {
+  width: 1px !important;
+  white-space: nowrap !important;
+  position: relative;
+  z-index: 4;
+  max-width: 40px !important; /* Extra constraint for chosen column */
+}
+
+/* competition column */
+.kwjar-table .for_db_column_competition {
+  width: 1px !important;
+  white-space: nowrap !important;
+  position: relative;
+  z-index: 5;
+}
+
+/* competition_index column */
+.kwjar-table .for_db_column_competition_index {
+  width: 1px !important;
+  white-space: nowrap !important;
+  position: relative;
+  z-index: 6;
+}
+
+/* ========================================
+   TD Cells (Data Cells) - Determine Natural Width
+   ======================================== */
+
+.kwjar-table td.for_db_column_keyword_id,
+.kwjar-table td.for_db_column_dfs_fetch_status,
+.kwjar-table td.for_db_column_is_starred,
+.kwjar-table td.for_db_column_is_chosen,
+.kwjar-table td.for_db_column_competition,
+.kwjar-table td.for_db_column_competition_index {
+  white-space: nowrap !important;
+  padding: 4px 8px !important;
+  min-width: fit-content !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  display: table-cell !important;
+}
+
+/* Special handling for star and chosen columns - center content */
+.kwjar-table td.for_db_column_is_starred,
+.kwjar-table td.for_db_column_is_chosen {
+  text-align: center !important;
+  justify-content: center !important;
+  padding: 4px !important;
+}
+
+/* ========================================
+   TH Cells (Header Cells) - Hard Clip Overflow
+   ======================================== */
+
+.kwjar-table th.for_db_column_keyword_id,
+.kwjar-table th.for_db_column_dfs_fetch_status,
+.kwjar-table th.for_db_column_is_starred,
+.kwjar-table th.for_db_column_is_chosen,
+.kwjar-table th.for_db_column_competition,
+.kwjar-table th.for_db_column_competition_index {
+  position: relative !important;
+  overflow: hidden !important;
+  max-width: 0 !important;
+  width: 1px !important;
+  white-space: nowrap !important;
+  text-overflow: clip !important; /* Hard cutoff, NOT ellipsis */
+  padding: 4px 8px !important;
+  min-width: 0 !important;
+  cursor: pointer; /* Indicates clickable for potential tooltip */
+  /* Removed background-color: inherit to allow Tailwind bg classes to work */
+}
+
+/* Special padding for star and chosen headers */
+.kwjar-table th.for_db_column_is_starred,
+.kwjar-table th.for_db_column_is_chosen {
+  padding: 4px !important;
+}
+
+/* ========================================
+   Sticky Header Z-Index Management
+   ======================================== */
+
+.kwjar-table thead {
+  z-index: 100;
+}
+
+.kwjar-table thead th {
+  z-index: 110;
+}
+
+/* Override z-index for sticky shrinkage column headers */
+.kwjar-table thead th.for_db_column_keyword_id {
+  z-index: 111;
+}
+
+.kwjar-table thead th.for_db_column_dfs_fetch_status {
+  z-index: 112;
+}
+
+.kwjar-table thead th.for_db_column_is_starred {
+  z-index: 113;
+}
+
+.kwjar-table thead th.for_db_column_is_chosen {
+  z-index: 114;
+}
+
+.kwjar-table thead th.for_db_column_competition {
+  z-index: 115;
+}
+
+.kwjar-table thead th.for_db_column_competition_index {
+  z-index: 116;
+}
+
+/* ========================================
+   Additional Visual Enhancements
+   ======================================== */
+
+/* Ensure proper background on sticky headers */
+.kwjar-table thead th.for_db_column_keyword_id,
+.kwjar-table thead th.for_db_column_dfs_fetch_status,
+.kwjar-table thead th.for_db_column_is_starred,
+.kwjar-table thead th.for_db_column_is_chosen,
+.kwjar-table thead th.for_db_column_competition,
+.kwjar-table thead th.for_db_column_competition_index {
+  background-color: inherit;
+}
+
+/* Hover effect for headers (tooltip indication) */
+.kwjar-table th.for_db_column_keyword_id:hover,
+.kwjar-table th.for_db_column_dfs_fetch_status:hover,
+.kwjar-table th.for_db_column_is_starred:hover,
+.kwjar-table th.for_db_column_is_chosen:hover,
+.kwjar-table th.for_db_column_competition:hover,
+.kwjar-table th.for_db_column_competition_index:hover {
+  opacity: 0.8;
+}

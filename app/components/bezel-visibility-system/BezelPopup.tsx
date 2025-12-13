@@ -41,6 +41,7 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   const [kwjarSinusChamberVisible, setKwjarSinusChamberVisible] = useState(true);
   const [kwjarProtozoicChamberVisible, setKwjarProtozoicChamberVisible] = useState(true);
   const [kwjarMesozoicChamberVisible, setKwjarMesozoicChamberVisible] = useState(true);
+  const [kwjarRocketChamberVisible, setKwjarRocketChamberVisible] = useState(true);
   
   // Chamber visibility states for /cnjar1 (default to true/visible)
   const [cnjar1MandibleChamberVisible, setCnjar1MandibleChamberVisible] = useState(true);
@@ -415,6 +416,20 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
       }
     }
   }, [pathname]);
+  
+  // Initialize kwjar rocket chamber visibility from localStorage
+  useEffect(() => {
+    if (pathname === '/kwjar') {
+      const savedVisibility = localStorage.getItem('kwjar_rocketChamberVisible');
+      if (savedVisibility !== null) {
+        setKwjarRocketChamberVisible(JSON.parse(savedVisibility));
+      } else {
+        // Default to true (visible) and save it
+        setKwjarRocketChamberVisible(true);
+        localStorage.setItem('kwjar_rocketChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
 
   // Initialize cnjar1 mandible chamber visibility from localStorage
   useEffect(() => {
@@ -512,6 +527,17 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     
     // Dispatch custom event to notify other components
     window.dispatchEvent(new CustomEvent('kwjarMesozoicChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+  
+  // Handle kwjar rocket chamber toggle
+  const handleKwjarRocketChamberToggle = (checked: boolean) => {
+    setKwjarRocketChamberVisible(checked);
+    localStorage.setItem('kwjar_rocketChamberVisible', JSON.stringify(checked));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('kwjarRocketChamberVisibilityChange', { 
       detail: { visible: checked } 
     }));
   };
@@ -1142,6 +1168,29 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
                     <div className="mt-3 text-sm text-gray-600">
                       <p>Toggle visibility of the mesozoic chamber on the Keywords Hub page.</p>
                       <p>Current state: <strong>{kwjarMesozoicChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+                    
+                    {/* Rocket Chamber Toggle */}
+                    <div className="flex items-center space-x-4 mt-6">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={kwjarRocketChamberVisible}
+                          onChange={(e) => handleKwjarRocketChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        rocket_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the rocket chamber on the Keywords Hub page.</p>
+                      <p>Current state: <strong>{kwjarRocketChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
                       <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
                     </div>
                   </div>

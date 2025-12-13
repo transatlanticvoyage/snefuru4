@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
+import '@/app/styles/kwjar_column_shrinkage.css';
 
 interface KeywordRecord {
   keyword_id: number;
@@ -439,6 +440,13 @@ interface KeywordsHubTableProps {
   onMainPaginationRender?: (controls: {
     PaginationControls: () => JSX.Element;
     SearchField: () => JSX.Element;
+    itemsPerPage: number;
+    setItemsPerPage: (value: number) => void;
+    currentPage: number;
+    setCurrentPage: (value: number) => void;
+    totalPages: number;
+    totalItems: number;
+    paginatedDataLength: number;
   }) => void;
   onTableActionsRender?: (controls: {
     DataForSEOActions: () => JSX.Element;
@@ -565,8 +573,12 @@ export default function KeywordsHubTable({
   const [data, setData] = useState<KeywordRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [keywordDatumSearch, setKeywordDatumSearch] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [debouncedKeywordDatumSearch, setDebouncedKeywordDatumSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(500); // Start with manageable 500 rows
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
@@ -609,6 +621,15 @@ export default function KeywordsHubTable({
 
   const supabase = createClientComponentClient();
 
+  // Helper function to get column shrinkage class
+  const getColumnShrinkageClass = (columnKey: string) => {
+    const shrinkageColumns = ['keyword_id', 'dfs_fetch_status', 'is_starred', 'is_chosen', 'competition', 'competition_index'];
+    if (shrinkageColumns.includes(columnKey)) {
+      return `for_db_column_${columnKey}`;
+    }
+    return '';
+  };
+
   // Get user ID
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
 
@@ -629,276 +650,104 @@ export default function KeywordsHubTable({
     getUserId();
   }, [user, supabase]);
 
-  // Fetch data
+  // Debounce search terms to avoid excessive API calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedKeywordDatumSearch(keywordDatumSearch);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [keywordDatumSearch]);
+
+  // Server-side fetch data with pagination
   const fetchData = async () => {
-    console.log('🏷️ [FETCH DATA] Called with selectedTagId:', selectedTagId);
+    console.log('🏷️ [FETCH DATA] Called with server-side pagination');
     try {
       setLoading(true);
       
-      // Use simpler query to avoid timeout when no tag filter is applied
-      let query = supabase
-        .from('keywordshub')
-        .select(`
-          keyword_id,
-          keyword_datum,
-          is_starred,
-          is_chosen,
-          search_volume,
-          cpc,
-          semrush_volume,
-          rel_dfs_location_code,
-          country_code_internal,
-          location_display_name,
-          location_coordinate,
-          language_code,
-          language_name,
-          competition,
-          competition_index,
-          low_top_of_page_bid,
-          high_top_of_page_bid,
-          api_fetched_at,
-          created_at,
-          updated_at,
-          created_by,
-          last_updated_by,
-          cached_cncglub_ids,
-          rel_industry_id,
-          cached_city_name,
-          rel_largest_city_id,
-          rel_exact_city_id,
-          dfs_fetch_status,
-          serp_results_count,
-          serp_last_fetched_at,
-          serp_fetch_status,
-          industries (
-            industry_name
-          ),
-          exact_city:cities!rel_exact_city_id (
-            classification,
-            city_name,
-            state_code,
-            state_full,
-            associated_principal_city,
-            city_population
-          ),
-          largest_city:cities!rel_largest_city_id (
-            city_population
-          )
-        `);
+      const requestBody = {
+        page: currentPage,
+        pageSize: itemsPerPage,
+        selectedTagId,
+        searchTerm: debouncedSearchTerm,
+        keywordDatumSearch: debouncedKeywordDatumSearch,
+        sortField,
+        sortOrder,
+        dfsFetchStatusFilter,
+        searchVolumeFilter,
+        cpcFilter,
+        competitionFilter,
+        competitionIndexFilter,
+        exactCityPopulationFilter,
+        largestCityPopulationFilter,
+        cityClassificationFilter
+      };
 
-      // If a tag is selected, filter by keywords that have this tag
-      if (selectedTagId) {
-        console.log('🏷️ [FETCH DATA] Filtering by tag ID:', selectedTagId);
-        // Get keyword IDs that have this tag
-        const { data: taggedKeywordIds, error: tagError } = await supabase
-          .from('keywordshub_tag_relations')
-          .select('fk_keyword_id')
-          .eq('fk_tag_id', selectedTagId);
+      console.log('🏷️ [FETCH DATA] Request body:', requestBody);
 
-        if (tagError) throw tagError;
+      const response = await fetch('/api/keywordshub/paginated', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-        const keywordIds = taggedKeywordIds.map(rel => rel.fk_keyword_id);
-        
-        if (keywordIds.length > 0) {
-          query = query.in('keyword_id', keywordIds);
-        } else {
-          // No keywords have this tag, return empty array
-          setData([]);
-          setLoading(false);
-          return;
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Apply reasonable limits to prevent timeout
-      const hasNoTagFilter = !selectedTagId;
-      if (hasNoTagFilter) {
-        query = query.limit(5000); // Reasonable limit when NO tag filter applied
-        console.log('Applied 5k limit - no tag filter active');
-      } else {
-        console.log('No limit applied - tag filter active');
-      }
+      const result = await response.json();
       
-      const { data: keywords, error } = await query
-        .order('search_volume', { ascending: false });
-
-      if (error) {
-        console.error('🏷️ [FETCH DATA] Database error:', error);
-        console.error('🏷️ [FETCH DATA] Error details:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
-        throw error;
-      }
+      console.log('🏷️ [FETCH DATA] Successfully loaded', result.data.length, 'keywords out of', result.totalCount, 'total');
       
-      // Fetch tag information and cache data for each keyword
-      if (keywords && keywords.length > 0) {
-        const keywordIds = keywords.map(k => k.keyword_id);
-        
-        // Batch the keyword IDs to avoid URL length issues
-        const BATCH_SIZE = 100; // Supabase can handle about 100 IDs safely in URL
-        const batches: number[][] = [];
-        
-        for (let i = 0; i < keywordIds.length; i += BATCH_SIZE) {
-          batches.push(keywordIds.slice(i, i + BATCH_SIZE));
-        }
-        
-        // Get all tag relations for these keywords (in batches)
-        let tagRelations: any[] = [];
-        
-        for (const batch of batches) {
-          const { data, error: tagRelError } = await supabase
-            .from('keywordshub_tag_relations')
-            .select(`
-              fk_keyword_id,
-              keywordshub_tags (
-                tag_id,
-                tag_name
-              )
-            `)
-            .in('fk_keyword_id', batch);
-          
-          if (tagRelError) {
-            console.error('Error fetching tag relations:', tagRelError);
-          } else if (data) {
-            tagRelations = [...tagRelations, ...data];
-          }
-        }
-        
-        // Get Universal SERP zone cache data for method-1 (in batches)
-        let cacheData: any[] = [];
-        
-        for (const batch of batches) {
-          const { data, error: cacheError } = await supabase
-            .from('keywordshub_serp_zone_cache')
-            .select(`
-              keyword_id,
-              total_emd_count,
-              zone_1_emd_count,
-              zone_2_emd_count,
-              zone_3_emd_count,
-              zone_4_10_emd_count,
-              zone_11_25_emd_count,
-              zone_26_50_emd_count,
-              zone_51_100_emd_count,
-              zone_1_domains,
-              zone_2_domains,
-              zone_3_domains,
-              zone_4_10_domains,
-              zone_11_25_domains,
-              zone_26_50_domains,
-              zone_51_100_domains,
-              cached_at,
-              latest_fetch_id,
-              source_fetch_id
-            `)
-            .eq('emd_stamp_method', 'method-1')
-            .eq('is_current', true)  // Only fetch current cache, not historical
-            .in('keyword_id', batch);
-          
-          if (cacheError) {
-            console.error('Error fetching EMD zone cache:', cacheError);
-          } else if (data) {
-            cacheData = [...cacheData, ...data];
-          }
-        }
-
-        // Get latest fetch_id for each keyword to detect staleness (in batches)
-        let latestFetches: any[] = [];
-        
-        for (const batch of batches) {
-          const { data, error: fetchError } = await supabase
-            .from('zhe_serp_fetches')
-            .select('rel_keyword_id, fetch_id')
-            .eq('is_latest', true)
-            .in('rel_keyword_id', batch);
-
-          if (fetchError) {
-            console.error('Error fetching latest fetches:', fetchError);
-          } else if (data) {
-            latestFetches = [...latestFetches, ...data];
-          }
-        }
-        
-        // Group tags by keyword_id
-        const tagsByKeywordId: Record<number, Array<{ tag_id: number; tag_name: string }>> = {};
-        
-        if (tagRelations) {
-          tagRelations.forEach(relation => {
-            const keywordId = relation.fk_keyword_id;
-            const tagInfo = relation.keywordshub_tags;
-            
-            if (tagInfo) {
-              if (!tagsByKeywordId[keywordId]) {
-                tagsByKeywordId[keywordId] = [];
-              }
-              tagsByKeywordId[keywordId].push({ tag_id: tagInfo.tag_id, tag_name: tagInfo.tag_name });
-            }
-          });
-        }
-        
-        // Group cache data by keyword_id
-        const cacheByKeywordId: Record<number, any> = {};
-        
-        if (cacheData) {
-          cacheData.forEach(cache => {
-            cacheByKeywordId[cache.keyword_id] = cache;
-          });
-        }
-
-        // Create latest fetch lookup for staleness detection
-        const latestFetchByKeywordId: Record<number, number> = {};
-        
-        if (latestFetches) {
-          latestFetches.forEach(fetch => {
-            latestFetchByKeywordId[fetch.rel_keyword_id] = fetch.fetch_id;
-          });
-        }
-        
-        // Calculate cache status for each keyword
-        const cacheStatusByKeywordId: Record<number, 'CURRENT' | 'STALE' | 'NO_CACHE'> = {};
-        
-        keywordIds.forEach(kwId => {
-          const cache = cacheByKeywordId[kwId];
-          const latestFetchId = latestFetchByKeywordId[kwId];
-          
-          if (!cache) {
-            cacheStatusByKeywordId[kwId] = 'NO_CACHE';
-          } else if (cache.source_fetch_id === latestFetchId) {
-            cacheStatusByKeywordId[kwId] = 'CURRENT';
-          } else {
-            cacheStatusByKeywordId[kwId] = 'STALE';
-          }
-        });
-        
-        // Add tags, cache data, and cache status to keywords
-        const keywordsWithTags = keywords.map(keyword => ({
-          ...keyword,
-          tags: tagsByKeywordId[keyword.keyword_id] || [],
-          serp_cache_m1: cacheByKeywordId[keyword.keyword_id] || null,
-          cache_status: cacheStatusByKeywordId[keyword.keyword_id] || 'NO_CACHE'
-        }));
-        
-        console.log('🏷️ [FETCH DATA] Loaded cache data for', Object.keys(cacheByKeywordId).length, 'keywords');
-        
-        setData(keywordsWithTags);
-      } else {
-        setData([]);
-      }
+      // Update state with server response
+      setData(result.data);
+      setTotalCount(result.totalCount);
+      setTotalPages(result.totalPages);
+      setError(null);
+      
     } catch (err) {
-      console.error('Error fetching keywords:', err);
+      console.error('🏷️ [FETCH DATA] Error fetching data:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch data');
+      setData([]);
+      setTotalCount(0);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    console.log('🏷️ [KEYWORDS HUB TABLE] useEffect triggered - selectedTagId:', selectedTagId, 'refreshKey:', tagFilterRefreshKey);
+    console.log('🏷️ [KEYWORDS HUB TABLE] useEffect triggered - refetching with new filters/pagination');
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTagId, tagFilterRefreshKey, supabase]);
+  }, [
+    selectedTagId, 
+    tagFilterRefreshKey, 
+    currentPage, 
+    itemsPerPage, 
+    debouncedSearchTerm, 
+    debouncedKeywordDatumSearch, 
+    sortField, 
+    sortOrder,
+    dfsFetchStatusFilter,
+    searchVolumeFilter,
+    cpcFilter,
+    competitionFilter,
+    competitionIndexFilter,
+    exactCityPopulationFilter,
+    largestCityPopulationFilter,
+    cityClassificationFilter
+  ]);
 
   // Listen for refresh events from parent
   useEffect(() => {
@@ -918,120 +767,9 @@ export default function KeywordsHubTable({
     }
   }, [selectedRows]);
 
-  // Filter and sort data
-  const filteredAndSortedData = useMemo(() => {
-    let filtered = data.filter(item => {
-      // Search term filter
-      if (searchTerm && !Object.values(item).some(value => 
-        value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      )) {
-        return false;
-      }
-      // Keyword datum search filter
-      if (keywordDatumSearch && !item.keyword_datum?.toLowerCase().includes(keywordDatumSearch.toLowerCase())) {
-        return false;
-      }
-
-      // DFS Fetch Status filter
-      if (dfsFetchStatusFilter !== 'all') {
-        if (item.dfs_fetch_status !== dfsFetchStatusFilter) {
-          return false;
-        }
-      }
-
-      // Search Volume filter
-      if (searchVolumeFilter !== 'all') {
-        const searchVolume = item.search_volume || 0;
-        const threshold = parseInt(searchVolumeFilter.replace('> ', ''));
-        if (searchVolume <= threshold) return false;
-      }
-
-      // CPC filter
-      if (cpcFilter !== 'all') {
-        const cpc = item.cpc || 0;
-        const threshold = parseFloat(cpcFilter.replace('< ', ''));
-        if (cpc >= threshold) return false;
-      }
-
-      // Competition filter
-      if (competitionFilter !== 'all') {
-        const competition = item.competition?.toUpperCase() || '';
-        if (competitionFilter === 'MEDIUM + LOW') {
-          if (competition !== 'MEDIUM' && competition !== 'LOW') return false;
-        } else {
-          if (competition !== competitionFilter) return false;
-        }
-      }
-
-      // Competition Index filter
-      if (competitionIndexFilter !== 'all') {
-        const competitionIndex = item.competition_index || 0;
-        switch (competitionIndexFilter) {
-          case '0-20':
-            if (competitionIndex < 0 || competitionIndex > 20) return false;
-            break;
-          case '21-50':
-            if (competitionIndex < 21 || competitionIndex > 50) return false;
-            break;
-          case '51-100':
-            if (competitionIndex < 51 || competitionIndex > 100) return false;
-            break;
-        }
-      }
-
-      // City Classification filter
-      if (cityClassificationFilter !== 'all') {
-        const cityClassification = item.exact_city?.classification || '';
-        if (cityClassification !== cityClassificationFilter) return false;
-      }
-
-      // Exact City Population filter
-      if (exactCityPopulationFilter !== 'all') {
-        const exactCityPop = item.exact_city?.city_population || 0;
-        if (!checkPopulationRange(exactCityPop, exactCityPopulationFilter)) return false;
-      }
-
-      // Largest City Population filter
-      if (largestCityPopulationFilter !== 'all') {
-        const largestCityPop = item.largest_city?.city_population || 0;
-        if (!checkPopulationRange(largestCityPop, largestCityPopulationFilter)) return false;
-      }
-
-      return true;
-    });
-
-    // Sort data - handle both regular fields and joined fields (with dots)
-    filtered.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-      
-      // Handle joined columns (e.g., "exact_city.city_population")
-      if (sortField.includes('.')) {
-        const [table, field] = sortField.split('.');
-        aValue = (a as any)[table]?.[field] ?? null;
-        bValue = (b as any)[table]?.[field] ?? null;
-      } else {
-        // Handle regular columns
-        aValue = (a as any)[sortField] ?? null;
-        bValue = (b as any)[sortField] ?? null;
-      }
-      
-      if (aValue === null && bValue === null) return 0;
-      if (aValue === null) return sortOrder === 'asc' ? -1 : 1;
-      if (bValue === null) return sortOrder === 'asc' ? 1 : -1;
-      
-      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    return filtered;
-  }, [data, searchTerm, keywordDatumSearch, sortField, sortOrder, dfsFetchStatusFilter, searchVolumeFilter, cpcFilter, competitionFilter, competitionIndexFilter, cityClassificationFilter, exactCityPopulationFilter, largestCityPopulationFilter]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === 0 ? filteredAndSortedData.length : itemsPerPage));
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+  // Server-side data is already filtered, sorted and paginated
+  const filteredAndSortedData = data; // Server already applied all filters and sorts
+  const paginatedData = data; // Server already applied pagination
 
   // Column pagination logic with sticky columns
   const baseStickyKeys = ['keyword_id', 'dfs_fetch_status', 'is_starred', 'is_chosen', 'keyword_datum', 'search_volume', 'cpc'];
@@ -1349,10 +1087,18 @@ export default function KeywordsHubTable({
     if (onMainPaginationRender) {
       onMainPaginationRender({
         PaginationControls,
-        SearchField
+        SearchField,
+        // Expose pagination state and setters for external control
+        itemsPerPage,
+        setItemsPerPage,
+        currentPage,
+        setCurrentPage,
+        totalPages,
+        totalItems: totalCount,
+        paginatedDataLength: paginatedData.length
       });
     }
-  }, [onMainPaginationRender, currentPage, totalPages, itemsPerPage, searchTerm]);
+  }, [onMainPaginationRender, currentPage, totalPages, itemsPerPage, totalCount, paginatedData.length]);
 
   // Notify parent of column pagination changes
   const prevColumnsPerPage = useRef(initialColumnsPerPage);
@@ -2818,6 +2564,8 @@ export default function KeywordsHubTable({
   }, [filteredAndSortedData, selectedRows, currentPage, itemsPerPage, showJoistColumns, showHoistColumns]);
 
   const SearchField = () => {
+    const isSearching = searchTerm !== debouncedSearchTerm;
+    
     return (
       <div className="relative">
         <input
@@ -2828,8 +2576,17 @@ export default function KeywordsHubTable({
             setSearchTerm(e.target.value);
             setCurrentPage(1);
           }}
-          className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+          className={`w-80 px-3 py-2 pr-12 border rounded-md text-sm ${
+            isSearching 
+              ? 'border-blue-300 bg-blue-50' 
+              : 'border-gray-300'
+          }`}
         />
+        {isSearching && (
+          <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
+            <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+          </div>
+        )}
         <button
           onClick={() => {
             setSearchTerm('');
@@ -2971,7 +2728,15 @@ export default function KeywordsHubTable({
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading keywords...</div>
+        <div className="flex flex-col items-center space-y-3">
+          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+          <div className="text-gray-600 font-medium">Loading keywords...</div>
+          <div className="text-gray-400 text-sm">
+            {searchTerm !== debouncedSearchTerm || keywordDatumSearch !== debouncedKeywordDatumSearch 
+              ? 'Applying filters...'
+              : 'Fetching data from server...'}
+          </div>
+        </div>
       </div>
     );
   }
@@ -3004,7 +2769,7 @@ export default function KeywordsHubTable({
         {/* Table */}
         <div className="flex-1 bg-white overflow-hidden min-w-0">
         <div className="h-full overflow-auto">
-          <table className="border-collapse border border-gray-200" style={{ width: 'auto', tableLayout: 'auto' }}>
+          <table className="kwjar-table border-collapse border border-gray-200" style={{ width: 'auto', tableLayout: 'auto' }}>
             <thead className="bg-gray-50 sticky top-0">
               {/* First header row */}
               <tr>
@@ -3024,7 +2789,7 @@ export default function KeywordsHubTable({
                       column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
                     } ${
                       column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
-                    }`}
+                    } ${getColumnShrinkageClass(column.key)}`}
                     style={{ 
                       backgroundColor: column.key === 'tags' ? '#d3d3d3' : (column.isJoistColumn ? '#D0F0C0' : (column.isHoistColumn ? '#F5F5DC' : undefined))
                     }}
@@ -3065,7 +2830,7 @@ export default function KeywordsHubTable({
                       column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
                     } ${
                       column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
-                    }`}
+                    } ${getColumnShrinkageClass(column.key)}`}
                     onClick={(column.key === 'serp_tool' || column.key === 'joist_metro_pop_placeholder' || column.key === 'hoist_metro_pop_placeholder') ? undefined : () => handleSort(column.key)}
                   >
                     <div className="flex items-center space-x-1">
@@ -3112,7 +2877,7 @@ export default function KeywordsHubTable({
                         column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
                       } ${
                         column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
-                      }`}
+                      } ${getColumnShrinkageClass(column.key)}`}
                     >
                       {renderCell(item, column, index)}
                     </td>

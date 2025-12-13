@@ -114,6 +114,13 @@ export default function KwjarClient() {
   const [mainPaginationControls, setMainPaginationControls] = useState<{
     PaginationControls: () => JSX.Element;
     SearchField: () => JSX.Element;
+    itemsPerPage: number;
+    setItemsPerPage: (value: number) => void;
+    currentPage: number;
+    setCurrentPage: (value: number) => void;
+    totalPages: number;
+    totalItems: number;
+    paginatedDataLength: number;
   } | null>(null);
   
   // Table actions state for mesozoic chamber
@@ -1141,17 +1148,6 @@ export default function KwjarClient() {
             <h1 className="text-2xl font-bold text-gray-800">🔍 Keywords Hub</h1>
             <ZhedoriButtonBar />
             
-            {/* Column Pagination Button Bars */}
-            {columnPaginationControls && (
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center">
-                  {columnPaginationControls.ColumnPaginationBar1()}
-                </div>
-                <div className="flex items-center">
-                  {columnPaginationControls.ColumnPaginationBar2()}
-                </div>
-              </div>
-            )}
             
             {/* Joist Columns Toggle */}
             <div className="flex flex-col gap-2 border border-gray-300 rounded px-3 py-2 bg-gray-50">
@@ -1250,14 +1246,9 @@ export default function KwjarClient() {
             sinus_chamber
           </div>
           
-          {/* Main pagination and search controls with industry controls */}
-          {mainPaginationControls && (
-            <div className="flex flex-wrap items-center gap-4">
-              {mainPaginationControls.PaginationControls()}
-              {mainPaginationControls.SearchField()}
-              
-              {/* Industry Selection Controls - Wrapped in bordered div */}
-              <div className="flex flex-wrap items-center gap-3 border border-black p-2 rounded-md">
+          {/* Industry Selection Controls - Wrapped in bordered div */}
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-3 border border-black p-2 rounded-md">
                 <button
                   onClick={() => setIsIndustryPopupOpen(true)}
                   className="px-3 py-1.5 bg-purple-600 text-white rounded text-xs font-medium hover:bg-purple-700 transition-colors"
@@ -1888,20 +1879,379 @@ export default function KwjarClient() {
             mesozoic_chamber
           </div>
           
-          {/* Table Actions */}
-          {tableActions && (
-            <div className="mt-2">
-              {tableActions.DataForSEOActions()}
-            </div>
-          )}
         </div>
       )}
       
       {/* Rocket Chamber */}
       {rocketChamberVisible && (
-        <div className="border border-black p-4" style={{ marginTop: '0px', marginLeft: '16px', marginRight: '16px', marginBottom: '0px' }}>
-          <div className="font-bold" style={{ fontSize: '16px', marginBottom: '12px' }}>
+        <div className="border border-black" style={{ 
+          marginTop: '0px', 
+          marginLeft: '16px', 
+          marginRight: '16px', 
+          marginBottom: '0px',
+          padding: 0,
+          margin: 0,
+          position: 'relative'
+        }}>
+          <div style={{ 
+            position: 'absolute', 
+            top: '4px', 
+            left: '4px', 
+            fontSize: '16px', 
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <svg 
+              width="22" 
+              height="22" 
+              viewBox="0 0 24 24" 
+              fill="black"
+            >
+              {/* Rocket body */}
+              <path d="M12 2 L8 10 L16 10 Z" fill="black"/>
+              {/* Rocket fins */}
+              <path d="M8 10 L6 12 L8 12 Z" fill="black"/>
+              <path d="M16 10 L18 12 L16 12 Z" fill="black"/>
+              {/* Exhaust flames */}
+              <path d="M10 14 L9 18 L10.5 16 L12 20 L13.5 16 L15 18 L14 14 Z" fill="black"/>
+              {/* Window */}
+              <circle cx="12" cy="6" r="1" fill="white"/>
+            </svg>
             rocket_chamber
+          </div>
+          <div style={{ marginTop: '24px', paddingTop: '4px', paddingBottom: 0, paddingLeft: '8px', paddingRight: '8px' }}>
+            <div className="flex items-end justify-between">
+              <div className="flex items-end space-x-8">
+                {/* Row pagination, search box, and column pagination table */}
+                <table style={{ borderCollapse: 'collapse' }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: 'bold' }}>row pagination</span>
+                          <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
+                            Showing <span style={{ fontWeight: 'bold' }}>{(mainPaginationControls?.paginatedDataLength || 0).toLocaleString()}</span> of <span style={{ fontWeight: 'bold' }}>{(mainPaginationControls?.totalItems || 0).toLocaleString()}</span> results
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                          search box 2
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                          wolf sticky columns exclusion band
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                          pillarshift column templates
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: 'bold' }}>column pagination</span>
+                          <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
+                            Showing <span style={{ fontWeight: 'bold' }}>6</span> non-sticky(non wolf band) columns of <span style={{ fontWeight: 'bold' }}>109</span> sourcedef columns
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: '1px solid black', padding: '4px' }}>
+                        <div className="flex items-end space-x-4">
+                          {/* Row Pagination Bar 1 - Rows per page selector */}
+                          <div className="flex items-center">
+                            <div className="flex items-center">
+                              <span className="text-xs text-gray-600 mr-2">Rows/page:</span>
+                              <div className="inline-flex rounded-md shadow-sm" role="group">
+                                {[10, 25, 50, 100, 200, 'All'].map((value) => (
+                                  <button
+                                    key={value}
+                                    type="button"
+                                    onClick={() => {
+                                      if (value === 'All' && mainPaginationControls) {
+                                        mainPaginationControls.setItemsPerPage(mainPaginationControls.totalItems || 2000);
+                                        mainPaginationControls.setCurrentPage(1);
+                                      } else if (mainPaginationControls && typeof value === 'number') {
+                                        mainPaginationControls.setItemsPerPage(value);
+                                        mainPaginationControls.setCurrentPage(1);
+                                      }
+                                    }}
+                                    className={`
+                                      px-2 py-2.5 text-sm font-medium border -mr-px cursor-pointer
+                                      ${value === 10 ? 'rounded-l' : ''}
+                                      ${value === 'All' ? 'rounded-r' : ''}
+                                      ${(value === 'All' && mainPaginationControls?.itemsPerPage === mainPaginationControls?.totalItems) || 
+                                        mainPaginationControls?.itemsPerPage === value
+                                        ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 focus:bg-blue-700 focus:text-white'
+                                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                      }
+                                      focus:z-10 focus:ring-2 focus:ring-blue-500
+                                    `}
+                                    style={{ 
+                                      fontSize: '14px', 
+                                      paddingTop: '10px', 
+                                      paddingBottom: '10px'
+                                    }}
+                                  >
+                                    {value}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Row Pagination Bar 2 - Page navigation */}
+                          <div className="flex items-center">
+                            <div className="flex items-center">
+                              <span className="text-xs text-gray-600 mr-2">Row page:</span>
+                              <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                {/* Previous button - Circular refresh wheel with infinite cycling */}
+                                <button
+                                  onClick={() => {
+                                    if (mainPaginationControls) {
+                                      const newPage = mainPaginationControls.currentPage === 1 
+                                        ? mainPaginationControls.totalPages 
+                                        : mainPaginationControls.currentPage - 1;
+                                      mainPaginationControls.setCurrentPage(newPage);
+                                    }
+                                  }}
+                                  className="relative inline-flex items-center rounded-l-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
+                                  style={{ 
+                                    fontSize: '14px', 
+                                    paddingTop: '10px', 
+                                    paddingBottom: '10px'
+                                  }}
+                                >
+                                  <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                    <path d="M1 4v6h6" />
+                                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                                  </svg>
+                                </button>
+                                
+                                {/* Page numbers - dynamically showing current pages */}
+                                {(() => {
+                                  const currentPage = mainPaginationControls?.currentPage || 1;
+                                  const totalPages = mainPaginationControls?.totalPages || 1;
+                                  
+                                  const getPageNumbers = () => {
+                                    const pages = [];
+                                    const startPage = Math.max(1, currentPage - 2);
+                                    const endPage = Math.min(totalPages, startPage + 4);
+                                    
+                                    for (let i = startPage; i <= endPage; i++) {
+                                      pages.push(i);
+                                    }
+                                    
+                                    return pages;
+                                  };
+                                  
+                                  return getPageNumbers().map((pageNum) => (
+                                    <button
+                                      key={pageNum}
+                                      onClick={() => {
+                                        if (mainPaginationControls) {
+                                          mainPaginationControls.setCurrentPage(pageNum);
+                                        }
+                                      }}
+                                      className={`
+                                        relative inline-flex items-center px-2 py-2.5 text-sm font-semibold
+                                        ${pageNum === currentPage
+                                          ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+                                          : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                                        }
+                                      `}
+                                      style={{ 
+                                        fontSize: '14px', 
+                                        paddingTop: '10px', 
+                                        paddingBottom: '10px'
+                                      }}
+                                    >
+                                      {pageNum}
+                                    </button>
+                                  ));
+                                })()}
+                                
+                                {/* Next button - Circular refresh wheel with infinite cycling */}
+                                <button
+                                  onClick={() => {
+                                    if (mainPaginationControls) {
+                                      const newPage = mainPaginationControls.currentPage === mainPaginationControls.totalPages 
+                                        ? 1 
+                                        : mainPaginationControls.currentPage + 1;
+                                      mainPaginationControls.setCurrentPage(newPage);
+                                    }
+                                  }}
+                                  className="relative inline-flex items-center rounded-r-md px-2 py-2.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
+                                  style={{ 
+                                    fontSize: '14px', 
+                                    paddingTop: '10px', 
+                                    paddingBottom: '10px'
+                                  }}
+                                >
+                                  <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                    <path d="M23 4v6h-6" />
+                                    <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                                  </svg>
+                                </button>
+                              </nav>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px' }}>
+                        <div className="flex items-end">
+                          <input
+                            type="text"
+                            placeholder="search keyword_datum"
+                            className="px-3 py-2 border border-gray-300 rounded-md text-sm w-48"
+                            style={{ marginBottom: '3px' }}
+                          />
+                          <button
+                            className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-2 py-2 rounded-md text-sm transition-colors w-10 h-10 flex items-center justify-center ml-1"
+                          >
+                            CL
+                          </button>
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px' }}>
+                        <button
+                          onClick={() => {}}
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors"
+                        >
+                          wolf options
+                        </button>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px' }}>
+                        <button
+                          onClick={() => {}}
+                          className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors"
+                        >
+                          use the pillarshift coltemp system
+                        </button>
+                      </td>
+                      <td style={{ border: '1px solid black', padding: '4px' }}>
+                        <div className="flex items-end space-x-4">
+                          {/* Column Pagination Bar 1 - Columns per page selector */}
+                          <div className="flex items-center">
+                            <div className="flex items-center">
+                              <span className="text-xs text-gray-600 mr-2">Cols/page:</span>
+                              {[6, 8, 10, 12, 15, 'ALL'].map((value) => (
+                                <button
+                                  key={value}
+                                  onClick={() => {
+                                    if (value === 'ALL') {
+                                      // TODO: Connect to actual columns length
+                                      console.log('Set to ALL columns');
+                                    } else {
+                                      // TODO: Connect to actual columnsPerPage setter
+                                      console.log('Set columns per page to:', value);
+                                    }
+                                  }}
+                                  className={`px-2 py-2.5 text-sm border ${value === 6 ? 'rounded-l' : ''} ${value === 'ALL' ? 'rounded-r' : ''} -mr-px cursor-pointer ${
+                                    value === 6 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+                                  }`}
+                                  style={{ 
+                                    fontSize: '14px', 
+                                    paddingTop: '10px', 
+                                    paddingBottom: '10px',
+                                    backgroundColor: value === 6 ? '#f8f782' : undefined
+                                  }}
+                                >
+                                  {value}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          {/* Column Pagination Bar 2 - Current column page selector */}
+                          <div className="flex items-center">
+                            <div className="flex items-center">
+                              <span className="text-xs text-gray-600 mr-2">Col page:</span>
+                              <button
+                                onClick={() => {
+                                  // TODO: Connect to actual first page setter
+                                  console.log('Go to first column page');
+                                }}
+                                className="px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                              >
+                                ≪
+                              </button>
+                              <button
+                                onClick={() => {
+                                  // TODO: Connect to actual previous page with infinite cycling
+                                  console.log('Previous column page with infinite cycling');
+                                }}
+                                className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                              >
+                                <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <path d="M1 4v6h6" />
+                                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                                </svg>
+                              </button>
+                              
+                              {/* Column page numbers - showing sample pagination */}
+                              {[1, 2, 3, 4, 5].map((pageNum) => (
+                                <button
+                                  key={pageNum}
+                                  onClick={() => {
+                                    // TODO: Connect to actual column page setter
+                                    console.log('Go to column page:', pageNum);
+                                  }}
+                                  className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+                                    pageNum === 1 // Default current page
+                                      ? 'text-black border-black' 
+                                      : 'bg-white hover:bg-gray-200'
+                                  }`}
+                                  style={{ 
+                                    fontSize: '14px', 
+                                    paddingTop: '10px', 
+                                    paddingBottom: '10px',
+                                    backgroundColor: pageNum === 1 ? '#f8f782' : undefined
+                                  }}
+                                >
+                                  {pageNum}
+                                </button>
+                              ))}
+                              
+                              <button
+                                onClick={() => {
+                                  // TODO: Connect to actual next page with infinite cycling
+                                  console.log('Next column page with infinite cycling');
+                                }}
+                                className="px-2 py-2.5 text-sm border -mr-px cursor-pointer bg-white hover:bg-gray-200"
+                                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                              >
+                                <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <path d="M23 4v6h-6" />
+                                  <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => {
+                                  // TODO: Connect to actual last page setter
+                                  console.log('Go to last column page');
+                                }}
+                                className="px-2 py-2.5 text-sm border rounded-r cursor-pointer bg-white hover:bg-gray-200"
+                                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                              >
+                                ≫
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       )}
