@@ -58,9 +58,15 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
   const [leadsmartMorphMosierChamberVisible, setLeadsmartMorphMosierChamberVisible] = useState(true);
   const [leadsmartMorphRocketChamberVisible, setLeadsmartMorphRocketChamberVisible] = useState(true);
 
+  // Chamber visibility states for /trench_cluster_jar (default to true/visible)
+  const [trenchClusterJarMandibleChamberVisible, setTrenchClusterJarMandibleChamberVisible] = useState(true);
+  const [trenchClusterJarSinusChamberVisible, setTrenchClusterJarSinusChamberVisible] = useState(true);
+  const [trenchClusterJarCardioChamberVisible, setTrenchClusterJarCardioChamberVisible] = useState(true);
+  const [trenchClusterJarPecChamberVisible, setTrenchClusterJarPecChamberVisible] = useState(true);
+
   useEffect(() => {
     // Check if current page has bezel configuration
-    const pagesWithConfig = ['/sitejar4', '/bin34/tebnar2', '/serpjar', '/kwjar', '/cnjar1', '/leadsmart_morph'];
+    const pagesWithConfig = ['/sitejar4', '/bin34/tebnar2', '/serpjar', '/kwjar', '/cnjar1', '/leadsmart_morph', '/trench_cluster_jar'];
     setHasConfig(pagesWithConfig.includes(pathname));
   }, [pathname]);
 
@@ -709,6 +715,81 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
     
     window.dispatchEvent(new CustomEvent('leadsmartMorph-chamber-toggle', { 
       detail: { chamber: 'rocket_chamber', visible: checked } 
+    }));
+  };
+
+  // Initialize trench cluster jar chambers from localStorage
+  useEffect(() => {
+    if (pathname === '/trench_cluster_jar') {
+      const savedMandible = localStorage.getItem('trenchClusterJar_mandibleChamberVisible');
+      const savedSinus = localStorage.getItem('trenchClusterJar_sinusChamberVisible');
+      const savedCardio = localStorage.getItem('trenchClusterJar_cardioChamberVisible');
+      const savedPec = localStorage.getItem('trenchClusterJar_pecChamberVisible');
+      
+      if (savedMandible !== null) {
+        setTrenchClusterJarMandibleChamberVisible(JSON.parse(savedMandible));
+      } else {
+        setTrenchClusterJarMandibleChamberVisible(true);
+        localStorage.setItem('trenchClusterJar_mandibleChamberVisible', JSON.stringify(true));
+      }
+      
+      if (savedSinus !== null) {
+        setTrenchClusterJarSinusChamberVisible(JSON.parse(savedSinus));
+      } else {
+        setTrenchClusterJarSinusChamberVisible(true);
+        localStorage.setItem('trenchClusterJar_sinusChamberVisible', JSON.stringify(true));
+      }
+      
+      if (savedCardio !== null) {
+        setTrenchClusterJarCardioChamberVisible(JSON.parse(savedCardio));
+      } else {
+        setTrenchClusterJarCardioChamberVisible(true);
+        localStorage.setItem('trenchClusterJar_cardioChamberVisible', JSON.stringify(true));
+      }
+      
+      if (savedPec !== null) {
+        setTrenchClusterJarPecChamberVisible(JSON.parse(savedPec));
+      } else {
+        setTrenchClusterJarPecChamberVisible(true);
+        localStorage.setItem('trenchClusterJar_pecChamberVisible', JSON.stringify(true));
+      }
+    }
+  }, [pathname]);
+
+  // Handle trench cluster jar chamber toggles
+  const handleTrenchClusterJarMandibleChamberToggle = (checked: boolean) => {
+    setTrenchClusterJarMandibleChamberVisible(checked);
+    localStorage.setItem('trenchClusterJar_mandibleChamberVisible', JSON.stringify(checked));
+    
+    window.dispatchEvent(new CustomEvent('trenchClusterJarMandibleChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  const handleTrenchClusterJarSinusChamberToggle = (checked: boolean) => {
+    setTrenchClusterJarSinusChamberVisible(checked);
+    localStorage.setItem('trenchClusterJar_sinusChamberVisible', JSON.stringify(checked));
+    
+    window.dispatchEvent(new CustomEvent('trenchClusterJarSinusChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  const handleTrenchClusterJarCardioChamberToggle = (checked: boolean) => {
+    setTrenchClusterJarCardioChamberVisible(checked);
+    localStorage.setItem('trenchClusterJar_cardioChamberVisible', JSON.stringify(checked));
+    
+    window.dispatchEvent(new CustomEvent('trenchClusterJarCardioChamberVisibilityChange', { 
+      detail: { visible: checked } 
+    }));
+  };
+
+  const handleTrenchClusterJarPecChamberToggle = (checked: boolean) => {
+    setTrenchClusterJarPecChamberVisible(checked);
+    localStorage.setItem('trenchClusterJar_pecChamberVisible', JSON.stringify(checked));
+    
+    window.dispatchEvent(new CustomEvent('trenchClusterJarPecChamberVisibilityChange', { 
+      detail: { visible: checked } 
     }));
   };
 
@@ -1456,6 +1537,113 @@ export default function BezelPopup({ isOpen, onClose }: BezelPopupProps) {
                     <div className="mt-3 text-sm text-gray-600">
                       <p>Toggle visibility of the rocket chamber on the Leadsmart Morph page.</p>
                       <p>Current state: <strong>{leadsmartMorphRocketChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Trench Cluster Jar Page Configuration */}
+              {pathname === '/trench_cluster_jar' && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Trench Cluster Jar Page Configuration</h3>
+                  
+                  {/* Mandible Chamber Toggle */}
+                  <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={trenchClusterJarMandibleChamberVisible}
+                          onChange={(e) => handleTrenchClusterJarMandibleChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        mandible_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the mandible chamber on the Trench Cluster Jar page.</p>
+                      <p>Current state: <strong>{trenchClusterJarMandibleChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+                  </div>
+                  
+                  {/* Sinus Chamber Toggle */}
+                  <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={trenchClusterJarSinusChamberVisible}
+                          onChange={(e) => handleTrenchClusterJarSinusChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        sinus_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the sinus chamber on the Trench Cluster Jar page.</p>
+                      <p>Current state: <strong>{trenchClusterJarSinusChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+                  </div>
+                  
+                  {/* Cardio Chamber Toggle */}
+                  <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={trenchClusterJarCardioChamberVisible}
+                          onChange={(e) => handleTrenchClusterJarCardioChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        cardio_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the cardio chamber on the Trench Cluster Jar page.</p>
+                      <p>Current state: <strong>{trenchClusterJarCardioChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
+                      <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
+                    </div>
+                  </div>
+                  
+                  {/* Pec Chamber Toggle */}
+                  <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={trenchClusterJarPecChamberVisible}
+                          onChange={(e) => handleTrenchClusterJarPecChamberToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                      
+                      <div className="font-bold text-black" style={{ fontSize: '16px' }}>
+                        pec_chamber
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-sm text-gray-600">
+                      <p>Toggle visibility of the pec chamber on the Trench Cluster Jar page.</p>
+                      <p>Current state: <strong>{trenchClusterJarPecChamberVisible ? 'Visible' : 'Hidden'}</strong></p>
                       <p className="text-xs text-gray-500 mt-1">Settings are automatically saved and synchronized across the page</p>
                     </div>
                   </div>

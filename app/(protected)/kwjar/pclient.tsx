@@ -5,6 +5,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
+import ClavedoriButtonBar from '@/app/components/ClavedoriButtonBar';
 import KeywordsHubTable from './components/KeywordsHubTable';
 import TagsPlenchPopup from './components/TagsPlenchPopup';
 import IndustrySelectorPopup from './components/IndustrySelectorPopup';
@@ -1146,6 +1147,7 @@ export default function KwjarClient() {
           {/* Moved header content */}
           <div className="flex flex-wrap items-center gap-4">
             <h1 className="text-2xl font-bold text-gray-800">🔍 Keywords Hub</h1>
+            <ClavedoriButtonBar />
             <ZhedoriButtonBar />
             
             
